@@ -19,12 +19,12 @@
 	"icon": "assets/enchants-cit/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"fr.estecka.enchantscit.EnchantsCIT"
+		"client": [
+			"fr.estecka.enchantscit.EnchantsCit"
 		]
 	},
 	"mixins": [
-		"enchants-cit.mixins.json"
+		{ "environment": "client", "config": "enchants-cit.mixins.json" }
 	],
 	"depends": {
 		"minecraft": "~1.21",

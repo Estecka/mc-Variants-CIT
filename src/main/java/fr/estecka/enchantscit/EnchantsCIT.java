@@ -24,17 +24,19 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public final Identifier CIT_MIXED   = Identifier.of(MODID, "item/mixed_enchanted_book");
-	static public final Identifier CIT_DEFAULT = Identifier.ofVanilla("item/filled_painting");
-	static public final String MODEL_PREFIX = "item/enchanted_book/";
+	static public final Identifier CIT_DEFAULT = Identifier.ofVanilla("enchanted_book");
+	static public final String MODEL_PREFIX = "item/enchanted_book";
 
 	static public final ModelIdentifier MODEL_DEFAULT = ModelIdentifier.ofInventoryVariant(CIT_DEFAULT);
 	static public final ModelIdentifier MODEL_MIXED   = ModelIdentifier.ofInventoryVariant(CIT_MIXED);
 
+	/**
+	 * Maps Enchantment identifier to the corresponding Model Id
+	 */
+	static private @NotNull Map<Identifier, Identifier> REGISTERED_MODEL_IDS = new HashMap<>();
 
-	static private @NotNull Map<Identifier, ModelIdentifier> REGISTERED_MODEL_IDS = new HashMap<>();
-
-	static public ModelIdentifier OfVariant(Identifier variantId){
-		return REGISTERED_MODEL_IDS.getOrDefault(variantId, MODEL_DEFAULT);
+	static public Identifier OfVariant(Identifier variantId){
+		return REGISTERED_MODEL_IDS.getOrDefault(variantId, CIT_DEFAULT);
 	}
 
 
@@ -44,14 +46,16 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	}
 
 	@Override
-	public void onInitializeModelLoader(Set<Identifier> modelIds, ModelLoadingPlugin.Context pluginContext){
+	public void onInitializeModelLoader(Set<Identifier> variantIds, ModelLoadingPlugin.Context pluginContext){
 		pluginContext.addModels(CIT_MIXED);
 		
-		LOGGER.info("Found {} enchanted-book CITs", modelIds.size());
-		pluginContext.addModels(modelIds);
+		LOGGER.info("Found {} enchanted-book CITs", variantIds.size());
 		REGISTERED_MODEL_IDS = new HashMap<>();
-		for (Identifier id : modelIds)
-			REGISTERED_MODEL_IDS.put(id, ModelIdentifier.ofInventoryVariant(id));
+		for (Identifier id : variantIds){
+			Identifier model = id.withPrefixedPath(MODEL_PREFIX+"/");
+			REGISTERED_MODEL_IDS.put(id, model);
+			pluginContext.addModels(model);
+		}
 	}
 
 	@Override
@@ -60,14 +64,16 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	}
 
 	static private Set<Identifier> FindCITs(ResourceManager manager){
-		Set<Identifier> modelIds = new HashSet<>();
+		Set<Identifier> variantIds = new HashSet<>();
 
-		for (Identifier id : manager.findResources("models/"+MODEL_PREFIX, id -> id.getPath().endsWith(".json")).keySet()) {
+		String folder = "models/" + MODEL_PREFIX;
+
+		for (Identifier id : manager.findResources(folder, id -> id.getPath().endsWith(".json")).keySet()) {
 			String path = id.getPath();
-			path = path.substring("models/".length(), path.length()-".png".length());
-			modelIds.add(Identifier.of(id.getNamespace(), path));
+			path = path.substring(folder.length()+1, path.length()-".json".length());
+			variantIds.add(Identifier.of(id.getNamespace(), path));
 		}
 
-		return modelIds;
+		return variantIds;
 	}
 }
