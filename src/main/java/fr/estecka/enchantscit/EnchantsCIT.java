@@ -4,7 +4,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
@@ -23,12 +22,9 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	static public final String MODID = "enchants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	static public final Identifier CIT_MIXED    = Identifier.of(MODID, "item/mixed_enchanted_book");
-	static public final Identifier CIT_FALLBACK = Identifier.ofVanilla("item/enchanted_book");
+	static public final Identifier CIT_MIXED = Identifier.of(MODID, "item/mixed_enchanted_book");
 	static public final String MODEL_PREFIX = "item/enchanted_book";
-
-	static public final ModelIdentifier MODEL_FALLBACK = ModelIdentifier.ofInventoryVariant(CIT_FALLBACK);
-	static public final ModelIdentifier MODEL_MIXED   = ModelIdentifier.ofInventoryVariant(CIT_MIXED);
+	
 
 	/**
 	 * Maps Enchantment identifier to the corresponding Model Id
@@ -36,7 +32,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	static private @NotNull Map<Identifier, Identifier> REGISTERED_MODEL_IDS = new HashMap<>();
 
 	static public Identifier OfVariant(Identifier variantId){
-		return REGISTERED_MODEL_IDS.getOrDefault(variantId, CIT_FALLBACK);
+		return REGISTERED_MODEL_IDS.get(variantId);
 	}
 
 

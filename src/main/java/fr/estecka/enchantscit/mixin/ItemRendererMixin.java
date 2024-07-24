@@ -3,6 +3,7 @@ package fr.estecka.enchantscit.mixin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -30,15 +31,19 @@ public class ItemRendererMixin
 	{
 		final BakedModelManager modelManager = models.getModelManager();
 		ItemEnchantmentsComponent enchants;
+		BakedModel model;
+
 
 		if (!stack.isOf(Items.ENCHANTED_BOOK) || null == (enchants=stack.get(DataComponentTypes.STORED_ENCHANTMENTS)) || enchants.isEmpty())
 			return original.call(instance, stack);
-		else if (enchants.getSize() > 1)
-			return modelManager.getModel(EnchantsCit.MODEL_MIXED);
+		else if (enchants.getSize() > 1){
+			model = modelManager.getModel(EnchantsCit.CIT_MIXED);
+			return (model != null) ? model : modelManager.getMissingModel();
+		}
 		else {
 			Identifier enchantId = enchants.getEnchantments().iterator().next().getKey().get().getValue();
-			BakedModel model = modelManager.getModel(EnchantsCit.OfVariant(enchantId));
-			return (model != null) ? model : modelManager.getModel(EnchantsCit.MODEL_FALLBACK);
+			model = modelManager.getModel(EnchantsCit.OfVariant(enchantId));
+			return (model != null) ? model : original.call(instance, stack);
 		}
 	}
 
