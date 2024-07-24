@@ -27,7 +27,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	
 
 	/**
-	 * Maps Enchantment identifier to the corresponding Model Id
+	 * Maps Enchantment id to the corresponding Model Id
 	 */
 	static private @NotNull Map<Identifier, Identifier> REGISTERED_MODEL_IDS = new HashMap<>();
 
@@ -42,12 +42,12 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	}
 
 	@Override
-	public void onInitializeModelLoader(Set<Identifier> variantIds, ModelLoadingPlugin.Context pluginContext){
+	public void onInitializeModelLoader(Set<Identifier> enchantIds, ModelLoadingPlugin.Context pluginContext){
 		pluginContext.addModels(CIT_MIXED);
 		
-		LOGGER.info("Found {} enchanted-book CITs", variantIds.size());
+		LOGGER.info("Found {} enchanted-book CITs", enchantIds.size());
 		REGISTERED_MODEL_IDS = new HashMap<>();
-		for (Identifier id : variantIds){
+		for (Identifier id : enchantIds){
 			Identifier model = id.withPrefixedPath(MODEL_PREFIX+"/");
 			REGISTERED_MODEL_IDS.put(id, model);
 			pluginContext.addModels(model);
