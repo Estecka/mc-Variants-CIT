@@ -3,15 +3,19 @@
 	"id": "enchants-cit",
 	"version": "${version}",
 	"name": "Enchants CIT",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Specialized CIT logic for enchanted book",
 	"authors": [
-		"Me!"
+		"Estecka",
+		"Mythithorium",
+		"Yomna"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/enchants-cit",
+		"sources": "https://github.com/Estecka/mc-Enchants-CIT",
+		"Even Better Enchants": "https://modrinth.com/resourcepack/even-better-enchants",
+		"Better Enchant Book": "https://www.planetminecraft.com/texture-pack/yomny-pack-better-enchanted-book/"
 	},
-	"license": "CC0-1.0",
+	"license": "Apache-2.0",
 	"icon": "assets/enchants-cit/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -23,12 +27,9 @@
 		"enchants-cit.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.15.11",
 		"minecraft": "~1.21",
-		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabricloader": ">=0.15.11",
+		"fabric-api": "*",
+		"java": ">=21"
 	}
 }

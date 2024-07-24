@@ -4,7 +4,9 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on:
+  - workflow_call
+  - workflow_dispatch
 
 jobs:
   build:
@@ -12,7 +14,7 @@ jobs:
       matrix:
         # Use these Java versions
         java: [
-          21,    # Current Java LTS
+          21,    # Current Java LTS & minimum supported by Minecraft
         ]
     runs-on: ubuntu-22.04
     steps:
