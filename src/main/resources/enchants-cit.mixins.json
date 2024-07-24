@@ -3,7 +3,7 @@
 	"package": "fr.estecka.enchantscit.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"ItemRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
