@@ -1,6 +1,6 @@
 {
 	"parent": "minecraft:item/generated",
 	"textures": {
-		"layer0": "enchants-cit:item/big_enchanted_book"
+		"layer0": "minecraft:item/enchanted_book/${NAME}"
 	}
 }
