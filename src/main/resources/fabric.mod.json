@@ -17,7 +17,7 @@
 	},
 	"license": "Apache-2.0",
 	"icon": "assets/enchants-cit/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"client": [
 			"fr.estecka.enchantscit.EnchantsCit"
