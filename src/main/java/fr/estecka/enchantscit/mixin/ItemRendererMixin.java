@@ -32,11 +32,10 @@ public class ItemRendererMixin
 		ItemEnchantmentsComponent enchants;
 		BakedModel model;
 
-
 		if (!stack.isOf(Items.ENCHANTED_BOOK) || null == (enchants=stack.get(DataComponentTypes.STORED_ENCHANTMENTS)) || enchants.isEmpty())
 			return original.call(instance, stack);
 		else if (enchants.getSize() > 1){
-			model = modelManager.getModel(EnchantsCit.CIT_MIXED);
+			model = modelManager.getModel(EnchantsCit.CIT_MULTI);
 			return (model != null) ? model : modelManager.getMissingModel();
 		}
 		else {

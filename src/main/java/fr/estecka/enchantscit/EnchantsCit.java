@@ -22,7 +22,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	static public final String MODID = "enchants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	static public final Identifier CIT_MIXED = Identifier.of(MODID, "item/mixed_enchanted_book");
+	static public final Identifier CIT_MULTI = Identifier.of(MODID, "item/multi_enchanted_book");
 	static public final String MODEL_PREFIX = "item/enchanted_book";
 	
 
@@ -43,7 +43,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 
 	@Override
 	public void onInitializeModelLoader(Set<Identifier> enchantIds, ModelLoadingPlugin.Context pluginContext){
-		pluginContext.addModels(CIT_MIXED);
+		pluginContext.addModels(CIT_MULTI);
 		
 		LOGGER.info("Found {} enchanted-book CITs", enchantIds.size());
 		REGISTERED_MODEL_IDS = new HashMap<>();
