@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "enchants-cit",
+	"version": "${version}",
+	"name": "Enchants CIT",
+	"description": "Specialized CIT logic for enchanted book",
+	"authors": [
+		"Estecka",
+		"Mythithorium",
+		"Yomna"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/enchants-cit",
+		"sources": "https://github.com/Estecka/mc-Enchants-CIT",
+		"Even Better Enchants": "https://modrinth.com/resourcepack/even-better-enchants",
+		"Better Enchant Book": "https://www.planetminecraft.com/texture-pack/yomny-pack-better-enchanted-book/"
+	},
+	"license": "Apache-2.0",
+	"icon": "assets/enchants-cit/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"fr.estecka.enchantscit.EnchantsCit"
+		]
+	},
+	"mixins": [
+		{ "environment": "client", "config": "enchants-cit.mixins.json" }
+	],
+	"depends": {
+		"minecraft": "~1.21",
+		"fabricloader": ">=0.15.11",
+		"fabric-api": "*",
+		"java": ">=21"
+	}
+}

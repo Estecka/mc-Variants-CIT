@@ -1,0 +1,26 @@
+name: release
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+  release:
+    needs: [ build ]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Artifacts
+          path: ./
+      - name: Draft release
+        uses: ncipollo/release-action@v1.13.0
+        with:
+          artifacts: ./*.jar
+          artifactErrorsFailBuild: true
+          draft: true
