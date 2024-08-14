@@ -36,8 +36,9 @@ public class ItemRendererMixin
 		}
 		else {
 			Identifier enchantId = enchants.getEnchantments().iterator().next().getKey().get().getValue();
+			// Can return a missing model with ModernFix, or null otherwise.
 			model = modelManager.getModel(EnchantsCit.OfVariant(enchantId));
-			return (model != null) ? model : original.call(models, stack);
+			return (model!=null && model!=modelManager.getMissingModel()) ? model : original.call(models, stack);
 		}
 	}
 
