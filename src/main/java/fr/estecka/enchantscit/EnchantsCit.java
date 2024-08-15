@@ -4,6 +4,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.item.Items;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
@@ -39,6 +41,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Set<Identifier>>, 
 	@Override
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(this, this);
+		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new LevelPredicate());
 	}
 
 	@Override
