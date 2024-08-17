@@ -7,4 +7,4 @@
 - Fixed an incompatibility with ModernFix
 
 ## 1.1
-- Added the `level` model predicate.
+- Added the `level` model predicate for enchanted books.

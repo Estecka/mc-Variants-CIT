@@ -1,7 +1,6 @@
 package fr.estecka.enchantscit;
 
 import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.item.ClampedModelPredicateProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
