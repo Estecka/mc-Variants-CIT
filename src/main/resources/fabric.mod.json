@@ -12,8 +12,8 @@
 	"contact": {
 		"homepage": "https://modrinth.com/mod/enchants-cit",
 		"sources": "https://github.com/Estecka/mc-Enchants-CIT",
-		"Even Better Enchants": "https://modrinth.com/resourcepack/even-better-enchants",
-		"Better Enchant Book": "https://www.planetminecraft.com/texture-pack/yomny-pack-better-enchanted-book/"
+		"Even Better Enchants":  "https://modrinth.com/resourcepack/even-better-enchants",
+		"Better Enchanted Book": "https://modrinth.com/resourcepack/better-enchanted-book"
 	},
 	"license": "Apache-2.0",
 	"icon": "assets/enchants-cit/icon.png",
