@@ -1,4 +1,4 @@
-package fr.estecka.enchantscit;
+package fr.estecka.variantscit.modules.enchanted_book;
 
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.item.ClampedModelPredicateProvider;

@@ -2,8 +2,6 @@ package fr.estecka.variantscit.api;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableSet;
@@ -37,7 +35,7 @@ public abstract class ACitModule
 	private @NotNull Map<Identifier, Identifier> existingModels = new HashMap<>();
 
 
-	public ACitModule(String modelsPath, Set<Item> validItems){
+	public ACitModule(String modelsPath, Item... validItems){
 		this.modelsPath = modelsPath;
 		this.validItems = ImmutableSet.copyOf(validItems);
 	}
@@ -69,7 +67,6 @@ public abstract class ACitModule
 	 * 
 	 * @return The model id, or null if the vanilla model should be used.
 	 */
-	@MustBeInvokedByOverriders
 	public @Nullable Identifier GetModelForItem(ItemStack stack){
 		Identifier modelId = this.existingModels.get(GetItemVariant(stack));
 		return (modelId != null) ? modelId : this.GetFallbackModel();
