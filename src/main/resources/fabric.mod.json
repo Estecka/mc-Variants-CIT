@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "enchants-cit",
+	"id": "variants-cit",
 	"version": "${version}",
-	"name": "Enchants CIT",
-	"description": "Specialized CIT logic for enchanted book",
+	"name": "Variants CIT",
+	"description": "Specialized CIT logic for variant-based items",
 	"authors": [
 		"Estecka",
 		"Mythithorium",
@@ -20,11 +20,15 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"fr.estecka.enchantscit.EnchantsCit"
+			"fr.estecka.variantscit.VariantsCitMod",
+			"fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule"
+		],
+		"variants-cit": [
+			"fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule"
 		]
 	},
 	"mixins": [
-		{ "environment": "client", "config": "enchants-cit.mixins.json" }
+		{ "environment": "client", "config": "variants-cit.mixins.json" }
 	],
 	"depends": {
 		"minecraft": "~1.21",
