@@ -2,8 +2,6 @@ package fr.estecka.variantscit.api;
 
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -38,22 +36,22 @@ public interface IVariantsCitModule
 	 * These models are not managed by the mod, and should be registered through
 	 * Fabric API's {@link ModelLoadingPlugin}.
 	 */
-	public default @Nullable BakedModel GetFallbackModel(BakedModelManager manager){
+	public default @Nullable Identifier GetFallbackModel(){
 		return null;
 	}
 
 	/**
-	 * Should be use for when an item can use models that are not tied to a
+	 * Should be  used for when an item must use a  models that is not tied to a
 	 * specific variants. E.g: a unique model for enchanted books with more than
 	 * one enchantement.
 	 * 
 	 * These models are not managed by the mod, and should be registered through
 	 * Fabric API's {@link ModelLoadingPlugin}.
 	 * 
-	 * @return The  model  to  use, or  null  if the  item  has  no  exceptional
-	 * conditions
+	 * @return The  model id  to use, or null  if the  item  has no  exceptional
+	 * conditions.
 	 */
-	public default @Nullable BakedModel GetExceptionalModel(ItemStack stack, BakedModelManager manager){
+	public default @Nullable Identifier GetExceptionalModel(ItemStack stack){
 		return null;
 	}
 }
