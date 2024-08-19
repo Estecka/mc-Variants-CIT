@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fr.estecka.variantscit.api.IVariantsCitModule;
+import fr.estecka.variantscit.api.ACitModule;
 
 
 public class VariantsCitMod
@@ -20,33 +20,34 @@ implements ClientModInitializer
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	static private final Map<Item, ModelRegistry> MODULES = new HashMap<>();
+	static private final Map<Item, ACitModule> MODULES = new HashMap<>();
 
 	@Override
 	public void onInitializeClient(){
 		RegisterModules();
 
-		for (ModelRegistry mod : MODULES.values())
-			PreparableModelLoadingPlugin.register(mod, mod);
+		for (ACitModule mod : MODULES.values()){
+			CitLoader loader = mod.GetModelLoader();
+			PreparableModelLoadingPlugin.register(loader, loader);
+		}
 	}
 
 	static private void RegisterModules(){
-		List<IVariantsCitModule> declaredModules = FabricLoader.getInstance().getEntrypoints(MODID, IVariantsCitModule.class);
+		List<ACitModule> declaredModules = FabricLoader.getInstance().getEntrypoints(MODID, ACitModule.class);
 		Set<String> foundPathes = new HashSet<>();
 
-		for (IVariantsCitModule mod : declaredModules)
+		for (ACitModule module : declaredModules)
 		{
-			if (foundPathes.contains(mod.GetModelPath()))
-				LOGGER.warn("Multiple CIT modules are registered for the same path at `models/{}`", mod.GetModelPath());
+			if (foundPathes.contains(module.modelsPath))
+				LOGGER.warn("Multiple CIT modules are registered for the same path at `models/{}`", module.modelsPath);
 			else
-				foundPathes.add(mod.GetModelPath());
+				foundPathes.add(module.modelsPath);
 
-			ModelRegistry registry = new ModelRegistry(mod);
-			for (Item itemType : mod.GetItemTypes())
+			for (Item itemType : module.validItems)
 			if  (MODULES.containsKey(itemType))
 				LOGGER.error("Attempted multiple CIT modules registration for item type {}. Only one module will be kept.");
 			else
-				MODULES.put(itemType, registry);
+				MODULES.put(itemType, module);
 		}
 	}
 }
