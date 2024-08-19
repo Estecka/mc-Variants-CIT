@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.estecka.variantscit.api.ACitModule;
@@ -21,6 +22,10 @@ implements ClientModInitializer
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static private final Map<Item, ACitModule> MODULES = new HashMap<>();
+
+	static public @Nullable ACitModule GetModule(Item itemType){
+		return MODULES.get(itemType);
+	}
 
 	@Override
 	public void onInitializeClient(){
