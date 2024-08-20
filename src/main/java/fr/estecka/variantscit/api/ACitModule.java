@@ -3,7 +3,6 @@ package fr.estecka.variantscit.api;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.item.ItemStack;
@@ -29,7 +28,7 @@ implements ModelLoadingPlugin
 	/**
 	 * Maps variant IDs to model IDs.
 	 */
-	private @NotNull Map<Identifier, Identifier> existingModels = new HashMap<>();
+	private Map<Identifier, Identifier> variantModels = new HashMap<>();
 
 
 	public ACitModule(ModuleDefinition definition){
@@ -53,16 +52,20 @@ implements ModelLoadingPlugin
 	 * @return The model id, or null if the vanilla model should be used.
 	 */
 	public @Nullable Identifier GetModelForItem(ItemStack stack){
-		Identifier modelId = this.existingModels.get(GetItemVariant(stack));
+		Identifier modelId = this.variantModels.get(GetItemVariant(stack));
 		return (modelId != null) ? modelId : this.fallbackModel;
 	}
 
 	@MustBeInvokedByOverriders
 	public void onInitializeModelLoader(ModelLoadingPlugin.Context pluginContext){
-		pluginContext.addModels(existingModels.values());
+		pluginContext.addModels(variantModels.values());
+	}
+
+	public final int GetModelCount(){
+		return this.variantModels.size();
 	}
 
 	public final CitLoader GetModelLoader(){
-		return new CitLoader(this.variantsDir, map->{this.existingModels = map;});
+		return new CitLoader(this.variantsDir, map->{this.variantModels = map;});
 	}
 }

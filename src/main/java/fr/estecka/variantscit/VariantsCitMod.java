@@ -52,8 +52,13 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 	@Override
 	public void onInitializeModelLoader(Map<Item,ACitModule> modules, ModelLoadingPlugin.Context pluginContext){
 		MODULES = modules;
-		for (ACitModule module : MODULES.values())
+		for (var entry : MODULES.entrySet()){
+			ACitModule module = entry.getValue();
+			Identifier itemId = Registries.ITEM.getId(entry.getKey());
+
 			module.onInitializeModelLoader(pluginContext);
+			LOGGER.info("Loaded {} CITs for item {}", module.GetModelCount(), itemId);
+		}
 	}
 
 	@Override
