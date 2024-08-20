@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlu
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -25,7 +26,9 @@ import fr.estecka.variantscit.api.ACitModule;
 import fr.estecka.variantscit.api.ModuleRegistry;
 import fr.estecka.variantscit.modules.axolotl_bucket.AxolotlBucketModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
-import fr.estecka.variantscit.modules.enchanted_book.LevelPredicate;
+import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookLevelPredicate;
+import fr.estecka.variantscit.modules.potion_effect.PotionEffectModule;
+import fr.estecka.variantscit.modules.potion_effect.PotionLevelPredicate;
 
 
 public class VariantsCitMod
@@ -45,8 +48,13 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 		PreparableModelLoadingPlugin.register(this, this);
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule::new);
+		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), PotionEffectModule::new);
 
-		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("level"), new LevelPredicate());
+		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
+		var potionPredicate = new PotionLevelPredicate();
+		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("level"), potionPredicate);
+		ModelPredicateProviderRegistry.register(Items.SPLASH_POTION, Identifier.ofVanilla("level"), potionPredicate);
+		ModelPredicateProviderRegistry.register(Items.LINGERING_POTION, Identifier.ofVanilla("level"), potionPredicate);
 	}
 
 	@Override
