@@ -29,6 +29,7 @@ import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookLevelPredicate;
 import fr.estecka.variantscit.modules.potion_effect.PotionEffectModule;
 import fr.estecka.variantscit.modules.potion_effect.PotionLevelPredicate;
+import fr.estecka.variantscit.modules.potion_effect.PotionTypeModule;
 
 
 public class VariantsCitMod
@@ -49,12 +50,13 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule::new);
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), PotionEffectModule::new);
+		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), PotionTypeModule::new);
 
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();
-		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("level"), potionPredicate);
-		ModelPredicateProviderRegistry.register(Items.SPLASH_POTION, Identifier.ofVanilla("level"), potionPredicate);
-		ModelPredicateProviderRegistry.register(Items.LINGERING_POTION, Identifier.ofVanilla("level"), potionPredicate);
+		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
+		ModelPredicateProviderRegistry.register(Items.SPLASH_POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
+		ModelPredicateProviderRegistry.register(Items.LINGERING_POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
 	}
 
 	@Override
