@@ -20,11 +20,7 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"fr.estecka.variantscit.VariantsCitMod",
-			"fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule"
-		],
-		"variants-cit": [
-			"fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule"
+			"fr.estecka.variantscit.VariantsCitMod"
 		]
 	},
 	"mixins": [

@@ -4,30 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.google.common.collect.ImmutableSet;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.CitLoader;
+import fr.estecka.variantscit.ModuleDefinition;
 
 public abstract class ACitModule
 {
 	/**
-	 * Which items this module  should run on. This is only evaluated during mod
-	 * initialization.
-	 */
-	public final ImmutableSet<Item> validItems;
-
-	/**
-	 * Every model path is formatted as:
+	 * Every variant model has a path formatted as:
 	 * `/assets/<namespace>/models/<path>/<name>.json`,
-	 * where variants of an item will automatically be matched to the model with
-	 * the corresponding `<namespace>` and `<name>`.
+	 * where  `<namespace>`  and  `<name>`  are  automatically  matched  to  the
+	 * corresponding variant ID.
 	 * 
 	 * This is the value of the <path> component.
 	 */
-	public final String modelsPath;
+	public final String variantsDir;
+
+	public final @Nullable Identifier fallbackModel;
 
 	/**
 	 * Maps variant IDs to model IDs.
@@ -35,9 +29,9 @@ public abstract class ACitModule
 	private @NotNull Map<Identifier, Identifier> existingModels = new HashMap<>();
 
 
-	public ACitModule(String modelsPath, Item... validItems){
-		this.modelsPath = modelsPath;
-		this.validItems = ImmutableSet.copyOf(validItems);
+	public ACitModule(ModuleDefinition definition){
+		this.variantsDir = definition.variantDirectory();
+		this.fallbackModel = definition.fallbackModel().orElse(null);
 	}
 
 	/**
@@ -50,29 +44,18 @@ public abstract class ACitModule
 	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
 
 	/**
-	 * The model to  use for items  that should be  using a  variant CIT, but no
-	 * model was registered for this particular variant.
-	 * 
-	 * These models are not managed by the mod, and should be registered through
-	 * Fabric API's {@link ModelLoadingPlugin}.
-	 */
-	public @Nullable Identifier GetFallbackModel(){
-		return null;
-	}
-
-	/**
-	 * Can be  overriden  to provide special  models for  exceptional conditions
-	 * that are not handled by the  mod. E.g: a unique model for enchanted books
-	 * with more than one enchantement.
+	 * Can be overriden  to provide special  models for situations  that are not
+	 * handled by  the mod. E.g: a unique model  for enchanted  books  with more 
+	 * than one enchantement.
 	 * 
 	 * @return The model id, or null if the vanilla model should be used.
 	 */
 	public @Nullable Identifier GetModelForItem(ItemStack stack){
 		Identifier modelId = this.existingModels.get(GetItemVariant(stack));
-		return (modelId != null) ? modelId : this.GetFallbackModel();
+		return (modelId != null) ? modelId : this.fallbackModel;
 	}
 
 	public final CitLoader GetModelLoader(){
-		return new CitLoader(this.modelsPath, map->{this.existingModels = map;});
+		return new CitLoader(this.variantsDir, map->{this.existingModels = map;});
 	}
 }

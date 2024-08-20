@@ -1,5 +1,5 @@
 {
-	"type": "stored_enchantment",
+	"type": "stored_enchantments",
 	"variantsDir": "item/enchanted_book",
 	"fallback": null,
 	"special": {
