@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.api.ACitModule;
 import fr.estecka.variantscit.api.ModuleRegistry;
+import fr.estecka.variantscit.modules.axolotl_bucket.AxolotlBucketModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
 import fr.estecka.variantscit.modules.enchanted_book.LevelPredicate;
 
@@ -43,6 +44,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(this, this);
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
+		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule::new);
 
 		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("level"), new LevelPredicate());
 	}
