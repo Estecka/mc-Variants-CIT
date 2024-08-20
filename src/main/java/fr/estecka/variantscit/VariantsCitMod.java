@@ -46,6 +46,8 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 	@Override
 	public void onInitializeModelLoader(Map<Item,ACitModule> modules, ModelLoadingPlugin.Context pluginContext){
 		MODULES = modules;
+		for (ACitModule module : MODULES.values())
+			module.onInitializeModelLoader(pluginContext);
 	}
 
 	@Override
@@ -77,6 +79,17 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 				VariantsCitMod.LOGGER.error("Error in cit module {}: {}", resourceId, dataResult.error().get().message());
 				continue;
 			}
+
+			try {
+				module = ModuleRegistry.CreateModule(dataResult.getOrThrow().getFirst());
+			}
+			catch (IllegalArgumentException e){
+				VariantsCitMod.LOGGER.error("Error building cit module of type {}: {}", dataResult.getPartialOrThrow().getFirst().type(), e);
+				continue;
+			}
+
+			module.GetModelLoader().FindCITs(manager);
+			result.put(item, module);
 		}
 
 		return result;

@@ -1,15 +1,19 @@
 package fr.estecka.variantscit.api;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.CitLoader;
 import fr.estecka.variantscit.ModuleDefinition;
 
 public abstract class ACitModule
+implements ModelLoadingPlugin
 {
 	/**
 	 * Every variant model has a path formatted as:
@@ -53,6 +57,11 @@ public abstract class ACitModule
 	public @Nullable Identifier GetModelForItem(ItemStack stack){
 		Identifier modelId = this.existingModels.get(GetItemVariant(stack));
 		return (modelId != null) ? modelId : this.fallbackModel;
+	}
+
+	@MustBeInvokedByOverriders
+	public void onInitializeModelLoader(ModelLoadingPlugin.Context pluginContext){
+		pluginContext.addModels(existingModels.values());
 	}
 
 	public final CitLoader GetModelLoader(){

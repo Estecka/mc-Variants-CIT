@@ -23,8 +23,12 @@ public class ModuleRegistry
 		moduleTypes.put(type, factory);
 	}
 
-	static public ACitModule CreateModule(Identifier type, ModuleDefinition definition){
-		assert type != null;
+	static public ACitModule CreateModule(ModuleDefinition definition)
+	throws IllegalArgumentException
+	{
+		assert definition != null;
+		Identifier type = definition.type();
+
 		if (!moduleTypes.containsKey(type))
 			throw new IllegalArgumentException("Unknown module type: " + type.toString());
 

@@ -10,17 +10,18 @@ import net.minecraft.util.Identifier;
 
 public class EnchantedBookModule
 extends ACitModule
-implements ModelLoadingPlugin
 {
-	static public final Identifier CIT_MULTI = Identifier.of("enchants-cit", "item/multi_enchanted_book");
+	private final Identifier citMulti;
 
 	public EnchantedBookModule(ModuleDefinition definition){
 		super(definition);
+		citMulti = definition.specialModels().get("multi");
 	}
 
 	@Override
 	public void onInitializeModelLoader(ModelLoadingPlugin.Context pluginContext){
-		pluginContext.addModels(CIT_MULTI);
+		super.onInitializeModelLoader(pluginContext);
+		pluginContext.addModels(citMulti);
 	}
 
 	@Override
@@ -36,7 +37,7 @@ implements ModelLoadingPlugin
 	public Identifier GetModelForItem(ItemStack stack){
 		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
 		if (enchants != null && enchants.getSize() > 1)
-			return CIT_MULTI;
+			return citMulti;
 		else
 			return super.GetModelForItem(stack);
 	}
