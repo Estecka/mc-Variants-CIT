@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -23,6 +24,7 @@ import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.api.ACitModule;
 import fr.estecka.variantscit.api.ModuleRegistry;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
+import fr.estecka.variantscit.modules.enchanted_book.LevelPredicate;
 
 
 public class VariantsCitMod
@@ -41,6 +43,8 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(this, this);
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
+
+		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("level"), new LevelPredicate());
 	}
 
 	@Override
