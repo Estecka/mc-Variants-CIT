@@ -1,0 +1,8 @@
+{
+	"type": "stored_enchantment",
+	"variantsDir": "item/enchanted_book",
+	"fallback": null,
+	"special": {
+		"multi": "enchants-cit:item/multi_enchanted_book"
+	}
+}
