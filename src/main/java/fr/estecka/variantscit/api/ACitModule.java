@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.api;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -39,9 +38,8 @@ implements ModelLoadingPlugin
 	}
 
 	/**
-	 * Returns the identifer  of the item's variant. Items with no variants will
-	 * fallback to the vanilla model. This will only be evaluated for items that
-	 * do not have an exceptional model.
+	 * Returns the identifer of the item's variant, from which the model ID will
+	 * be derived. Items with no variants will fallback to the vanilla model.
 	 * 
 	 * {@return} The variant's identifier, or null if the item has none.
 	 */
