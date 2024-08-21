@@ -2,7 +2,6 @@ package fr.estecka.variantscit.modules.enchanted_book;
 
 import fr.estecka.variantscit.ModuleDefinition;
 import fr.estecka.variantscit.api.ACitModule;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
@@ -19,9 +18,8 @@ extends ACitModule
 	}
 
 	@Override
-	public void onInitializeModelLoader(ModelLoadingPlugin.Context pluginContext){
-		super.onInitializeModelLoader(pluginContext);
-		pluginContext.addModels(citMulti);
+	public Identifier[] GetSpecialModels(){
+		return new Identifier[]{ citMulti };
 	}
 
 	@Override

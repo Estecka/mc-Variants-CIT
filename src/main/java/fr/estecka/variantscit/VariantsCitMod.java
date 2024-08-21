@@ -15,6 +15,7 @@ import net.minecraft.util.JsonHelper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.jetbrains.annotations.Nullable;
@@ -66,8 +67,8 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 			ACitModule module = entry.getValue();
 			Identifier itemId = Registries.ITEM.getId(entry.getKey());
 
-			module.onInitializeModelLoader(pluginContext);
-			LOGGER.info("Loaded {} CITs for item {}", module.GetModelCount(), itemId);
+			pluginContext.addModels(module.GetAllModels());
+			LOGGER.info("Loaded {} CITs for item {}", module.GetVariantCount(), itemId);
 		}
 	}
 
