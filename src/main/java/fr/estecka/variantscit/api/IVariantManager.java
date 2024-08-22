@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 @FunctionalInterface
-public interface IVariantModelProvider
+public interface IVariantManager
 {
 	/**
 	 * @return The model that matches this item's variant, (which may be the 

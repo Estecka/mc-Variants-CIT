@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 @FunctionalInterface
-public interface IVariantProvider
+public interface ISimpleCitModule
 {
 	/**
 	 * Returns the identifer of the item's variant, from which the model ID will

@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.modules.enchanted_book;
+package fr.estecka.variantscit.modules;
 
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.world.ClientWorld;

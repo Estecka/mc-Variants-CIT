@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public interface ICitModule
-extends IVariantProvider
+extends ISimpleCitModule
 {
 	/**
 	 * @param specialModel Provides the model identifiers that were configured
@@ -35,5 +35,5 @@ extends IVariantProvider
 	 * @param variantBasedModel The provider for variant-based models
 	 * @return The model ID , or null if the vanilla model should be used.
 	 */
-	public abstract @Nullable Identifier GetModelForItem(ItemStack stack, IVariantModelProvider variantBasedModel);
+	public abstract @Nullable Identifier GetModelForItem(ItemStack stack, IVariantManager variantBasedModel);
 }

@@ -3,7 +3,7 @@ package fr.estecka.variantscit;
 import java.util.HashMap;
 import java.util.Map;
 import fr.estecka.variantscit.api.ICitModule;
-import fr.estecka.variantscit.api.IVariantProvider;
+import fr.estecka.variantscit.api.ISimpleCitModule;
 import net.minecraft.util.Identifier;
 
 public final class ModuleRegistry
@@ -19,7 +19,7 @@ public final class ModuleRegistry
 		RegisterFactory(type, build->new VariantManager(build, module));
 	}
 
-	static public void RegisterModule(Identifier type, IVariantProvider module){
+	static public void RegisterModule(Identifier type, ISimpleCitModule module){
 		RegisterFactory(type, build->new VariantManager(build, module));
 	}
 

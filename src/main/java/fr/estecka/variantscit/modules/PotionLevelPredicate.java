@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.modules.potion_effect;
+package fr.estecka.variantscit.modules;
 
 import fr.estecka.variantscit.UnclampedOverridePredicate;
 import net.minecraft.client.world.ClientWorld;

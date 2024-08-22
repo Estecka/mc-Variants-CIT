@@ -22,12 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.modules.axolotl_bucket.AxolotlBucketModule;
-import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
-import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookLevelPredicate;
-import fr.estecka.variantscit.modules.potion_effect.PotionEffectModule;
-import fr.estecka.variantscit.modules.potion_effect.PotionLevelPredicate;
-import fr.estecka.variantscit.modules.potion_effect.PotionTypeModule;
+
+import fr.estecka.variantscit.modules.*;
 
 
 public class VariantsCitMod

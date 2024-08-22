@@ -9,7 +9,7 @@ public final class ModuleRegistrar
 		ModuleRegistry.RegisterModule(moduleId, module);
 	}
 
-	static public void Register(Identifier moduleId, IVariantProvider module){
+	static public void Register(Identifier moduleId, ISimpleCitModule module){
 		ModuleRegistry.RegisterModule(moduleId, module);
 	}
 }
