@@ -8,16 +8,16 @@ import net.minecraft.util.Identifier;
 public interface ICitModule
 {
 	/**
-	 * Returns the identifer of the item's variant, from which the model ID will
-	 * be derived. Items with no variants will fallback to the vanilla model.
+	 * Identifies  the item's variant, from which the  model ID will be derived.
+	 * Items with no variants will fallback to the vanilla model.
 	 * 
-	 * {@return} The variant's identifier, or null if the item has none.
+	 * @return The variant's identifier, or null if the item has none.
 	 */
 	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
 
 	/**
-	 * @param specialModel  Provides the model identifiers  that were configured
-	 * in the resource pack. It is up to you to only keep the models you need.
+	 * @param specialModels  The model  identifiers that were  configured in the
+	 * resource pack. It is up to you to only keep the models you need.
 	 */
 	public abstract void SetSpecialModels(Map<String, @Nullable Identifier> specialModels);
 
@@ -25,6 +25,8 @@ public interface ICitModule
 	 * Provides the list  of special models  managed by this module, so they can
 	 * also be  loaded. Those should be  the same models  that were provided via
 	 * {@link #SetSpecialModels}.
+	 * 
+	 * @return The identifier of the models.
 	 */
 	public abstract @Nullable Identifier[] GetSpecialModels();
 

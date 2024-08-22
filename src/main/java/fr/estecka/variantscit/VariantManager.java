@@ -26,6 +26,7 @@ implements IVariantManager
 
 	public VariantManager(ModuleDefinition definition, ICitModule module){
 		this.module = module;
+		this.module.SetSpecialModels(definition.specialModels());
 		this.variantsDir = definition.variantDirectory();
 		this.fallbackModel = definition.fallbackModel().orElse(null);
 	}
