@@ -32,7 +32,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 	@Override
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
