@@ -15,7 +15,6 @@ import net.minecraft.util.JsonHelper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
-
 import fr.estecka.variantscit.modules.axolotl_bucket.AxolotlBucketModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookLevelPredicate;
@@ -47,10 +45,10 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 	@Override
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(this, this);
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
-		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule::new);
-		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), PotionEffectModule::new);
-		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), PotionTypeModule::new);
+		ModuleRegistry.RegisterModule(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
+		ModuleRegistry.RegisterModule(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
+		ModuleRegistry.RegisterModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
+		ModuleRegistry.RegisterModule(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
 
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();

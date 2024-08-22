@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.modules.axolotl_bucket;
 
-import fr.estecka.variantscit.VariantManager;
-import fr.estecka.variantscit.ModuleDefinition;
+import fr.estecka.variantscit.api.IVariantProvider;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.passive.AxolotlEntity;
@@ -9,12 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public class AxolotlBucketModule
-extends VariantManager
+implements IVariantProvider
 {
-	public AxolotlBucketModule(ModuleDefinition definition){
-		super(definition);
-	}
-
 	@Override
 	public Identifier GetItemVariant(ItemStack stack){
 		NbtComponent nbt = stack.get(DataComponentTypes.BUCKET_ENTITY_DATA);

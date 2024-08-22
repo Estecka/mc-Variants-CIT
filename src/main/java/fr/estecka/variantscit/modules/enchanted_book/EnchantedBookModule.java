@@ -1,20 +1,21 @@
 package fr.estecka.variantscit.modules.enchanted_book;
 
-import fr.estecka.variantscit.VariantManager;
-import fr.estecka.variantscit.ModuleDefinition;
+import fr.estecka.variantscit.api.ICitModule;
+import fr.estecka.variantscit.api.IVariantModelProvider;
+import java.util.Map;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public class EnchantedBookModule
-extends VariantManager
+implements ICitModule
 {
-	private final Identifier citMulti;
+	private Identifier citMulti;
 
-	public EnchantedBookModule(ModuleDefinition definition){
-		super(definition);
-		citMulti = definition.specialModels().get("multi");
+	@Override
+	public void SetSpecialModels(Map<String,Identifier> models){
+		citMulti = models.get("multi");
 	}
 
 	@Override
@@ -32,11 +33,11 @@ extends VariantManager
 	}
 
 	@Override
-	public Identifier GetModelForItem(ItemStack stack){
+	public Identifier GetModelForItem(ItemStack stack, IVariantModelProvider variant){
 		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
 		if (enchants != null && enchants.getSize() > 1)
 			return citMulti;
 		else
-			return super.GetModelForItem(stack);
+			return variant.GetModelVariantForItem(stack);
 	}
 }
