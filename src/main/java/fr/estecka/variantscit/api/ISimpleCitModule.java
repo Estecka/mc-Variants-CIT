@@ -1,17 +1,27 @@
 package fr.estecka.variantscit.api;
 
+import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 @FunctionalInterface
 public interface ISimpleCitModule
+extends ICitModule
 {
-	/**
-	 * Returns the identifer of the item's variant, from which the model ID will
-	 * be derived. Items with no variants will fallback to the vanilla model.
-	 * 
-	 * {@return} The variant's identifier, or null if the item has none.
-	 */
 	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
+
+	@Override
+	public default void SetSpecialModels(Map<String,Identifier> specialModels){
+	}
+
+	@Override
+	public default @Nullable Identifier[] GetSpecialModels(){
+		return new Identifier[0];
+	}
+
+	@Override
+	public default Identifier GetModelForItem(ItemStack stack, IVariantManager variantBasedModel){
+		return variantBasedModel.GetModelVariantForItem(stack);
+	}
 }

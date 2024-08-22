@@ -41,10 +41,10 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 	@Override
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(this, this);
-		ModuleRegistry.RegisterModule(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
-		ModuleRegistry.RegisterModule(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
-		ModuleRegistry.RegisterModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
-		ModuleRegistry.RegisterModule(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
 
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();
@@ -96,7 +96,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 			}
 
 			try {
-				module = ModuleRegistry.CreateModule(dataResult.getOrThrow().getFirst());
+				module = ModuleRegistry.CreateManager(dataResult.getOrThrow().getFirst());
 			}
 			catch (IllegalArgumentException e){
 				VariantsCitMod.LOGGER.error("Error building cit module of type {}: {}", dataResult.getPartialOrThrow().getFirst().type(), e);
