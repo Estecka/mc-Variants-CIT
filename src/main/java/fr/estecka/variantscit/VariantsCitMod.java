@@ -103,7 +103,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 				continue;
 			}
 
-			module.GetModelLoader().FindCITs(manager);
+			module.ReloadVariants(manager);
 			result.put(item, module);
 		}
 

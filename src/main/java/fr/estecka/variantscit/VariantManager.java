@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 public final class VariantManager
@@ -53,7 +54,25 @@ implements IVariantManager
 		return result;
 	}
 
-	public final CitLoader GetModelLoader(){
-		return new CitLoader(this.variantsDir, map->{this.variantModels = map;});
+	public void ReloadVariants(ResourceManager manager){
+		this.variantModels = new HashMap<>();
+		
+		String folder = "models/"+variantsDir;
+		
+		for (Identifier fileId : manager.findResources(folder, id -> id.getPath().endsWith(".json")).keySet())
+		{
+			String namespace = fileId.getNamespace();
+			String modelName, variantName;
+			
+			modelName = fileId.getPath();
+			modelName = modelName.substring("models/".length(), modelName.length()-".json".length());
+			
+			variantName = modelName.substring(variantsDir.length() + 1);
+			
+			this.variantModels.put(
+				Identifier.of(namespace, variantName),
+				Identifier.of(namespace, modelName)
+			);
+		}
 	}
 }

@@ -20,7 +20,7 @@ import fr.estecka.variantscit.VariantsCitMod;
 public class ItemRendererMixin
 {
 	@WrapOperation( method="getModel", at=@At( value="INVOKE", target="net/minecraft/client/render/item/ItemModels.getModel (Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;") )
-	private BakedModel	GetEnchantModel(ItemModels models, ItemStack stack, Operation<BakedModel> original)
+	private BakedModel	GetVariantModel(ItemModels models, ItemStack stack, Operation<BakedModel> original)
 	{
 		final VariantManager module = VariantsCitMod.GetModule(stack.getItem());
 		Identifier modelId;

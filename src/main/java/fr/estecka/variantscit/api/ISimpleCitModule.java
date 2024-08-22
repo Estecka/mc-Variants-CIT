@@ -12,7 +12,7 @@ extends ICitModule
 	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
 
 	@Override
-	public default void SetSpecialModels(Map<String,Identifier> specialModels){
+	public default void SetSpecialModels(Map<String, @Nullable Identifier> specialModels){
 	}
 
 	@Override
@@ -21,7 +21,7 @@ extends ICitModule
 	}
 
 	@Override
-	public default Identifier GetModelForItem(ItemStack stack, IVariantManager variantBasedModel){
+	public default @Nullable Identifier GetModelForItem(ItemStack stack, IVariantManager variantBasedModel){
 		return variantBasedModel.GetModelVariantForItem(stack);
 	}
 }
