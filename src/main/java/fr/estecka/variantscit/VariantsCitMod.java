@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.api.ACitModule;
+
 import fr.estecka.variantscit.api.ModuleRegistry;
 import fr.estecka.variantscit.modules.axolotl_bucket.AxolotlBucketModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
@@ -34,14 +34,14 @@ import fr.estecka.variantscit.modules.potion_effect.PotionTypeModule;
 
 
 public class VariantsCitMod
-implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModule>>, DataLoader<Map<Item,ACitModule>>
+implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantManager>>, DataLoader<Map<Item,VariantManager>>
 {
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	static private Map<Item, ACitModule> MODULES = new HashMap<>();
+	static private Map<Item, VariantManager> MODULES = new HashMap<>();
 
-	static public @Nullable ACitModule GetModule(Item itemType){
+	static public @Nullable VariantManager GetModule(Item itemType){
 		return MODULES.get(itemType);
 	}
 
@@ -61,10 +61,10 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 	}
 
 	@Override
-	public void onInitializeModelLoader(Map<Item,ACitModule> modules, ModelLoadingPlugin.Context pluginContext){
+	public void onInitializeModelLoader(Map<Item,VariantManager> modules, ModelLoadingPlugin.Context pluginContext){
 		MODULES = modules;
 		for (var entry : MODULES.entrySet()){
-			ACitModule module = entry.getValue();
+			VariantManager module = entry.getValue();
 			Identifier itemId = Registries.ITEM.getId(entry.getKey());
 
 			pluginContext.addModels(module.GetAllModels());
@@ -73,12 +73,12 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 	}
 
 	@Override
-	public CompletableFuture<Map<Item,ACitModule>> load(ResourceManager resourceManager, Executor executor){
+	public CompletableFuture<Map<Item,VariantManager>> load(ResourceManager resourceManager, Executor executor){
 		return CompletableFuture.supplyAsync(()->Reload(resourceManager), executor);
 	}
 
-	private Map<Item,ACitModule> Reload(ResourceManager manager){
-		Map<Item,ACitModule> result = new HashMap<>();
+	private Map<Item,VariantManager> Reload(ResourceManager manager){
+		Map<Item,VariantManager> result = new HashMap<>();
 
 		for (Map.Entry<Identifier, Resource> entry : manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")).entrySet()){
 			Identifier resourceId = entry.getKey();
@@ -87,7 +87,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,ACitModul
 				continue;
 
 			JsonElement json;
-			ACitModule module;
+			VariantManager module;
 			try {
 				json = JsonHelper.deserialize(entry.getValue().getReader());
 			}

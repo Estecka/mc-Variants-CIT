@@ -3,12 +3,13 @@ package fr.estecka.variantscit.api;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.VariantManager;
 import fr.estecka.variantscit.ModuleDefinition;
 
 public class ModuleRegistry
 {
 	@FunctionalInterface
-	static public interface ModuleFactory<T extends ACitModule> {
+	static public interface ModuleFactory<T extends VariantManager> {
 		T apply(ModuleDefinition definition);
 	}
 
@@ -23,7 +24,7 @@ public class ModuleRegistry
 		moduleTypes.put(type, factory);
 	}
 
-	static public ACitModule CreateModule(ModuleDefinition definition)
+	static public VariantManager CreateModule(ModuleDefinition definition)
 	throws IllegalArgumentException
 	{
 		assert definition != null;

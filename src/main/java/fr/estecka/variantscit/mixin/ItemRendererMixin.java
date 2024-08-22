@@ -12,8 +12,8 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.VariantManager;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.ACitModule;
 
 @Mixin(ItemRenderer.class)
 @Environment(EnvType.CLIENT)
@@ -22,7 +22,7 @@ public class ItemRendererMixin
 	@WrapOperation( method="getModel", at=@At( value="INVOKE", target="net/minecraft/client/render/item/ItemModels.getModel (Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;") )
 	private BakedModel	GetEnchantModel(ItemModels models, ItemStack stack, Operation<BakedModel> original)
 	{
-		final ACitModule module = VariantsCitMod.GetModule(stack.getItem());
+		final VariantManager module = VariantsCitMod.GetModule(stack.getItem());
 		Identifier modelId;
 
 		if (module == null || (modelId=module.GetModelForItem(stack)) == null)
