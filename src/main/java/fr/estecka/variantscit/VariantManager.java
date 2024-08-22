@@ -7,6 +7,7 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantModelProvider;
+import fr.estecka.variantscit.api.IVariantProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -29,6 +30,10 @@ implements IVariantModelProvider
 		this.fallbackModel = definition.fallbackModel().orElse(null);
 	}
 
+	public VariantManager(ModuleDefinition definition, IVariantProvider module){
+		this(definition, new SimpleCitModule(module));
+	}
+
 	public @Nullable Identifier GetModelVariantForItem(ItemStack stack){
 		Identifier modelId = this.variantModels.get(module.GetItemVariant(stack));
 		return (modelId != null) ? modelId : this.fallbackModel;
@@ -46,7 +51,7 @@ implements IVariantModelProvider
 		Set<Identifier> result = new HashSet<>();
 		result.add(fallbackModel);
 		result.addAll(this.variantModels.values());
-		for (Identifier id : module.GetModelsToLoad())
+		for (Identifier id : module.GetSpecialModels())
 		if  (id != null)
 			result.add(id);
 
@@ -55,5 +60,26 @@ implements IVariantModelProvider
 
 	public final CitLoader GetModelLoader(){
 		return new CitLoader(this.variantsDir, map->{this.variantModels = map;});
+	}
+
+	static private class SimpleCitModule
+	implements ICitModule
+	{
+		private final IVariantProvider module;
+
+		public SimpleCitModule(IVariantProvider module){
+			this.module = module;
+		}
+
+		public void SetSpecialModels(Map<String,Identifier> specialModels){
+		}
+
+		public Identifier GetItemVariant(ItemStack stack){
+			return module.GetItemVariant(stack);
+		}
+
+		public Identifier GetModelForItem(ItemStack stack, IVariantModelProvider variantBasedModel){
+			return variantBasedModel.GetModelVariantForItem(stack);
+		}
 	}
 }

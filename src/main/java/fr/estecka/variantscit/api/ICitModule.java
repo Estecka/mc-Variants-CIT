@@ -1,9 +1,7 @@
 package fr.estecka.variantscit.api;
 
 import java.util.Map;
-
 import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -21,7 +19,7 @@ extends IVariantProvider
 	 * all special  models, although  models that are  already  loaded via other
 	 * means don't need to be provided.
 	 */
-	public default @Nullable Identifier[] GetModelsToLoad(){
+	public default @Nullable Identifier[] GetSpecialModels(){
 		return new Identifier[0];
 	}
 

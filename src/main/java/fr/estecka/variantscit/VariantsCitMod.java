@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 
-import fr.estecka.variantscit.api.ModuleRegistry;
 import fr.estecka.variantscit.modules.axolotl_bucket.AxolotlBucketModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookModule;
 import fr.estecka.variantscit.modules.enchanted_book.EnchantedBookLevelPredicate;
