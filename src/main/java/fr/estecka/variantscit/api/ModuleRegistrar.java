@@ -1,12 +1,16 @@
 package fr.estecka.variantscit.api;
 
 import fr.estecka.variantscit.ModuleRegistry;
-import com.google.common.base.Supplier;
+import java.util.Map;
 import net.minecraft.util.Identifier;
 
 public final class ModuleRegistrar
 {
-	static public void Register(Identifier moduleId, Supplier<ICitModule> module){
+	static public interface ModuleFactory {
+		ICitModule Build(Map<String, Identifier> specialModels);
+	}
+
+	static public void Register(Identifier moduleId, ModuleFactory module){
 		ModuleRegistry.Register(moduleId, module);
 	}
 

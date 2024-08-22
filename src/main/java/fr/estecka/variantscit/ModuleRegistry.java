@@ -2,23 +2,22 @@ package fr.estecka.variantscit;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
-import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.ISimpleCitModule;
+import fr.estecka.variantscit.api.ModuleRegistrar.ModuleFactory;
 import net.minecraft.util.Identifier;
 
 public final class ModuleRegistry
 {
 	@FunctionalInterface
-	static public interface ManagerFactory {
+	static private interface ManagerFactory {
 		VariantManager build(ModuleDefinition definition);
 	}
 
 	static private final Map<Identifier, ManagerFactory> MODULE_TYPES = new HashMap<>();
 
-	static public void Register(Identifier type, Supplier<ICitModule> moduleFactory){
+	static public void Register(Identifier type, ModuleFactory moduleFactory){
 		assert moduleFactory != null;
-		Register(type, (ManagerFactory)config->new VariantManager(config, moduleFactory.get()));
+		Register(type, (ManagerFactory)config->new VariantManager(config, moduleFactory.Build(config.specialModels())));
 	}
 
 	static public void Register(Identifier type, ISimpleCitModule module){

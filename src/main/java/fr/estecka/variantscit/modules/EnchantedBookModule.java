@@ -11,16 +11,10 @@ import net.minecraft.util.Identifier;
 public class EnchantedBookModule
 implements ICitModule
 {
-	private Identifier citMulti;
+	private final Identifier citMulti;
 
-	@Override
-	public void SetSpecialModels(Map<String,Identifier> models){
+	public EnchantedBookModule(Map<String,Identifier> models){
 		citMulti = models.get("multi");
-	}
-
-	@Override
-	public Identifier[] GetSpecialModels(){
-		return new Identifier[]{ citMulti };
 	}
 
 	@Override
@@ -33,7 +27,7 @@ implements ICitModule
 	}
 
 	@Override
-	public Identifier GetModelForItem(ItemStack stack, IVariantManager variant){
+	public Identifier GetItemModel(ItemStack stack, IVariantManager variant){
 		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
 		if (enchants != null && enchants.getSize() > 1)
 			return citMulti;

@@ -22,13 +22,19 @@ implements IVariantManager
 	 * Maps variant IDs to model IDs.
 	 */
 	private Map<Identifier, Identifier> variantModels = new HashMap<>();
+	private final Set<Identifier> specialModels = new HashSet<>();
 
 
 	public VariantManager(ModuleDefinition definition, ICitModule module){
 		this.module = module;
-		this.module.SetSpecialModels(definition.specialModels());
 		this.variantsDir = definition.variantDirectory();
 		this.fallbackModel = definition.fallbackModel().orElse(null);
+
+		definition.specialModels().values().stream()
+			.filter(id -> id!=null)
+			.distinct()
+			.forEach(specialModels::add);
+			;
 	}
 
 	public @Nullable Identifier GetModelVariantForItem(ItemStack stack){
@@ -37,7 +43,7 @@ implements IVariantManager
 	}
 
 	public @Nullable Identifier GetModelForItem(ItemStack stack){
-		return module.GetModelForItem(stack, this);
+		return module.GetItemModel(stack, this);
 	}
 
 	public final int GetVariantCount(){
@@ -48,10 +54,7 @@ implements IVariantManager
 		Set<Identifier> result = new HashSet<>();
 		result.add(fallbackModel);
 		result.addAll(this.variantModels.values());
-		for (Identifier id : module.GetSpecialModels())
-		if  (id != null)
-			result.add(id);
-
+		result.addAll(this.specialModels);
 		return result;
 	}
 
