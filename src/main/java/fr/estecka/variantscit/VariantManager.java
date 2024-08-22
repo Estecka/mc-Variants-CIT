@@ -55,6 +55,7 @@ implements IVariantManager
 		result.add(fallbackModel);
 		result.addAll(this.variantModels.values());
 		result.addAll(this.specialModels);
+		result.remove(null);
 		return result;
 	}
 
