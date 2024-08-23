@@ -5,17 +5,13 @@
 	"name": "Variants CIT",
 	"description": "Specialized CIT logic for variant-based items",
 	"authors": [
-		"Estecka",
-		"Mythithorium",
-		"Yomna"
+		"Estecka"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/enchants-cit",
-		"sources": "https://github.com/Estecka/mc-Enchants-CIT",
-		"Even Better Enchants":  "https://modrinth.com/resourcepack/even-better-enchants",
-		"Better Enchanted Book": "https://modrinth.com/resourcepack/better-enchanted-book"
+		"homepage": "https://modrinth.com/mod/variants-cit",
+		"sources": "https://github.com/Estecka/mc-Variants-CIT"
 	},
-	"license": "Apache-2.0",
+	"license": "GNU AGPLv3",
 	"icon": "assets/variants-cit/icon.png",
 	"environment": "client",
 	"entrypoints": {
