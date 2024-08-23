@@ -13,7 +13,7 @@ implements ISimpleCitModule
 	@Override
 	public Identifier GetItemVariant(ItemStack stack){
 		NbtComponent nbt = stack.get(DataComponentTypes.BUCKET_ENTITY_DATA);
-		if (!nbt.contains("Variant"))
+		if (nbt==null || !nbt.contains("Variant"))
 			return null;
 
 		int variantRaw = nbt.getNbt().getInt("Variant");
