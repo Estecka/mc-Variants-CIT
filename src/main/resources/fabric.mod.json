@@ -16,7 +16,7 @@
 		"Better Enchanted Book": "https://modrinth.com/resourcepack/better-enchanted-book"
 	},
 	"license": "Apache-2.0",
-	"icon": "assets/enchants-cit/icon.png",
+	"icon": "assets/variants-cit/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": [
