@@ -29,7 +29,7 @@ public class ItemRendererMixin
 			return original.call(models, stack);
 
 		final BakedModelManager modelManager = models.getModelManager();
-		BakedModel model = models.getModelManager().getModel(modelId);
+		BakedModel model = modelManager.getModel(modelId);
 		if (model != null) 
 			return model;
 		else
