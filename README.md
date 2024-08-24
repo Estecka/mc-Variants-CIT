@@ -1,18 +1,21 @@
 # Variants-CIT
-A specialized CIT logic for miscellanous variant-based items.
-This allows the creation of CIT resource packs for MC 1.21, without relying on optifine nor CIT-resewn.
+A CIT logic for MC 1.21, specialized in handling miscellani items with standardized variants.
 
-**This mod is not a plug-and-play replacement for Optifine/CIT-resewn.**
-It uses its own resource format, and requires some changes be made to older packs for them to work.
-On low-end PCs, using this mod instead of the optifine format may lead to improved performances in scenarios where a single item has very many different variants.
+**This mod is not a plug-and-play replacement for Optifine/CIT-resewn;** it uses its own resource format. Changes to older packs are required for them to work.
+On low-end PCs, using this mod instead of the optifine format may lead to a improved performances in scenarios where a single item has very many different variants.
+
+The mod is not as all-purpose as optifine, it still requires specialized code for each item type, but this code is modular and easy to expand upon. Other mods can also add custom modules for their own items.
+
+Built-in modules support **Axolotl Buckets**, **Enchanted Books**, **Music Discs**, **Goat Horns**, and **Potions**.
+If Mojang ever makes these items more componentized, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future.
 
 ## Resource Pack Format
-A resource pack who wants to modify an item must declare what item it changes, and where its resources are located.
+A resource pack who wants to modify an item must provide a configuration file to declare what item to change, where its resources are located, and which logic to use.
 The item type is inferred from the file name: `/assets/<namespace>/variants-cit/item/<name>.json`
 
 Only one logic is supported per item type. Multiple resource packs that affect the same item will be compatible if they are using the same config. Otherwise, the config from the top-most pack is used. See the wiki for recommendations on what config to use for what item.
 
-Here's a example of CIT module that would reproduce the behaviour of Enchants-CIT :
+Here's an example of CIT module that would reproduce the behaviour of Enchants-CIT :
 
 `/assets/minecraft/variant-cits/item/enchanted_book.json`
 ```json
