@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -54,7 +55,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 			VariantManager module = entry.getValue();
 			Identifier itemId = Registries.ITEM.getId(entry.getKey());
 
-			pluginContext.addModels(module.GetAllModels());
+			module.GetAllModels().stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 			LOGGER.info("Loaded {} CITs for item {}", module.GetVariantCount(), itemId);
 		}
 	}

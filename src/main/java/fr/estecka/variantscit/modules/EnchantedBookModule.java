@@ -3,6 +3,7 @@ package fr.estecka.variantscit.modules;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import java.util.Map;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
@@ -11,9 +12,9 @@ import net.minecraft.util.Identifier;
 public class EnchantedBookModule
 implements ICitModule
 {
-	private final Identifier citMulti;
+	private final ModelIdentifier citMulti;
 
-	public EnchantedBookModule(Map<String,Identifier> models){
+	public EnchantedBookModule(Map<String,ModelIdentifier> models){
 		citMulti = models.get("multi");
 	}
 
@@ -27,7 +28,7 @@ implements ICitModule
 	}
 
 	@Override
-	public Identifier GetItemModel(ItemStack stack, IVariantManager variant){
+	public ModelIdentifier GetItemModel(ItemStack stack, IVariantManager variant){
 		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
 		if (enchants != null && enchants.getSize() > 1)
 			return citMulti;

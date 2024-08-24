@@ -17,7 +17,7 @@ public final class ModuleRegistry
 
 	static public void Register(Identifier type, ModuleFactory moduleFactory){
 		assert moduleFactory != null;
-		Register(type, (ManagerFactory)config->new VariantManager(config, moduleFactory.Build(config.specialModels())));
+		Register(type, (ManagerFactory)config->new VariantManager(config, moduleFactory.Build(config.GetSpecialModelIds())));
 	}
 
 	static public void Register(Identifier type, ISimpleCitModule module){

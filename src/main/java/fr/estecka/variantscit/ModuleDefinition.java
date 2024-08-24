@@ -1,7 +1,11 @@
 package fr.estecka.variantscit;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
+import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
@@ -26,5 +30,16 @@ public record ModuleDefinition(Identifier type, String variantDirectory, Optiona
 			return DataResult.success(path);
 		else
 			return DataResult.error(()->"Invalid character in directory name: "+path);
+	}
+
+	public @Nullable ModelIdentifier GetFallbackModelId(){
+		return fallbackModel.map(ModelLoadingConstants::toResourceModelId).orElse(null);
+	}
+
+	public Map<String, @Nullable ModelIdentifier> GetSpecialModelIds(){
+		Map<String, @Nullable ModelIdentifier> result = new HashMap<>();
+		for (var entry : this.specialModels.entrySet())
+			result.put(entry.getKey(), ModelLoadingConstants.toResourceModelId(entry.getValue()));
+		return result;
 	}
 }

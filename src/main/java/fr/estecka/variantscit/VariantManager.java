@@ -7,6 +7,8 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
+import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -16,33 +18,33 @@ implements IVariantManager
 {
 	private final ICitModule module;
 	private final String variantsDir;
-	private final @Nullable Identifier fallbackModel;
+	private final @Nullable ModelIdentifier fallbackModel;
 
 	/**
 	 * Maps variant IDs to model IDs.
 	 */
-	private Map<Identifier, Identifier> variantModels = new HashMap<>();
-	private final Set<Identifier> specialModels = new HashSet<>();
+	private Map<Identifier, ModelIdentifier> variantModels = new HashMap<>();
+	private final Set<ModelIdentifier> specialModels = new HashSet<>();
 
 
 	public VariantManager(ModuleDefinition definition, ICitModule module){
 		this.module = module;
 		this.variantsDir = definition.variantDirectory();
-		this.fallbackModel = definition.fallbackModel().orElse(null);
+		this.fallbackModel = definition.GetFallbackModelId();
 
-		definition.specialModels().values().stream()
+		definition.GetSpecialModelIds().values().stream()
 			.filter(id -> id!=null)
 			.distinct()
 			.forEach(specialModels::add);
 			;
 	}
 
-	public @Nullable Identifier GetModelVariantForItem(ItemStack stack){
-		Identifier modelId = this.variantModels.get(module.GetItemVariant(stack));
+	public @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack){
+		ModelIdentifier modelId = this.variantModels.get(module.GetItemVariant(stack));
 		return (modelId != null) ? modelId : this.fallbackModel;
 	}
 
-	public @Nullable Identifier GetModelForItem(ItemStack stack){
+	public @Nullable ModelIdentifier GetModelForItem(ItemStack stack){
 		return module.GetItemModel(stack, this);
 	}
 
@@ -50,8 +52,8 @@ implements IVariantManager
 		return this.variantModels.size();
 	}
 
-	public final Set<Identifier> GetAllModels(){
-		Set<Identifier> result = new HashSet<>();
+	public final Set<ModelIdentifier> GetAllModels(){
+		Set<ModelIdentifier> result = new HashSet<>();
 		result.add(fallbackModel);
 		result.addAll(this.variantModels.values());
 		result.addAll(this.specialModels);
@@ -76,7 +78,7 @@ implements IVariantManager
 			
 			this.variantModels.put(
 				Identifier.of(namespace, variantName),
-				Identifier.of(namespace, modelName)
+				ModelLoadingConstants.toResourceModelId(Identifier.of(namespace, modelName))
 			);
 		}
 	}

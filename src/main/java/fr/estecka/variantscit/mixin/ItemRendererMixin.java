@@ -10,8 +10,8 @@ import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.VariantManager;
 import fr.estecka.variantscit.VariantsCitMod;
 
@@ -23,17 +23,14 @@ public class ItemRendererMixin
 	private BakedModel	GetVariantModel(ItemModels models, ItemStack stack, Operation<BakedModel> original)
 	{
 		final VariantManager module = VariantsCitMod.GetModule(stack.getItem());
-		Identifier modelId;
+		ModelIdentifier modelId;
 
 		if (module == null || (modelId=module.GetModelForItem(stack)) == null)
 			return original.call(models, stack);
 
 		final BakedModelManager modelManager = models.getModelManager();
 		BakedModel model = modelManager.getModel(modelId);
-		if (model != null) 
-			return model;
-		else
-			return modelManager.getMissingModel();
+		return (model != null) ? model : modelManager.getMissingModel();
 	}
 
 }

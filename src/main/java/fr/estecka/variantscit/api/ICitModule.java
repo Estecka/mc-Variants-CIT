@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.api;
 
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -26,5 +27,5 @@ public interface ICitModule
 	 * @param variantManager The provider for variant-based models
 	 * @return The model ID , or null if the vanilla model should be used.
 	 */
-	public abstract @Nullable Identifier GetItemModel(ItemStack stack, IVariantManager variantManager);
+	public abstract @Nullable ModelIdentifier GetItemModel(ItemStack stack, IVariantManager variantManager);
 }
