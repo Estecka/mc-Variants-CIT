@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.jetbrains.annotations.Nullable;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
 import net.minecraft.item.Item;
@@ -33,7 +33,7 @@ implements DataLoader<Map<Item,VariantManager>>
 			if (item == null)
 				continue;
 
-			JsonElement json;
+			JsonObject json;
 			VariantManager module;
 			try {
 				json = JsonHelper.deserialize(entry.getValue().getReader());
@@ -50,9 +50,9 @@ implements DataLoader<Map<Item,VariantManager>>
 			}
 
 			try {
-				module = ModuleRegistry.CreateManager(dataResult.getOrThrow().getFirst());
+				module = ModuleRegistry.CreateManager(dataResult.getOrThrow().getFirst(), json);
 			}
-			catch (IllegalArgumentException e){
+			catch (IllegalArgumentException|IllegalStateException e){
 				VariantsCitMod.LOGGER.error("Error building cit module of type {}: {}", dataResult.getPartialOrThrow().getFirst().type(), e);
 				continue;
 			}
