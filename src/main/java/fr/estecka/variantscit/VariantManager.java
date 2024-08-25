@@ -17,7 +17,7 @@ public final class VariantManager
 implements IVariantManager
 {
 	private final ICitModule module;
-	private final String variantsDir;
+	private final String prefix;
 	private final @Nullable ModelIdentifier fallbackModel;
 
 	/**
@@ -29,7 +29,7 @@ implements IVariantManager
 
 	public VariantManager(ModuleDefinition definition, ICitModule module){
 		this.module = module;
-		this.variantsDir = definition.variantDirectory();
+		this.prefix = definition.modelPrefix();
 		this.fallbackModel = definition.GetFallbackModelId();
 
 		definition.GetSpecialModelIds().values().stream()
@@ -64,18 +64,19 @@ implements IVariantManager
 	public void ReloadVariants(ResourceManager manager){
 		this.variantModels = new HashMap<>();
 		
-		String folder = "models/"+variantsDir;
-		
-		for (Identifier fileId : manager.findResources(folder, id -> id.getPath().endsWith(".json")).keySet())
+		String folder = "models";
+		if (prefix.contains("/")){
+			folder += '/' + prefix.substring(0, prefix.lastIndexOf('/'));
+		}
+
+		for (Identifier fileId : manager.findResources(folder, id -> id.getPath().startsWith("models/"+prefix) && id.getPath().endsWith(".json")).keySet())
 		{
 			String namespace = fileId.getNamespace();
 			String modelName, variantName;
-			
 			modelName = fileId.getPath();
 			modelName = modelName.substring("models/".length(), modelName.length()-".json".length());
-			
-			variantName = modelName.substring(variantsDir.length() + 1);
-			
+			variantName = modelName.substring(prefix.length());
+
 			this.variantModels.put(
 				Identifier.of(namespace, variantName),
 				ModelLoadingConstants.toResourceModelId(Identifier.of(namespace, modelName))
