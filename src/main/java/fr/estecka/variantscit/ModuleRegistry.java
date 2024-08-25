@@ -8,6 +8,7 @@ import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.ISimpleCitModule;
 import fr.estecka.variantscit.api.ModuleRegistrar.ComplexCitModuleFactory;
+import fr.estecka.variantscit.api.ModuleRegistrar.ParameterizedCitModuleFactory;
 import fr.estecka.variantscit.api.ModuleRegistrar.SpecialCitModuleFactory;
 import net.minecraft.util.Identifier;
 
@@ -25,6 +26,15 @@ public final class ModuleRegistry
 		Register(type, (ModuleDefinition config, JsonObject json) -> {
 			var data = codec.fieldOf("parameters").decoder().decode(JsonOps.INSTANCE, json);
 			ICitModule module = moduleFactory.Build(config.GetSpecialModelIds(), data.getOrThrow().getFirst());
+			return new VariantManager(config, module);
+		});
+	}
+
+	static public <T> void Register(Identifier type, ParameterizedCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
+		assert moduleFactory != null;
+		Register(type, (ModuleDefinition config, JsonObject json) -> {
+			var data = codec.fieldOf("parameters").decoder().decode(JsonOps.INSTANCE, json);
+			ICitModule module = moduleFactory.Build(data.getOrThrow().getFirst());
 			return new VariantManager(config, module);
 		});
 	}

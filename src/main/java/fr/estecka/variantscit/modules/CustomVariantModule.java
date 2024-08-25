@@ -1,11 +1,9 @@
 package fr.estecka.variantscit.modules;
 
-import java.util.Map;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.api.ISimpleCitModule;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -25,7 +23,7 @@ implements ISimpleCitModule
 
 	private final String key;
 
-	public CustomVariantModule(Map<String, ModelIdentifier> specialModels, String key){
+	public CustomVariantModule(String key){
 		this.key = key;
 	}
 
