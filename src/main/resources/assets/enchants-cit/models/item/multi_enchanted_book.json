@@ -1,6 +1,0 @@
-{
-	"parent": "minecraft:item/generated",
-	"textures": {
-		"layer0": "enchants-cit:item/multi_enchanted_book"
-	}
-}

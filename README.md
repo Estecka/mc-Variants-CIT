@@ -1,45 +1,33 @@
-# Enchants CIT
-A specialized CIT logic for enchanted books, made to allow enchantment-based resource packs to work on MC 1.21 without the help of optifine nor CIT-resewn.
+# Variants-CIT
+A CIT logic for MC 1.21, specialized in handling items with standardized variants.
 
-**This mod is not a plug-and-play replacement for Optifine or CIT-resewn.**
-It uses its own resource format, and requires some changes be made to older packs for them to work.
+**This mod is not a plug-and-play replacement for Optifine/CIT-resewn;** it uses its own resource format. Changes to older packs are required for them to work.
+On low-end PCs, using this mod instead of the optifine format may lead to improved performances in scenarios where a single item has very many different variants.
 
-The current release includes the textures from [**Even Better Enchants**](https://modrinth.com/resourcepack/even-better-enchants).
+The mod is not as all-purpose as optifine, it still requires specialized code for most item type, but this code is modular and easy to expand upon. Other mods can also add custom modules for their own items.
+
+Built-in modules support **Axolotl Buckets**, **Enchanted Books**, **Music Discs**, **Goat Horns**, and **Potions**.
+If Mojang ever makes these items more componentized, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future.
+
+For datapack makers, there is also a more generic module that can pull a variant id from the `custom_data` component of an item.
 
 ## Resource Pack Format
+A resource pack who wants to modify an item must start by providing a configuration file to declare what item to change, where its resources are located, and which logic to use.
+The targetd item type is automatically derived from the file name: `/assets/<namespace>/variants-cit/item/<name>.json`
 
-### Enchantment-specific models
-The mod looks for [item models](https://minecraft.wiki/w/Model#Item_models) with pathes formatted like this, where `<namespace>` and `<name>` match an enchantment's identifier:  
-**`/assets/<namespace>/models/item/enchanted_book/<name>.json`**
+The mod will look for [item models](https://minecraft.wiki/w/Model#Item_models) stored in a chosen directory, and automatically associate them to variants with the corresponding namespace and name.
 
-Texture pathes are defined in the models themselves; I recommend following the same naming convention as the models. (Simply replace `models` with `textures` in the path.)
-
-Enchantments with no model will fall back to the vanilla one.
-
-### Level-specific models
-The mod provides a **`level`** predicate, which can be used to define overrides in the aforementioned models.
-
-**The models used as overrides should be stored outside of `item/enchanted_book` and its subfolders,** otherwise each level will also be treated as its own enchantment. (This is unlikely to cause bugs, but is less optimised.)
-
-Example: `/assets/minecraft/models/item/enchanted_book/unbreaking.json`
+For example, here's a module that would reproduce the behaviour of the previous version of the mod, Enchants-CIT :  
+`/assets/minecraft/variant-cits/item/enchanted_book.json`
 ```json
 {
-	"parent": "item/levelled_enchanted_book/unbreaking_1",
-	"overrides": [
-		{
-			"predicate": { "level": 2 },
-			"model": "item/levelled_enchanted_book/unbreaking_2"
-		},
-		{
-			"predicate": { "level": 3 },
-			"model": "item/levelled_enchanted_book/unbreaking_3"
-		}
-	]
+	"type": "stored_enchantments",
+	"modelPrefix": "item/enchanted_book/",
+	"special": {
+		"multi": "enchants-cit:item/multi_enchanted_book"
+	}
 }
 ```
+Here, the enchantment `minecraft:unbreaking` will be associated with the model `minecraft:item/enchanted_book/unbreaking`, which is stored at `/assets/minecraft/models/item/enchanted_book/unbreaking.json`
 
-### Multi-enchantment
-The mod only supports a single model for books with multiple enchantments, hardcoded at:  
-**`/assets/enchants-cit/models/item/multi_enchanted_book.json`**
-
-The behaviour of the `level` predicate is undefined on this type of books.
+Some module types may define additional models to use in special cases, or take addional parameters. See the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a more complete guide.
