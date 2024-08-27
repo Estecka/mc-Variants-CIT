@@ -8,8 +8,11 @@
 - Added the `level` model predicate for enchanted books.
 
 # v2
+## 2.0
 - Renammed from Enchants-CIT to Variants-CIT
 - CIT logic is now modular, and can be extended via an api
 - CIT modules are now enabled and configured via resource packs
 - Added CIT modules: `axolotl_variant`, `custom_data`, `instrument`, `jukebox_playable`, `potion_type`, `stored_enchantments`
 - Removed embedded resource pack.
+## 2.1
+- Added `custom_name` module
