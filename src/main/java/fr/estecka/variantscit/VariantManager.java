@@ -40,7 +40,11 @@ implements IVariantManager
 	}
 
 	public @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack){
-		ModelIdentifier modelId = this.variantModels.get(module.GetItemVariant(stack));
+		Identifier variant = module.GetItemVariant(stack);
+		if (variant == null)
+			return null;
+
+		ModelIdentifier modelId = this.variantModels.get(variant);
 		return (modelId != null) ? modelId : this.fallbackModel;
 	}
 

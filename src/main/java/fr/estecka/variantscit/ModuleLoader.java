@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
 import net.minecraft.item.Item;
@@ -27,44 +28,28 @@ implements DataLoader<Map<Item,VariantManager>>
 	private Map<Item,VariantManager> ReloadModules(ResourceManager manager){
 		Map<Item,VariantManager> result = new HashMap<>();
 
-		for (Map.Entry<Identifier, Resource> entry : manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")).entrySet()){
+		for (Map.Entry<Identifier, Resource> entry : manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")).entrySet())
+		{
 			Identifier resourceId = entry.getKey();
-			Item item = ItemFromModule(resourceId);
+			Item item = ItemFromResourcePath(resourceId);
 			if (item == null)
 				continue;
 
-			JsonObject json;
-			VariantManager module;
-			try {
-				json = JsonHelper.deserialize(entry.getValue().getReader());
+			DataResult<VariantManager> dataResult = ManagerFromResource(entry.getValue());
+			if (dataResult.isSuccess()){
+				VariantManager module = dataResult.getOrThrow();
+				module.ReloadVariants(manager);
+				result.put(item, module);
 			}
-			catch (IOException e){
-				VariantsCitMod.LOGGER.error("{}", e);
-				continue;
-			}
-
-			var dataResult = ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json);
-			if (dataResult.isError()){
+			else {
 				VariantsCitMod.LOGGER.error("Error in cit module {}: {}", resourceId, dataResult.error().get().message());
-				continue;
 			}
-
-			try {
-				module = ModuleRegistry.CreateManager(dataResult.getOrThrow().getFirst(), json);
-			}
-			catch (IllegalArgumentException|IllegalStateException e){
-				VariantsCitMod.LOGGER.error("Error building cit module of type {}: {}", dataResult.getPartialOrThrow().getFirst().type(), e);
-				continue;
-			}
-
-			module.ReloadVariants(manager);
-			result.put(item, module);
 		}
 
 		return result;
 	}
 
-	static private @Nullable Item ItemFromModule(Identifier resourceId){
+	static private @Nullable Item ItemFromResourcePath(Identifier resourceId){
 		String path = resourceId.getPath();
 		path = path.substring("variant-cits/item".length() + 1, path.length() - ".json".length());
 
@@ -74,5 +59,32 @@ implements DataLoader<Map<Item,VariantManager>>
 			return Registries.ITEM.get(itemId);
 		else
 			return null;
+	}
+
+	static private DataResult<VariantManager> ManagerFromResource(Resource resource){
+		JsonObject json;
+		try {
+			json = JsonHelper.deserialize(resource.getReader());
+		}
+		catch (IOException e){
+			return DataResult.error(e::toString);
+		}
+
+		var dataResult = ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json);
+		if (dataResult.isError()){
+			return DataResult.error(dataResult.error().get()::message);
+		}
+
+		try {
+			ModuleDefinition definition = dataResult.getOrThrow().getFirst();
+			JsonObject parameters = json.getAsJsonObject("parameters");
+			if (parameters == null)
+				parameters = new JsonObject();
+
+			return DataResult.success(ModuleRegistry.CreateManager(definition, parameters));
+		}
+		catch (IllegalArgumentException|IllegalStateException|ClassCastException e){
+			return DataResult.error(e::toString);
+		}
 	}
 }

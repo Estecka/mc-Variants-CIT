@@ -24,7 +24,7 @@ public final class ModuleRegistry
 	static public <T> void Register(Identifier type, ComplexCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
 		assert moduleFactory != null;
 		Register(type, (ModuleDefinition config, JsonObject json) -> {
-			var data = codec.fieldOf("parameters").decoder().decode(JsonOps.INSTANCE, json);
+			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
 			ICitModule module = moduleFactory.Build(config.GetSpecialModelIds(), data.getOrThrow().getFirst());
 			return new VariantManager(config, module);
 		});
@@ -33,7 +33,7 @@ public final class ModuleRegistry
 	static public <T> void Register(Identifier type, ParameterizedCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
 		assert moduleFactory != null;
 		Register(type, (ModuleDefinition config, JsonObject json) -> {
-			var data = codec.fieldOf("parameters").decoder().decode(JsonOps.INSTANCE, json);
+			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
 			ICitModule module = moduleFactory.Build(data.getOrThrow().getFirst());
 			return new VariantManager(config, module);
 		});
