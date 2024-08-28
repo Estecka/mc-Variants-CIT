@@ -15,4 +15,6 @@
 - Added CIT modules: `axolotl_variant`, `custom_data`, `instrument`, `jukebox_playable`, `potion_type`, `stored_enchantments`
 - Removed embedded resource pack.
 ## 2.1
-- Added `custom_name` module
+- Added the `custom_name` module
+- Fixed the `parameters` block being mandatory on modules with only optional parameters.
+- Fixed items with no variant using the fallback model instead of the vanilla one.
