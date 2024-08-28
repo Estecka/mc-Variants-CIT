@@ -27,7 +27,7 @@ For example, here's a module that would reproduce the behaviour of the previous 
 	}
 }
 ```
-The targeted item type is automatically derived from the name file name of the config.
+The targeted item type is automatically derived from the file name of the config.
 Here, the enchantment `minecraft:unbreaking` will be associated with the model stored at `/assets/minecraft/models/item/enchanted_book/unbreaking.json`
 
 Some module types may define additional models to use in special cases, or take addional parameters. 
