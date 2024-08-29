@@ -17,6 +17,9 @@ public final class ModuleRegistrar
 		ICitModule Build(Map<String, ModelIdentifier> specialModels);
 	}
 
+	/**
+	 * @deprecated Modules may now be built directly from their codec.
+	 */
 	@Deprecated
 	static public interface ParameterizedCitModuleFactory<T> {
 		ICitModule Build(T customData);
@@ -39,6 +42,9 @@ public final class ModuleRegistrar
 		ModuleRegistry.Register(moduleId, module, customDataCodec);
 	}
 
+	/**
+	 * @deprecated See {@link ParameterizedCitModuleFactory}
+	 */
 	@Deprecated
 	static public <T> void Register(Identifier moduleId, ParameterizedCitModuleFactory<T> module, MapCodec<T> customDataCodec){
 		ModuleRegistry.Register(moduleId, module, customDataCodec);
