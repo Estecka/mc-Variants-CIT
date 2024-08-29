@@ -14,7 +14,6 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fr.estecka.variantscit.modules.*;
 
 
@@ -41,7 +40,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
 
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();

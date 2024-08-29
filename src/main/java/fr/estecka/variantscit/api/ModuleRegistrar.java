@@ -8,19 +8,33 @@ import net.minecraft.util.Identifier;
 
 public final class ModuleRegistrar
 {
+	/**
+	 * @deprecated Modules may now  access the list  of special models  from the
+	 * {@link IVariantManager} provided to {@link ICitModule#GetItemModel}.
+	 */
+	@Deprecated
 	static public interface SpecialCitModuleFactory {
 		ICitModule Build(Map<String, ModelIdentifier> specialModels);
 	}
 
+	@FunctionalInterface
 	static public interface ParameterizedCitModuleFactory<T> {
 		ICitModule Build(T customData);
 	}
 
+	/**
+	 * @deprecated See {@link SpecialCitModuleFactory}
+	 */
+	@Deprecated
 	static public interface ComplexCitModuleFactory<T> {
 		ICitModule Build(Map<String, ModelIdentifier> specialModels, T customData);
 	}
 
 
+	/**
+	 * @deprecated See {@link SpecialCitModuleFactory}
+	 */
+	@Deprecated
 	static public <T> void Register(Identifier moduleId, ComplexCitModuleFactory<T> module, MapCodec<T> customDataCodec){
 		ModuleRegistry.Register(moduleId, module, customDataCodec);
 	}
@@ -29,11 +43,20 @@ public final class ModuleRegistrar
 		ModuleRegistry.Register(moduleId, module, customDataCodec);
 	}
 
+
+	/**
+	 * @deprecated See {@link SpecialCitModuleFactory}
+	 */
+	@Deprecated
 	static public void Register(Identifier moduleId, SpecialCitModuleFactory module){
 		ModuleRegistry.Register(moduleId, module);
 	}
 
 	static public void Register(Identifier moduleId, ISimpleCitModule module){
+		ModuleRegistry.Register(moduleId, module);
+	}
+
+	static public void Register(Identifier moduleId, ICitModule module){
 		ModuleRegistry.Register(moduleId, module);
 	}
 }

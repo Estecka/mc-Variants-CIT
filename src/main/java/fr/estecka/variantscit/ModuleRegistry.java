@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.api.ICitModule;
-import fr.estecka.variantscit.api.ISimpleCitModule;
 import fr.estecka.variantscit.api.ModuleRegistrar.ComplexCitModuleFactory;
 import fr.estecka.variantscit.api.ModuleRegistrar.ParameterizedCitModuleFactory;
 import fr.estecka.variantscit.api.ModuleRegistrar.SpecialCitModuleFactory;
@@ -21,9 +20,10 @@ public final class ModuleRegistry
 
 	static private final Map<Identifier, ManagerFactory> MODULE_TYPES = new HashMap<>();
 
+	@Deprecated
 	static public <T> void Register(Identifier type, ComplexCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
 		assert moduleFactory != null;
-		Register(type, (ModuleDefinition config, JsonObject json) -> {
+		RegisterManager(type, (config, json) -> {
 			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
 			ICitModule module = moduleFactory.Build(config.GetSpecialModelIds(), data.getOrThrow().getFirst());
 			return new VariantManager(config, module);
@@ -32,24 +32,25 @@ public final class ModuleRegistry
 
 	static public <T> void Register(Identifier type, ParameterizedCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
 		assert moduleFactory != null;
-		Register(type, (ModuleDefinition config, JsonObject json) -> {
+		RegisterManager(type, (config, json) -> {
 			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
 			ICitModule module = moduleFactory.Build(data.getOrThrow().getFirst());
 			return new VariantManager(config, module);
 		});
 	}
 
+	@Deprecated
 	static public void Register(Identifier type, SpecialCitModuleFactory moduleFactory){
 		assert moduleFactory != null;
-		Register(type, (config,json)->new VariantManager(config, moduleFactory.Build(config.GetSpecialModelIds())));
+		RegisterManager(type, (config,json)->new VariantManager(config, moduleFactory.Build(config.GetSpecialModelIds())));
 	}
 
-	static public void Register(Identifier type, ISimpleCitModule module){
+	static public void Register(Identifier type, ICitModule module){
 		assert module != null;
-		Register(type, (config,json)->new VariantManager(config, module));
+		RegisterManager(type, (config,json)->new VariantManager(config, module));
 	}
 
-	static private void Register(Identifier type, ManagerFactory factory){
+	static private void RegisterManager(Identifier type, ManagerFactory factory){
 		assert type != null;
 		assert factory != null;
 		if (MODULE_TYPES.containsKey(type))

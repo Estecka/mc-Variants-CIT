@@ -8,24 +8,21 @@ import net.minecraft.util.Identifier;
 public interface ICitModule
 {
 	/**
-	 * Identifies  the item's variant, from which the  model ID will be derived.
-	 * Items with no variants will fallback to the vanilla model.
-	 * 
-	 * @return The variant's identifier, or null if the item has none.
+	 * @deprecated Will  become  exclusive  to {@link ISimpleCitModule}. You may
+	 * now implement that logic directly inside {@link #GetItemModel}.
 	 */
-	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
+	@Deprecated
+	public default @Nullable Identifier GetItemVariant(ItemStack stack){
+		return null;
+	}
 
 	/**
-	 * Special logic  for overriding the variant-based models  in scenarios that
-	 * are not handled by the mod. E.g: a unique model  for enchanted books with
-	 * more than one enchantement.
-	 * 
-	 * If no  special model  apply to  this item stack,  this should  return the
-	 * value from the {@param variantManager}.
+	 * The main logic for changing an items model.
 	 * 
 	 * @param stack The item stack to evaluate the model for.
-	 * @param variantManager The provider for variant-based models
-	 * @return The model ID , or null if the vanilla model should be used.
+	 * @param variantManager The provider  for both  special  and  variant-based
+	 * models.
+	 * @return The model ID, or null if the vanilla model should be used.
 	 */
-	public abstract @Nullable ModelIdentifier GetItemModel(ItemStack stack, IVariantManager variantManager);
+	public abstract @Nullable ModelIdentifier GetItemModel(ItemStack stack, IVariantManager modelProvider);
 }

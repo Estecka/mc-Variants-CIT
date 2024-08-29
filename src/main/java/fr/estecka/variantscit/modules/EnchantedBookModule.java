@@ -2,37 +2,24 @@ package fr.estecka.variantscit.modules;
 
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
-import java.util.Map;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 public class EnchantedBookModule
 implements ICitModule
 {
-	private final ModelIdentifier citMulti;
-
-	public EnchantedBookModule(Map<String,ModelIdentifier> models){
-		citMulti = models.get("multi");
-	}
-
 	@Override
-	public Identifier GetItemVariant(ItemStack stack){
+	public ModelIdentifier GetItemModel(ItemStack stack, IVariantManager modelProvider){
 		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
-		if (enchants != null && enchants.getSize() == 1)
-			return enchants.getEnchantments().iterator().next().getKey().get().getValue();
-		else
+
+		if (enchants == null || enchants.isEmpty())
 			return null;
-	}
-
-	@Override
-	public ModelIdentifier GetItemModel(ItemStack stack, IVariantManager variant){
-		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
-		if (enchants != null && enchants.getSize() > 1)
-			return citMulti;
+		else if (enchants.getSize() == 1)
+			return modelProvider.GetVariantModel(enchants.getEnchantments().iterator().next().getKey().get().getValue());
 		else
-			return variant.GetModelVariantForItem(stack);
+			return modelProvider.GetSpecialModel("multi");
+
 	}
 }
