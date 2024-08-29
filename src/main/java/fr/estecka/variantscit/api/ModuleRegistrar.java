@@ -17,7 +17,7 @@ public final class ModuleRegistrar
 		ICitModule Build(Map<String, ModelIdentifier> specialModels);
 	}
 
-	@FunctionalInterface
+	@Deprecated
 	static public interface ParameterizedCitModuleFactory<T> {
 		ICitModule Build(T customData);
 	}
@@ -39,8 +39,13 @@ public final class ModuleRegistrar
 		ModuleRegistry.Register(moduleId, module, customDataCodec);
 	}
 
+	@Deprecated
 	static public <T> void Register(Identifier moduleId, ParameterizedCitModuleFactory<T> module, MapCodec<T> customDataCodec){
 		ModuleRegistry.Register(moduleId, module, customDataCodec);
+	}
+
+	static public void Register(Identifier moduleId, MapCodec<? extends ICitModule> moduleCodec){
+		ModuleRegistry.Register(moduleId, moduleCodec);
 	}
 
 

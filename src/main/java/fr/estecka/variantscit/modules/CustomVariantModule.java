@@ -14,11 +14,11 @@ import net.minecraft.util.Identifier;
 public class CustomVariantModule
 implements ISimpleCitModule
 {
-	static public final MapCodec<String> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<CustomVariantModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.STRING.fieldOf("nbtKey").forGetter(s->s)
+			Codec.STRING.fieldOf("nbtKey").forGetter(s->s.key)
 		)
-		.apply(builder, s->s)
+		.apply(builder, CustomVariantModule::new)
 	);
 
 	private final String key;

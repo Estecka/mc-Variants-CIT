@@ -30,11 +30,20 @@ public final class ModuleRegistry
 		});
 	}
 
+	@Deprecated
 	static public <T> void Register(Identifier type, ParameterizedCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
 		assert moduleFactory != null;
 		RegisterManager(type, (config, json) -> {
 			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
 			ICitModule module = moduleFactory.Build(data.getOrThrow().getFirst());
+			return new VariantManager(config, module);
+		});
+	}
+
+	static public void Register(Identifier type, MapCodec<? extends ICitModule> codec){
+		assert codec != null;
+		RegisterManager(type, (config, json) -> {
+			ICitModule module = codec.decoder().decode(JsonOps.INSTANCE, json).getOrThrow().getFirst();
 			return new VariantManager(config, module);
 		});
 	}

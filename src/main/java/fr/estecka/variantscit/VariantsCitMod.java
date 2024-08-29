@@ -34,8 +34,8 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
 
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomVariantModule::new, CustomVariantModule.CODEC);
-		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule::new, CustomNameModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomVariantModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
