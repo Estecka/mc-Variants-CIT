@@ -23,29 +23,34 @@ implements IVariantManager
 	/**
 	 * Maps variant IDs to model IDs.
 	 */
-	private Map<Identifier, ModelIdentifier> variantModels = new HashMap<>();
-	private final Set<ModelIdentifier> specialModels = new HashSet<>();
+	private final Map<Identifier, ModelIdentifier> variantModels = new HashMap<>();
+	private final Map<String, ModelIdentifier> specialModels;
 
 
 	public VariantManager(ModuleDefinition definition, ICitModule module){
 		this.module = module;
 		this.prefix = definition.modelPrefix();
 		this.fallbackModel = definition.GetFallbackModelId();
-
-		definition.GetSpecialModelIds().values().stream()
-			.filter(id -> id!=null)
-			.distinct()
-			.forEach(specialModels::add);
-			;
+		this.specialModels = definition.GetSpecialModelIds();
 	}
 
+	@Deprecated
+	@Override
 	public @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack){
-		Identifier variant = module.GetItemVariant(stack);
+		return GetVariantModel(module.GetItemVariant(stack));
+	}
+
+	@Override
+	public @Nullable ModelIdentifier GetVariantModel(Identifier variant){
 		if (variant == null)
 			return null;
+		else
+			return this.variantModels.getOrDefault(variant, this.fallbackModel);
+	}
 
-		ModelIdentifier modelId = this.variantModels.get(variant);
-		return (modelId != null) ? modelId : this.fallbackModel;
+	@Override
+	public @Nullable ModelIdentifier GetSpecialModel(String key){
+		return this.specialModels.get(key);
 	}
 
 	public @Nullable ModelIdentifier GetModelForItem(ItemStack stack){
@@ -60,13 +65,13 @@ implements IVariantManager
 		Set<ModelIdentifier> result = new HashSet<>();
 		result.add(fallbackModel);
 		result.addAll(this.variantModels.values());
-		result.addAll(this.specialModels);
+		result.addAll(this.specialModels.values());
 		result.remove(null);
 		return result;
 	}
 
 	public void ReloadVariants(ResourceManager manager){
-		this.variantModels = new HashMap<>();
+		this.variantModels.clear();
 		
 		String folder = "models";
 		if (prefix.contains("/")){

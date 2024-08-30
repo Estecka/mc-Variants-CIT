@@ -14,7 +14,6 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fr.estecka.variantscit.modules.*;
 
 
@@ -35,13 +34,13 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
 
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomVariantModule::new, CustomVariantModule.CODEC);
-		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule::new, CustomNameModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomDataModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), EnchantedBookModule::new);
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
 
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();

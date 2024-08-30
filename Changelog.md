@@ -18,3 +18,9 @@
 - Added the `custom_name` module
 - Fixed the `parameters` block being mandatory on modules with only optional parameters.
 - Fixed items with no variant using the fallback model instead of the vanilla one.
+## 2.2
+- `custom_data` module now has a `caseSensitive` option.
+- Parameterized modules no longer need to register a constructor. They may be built directly from their codec instead.
+- Special modules no longer need to register a constructor. They may be registered the same way as Simple modules.
+- Special modules are no longer required to implement their variant logic separately from the special logic.
+- The old ways of registering special and parameterized modules has been marked as deprecated.

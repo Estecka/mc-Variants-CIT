@@ -14,24 +14,22 @@ import net.minecraft.util.Identifier;
 public class CustomNameModule
 implements ISimpleCitModule
 {
-	static public record CustomNameConfig(boolean caseSensitive, Map<String, Identifier> specialNames) {}
-
-	static public final MapCodec<CustomNameConfig> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Codec.BOOL.fieldOf("caseSensitive").orElse(false).forGetter(p->p.caseSensitive),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("specialNames").orElse(Map.of()).forGetter(p->p.specialNames)
 		)
-		.apply(builder, CustomNameConfig::new)
+		.apply(builder, CustomNameModule::new)
 	);
 
 	private final boolean caseSensitive;
 	private final Map<String,Identifier> specialNames = new HashMap<>();
 
-	public CustomNameModule(CustomNameConfig params){
-		this.caseSensitive = params.caseSensitive;
+	public CustomNameModule(Boolean caseSensitive, Map<String, Identifier> specialNames){
+		this.caseSensitive = caseSensitive;
 		if (caseSensitive)
-			this.specialNames.putAll(params.specialNames);
-		else for (var e : params.specialNames.entrySet())
+			this.specialNames.putAll(specialNames);
+		else for (var e : specialNames.entrySet())
 			this.specialNames.put(e.getKey().toLowerCase(), e.getValue());
 	}
 
