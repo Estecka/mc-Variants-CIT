@@ -20,7 +20,7 @@ public interface ICitModule
 	 * The main logic for changing an items model.
 	 * 
 	 * @param stack The item stack to evaluate the model for.
-	 * @param variantManager The provider  for both  special  and  variant-based
+	 * @param modelProvider  The provider  for both  special  and  variant-based
 	 * models.
 	 * @return The model ID, or null if the vanilla model should be used.
 	 */

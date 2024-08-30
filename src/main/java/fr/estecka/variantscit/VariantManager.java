@@ -37,11 +37,7 @@ implements IVariantManager
 	@Deprecated
 	@Override
 	public @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack){
-		Identifier variant = module.GetItemVariant(stack);
-		if (variant == null)
-			return null;
-
-		return GetVariantModel(variant);
+		return GetVariantModel(module.GetItemVariant(stack));
 	}
 
 	@Override
