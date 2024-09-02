@@ -15,23 +15,24 @@ This comes at the cost of some flexibility; while being _multi_-purpose, it may 
 The typical scenarios this mod targets are when a single item type has a large amount of variants, and all those variants can be unified under a single all-encompassing rules (so-called modules).
 
 ## Resource Pack Format
+This is an overview, see the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
+
 The format revolves around item variants (reduced to namespaced identifiers) being automatically associated to [item models](https://minecraft.wiki/w/Model#Item_models) with matching names, stored in a directory of your choosing.
 
-Resource packs must start by providing a configuration file, that defines what item type is affected, how to figure out its variant, and where the models are located.
+Resource packs must start by providing a module configuration, that defines what item is affected, how to figure out its variant, and where their models are located.
 
 For example, here's a module that would reproduce the behaviour of the previous version of the mod, Enchants-CIT :  
 `/assets/minecraft/variant-cits/item/enchanted_book.json`
 ```json
 {
 	"type": "stored_enchantments",
+	"items": ["enchanted_book"],
 	"modelPrefix": "item/enchanted_book/",
 	"special": {
 		"multi": "enchants-cit:item/multi_enchanted_book"
 	}
 }
 ```
-The targeted item type is automatically derived from the file name of the config.
 Here, the enchantment `minecraft:unbreaking` will be associated with the model stored at `/assets/minecraft/models/item/enchanted_book/unbreaking.json`
 
-Some module types may define additional models to use in special cases, or take addional parameters. 
-See the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a more complete guide.
+Some module types may define additional models to use in special cases, or take addional parameters.
