@@ -14,7 +14,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 public final class VariantManager
-implements IVariantManager
+implements IVariantManager, IItemModelProvider
 {
 	private final ICitModule module;
 	private final String prefix;

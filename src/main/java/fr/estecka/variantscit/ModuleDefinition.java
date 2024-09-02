@@ -1,6 +1,7 @@
 package fr.estecka.variantscit;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
@@ -13,11 +14,20 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public record ModuleDefinition(Identifier type, String modelPrefix, Optional<Identifier> fallbackModel, Map<String,Identifier> specialModels)
+public record ModuleDefinition(
+	Identifier type,
+	Optional<List<Identifier>> targets,
+	int priority,
+	String modelPrefix,
+	Optional<Identifier> fallbackModel,
+	Map<String,Identifier> specialModels
+)
 {
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
+			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::targets),
+			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Identifier.CODEC.optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
