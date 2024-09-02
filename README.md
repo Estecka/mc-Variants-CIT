@@ -2,14 +2,17 @@
 A CIT logic for MC 1.21, optimized around items with standardized variants.
 
 **This mod is not a plug-and-play replacement for Optifine/CIT-resewn;** it uses its own resource format. Changes to older packs are required for them to work.
-On low-end PCs, using this mod instead of the optifine format may lead to improved performances in scenarios where a single item has very many different variants.
 
-The mod is not as all-purpose as optifine, it still requires specialized code for most item type, but this code is modular and easy to expand upon. Other mods can also add custom modules for their own items.
+The mod contains built-in logic for handling **Axolotl Buckets**, **Enchanted Books**, **Music Discs**, **Goat Horns**, and **Potions**. 
+There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item, other mods can easily create custom logic for their own items.
 
-Built-in modules support **Axolotl Buckets**, **Enchanted Books**, **Music Discs**, **Goat Horns**, and **Potions**.
-There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item.
-If Mojang ever makes these items more componentized, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future.
+If Mojang ever makes these items data-driven, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future. 
 
+## Difference with Optifine/CIT-Resewn
+The base concept for this mod was born out of a need for _optimization_, at a time when optifine was still an up-to-date CIT option. 
+This comes at the cost of some flexibility; while being _multi_-purpose, it may not be as _all_-purpose.
+
+The typical scenarios this mod targets are when a single item type has a large amount of variants, and all those variants can be unified under a single all-encompassing rules (so-called modules).
 
 ## Resource Pack Format
 The format revolves around item variants (reduced to namespaced identifiers) being automatically associated to [item models](https://minecraft.wiki/w/Model#Item_models) with matching names, stored in a directory of your choosing.
