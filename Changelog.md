@@ -24,3 +24,6 @@
 - Special modules no longer need to register a constructor. They may be registered the same way as Simple modules.
 - Special modules are no longer required to implement their variant logic separately from the special logic.
 - The old ways of registering special and parameterized modules has been marked as deprecated.
+## 2.3
+- It's now possible to apply multiple modules to a single item.
+- It's now possible to apply a single module to multiple items.
