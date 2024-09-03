@@ -3,6 +3,7 @@ package fr.estecka.variantscit.modules;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -32,7 +33,7 @@ implements ISimpleCitModule
 	 * Keys  are  evaluated  by identity, not  by content. Item  components  are
 	 * supposed to be immutable, so the value of text should change.
 	 */
-	private final WeakHashMap<Text, Identifier> cachedVariants = new WeakHashMap<>();
+	private final WeakHashMap<Text, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
 
 	private final boolean caseSensitive;
 	private final boolean keepIllegal;
@@ -52,7 +53,10 @@ implements ISimpleCitModule
 		if (component == null)
 			return null;
 
-		return cachedVariants.computeIfAbsent(component, this::GetVariantFromText);
+		if (!cachedVariants.containsKey(component))
+			cachedVariants.put(component, GetVariantFromText(component));
+		return cachedVariants.get(component);
+
 	}
 
 	public Identifier GetVariantFromText(Text text){
@@ -71,7 +75,7 @@ implements ISimpleCitModule
 
 		if (!this.keepIllegal){
 			name = name.replace(' ', '_');
-			name.replaceAll("^[a-zA-Z0-9_.-]", "");
+			name = name.replaceAll("[^a-zA-Z0-9_.-]", "");
 		}
 
 		return name;
