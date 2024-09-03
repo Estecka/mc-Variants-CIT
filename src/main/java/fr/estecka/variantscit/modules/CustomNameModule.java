@@ -42,10 +42,8 @@ implements ISimpleCitModule
 		this.caseSensitive = caseSensitive;
 		this.keepIllegal = keepIllegal;
 
-		if (caseSensitive)
-			this.specialNames.putAll(specialNames);
-		else for (var e : specialNames.entrySet())
-			this.specialNames.put(e.getKey().toLowerCase(), e.getValue());
+		for (var e : specialNames.entrySet())
+			this.specialNames.put(this.Transform(e.getKey().toLowerCase()), e.getValue());
 	}
 
 	@Override
@@ -58,22 +56,24 @@ implements ISimpleCitModule
 	}
 
 	public Identifier GetVariantFromText(Text text){
-		String name = text.getString();
+		String name = this.Transform(text.getString());
+		VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
 
-		if (!caseSensitive)
+		if (specialNames.containsKey(name))
+			return specialNames.get(name);
+		else
+			return Identifier.tryParse(name);
+	}
+
+	public String Transform(String name){
+		if (!this.caseSensitive)
 			name = name.toLowerCase();
 
-		if (specialNames.containsKey(name)){
-			VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
-			return specialNames.get(name);
-		}
-
-		if (!keepIllegal){
+		if (!this.keepIllegal){
 			name = name.replace(' ', '_');
-			name.replaceAll("[^a-zA-Z0-9_.-]", "");
+			name.replaceAll("^[a-zA-Z0-9_.-]", "");
 		}
 
-		VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
-		return Identifier.tryParse(name);
+		return name;
 	}
 }
