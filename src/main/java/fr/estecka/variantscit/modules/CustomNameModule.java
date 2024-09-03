@@ -19,23 +19,29 @@ implements ISimpleCitModule
 	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Codec.BOOL.fieldOf("caseSensitive").orElse(false).forGetter(p->p.caseSensitive),
+			Codec.BOOL.fieldOf("keepIllegal").orElse(false).forGetter(p->p.keepIllegal),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("specialNames").orElse(Map.of()).forGetter(p->p.specialNames)
 		)
 		.apply(builder, CustomNameModule::new)
 	);
 
+	/*
+	 * Using  a Text (i.e, the item's component) instead of  a string  key means
+	 * that the lifetime of the each entry is roughly equivalent to the lifetime
+	 * of the associated item stack.
+	 * Keys  are  evaluated  by identity, not  by content. Item  components  are
+	 * supposed to be immutable, so the value of text should change.
+	 */
 	private final WeakHashMap<Text, Identifier> cachedVariants = new WeakHashMap<>();
 
 	private final boolean caseSensitive;
+	private final boolean keepIllegal;
 	private final Map<String,Identifier> specialNames = new HashMap<>();
-	private final Map<Character,Character> illegalConversions = new HashMap<>();
-	{
-		illegalConversions.put(' ', '_');
-		illegalConversions.put('\'', '-');
-	}
 
-	public CustomNameModule(Boolean caseSensitive, Map<String, Identifier> specialNames){
+	public CustomNameModule(boolean caseSensitive, boolean keepIllegal, Map<String, Identifier> specialNames){
 		this.caseSensitive = caseSensitive;
+		this.keepIllegal = keepIllegal;
+
 		if (caseSensitive)
 			this.specialNames.putAll(specialNames);
 		else for (var e : specialNames.entrySet())
@@ -62,8 +68,10 @@ implements ISimpleCitModule
 			return specialNames.get(name);
 		}
 
-		for (var e : illegalConversions.entrySet())
-			name = name.replace(e.getKey(), e.getValue());
+		if (!keepIllegal){
+			name = name.replace(' ', '_');
+			name.replaceAll("[^a-zA-Z0-9_.-]", "");
+		}
 
 		VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
 		return Identifier.tryParse(name);
