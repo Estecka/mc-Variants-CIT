@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules;
 
+import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -61,7 +62,7 @@ implements ISimpleCitModule
 
 	public Identifier GetVariantFromText(Text text){
 		String name = this.Transform(text.getString());
-		VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
+		// VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
 
 		if (specialNames.containsKey(name))
 			return specialNames.get(name);
@@ -75,6 +76,7 @@ implements ISimpleCitModule
 
 		if (!this.keepIllegal){
 			name = name.replace(' ', '_');
+			name = Normalizer.normalize(name, Normalizer.Form.NFD);
 			name = name.replaceAll("[^a-zA-Z0-9_.-]", "");
 		}
 
