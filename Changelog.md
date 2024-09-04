@@ -27,3 +27,6 @@
 ## 2.3
 - It's now possible to apply multiple modules to a single item.
 - It's now possible to apply a single module to multiple items.
+- `custom_data` may now look for variants inside nested pathes.
+- `custom_name` will now always convert all names into valid identifiers.
+- `custom_name` 's special names are no longer affected by name transformations.
