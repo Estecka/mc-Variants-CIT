@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.modules;
 
 import java.text.Normalizer;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import org.jetbrains.annotations.Nullable;
@@ -20,8 +19,7 @@ implements ISimpleCitModule
 {
 	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.BOOL.fieldOf("caseSensitive").orElse(false).forGetter(p->p.caseSensitive),
-			Codec.BOOL.fieldOf("keepIllegal").orElse(false).forGetter(p->p.keepIllegal),
+			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(p->p.debug),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("specialNames").orElse(Map.of()).forGetter(p->p.specialNames)
 		)
 		.apply(builder, CustomNameModule::new)
@@ -36,16 +34,12 @@ implements ISimpleCitModule
 	 */
 	private final WeakHashMap<Text, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
 
-	private final boolean caseSensitive;
-	private final boolean keepIllegal;
-	private final Map<String,Identifier> specialNames = new HashMap<>();
+	private final boolean debug;
+	private final Map<String,Identifier> specialNames;
 
-	public CustomNameModule(boolean caseSensitive, boolean keepIllegal, Map<String, Identifier> specialNames){
-		this.caseSensitive = caseSensitive;
-		this.keepIllegal = keepIllegal;
-
-		for (var e : specialNames.entrySet())
-			this.specialNames.put(this.Transform(e.getKey().toLowerCase()), e.getValue());
+	public CustomNameModule(boolean debug, Map<String, Identifier> specialNames){
+		this.debug = debug;
+		this.specialNames = specialNames;
 	}
 
 	@Override
@@ -61,25 +55,21 @@ implements ISimpleCitModule
 	}
 
 	public Identifier GetVariantFromText(Text text){
-		String name = this.Transform(text.getString());
-		// VariantsCitMod.LOGGER.warn("Cached {}: {} -> {}", cachedVariants.size(), text.getString(), name);
-
+		String name = text.getString();
 		if (specialNames.containsKey(name))
 			return specialNames.get(name);
-		else
-			return Identifier.tryParse(name);
+		
+		name = this.Transform(name);
+		if (debug)
+			VariantsCitMod.LOGGER.info("[custom_name CIT] #{} \"{}\" -> `{}`", cachedVariants.size(), text.getString(), name);
+		return Identifier.tryParse(name);
 	}
 
 	public String Transform(String name){
-		if (!this.caseSensitive)
-			name = name.toLowerCase();
-
-		if (!this.keepIllegal){
-			name = name.replace(' ', '_');
-			name = Normalizer.normalize(name, Normalizer.Form.NFD);
-			name = name.replaceAll("[^a-zA-Z0-9_.-]", "");
-		}
-
-		return name;
+		return Normalizer.normalize(name, Normalizer.Form.NFD)
+			.replace(' ', '_')
+			.toLowerCase()
+			.replaceAll("[^a-zA-Z0-9_.-]", "")
+			;
 	}
 }
