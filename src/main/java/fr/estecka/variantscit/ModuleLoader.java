@@ -102,11 +102,6 @@ implements DataLoader<ModuleLoader.Result>
 		return result;
 	}
 
-	/**
-	 * @return An empty optional if the targets were not explicitely defined. An
-	 * empty set  if the targets  are explicitely  set, but  do not  contain any
-	 * valid item ID.
-	 */
 	static private Set<RegistryEntry<Item>> ItemsFromTarget(List<Identifier> targets){
 		Set<RegistryEntry<Item>> result = new HashSet<>();
 		targets.stream()

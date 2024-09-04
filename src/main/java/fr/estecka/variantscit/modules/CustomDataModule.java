@@ -18,7 +18,7 @@ implements ISimpleCitModule
 {
 	static public final MapCodec<CustomDataModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.STRING.optionalFieldOf("nbtKey").forGetter(s->Optional.empty()),
+			Codec.STRING.optionalFieldOf("nbtKey").deprecated(0).forGetter(s->Optional.empty()),
 			Codec.STRING.optionalFieldOf("nbtPath").forGetter(s->Optional.empty()),
 			Codec.BOOL.fieldOf("caseSensitive").orElse(true).forGetter(s->s.caseSensitive)
 		)
