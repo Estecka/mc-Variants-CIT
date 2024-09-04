@@ -9,15 +9,15 @@ There are also more generic modules that can identify a variant from the `custom
 If Mojang ever makes these items data-driven, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future. 
 
 ## Difference with Optifine/CIT-Resewn
-The base concept for this mod was born out of a need for _optimization_, at a time when optifine was still an up-to-date CIT option. 
-This comes at the cost of some flexibility; while being _multi_-purpose, it may not be as _all_-purpose.
+The base concept for this mod was born out of a need for _optimization_, at a time when CIT-resewn was still an up-to-date option. 
+This comes at the cost of some flexibility; while being _multi_-purpose, it may not be as _all_-purpose as optifine.
 
-The typical scenarios this mod targets are when a single item type has a large amount of variants, and all those variants can be unified under a single all-encompassing rules (so-called modules).
+This mod excels in scenarios where a single item type has a large amount of variants, which can all be derived from the same piece of data in the item. Instead of defining a condition for every single CIT, you define a single rule that governs all CITs in the same collection (so-called modules).
 
 ## Resource Pack Format
 This is an overview, see the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
 
-The format revolves around item variants (reduced to namespaced identifiers) being automatically associated to [item models](https://minecraft.wiki/w/Model#Item_models) with matching names, stored in a directory of your choosing.
+The format revolves around item **variants** (reduced to namespaced identifiers) being automatically associated to [item models](https://minecraft.wiki/w/Model#Item_models) with matching names, stored in a directory of your choosing.
 
 Resource packs must start by providing a module configuration, that defines what item is affected, how to figure out its variant, and where their models are located.
 
