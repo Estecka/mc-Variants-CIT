@@ -29,6 +29,6 @@
 - It's now possible to apply a single module to multiple items.
 - Added the module `enchantment` for tools and armours.
 - `stored_enchantments` (plural) is being renamed to `stored_enchantment` (singular).
-- `custom_data` may now look for variants inside nested pathes.
+- `custom_data` may now look for variants inside nested pathes. The parameter `nbtKey` is being renamed to `nbtPath`.
 - `custom_name` will now always convert all names into valid identifiers. The case sensitivity option was removed.
 - `custom_name`'s special names are now case-sensitive.
