@@ -3,8 +3,8 @@ A CIT logic for MC 1.21, optimized around items with standardized variants.
 
 **This mod is not a plug-and-play replacement for Optifine/CIT-resewn;** it uses its own resource format. Changes to older packs are required for them to work.
 
-The mod contains built-in logic for handling **Axolotl Buckets**, **Enchanted Books**, **Music Discs**, **Goat Horns**, and **Potions**. 
-There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item, other mods can easily create custom logic for their own items.
+The mod contains built-in logic for handling **Axolotl Buckets**, **Enchantments**, **Music Discs**, **Goat Horns**, and **Potions**. 
+There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item. Other mods can easily create custom logic for their own items.
 
 If Mojang ever makes these items data-driven, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future. 
 
