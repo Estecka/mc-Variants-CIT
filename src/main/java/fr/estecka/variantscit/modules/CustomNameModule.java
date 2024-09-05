@@ -1,10 +1,13 @@
 package fr.estecka.variantscit.modules;
 
-import java.util.HashMap;
+import java.text.Normalizer;
 import java.util.Map;
+import java.util.WeakHashMap;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ISimpleCitModule;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -16,21 +19,27 @@ implements ISimpleCitModule
 {
 	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.BOOL.fieldOf("caseSensitive").orElse(false).forGetter(p->p.caseSensitive),
+			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(p->p.debug),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("specialNames").orElse(Map.of()).forGetter(p->p.specialNames)
 		)
 		.apply(builder, CustomNameModule::new)
 	);
 
-	private final boolean caseSensitive;
-	private final Map<String,Identifier> specialNames = new HashMap<>();
+	/*
+	 * Using  a Text (i.e, the item's component) instead of  a string  key means
+	 * that the lifetime of the each entry is roughly equivalent to the lifetime
+	 * of the associated item stack.
+	 * Keys  are  evaluated  by identity, not  by content. Item  components  are
+	 * supposed to be immutable, so the value of text should change.
+	 */
+	private final WeakHashMap<Text, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
 
-	public CustomNameModule(Boolean caseSensitive, Map<String, Identifier> specialNames){
-		this.caseSensitive = caseSensitive;
-		if (caseSensitive)
-			this.specialNames.putAll(specialNames);
-		else for (var e : specialNames.entrySet())
-			this.specialNames.put(e.getKey().toLowerCase(), e.getValue());
+	private final boolean debug;
+	private final Map<String,Identifier> specialNames;
+
+	public CustomNameModule(boolean debug, Map<String, Identifier> specialNames){
+		this.debug = debug;
+		this.specialNames = specialNames;
 	}
 
 	@Override
@@ -39,11 +48,28 @@ implements ISimpleCitModule
 		if (component == null)
 			return null;
 
-		String name = component.getString();
-		if (!caseSensitive)
-			name = name.toLowerCase();
+		if (!cachedVariants.containsKey(component))
+			cachedVariants.put(component, GetVariantFromText(component));
+		return cachedVariants.get(component);
 
-		Identifier variant = specialNames.get(name);
-		return (variant != null) ? variant : Identifier.tryParse(name);
+	}
+
+	public Identifier GetVariantFromText(Text text){
+		String name = text.getString();
+		if (specialNames.containsKey(name))
+			return specialNames.get(name);
+		
+		name = this.Transform(name);
+		if (debug)
+			VariantsCitMod.LOGGER.info("[custom_name CIT] #{} \"{}\" -> `{}`", cachedVariants.size(), text.getString(), name);
+		return Identifier.tryParse(name);
+	}
+
+	public String Transform(String name){
+		return Normalizer.normalize(name, Normalizer.Form.NFD)
+			.replace(' ', '_')
+			.toLowerCase()
+			.replaceAll("[^a-zA-Z0-9_.-]", "")
+			;
 	}
 }

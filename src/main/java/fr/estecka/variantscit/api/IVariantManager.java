@@ -15,6 +15,12 @@ public interface IVariantManager
 	public abstract @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack);
 
 	/**
+	 * @return  Whether this variant  has it's own model, ignoring  the fallback
+	 * model.
+	 */
+	public abstract boolean HasVariantModel(Identifier variantId);
+
+	/**
 	 * @return The model  that matches  this variant, the  fallback model  if no
 	 * model was provided for this variant, or null if the variant is null.
 	 */

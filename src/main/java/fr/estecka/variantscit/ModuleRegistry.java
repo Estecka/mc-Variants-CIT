@@ -69,13 +69,13 @@ public final class ModuleRegistry
 	}
 
 	static public VariantManager CreateManager(ModuleDefinition definition, JsonObject customData)
-	throws IllegalArgumentException, IllegalStateException
+	throws IllegalStateException
 	{
 		assert definition != null;
 		Identifier type = definition.type();
 
 		if (!MODULE_TYPES.containsKey(type))
-			throw new IllegalArgumentException("Unknown module type: " + type.toString());
+			throw new IllegalStateException("Unknown module type: " + type.toString());
 
 		return MODULE_TYPES.get(type).build(definition, customData);
 	}

@@ -14,7 +14,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 public final class VariantManager
-implements IVariantManager
+implements IVariantManager, IItemModelProvider
 {
 	private final ICitModule module;
 	private final String prefix;
@@ -38,6 +38,11 @@ implements IVariantManager
 	@Override
 	public @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack){
 		return GetVariantModel(module.GetItemVariant(stack));
+	}
+
+	@Override
+	public boolean HasVariantModel(Identifier variant){
+		return this.variantModels.containsKey(variant);
 	}
 
 	@Override

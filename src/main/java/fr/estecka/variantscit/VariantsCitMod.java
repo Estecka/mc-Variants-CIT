@@ -7,25 +7,27 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fr.estecka.variantscit.ModuleLoader.MetaModule;
 import fr.estecka.variantscit.modules.*;
 
 
 public class VariantsCitMod
-implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantManager>>
+implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Result>
 {
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	static private Map<Item, VariantManager> MODULES = new HashMap<>();
+	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
 
-	static public @Nullable VariantManager GetModule(Item itemType){
+	static public @Nullable IItemModelProvider GetModule(Item itemType){
 		return MODULES.get(itemType);
 	}
 
@@ -36,11 +38,16 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomDataModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), new EnchantedToolModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), new EnchantedBookModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), new EnchantedBookModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), _0 -> {
+			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
+			return new EnchantedBookModule();
+		});
 
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();
@@ -50,15 +57,23 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<Map<Item,VariantMa
 	}
 
 	@Override
-	public void onInitializeModelLoader(Map<Item,VariantManager> modules, ModelLoadingPlugin.Context pluginContext){
-		MODULES = modules;
-		for (var entry : MODULES.entrySet()){
-			VariantManager module = entry.getValue();
-			Identifier itemId = Registries.ITEM.getId(entry.getKey());
+	public void onInitializeModelLoader(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
+		Set<MetaModule> uniqueModules = new HashSet<>();
 
-			module.GetAllModels().stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
-			LOGGER.info("Loaded {} CITs for item {}", module.GetVariantCount(), itemId);
+		MODULES = new HashMap<>();
+		for (var entry : result.modulesPerItem.entrySet()){
+			uniqueModules.addAll(entry.getValue());
+			MODULES.put(
+				entry.getKey().value(),
+				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.manager).toList() )
+			);
 		}
+
+		for (MetaModule module : uniqueModules){
+			module.manager.GetAllModels().stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
+			LOGGER.info("Found {} variants for CIT module {}", module.manager.GetVariantCount(), module.id);
+		}
+
 	}
 
 }
