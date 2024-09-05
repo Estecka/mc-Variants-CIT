@@ -1,22 +1,23 @@
 package fr.estecka.variantscit.modules;
 
 import java.util.Iterator;
-import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 
 public class EnchantedToolModule
-implements ICitModule
+extends AComponentCachingModule<ItemEnchantmentsComponent>
 {
+	public EnchantedToolModule(){
+		super(DataComponentTypes.ENCHANTMENTS);
+	}
+
 	@Override
-	public ModelIdentifier GetItemModel(ItemStack stack, IVariantManager models){
-		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.ENCHANTMENTS);
+	public ModelIdentifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager models){
 		if (enchants == null || enchants.isEmpty())
 			return null;
 
