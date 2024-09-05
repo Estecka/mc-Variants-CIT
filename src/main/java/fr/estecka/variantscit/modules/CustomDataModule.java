@@ -2,8 +2,10 @@ package fr.estecka.variantscit.modules;
 
 import java.util.Optional;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ISimpleCitModule;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -18,7 +20,10 @@ implements ISimpleCitModule
 {
 	static public final MapCodec<CustomDataModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.STRING.optionalFieldOf("nbtKey").deprecated(0).forGetter(s->Optional.empty()),
+			Codec.STRING.optionalFieldOf("nbtKey").deprecated(0).validate(_0 -> {
+				VariantsCitMod.LOGGER.warn("The custom_data parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
+				return DataResult.success(_0);
+			}).forGetter(s->Optional.empty()),
 			Codec.STRING.optionalFieldOf("nbtPath").forGetter(s->Optional.empty()),
 			Codec.BOOL.fieldOf("caseSensitive").orElse(true).forGetter(s->s.caseSensitive)
 		)
