@@ -12,7 +12,7 @@ If Mojang ever makes these items data-driven, you can expect Banner Patterns, Tr
 The base concept for this mod was born out of a need for _optimization_, at a time when CIT-resewn was still an up-to-date option. 
 This comes at the cost of some flexibility; while being _multi_-purpose, it may not be as _all_-purpose as optifine.
 
-This mod excels in scenarios where a single item type has a large amount of variants, which can all be derived from the same piece of data in the item. Instead of defining a condition for every single CIT, you define a single rule that governs all CITs in the same collection (so-called modules).
+This mod excels in scenarios where a single item type has a large amount of variants, which can all be derived from a single piece of data. Instead of defining a condition for every single CIT, you define a single rule that governs all CITs in a collection (so-called modules).
 
 ## Resource Pack Format
 This is an overview, see the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
@@ -25,7 +25,7 @@ For example, here's a module that would reproduce the behaviour of the previous 
 `/assets/minecraft/variant-cits/item/enchanted_book.json`
 ```json
 {
-	"type": "stored_enchantments",
+	"type": "stored_enchantment",
 	"items": ["enchanted_book"],
 	"modelPrefix": "item/enchanted_book/",
 	"special": {
