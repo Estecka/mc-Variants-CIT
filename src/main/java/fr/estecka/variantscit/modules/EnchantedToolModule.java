@@ -1,22 +1,22 @@
 package fr.estecka.variantscit.modules;
 
 import java.util.Iterator;
-import fr.estecka.variantscit.api.ISimpleCitModule;
+import fr.estecka.variantscit.api.ICitModule;
+import fr.estecka.variantscit.api.IVariantManager;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
 
 public class EnchantedToolModule
-implements ISimpleCitModule
+implements ICitModule
 {
 	@Override
-	public Identifier GetItemVariant(ItemStack stack){
+	public ModelIdentifier GetItemModel(ItemStack stack, IVariantManager models){
 		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.ENCHANTMENTS);
-
 		if (enchants == null || enchants.isEmpty())
 			return null;
 
@@ -24,15 +24,21 @@ implements ISimpleCitModule
 		var bestFit = iterator.next();
 		while (iterator.hasNext()){
 			var contestant = iterator.next();
-			if (Compare(contestant, bestFit) > 0)
+			if (Compare(contestant, bestFit, models) > 0)
 				bestFit = contestant;
 		}
 
-		return bestFit.getKey().getKey().get().getValue();
+		return models.GetVariantModel(bestFit.getKey().getKey().get().getValue());
 	}
 
-	public int Compare(Entry<RegistryEntry<Enchantment>> a, Entry<RegistryEntry<Enchantment>> b){
+	public int Compare(Entry<RegistryEntry<Enchantment>> a, Entry<RegistryEntry<Enchantment>> b, IVariantManager models){
 		int result = 0;
+
+		result = Boolean.compare(
+			models.HasVariantModel(a.getKey().getKey().get().getValue()),
+			models.HasVariantModel(b.getKey().getKey().get().getValue())
+		);
+		if (result != 0) return result;
 
 		result = a.getKey().value().exclusiveSet().size() - b.getKey().value().exclusiveSet().size();
 		if (result != 0) return result;

@@ -41,6 +41,11 @@ implements IVariantManager, IItemModelProvider
 	}
 
 	@Override
+	public boolean HasVariantModel(Identifier variant){
+		return this.variantModels.containsKey(variant);
+	}
+
+	@Override
 	public @Nullable ModelIdentifier GetVariantModel(Identifier variant){
 		if (variant == null)
 			return null;
