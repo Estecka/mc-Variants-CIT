@@ -23,9 +23,14 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
+	static private Map<ModelIdentifier, Identifier> AUTOGEN = new HashMap<>();
 
 	static public @Nullable IItemModelProvider GetModule(Item itemType){
 		return MODULES.get(itemType);
+	}
+
+	static public Map<ModelIdentifier, Identifier> GetModelsToCreate(){
+		return Map.copyOf(AUTOGEN);
 	}
 
 	@Override
@@ -60,6 +65,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		for (var e : result.uniqueModules.entrySet())
 			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
 
+		AUTOGEN = result.modelAggregator.modelsToCreate;
 		MODULES = new HashMap<>();
 		for (var entry : result.modulesPerItem.entrySet()){
 			MODULES.put(

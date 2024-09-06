@@ -3,7 +3,8 @@
 	"package": "fr.estecka.variantscit.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ItemRendererMixin"
+		"ItemRendererMixin",
+		"ModelLoaderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
