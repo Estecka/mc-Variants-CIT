@@ -43,7 +43,7 @@ implements DataLoader<ModuleLoader.Result>
 	 * afterward.
 	 */
 	static public record MetaModule (
-		Identifier resourceId,
+		Identifier id,
 		ProtoModule prototype,
 		BakedModule bakedModule
 	){}
@@ -59,33 +59,33 @@ implements DataLoader<ModuleLoader.Result>
 
 		for (Map.Entry<Identifier, Resource> entry : manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")).entrySet())
 		try {
-			Identifier resourceId = entry.getKey();
+			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
 			Set<RegistryEntry<Item>> targets = prototype.definition.targets()
 				.map(ModuleLoader::ItemsFromTarget)
-				.orElseGet(()->ItemsFromResourcePath(resourceId))
+				.orElseGet(()->ItemsFromModuleId(moduleId))
 				;
 			if (targets.isEmpty()){
-				result.ignoredModules.add(resourceId);
+				result.ignoredModules.add(moduleId);
 				continue;
 			}
 
 			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition, prototype.parameters);
 			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype, manager);
 			MetaModule meta = new MetaModule(
-				resourceId,
+				moduleId,
 				prototype,
 				new BakedModule(library, moduleLogic)
 			);
 
-			result.uniqueModules.put(resourceId, meta.bakedModule());
+			result.uniqueModules.put(moduleId, meta.bakedModule());
 			for (var item : targets){
 				result.modulesPerItem.computeIfAbsent(item, __->new ArrayList<>()).add(meta);
 			}
 		}
 		catch (IllegalStateException e){
-			VariantsCitMod.LOGGER.error("Error in cit module {}: {}", entry.getKey(), e);
+			VariantsCitMod.LOGGER.error("Error in CIT module {}: {}", entry.getKey(), e);
 		}
 
 		// Sort highest priorities first.
@@ -105,16 +105,25 @@ implements DataLoader<ModuleLoader.Result>
 		return result;
 	}
 
-	static private Set<RegistryEntry<Item>> ItemsFromResourcePath(Identifier resourceId){
-		String path = resourceId.getPath();
-		path = path.substring("variant-cits/item".length() + 1, path.length() - ".json".length());
-
-		Identifier itemId = Identifier.of(resourceId.getNamespace(), path);
+	static private Set<RegistryEntry<Item>> ItemsFromModuleId(Identifier moduleId){
+		Identifier itemId = ItemIdFromModuleId(moduleId);
 
 		if (Registries.ITEM.containsId(itemId))
 			return Set.of(Registries.ITEM.getEntry(itemId).get());
 		else
 			return Set.of();
+	}
+
+	static private Identifier ItemIdFromModuleId(Identifier resource){
+		String path = resource.getPath();
+		path = path.substring("item/".length());
+		return Identifier.of(resource.getNamespace(), path);
+	}
+
+	static private Identifier ModuleIdFromResourceId(Identifier resource){
+		String path = resource.getPath();
+		path = path.substring("variant-cits/".length(), path.length()-".json".length());
+		return Identifier.of(resource.getNamespace(), path);
 	}
 
 	static private DataResult<ProtoModule> DefinitionFromResource(Resource resource){
