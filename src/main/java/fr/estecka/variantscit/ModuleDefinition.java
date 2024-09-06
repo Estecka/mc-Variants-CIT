@@ -19,6 +19,7 @@ public record ModuleDefinition(
 	Optional<List<Identifier>> targets,
 	int priority,
 	String modelPrefix,
+	Optional<Identifier> modelParent,
 	Optional<Identifier> fallbackModel,
 	Map<String,Identifier> specialModels
 )
@@ -29,6 +30,7 @@ public record ModuleDefinition(
 			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
+			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
 			Identifier.CODEC.optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
 		)
