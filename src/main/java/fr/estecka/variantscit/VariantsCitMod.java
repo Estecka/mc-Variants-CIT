@@ -25,6 +25,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
+	static public int reloadcount = 0;
 	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
 
 	static public @Nullable IItemModelProvider GetModule(Item itemType){
@@ -58,6 +59,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 
 	@Override
 	public void onInitializeModelLoader(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
+		++reloadcount;
 		Set<MetaModule> uniqueModules = new HashSet<>();
 
 		MODULES = new HashMap<>();

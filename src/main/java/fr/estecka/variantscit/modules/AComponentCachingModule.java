@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.WeakHashMap;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import net.minecraft.client.util.ModelIdentifier;
@@ -12,10 +13,8 @@ import net.minecraft.item.ItemStack;
  * Optimization for deterministic modules that may require expensive computation
  * upon a single item component.
  * 
- * TODO:
- * Clear  the cache  upon  reosurce  reload.  This  does not  work  well  on the
- * EnchantedToolModule because  it both survives the reload, and caches based on 
- * available models.
+ * This version  may be  less stable  than  its simple  counterpart, because its
+ * cache needs to be cleared after every resource reload.
  */
 abstract class AComponentCachingModule<T>
 implements ICitModule
@@ -29,6 +28,7 @@ implements ICitModule
 	 * identity.
 	 */
 	private final WeakHashMap<T, @Nullable ModelIdentifier> cachedModels = new WeakHashMap<>();
+	private int reloadCounts = 0;
 
 	public AComponentCachingModule(ComponentType<T> component){
 		this.componentType = component;
@@ -41,6 +41,8 @@ implements ICitModule
 		if (component == null)
 			return null;
 
+		if (this.reloadCounts != VariantsCitMod.reloadcount)
+			cachedModels.clear();
 		/**
 		 * Do  not  use  computeIfAbsent! It would  attempt  to  recompute  null
 		 * values, which are valid to cache.
