@@ -37,7 +37,7 @@ implements DataLoader<ModuleLoader.Result>
 	 */
 	static public class MetaModule {
 		public final Identifier id;
-		public final VariantManager manager;
+		public final VariantLibrary manager;
 		public final ModuleDefinition definition;
 		public final JsonObject parameters;
 

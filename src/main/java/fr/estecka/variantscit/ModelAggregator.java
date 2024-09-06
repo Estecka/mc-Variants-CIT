@@ -1,6 +1,5 @@
 package fr.estecka.variantscit;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,12 +14,13 @@ import net.minecraft.util.Identifier;
 
 public class ModelAggregator
 {
-	public final Map<String, Map<Identifier,ModelIdentifier>> variantsPerPrefix = new HashMap<>();
-	public final Map<Identifier, Map<String,ModelIdentifier>> specialsPerModule = new HashMap<>();
 	public final Set<ModelIdentifier> modelsToLoad = new HashSet<>();
 	public final Map<ModelIdentifier, Identifier> modelsToCreate = new HashMap<>();
 
-	public void AddModule(MetaModule module, ResourceManager manager){
+	public VariantLibrary CreateLibrary(MetaModule module, ResourceManager manager){
+		Map<Identifier,ModelIdentifier> allVariants = new HashMap<>();
+		Map<String,ModelIdentifier> allSpecials = new HashMap<>();
+
 		final Identifier id = module.id;
 		final String prefix = module.definition.modelPrefix();
 		final Optional<Identifier> modelParent = module.definition.modelParent();
@@ -28,8 +28,8 @@ public class ModelAggregator
 
 		var varModels = FindVariants(manager, "models", prefix, ".json");
 		var speModels = FindSpecials(manager, "models", specials, ".json");
-		this.variantsPerPrefix.computeIfAbsent(prefix, _0->new HashMap<>()).putAll(varModels);
-		this.specialsPerModule.computeIfAbsent(id, _0->new HashMap<>()).putAll(speModels);
+		allVariants.putAll(varModels);
+		allSpecials.putAll(speModels);
 		this.modelsToLoad.addAll(varModels.values());
 		this.modelsToLoad.addAll(speModels.values());
 
@@ -39,11 +39,17 @@ public class ModelAggregator
 			var speTextures = FindSpecials(manager, "textures", specials, ".png" );
 			varModels.keySet().forEach(varTextures::remove);
 			speModels.keySet().forEach(speTextures::remove);
-			this.variantsPerPrefix.get(prefix).putAll(varTextures);
-			this.specialsPerModule.get(id).putAll(speTextures);
+			allVariants.putAll(varTextures);
+			allSpecials.putAll(speTextures);
 			varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
 			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
 		}
+
+		return new VariantLibrary(
+			module.definition.GetFallbackModelId(),
+			allVariants,
+			allSpecials
+		);
 	}
 
 	private void AddModelToCreate(ModelIdentifier model, Identifier parent){
