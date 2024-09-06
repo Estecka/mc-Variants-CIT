@@ -23,7 +23,8 @@ public class ModelAggregator
 
 		final String prefix = prototype.definition().modelPrefix();
 		final Optional<Identifier> modelParent = prototype.definition().modelParent();
-		final var specials = prototype.definition().specialModels();
+		final var specials = new HashMap<>(prototype.definition().specialModels());
+		prototype.definition().fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
 		var varModels = FindVariants(manager, "models", prefix, ".json");
 		var speModels = FindSpecials(manager, "models", specials, ".json");
@@ -44,6 +45,7 @@ public class ModelAggregator
 			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
 		}
 
+		allSpecials.remove(null);
 		return new VariantLibrary(
 			prototype.definition().GetFallbackModelId(),
 			allVariants,
