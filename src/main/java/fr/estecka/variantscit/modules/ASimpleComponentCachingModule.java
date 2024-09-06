@@ -21,10 +21,10 @@ implements ISimpleCitModule
 	/*
 	 * The lifetime of each entry  is roughly equivalent  to the lifetime of the
 	 * associated  item stack's  component. Item components  are supposed  to be
-	 * immutable, so a cache  should never  need  to be  recomputed  for a given
-	 * identity.
+	 * immutable, so a variant  should never need  to be recomputed  for a given
+	 * component.
 	 */
-	private final WeakHashMap<T, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
+	final WeakHashMap<T, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
 
 	public ASimpleComponentCachingModule(ComponentType<T> component){
 		this.componentType = component;
