@@ -2,20 +2,16 @@ package fr.estecka.variantscit.modules;
 
 import java.text.Normalizer;
 import java.util.Map;
-import java.util.WeakHashMap;
-import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.ISimpleCitModule;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class CustomNameModule
-implements ISimpleCitModule
+extends ASimpleComponentCachingModule<Text>
 {
 	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -25,43 +21,24 @@ implements ISimpleCitModule
 		.apply(builder, CustomNameModule::new)
 	);
 
-	/*
-	 * Using  a Text (i.e, the item's component) instead of  a string  key means
-	 * that the lifetime of the each entry is roughly equivalent to the lifetime
-	 * of the associated item stack.
-	 * Keys  are  evaluated  by identity, not  by content. Item  components  are
-	 * supposed to be immutable, so the value of text should change.
-	 */
-	private final WeakHashMap<Text, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
-
 	private final boolean debug;
 	private final Map<String,Identifier> specialNames;
 
 	public CustomNameModule(boolean debug, Map<String, Identifier> specialNames){
+		super(DataComponentTypes.CUSTOM_NAME);
 		this.debug = debug;
 		this.specialNames = specialNames;
 	}
 
 	@Override
-	public Identifier GetItemVariant(ItemStack stack){
-		Text component = stack.get(DataComponentTypes.CUSTOM_NAME);
-		if (component == null)
-			return null;
-
-		if (!cachedVariants.containsKey(component))
-			cachedVariants.put(component, GetVariantFromText(component));
-		return cachedVariants.get(component);
-
-	}
-
-	public Identifier GetVariantFromText(Text text){
+	public Identifier GetVariantForComponent(Text text){
 		String name = text.getString();
 		if (specialNames.containsKey(name))
 			return specialNames.get(name);
 		
 		name = this.Transform(name);
 		if (debug)
-			VariantsCitMod.LOGGER.info("[custom_name CIT] #{} \"{}\" -> `{}`", cachedVariants.size(), text.getString(), name);
+			VariantsCitMod.LOGGER.info("[custom_name CIT] #{} \"{}\" -> `{}`", super.cachedVariants.size(), text.getString(), name);
 		return Identifier.tryParse(name);
 	}
 
