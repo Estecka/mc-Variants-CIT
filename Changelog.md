@@ -32,3 +32,5 @@
 - `custom_data` may now look for variants inside nested pathes. The parameter `nbtKey` is being renamed to `nbtPath`.
 - `custom_name` will now always convert all names into valid identifiers. The case sensitivity option was removed.
 - `custom_name`'s special names are now case-sensitive.
+## 2.4
+- Modules may now automatically generate models for provided textures.
