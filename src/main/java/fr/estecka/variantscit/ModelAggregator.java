@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import fr.estecka.variantscit.ModuleLoader.MetaModule;
+import fr.estecka.variantscit.ModuleLoader.ProtoModule;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceManager;
@@ -17,14 +17,13 @@ public class ModelAggregator
 	public final Set<ModelIdentifier> modelsToLoad = new HashSet<>();
 	public final Map<ModelIdentifier, Identifier> modelsToCreate = new HashMap<>();
 
-	public VariantLibrary CreateLibrary(MetaModule module, ResourceManager manager){
+	public VariantLibrary CreateLibrary(ProtoModule prototype, ResourceManager manager){
 		Map<Identifier,ModelIdentifier> allVariants = new HashMap<>();
 		Map<String,ModelIdentifier> allSpecials = new HashMap<>();
 
-		final Identifier id = module.id;
-		final String prefix = module.definition.modelPrefix();
-		final Optional<Identifier> modelParent = module.definition.modelParent();
-		final var specials = module.definition.specialModels();
+		final String prefix = prototype.definition().modelPrefix();
+		final Optional<Identifier> modelParent = prototype.definition().modelParent();
+		final var specials = prototype.definition().specialModels();
 
 		var varModels = FindVariants(manager, "models", prefix, ".json");
 		var speModels = FindSpecials(manager, "models", specials, ".json");
@@ -46,7 +45,7 @@ public class ModelAggregator
 		}
 
 		return new VariantLibrary(
-			module.definition.GetFallbackModelId(),
+			prototype.definition().GetFallbackModelId(),
 			allVariants,
 			allSpecials
 		);

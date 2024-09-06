@@ -59,4 +59,8 @@ implements IVariantManager
 	public @Nullable ModelIdentifier GetSpecialModel(String key){
 		return this.specialModels.get(key);
 	}
+
+	public int GetVariantCount(){
+		return this.variantModels.size();
+	}
 }
