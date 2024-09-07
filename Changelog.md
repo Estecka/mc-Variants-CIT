@@ -34,4 +34,5 @@
 - `custom_name`'s special names are now case-sensitive.
 ## 2.4
 - Modules may now automatically generate models for provided textures.
-- Optimized some modules, reducing how often they compute an item's model.
+- Optimized some modules, reducing how often they recompute an item's model.
+- Fixed Trident and spyglass (in stack form) not being affected by CITs.

@@ -1,6 +1,8 @@
 package fr.estecka.variantscit.mixin;
 
+import java.util.function.Supplier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -19,18 +21,29 @@ import fr.estecka.variantscit.VariantsCitMod;
 @Environment(EnvType.CLIENT)
 public class ItemRendererMixin
 {
-	@WrapOperation( method="getModel", at=@At( value="INVOKE", target="net/minecraft/client/render/item/ItemModels.getModel (Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;") )
-	private BakedModel	GetVariantModel(ItemModels models, ItemStack stack, Operation<BakedModel> original)
+	@Unique
+	private BakedModel	GetVariantModel(BakedModelManager modelManager, ItemStack stack, Supplier<BakedModel> original)
 	{
 		final IItemModelProvider module = VariantsCitMod.GetModule(stack.getItem());
 		ModelIdentifier modelId;
 
 		if (module == null || (modelId=module.GetModelForItem(stack)) == null)
-			return original.call(models, stack);
+			return original.get();
 
-		final BakedModelManager modelManager = models.getModelManager();
 		BakedModel model = modelManager.getModel(modelId);
 		return (model != null) ? model : modelManager.getMissingModel();
+	}
+
+	// Most items
+	@WrapOperation( method="getModel", require=1, at=@At( value="INVOKE", target="net/minecraft/client/render/item/ItemModels.getModel (Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;") )
+	private BakedModel	GetItemStackModel(ItemModels models, ItemStack stack, Operation<BakedModel> original) {
+		return GetVariantModel(models.getModelManager(), stack, ()->original.call(models, stack));
+	}
+
+	// Trident and Spyglass
+	@WrapOperation( method="renderItem", require=2, at=@At( value="INVOKE", target="net/minecraft/client/render/model/BakedModelManager.getModel (Lnet/minecraft/client/util/ModelIdentifier;)Lnet/minecraft/client/render/model/BakedModel;") )
+	private BakedModel	GetIdentifiedModel(BakedModelManager models, ModelIdentifier id, Operation<BakedModel> original, ItemStack stack) {
+		return GetVariantModel(models, stack, ()->original.call(models, id));
 	}
 
 }
