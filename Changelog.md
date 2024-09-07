@@ -34,3 +34,4 @@
 - `custom_name`'s special names are now case-sensitive.
 ## 2.4
 - Modules may now automatically generate models for provided textures.
+- Optimized some modules, reducing how often they compute an item's model.
