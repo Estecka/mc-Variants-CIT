@@ -6,17 +6,15 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.ISimpleCitModule;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
 
 public class CustomDataModule
-implements ISimpleCitModule
+extends ASimpleComponentCachingModule<NbtComponent>
 {
 	static public final MapCodec<CustomDataModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -39,6 +37,7 @@ implements ISimpleCitModule
 	private CustomDataModule(Optional<String> key, Optional<String> path, boolean caseSensitive)
 	throws IllegalStateException
 	{
+		super(DataComponentTypes.CUSTOM_DATA);
 		this.caseSensitive = caseSensitive;
 		if (path.isPresent())
 			this.path = ParsePath(path.get());
@@ -49,8 +48,7 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public Identifier GetItemVariant(ItemStack stack){
-		NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
+	public Identifier GetVariantForComponent(NbtComponent component){
 		NbtElement nbt;
 		if (component==null || (nbt=component.getNbt())==null)
 			return null;

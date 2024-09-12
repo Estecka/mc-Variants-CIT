@@ -9,13 +9,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fr.estecka.variantscit.ModuleLoader.MetaModule;
 import fr.estecka.variantscit.modules.*;
 
 
@@ -25,10 +22,16 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
+	static public int reloadcount = 0;
 	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
+	static private Map<ModelIdentifier, Identifier> AUTOGEN = new HashMap<>();
 
 	static public @Nullable IItemModelProvider GetModule(Item itemType){
 		return MODULES.get(itemType);
+	}
+
+	static public Map<ModelIdentifier, Identifier> GetModelsToCreate(){
+		return Map.copyOf(AUTOGEN);
 	}
 
 	@Override
@@ -58,22 +61,20 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 
 	@Override
 	public void onInitializeModelLoader(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
-		Set<MetaModule> uniqueModules = new HashSet<>();
+		++reloadcount;
+		result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 
+		for (var e : result.uniqueModules.entrySet())
+			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
+
+		AUTOGEN = result.modelAggregator.modelsToCreate;
 		MODULES = new HashMap<>();
 		for (var entry : result.modulesPerItem.entrySet()){
-			uniqueModules.addAll(entry.getValue());
 			MODULES.put(
 				entry.getKey().value(),
-				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.manager).toList() )
+				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.bakedModule()).toList() )
 			);
 		}
-
-		for (MetaModule module : uniqueModules){
-			module.manager.GetAllModels().stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
-			LOGGER.info("Found {} variants for CIT module {}", module.manager.GetVariantCount(), module.id);
-		}
-
 	}
 
 }

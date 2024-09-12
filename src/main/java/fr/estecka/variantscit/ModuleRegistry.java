@@ -14,19 +14,18 @@ import net.minecraft.util.Identifier;
 public final class ModuleRegistry
 {
 	@FunctionalInterface
-	static private interface ManagerFactory {
-		VariantManager build(ModuleDefinition definition, JsonObject customData) throws IllegalStateException;
+	static private interface ModuleFactory {
+		ICitModule build(ModuleDefinition definition, JsonObject customData) throws IllegalStateException;
 	}
 
-	static private final Map<Identifier, ManagerFactory> MODULE_TYPES = new HashMap<>();
+	static private final Map<Identifier, ModuleFactory> MODULE_TYPES = new HashMap<>();
 
 	@Deprecated
 	static public <T> void Register(Identifier type, ComplexCitModuleFactory<T> moduleFactory, MapCodec<T> codec){
 		assert moduleFactory != null;
 		RegisterManager(type, (config, json) -> {
 			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
-			ICitModule module = moduleFactory.Build(config.GetSpecialModelIds(), data.getOrThrow().getFirst());
-			return new VariantManager(config, module);
+			return moduleFactory.Build(config.GetSpecialModelIds(), data.getOrThrow().getFirst());
 		});
 	}
 
@@ -35,31 +34,29 @@ public final class ModuleRegistry
 		assert moduleFactory != null;
 		RegisterManager(type, (config, json) -> {
 			var data = codec.decoder().decode(JsonOps.INSTANCE, json);
-			ICitModule module = moduleFactory.Build(data.getOrThrow().getFirst());
-			return new VariantManager(config, module);
+			return moduleFactory.Build(data.getOrThrow().getFirst());
 		});
 	}
 
 	static public void Register(Identifier type, MapCodec<? extends ICitModule> codec){
 		assert codec != null;
 		RegisterManager(type, (config, json) -> {
-			ICitModule module = codec.decoder().decode(JsonOps.INSTANCE, json).getOrThrow().getFirst();
-			return new VariantManager(config, module);
+			return codec.decoder().decode(JsonOps.INSTANCE, json).getOrThrow().getFirst();
 		});
 	}
 
 	@Deprecated
 	static public void Register(Identifier type, SpecialCitModuleFactory moduleFactory){
 		assert moduleFactory != null;
-		RegisterManager(type, (config,json)->new VariantManager(config, moduleFactory.Build(config.GetSpecialModelIds())));
+		RegisterManager(type, (config,json)->moduleFactory.Build(config.GetSpecialModelIds()));
 	}
 
 	static public void Register(Identifier type, ICitModule module){
 		assert module != null;
-		RegisterManager(type, (config,json)->new VariantManager(config, module));
+		RegisterManager(type, (config,json)-> module);
 	}
 
-	static private void RegisterManager(Identifier type, ManagerFactory factory){
+	static private void RegisterManager(Identifier type, ModuleFactory factory){
 		assert type != null;
 		assert factory != null;
 		if (MODULE_TYPES.containsKey(type))
@@ -68,7 +65,7 @@ public final class ModuleRegistry
 		MODULE_TYPES.put(type, factory);
 	}
 
-	static public VariantManager CreateManager(ModuleDefinition definition, JsonObject customData)
+	static public ICitModule CreateModule(ModuleDefinition definition, JsonObject customData)
 	throws IllegalStateException
 	{
 		assert definition != null;
