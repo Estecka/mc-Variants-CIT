@@ -14,8 +14,8 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
+import fr.estecka.variantscit.BakedModuleRegistry;
 import fr.estecka.variantscit.IItemModelProvider;
-import fr.estecka.variantscit.VariantsCitMod;
 
 @Mixin(ItemRenderer.class)
 @Environment(EnvType.CLIENT)
@@ -24,7 +24,7 @@ public class ItemRendererMixin
 	@Unique
 	private BakedModel	GetVariantModel(BakedModelManager modelManager, ItemStack stack, Supplier<BakedModel> original)
 	{
-		final IItemModelProvider module = VariantsCitMod.GetModule(stack.getItem());
+		final IItemModelProvider module = BakedModuleRegistry.GetForItem(stack.getItem());
 		ModelIdentifier modelId;
 
 		if (module == null || (modelId=module.GetModelForItem(stack)) == null)

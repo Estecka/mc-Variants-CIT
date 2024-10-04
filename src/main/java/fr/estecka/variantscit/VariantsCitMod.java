@@ -5,12 +5,10 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.estecka.variantscit.modules.*;
@@ -23,12 +21,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public int reloadcount = 0;
-	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
 	static private Map<ModelIdentifier, Identifier> AUTOGEN = new HashMap<>();
-
-	static public @Nullable IItemModelProvider GetModule(Item itemType){
-		return MODULES.get(itemType);
-	}
 
 	static public Map<ModelIdentifier, Identifier> GetModelsToCreate(){
 		return Map.copyOf(AUTOGEN);
@@ -68,13 +61,16 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
 
 		AUTOGEN = result.modelAggregator.modelsToCreate;
-		MODULES = new HashMap<>();
+		BakedModuleRegistry.Clear();
+		for (var entry : result.uniqueModules.entrySet())
+			BakedModuleRegistry.RegisterId(entry.getKey(), entry.getValue());
 		for (var entry : result.modulesPerItem.entrySet()){
-			MODULES.put(
+			BakedModuleRegistry.RegisterItem(
 				entry.getKey().value(),
 				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.bakedModule()).toList() )
 			);
 		}
+
 	}
 
 }
