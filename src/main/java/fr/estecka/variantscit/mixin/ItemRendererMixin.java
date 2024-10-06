@@ -1,5 +1,7 @@
 package fr.estecka.variantscit.mixin;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -30,8 +32,25 @@ public class ItemRendererMixin
 		if (module == null || (modelId=module.GetModelForItem(stack)) == null)
 			return original.get();
 
+		modelId = GetRecursiveModelOverride(stack, modelId, new HashSet<>());
 		BakedModel model = modelManager.getModel(modelId);
 		return (model != null) ? model : modelManager.getMissingModel();
+	}
+
+	@Unique
+	private ModelIdentifier GetRecursiveModelOverride(ItemStack stack, ModelIdentifier targetModel, Set<IItemModelProvider> recursion)
+	{
+		IItemModelProvider module = BakedModuleRegistry.GetForModel(targetModel.id());
+		if (module==null || recursion.contains(module))
+			return targetModel;
+
+		recursion.add(module);
+
+		ModelIdentifier result = module.GetModelForItem(stack);
+		if (result == null)
+			return targetModel;
+		else
+			return GetRecursiveModelOverride(stack, result, recursion);
 	}
 
 	// Most items
