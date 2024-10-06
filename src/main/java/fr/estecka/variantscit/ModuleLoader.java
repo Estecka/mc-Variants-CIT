@@ -2,6 +2,7 @@ package fr.estecka.variantscit;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ implements DataLoader<ModuleLoader.Result>
 		public final HashMap<Identifier, BakedModule> uniqueModules = new HashMap<>();
 		public final HashSet<Identifier> ignoredModules = new HashSet<>();
 		public final Map<RegistryEntry<Item>,List<MetaModule>> modulesPerItem = new HashMap<>();
+		public final Map<Identifier,List<MetaModule>> modulesPerModel = new HashMap<>();
 		public final ModelAggregator modelAggregator = new ModelAggregator();
 	}
 
@@ -62,11 +64,11 @@ implements DataLoader<ModuleLoader.Result>
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			Set<RegistryEntry<Item>> targets = prototype.definition.targets()
+			Set<RegistryEntry<Item>> itemTargets = prototype.definition.itemTargets()
 				.map(ModuleLoader::ItemsFromTarget)
 				.orElseGet(()->ItemsFromModuleId(moduleId))
 				;
-			if (targets.isEmpty()){
+			if (itemTargets.isEmpty() && prototype.definition.modelTargets().isEmpty()){
 				result.ignoredModules.add(moduleId);
 				continue;
 			}
@@ -80,19 +82,27 @@ implements DataLoader<ModuleLoader.Result>
 			);
 
 			result.uniqueModules.put(moduleId, meta.bakedModule());
-			for (var item : targets){
+			for (var item : itemTargets){
 				result.modulesPerItem.computeIfAbsent(item, __->new ArrayList<>()).add(meta);
+			}
+			for (var item : prototype.definition.modelTargets()){
+				result.modulesPerModel.computeIfAbsent(item, __->new ArrayList<>()).add(meta);
 			}
 		}
 		catch (IllegalStateException e){
 			VariantsCitMod.LOGGER.error("Error in CIT module {}: {}", entry.getKey(), e);
 		}
 
-		// Sort highest priorities first.
-		for (List<MetaModule> modules : result.modulesPerItem.values()){
+		SortByPriority(result.modulesPerItem.values());
+		SortByPriority(result.modulesPerModel.values());
+
+		return result;
+	}
+
+	static private void SortByPriority(Collection<List<MetaModule>> lists){
+		for (List<MetaModule> modules : lists){
 			modules.sort((a,b) -> -Integer.compare(a.prototype.definition.priority(), b.prototype.definition.priority()));
 		}
-		return result;
 	}
 
 	static private Set<RegistryEntry<Item>> ItemsFromTarget(List<Identifier> targets){

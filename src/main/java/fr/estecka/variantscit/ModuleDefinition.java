@@ -16,7 +16,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public record ModuleDefinition(
 	Identifier type,
-	Optional<List<Identifier>> targets,
+	Optional<List<Identifier>> itemTargets,
+	List<Identifier> modelTargets,
 	int priority,
 	String modelPrefix,
 	Optional<Identifier> modelParent,
@@ -27,7 +28,8 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
-			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::targets),
+			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::itemTargets),
+			Identifier.CODEC.listOf().fieldOf("modelOverrides").orElse(List.of()).forGetter(ModuleDefinition::modelTargets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),

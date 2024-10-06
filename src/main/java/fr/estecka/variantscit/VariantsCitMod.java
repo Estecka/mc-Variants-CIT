@@ -70,6 +70,12 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.bakedModule()).toList() )
 			);
 		}
+		for (var entry : result.modulesPerModel.entrySet()){
+			BakedModuleRegistry.RegisterModel(
+				entry.getKey(),
+				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.bakedModule()).toList() )
+			);
+		}
 
 	}
 
