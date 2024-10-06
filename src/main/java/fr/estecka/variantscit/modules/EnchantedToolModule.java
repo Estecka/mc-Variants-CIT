@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules;
 
 import java.util.Iterator;
+import fr.estecka.variantscit.BakedModuleRegistry;
 import fr.estecka.variantscit.api.IVariantManager;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import net.minecraft.client.util.ModelIdentifier;
@@ -8,6 +9,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
 
 public class EnchantedToolModule
 extends AComponentCachingModule<ItemEnchantmentsComponent>
@@ -35,9 +37,9 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 	public int Compare(Entry<RegistryEntry<Enchantment>> a, Entry<RegistryEntry<Enchantment>> b, IVariantManager models){
 		int result = 0;
 
-		result = Boolean.compare(
-			models.HasVariantModel(a.getKey().getKey().get().getValue()),
-			models.HasVariantModel(b.getKey().getKey().get().getValue())
+		result = Integer.compare(
+			ModelPriority(a.getKey().getKey().get().getValue(), models),
+			ModelPriority(b.getKey().getKey().get().getValue(), models)
 		);
 		if (result != 0) return result;
 
@@ -48,5 +50,14 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 		if (result != 0) return result;
 
 		return result;
+	}
+
+	static private int ModelPriority(Identifier variantId, IVariantManager library){
+		if (!library.HasVariantModel(variantId))
+			return 0;
+		else if (null == BakedModuleRegistry.GetForModel(library.GetVariantModel(variantId).id()))
+			return 1;
+		else
+			return 2;
 	}
 }
