@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules;
 
-import java.util.Iterator;
 import java.util.Map;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -37,19 +36,26 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 		if (enchants == null || enchants.isEmpty() || !this.Matches(enchants))
 			return null;
 
-		Iterator<Entry<RegistryEntry<Enchantment>>> iterator = enchants.getEnchantmentEntries().iterator();
-		var bestFit = iterator.next();
-		while (iterator.hasNext()){
-			var contestant = iterator.next();
-			if (Compare(contestant, bestFit, models) > 0)
+		Entry<RegistryEntry<Enchantment>> bestFit = null;
+		for (var contestant : enchants.getEnchantmentEntries()){
+			if (!this.precondition.containsKey(contestant.getKey().getKey().get().getValue())
+			&&  Compare(contestant, bestFit, models) > 0
+			){
 				bestFit = contestant;
+			}
 		}
 
-		return models.GetVariantModel(bestFit.getKey().getKey().get().getValue());
+		if (bestFit == null)
+			return null;
+		else
+			return models.GetVariantModel(bestFit.getKey().getKey().get().getValue());
 	}
 
 	public int Compare(Entry<RegistryEntry<Enchantment>> a, Entry<RegistryEntry<Enchantment>> b, IVariantManager models){
 		int result = 0;
+
+		if (a == null) return -1;
+		if (b == null) return 1;
 
 		result = Boolean.compare(
 			models.HasVariantModel(a.getKey().getKey().get().getValue()),
