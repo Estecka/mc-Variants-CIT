@@ -1,38 +1,27 @@
 # Variants-CIT
-A CIT logic for MC 1.21, optimized around items with standardized variants.
+A CIT logic optimized around items with standardized variants.
 
-**This mod is not a plug-and-play replacement for Optifine/CIT-resewn;** it uses its own resource format. Changes to older packs are required for them to work.
+This mod isn't as flexible as optifine, but excels in scenarios where one item has many variants based on the same piece of data. It yields better performances when extreme amounts of CITs are available, and uses a resource format that is less redundant, requiring only a short file to configure all variants at once.
 
-The mod contains built-in logic for handling **Axolotl Buckets**, **Enchantments**, **Music Discs**, **Goat Horns**, **Painting Variants**, and **Potions**. 
-There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item. Other mods can easily create custom logic for their own items.
+## Supported Components
+The mod can handle **Axolotl Buckets**, **Enchantments**, **Music Discs**, **Goat Horns**, **Painting Variants**, and **Potions**. Other mods can easily create add logic for their own components or items.
+There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item. 
 
 If Mojang ever makes these items data-driven, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future. 
 
-## Difference with Optifine/CIT-Resewn
-The base concept for this mod was born out of a need for _optimization_, at a time when CIT-resewn was still an up-to-date option. 
-This comes at the cost of some flexibility; while being _multi_-purpose, it may not be as _all_-purpose as optifine.
-
-This mod excels in scenarios where a single item type has a large amount of variants, which can all be derived from a single piece of data. Instead of defining a condition for every single CIT, you define a single rule that governs all CITs in a collection (so-called modules).
-
 ## Resource Pack Format
-This is an overview, see the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
+This is an overview, please see the [wiki](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
 
-The format revolves around item **variants** (reduced to namespaced identifiers) being automatically associated to [item models](https://minecraft.wiki/w/Model#Item_models) with matching names, stored in a directory of your choosing.
+The format revolves around item variants being automatically associated to models or textures with matching names.
+Instead of defining a condition for every CIT, you define a single rule that governs all CITs in a collection, (so-called **modules**). This modules defines what item is affected, how to figure out its variants, and where their models are located.
 
-Resource packs must start by providing a module configuration, that defines what item is affected, how to figure out its variant, and where their models are located.
-
-For example, here's a module that would reproduce the behaviour of the previous version of the mod, Enchants-CIT :  
-`/assets/minecraft/variant-cits/item/enchanted_book.json`
+For example, here's a simplistic module that would change the texture of enchanted books :
 ```json
 {
 	"type": "stored_enchantment",
 	"items": ["enchanted_book"],
-	"modelPrefix": "item/enchanted_book/",
-	"special": {
-		"multi": "enchants-cit:item/multi_enchanted_book"
-	}
+	"modelPrefix": "item/book_cit/",
+	"modelParent": "item/generated"
 }
 ```
-Here, the enchantment `minecraft:unbreaking` will be associated with the model stored at `/assets/minecraft/models/item/enchanted_book/unbreaking.json`
-
-Some module types may define additional models to use in special cases, or take addional parameters.
+Here, a book with the enchantment `minecraft:unbreaking` will use the texture stored at `/assets/minecraft/texture/item/book_cit/unbreaking.png`. This single module will work for every enchantment, vanilla or modded, so long as a corresponding texture exists.

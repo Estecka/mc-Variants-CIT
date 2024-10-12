@@ -3,13 +3,14 @@
 	"id": "variants-cit",
 	"version": "${version}",
 	"name": "Variants CIT",
-	"description": "Specialized CIT logic for variant-based items",
+	"description": "CIT logic optimized for large collections of variants.",
 	"authors": [
 		"Estecka"
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/variants-cit",
-		"sources": "https://github.com/Estecka/mc-Variants-CIT"
+		"sources": "https://github.com/Estecka/mc-Variants-CIT",
+		"issues":  "https://github.com/Estecka/mc-Variants-CIT/issues"
 	},
 	"license": "EUPL",
 	"icon": "assets/variants-cit/icon.png",
