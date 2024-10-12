@@ -39,3 +39,4 @@
 ## 2.5
 - Added the `painting_variant` module.
 - Added the `requiredEnchantment` parameter to the `enchantment` module.
+- Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
