@@ -11,7 +11,7 @@
 		"homepage": "https://modrinth.com/mod/variants-cit",
 		"sources": "https://github.com/Estecka/mc-Variants-CIT"
 	},
-	"license": "GNU AGPLv3",
+	"license": "EUPL",
 	"icon": "assets/variants-cit/icon.png",
 	"environment": "client",
 	"entrypoints": {
