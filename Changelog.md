@@ -38,5 +38,5 @@
 - Fixed Trident and spyglass (in stack form) not being affected by CITs.
 ## 2.5
 - Added the `painting_variant` module.
-- Added the `requiredEnchantment` parameter to the `enchantment` module.
+- Added the `requiredEnchantments` parameter to the `enchantment` module.
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
