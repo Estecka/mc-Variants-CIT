@@ -3,7 +3,7 @@
 	"id": "variants-cit",
 	"version": "${version}",
 	"name": "Variants CIT",
-	"description": "CIT logic optimized for large collections of variants.",
+	"description": "Streamlined CIT format for large collections of variants.",
 	"authors": [
 		"Estecka"
 	],

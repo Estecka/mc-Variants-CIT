@@ -1,10 +1,10 @@
 # Variants-CIT
-A CIT logic optimized around items with standardized variants.
+A streamlined CIT format for items with standardized variants.
 
-This mod isn't as flexible as optifine, but excels in scenarios where one item has many variants based on the same piece of data. It yields better performances when extreme amounts of CITs are available, and uses a resource format that is less redundant, requiring only a short file to configure all variants at once.
+This mod isn't as flexible as optifine, but excels in scenarios where one item has many variants based on the same piece of data. It yields better performances when extreme amounts of CITs are available, and uses a resource format that is less redundant, requiring only a short file to configure all possible variants at once.
 
 ## Supported Components
-The mod can handle **Axolotl Buckets**, **Enchantments**, **Music Discs**, **Goat Horns**, **Painting Variants**, and **Potions**. Other mods can easily create add logic for their own components or items.
+The mod can handle **Axolotl Buckets**, **Enchantments**, **Music Discs**, **Goat Horns**, **Painting Variants**, and **Potions**. More may be added as needed, and other mods can easily create add logic to it.
 There are also more generic modules that can identify a variant from the `custom_data` or `custom_name` component of an item. 
 
 If Mojang ever makes these items data-driven, you can expect Banner Patterns, Trim Templates, and Pottery Sherds to become supported in the future. 
