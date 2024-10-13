@@ -57,7 +57,12 @@ implements DataLoader<ModuleLoader.Result>
 	{
 		ModuleLoader.Result result = new ModuleLoader.Result();
 
-		for (Map.Entry<Identifier, Resource> entry : manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")).entrySet())
+		Map<Identifier, Resource> resources = new HashMap<>();
+		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
+		Warn(resources);
+		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+
+		for (var entry : resources.entrySet())
 		try {
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
@@ -93,6 +98,17 @@ implements DataLoader<ModuleLoader.Result>
 			modules.sort((a,b) -> -Integer.compare(a.prototype.definition.priority(), b.prototype.definition.priority()));
 		}
 		return result;
+	}
+
+	static private void Warn(Map<Identifier, Resource> resources){
+		if (!resources.isEmpty()){
+			String names = "";
+			for (Identifier id : resources.keySet()) {
+				names += ' ';
+				names += ModuleIdFromResourceId(id).toString();
+			}
+			VariantsCitMod.LOGGER.warn("Some CIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
+		}
 	}
 
 	static private Set<RegistryEntry<Item>> ItemsFromTarget(List<Identifier> targets){

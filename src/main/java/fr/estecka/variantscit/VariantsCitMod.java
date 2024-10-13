@@ -41,9 +41,10 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomDataModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
-		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), new EnchantedToolModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantedToolModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), new EnchantedBookModule());
