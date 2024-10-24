@@ -23,8 +23,8 @@ classes/
 .settings/
 .vscode/
 bin/
-.factorypath
 .classpath
+.factorypath
 .project
 
 # macos

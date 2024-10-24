@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -18,6 +18,21 @@ repositories {
 	// for more information about repositories.
 }
 
+loom {
+	runs {
+		client {
+			configName "Client"
+			programArgs "--username"
+			programArgs "Dev"
+			runDir "run/client"
+		}
+		server {
+			configName "Server"
+			runDir "run/server"
+		}
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -26,7 +41,6 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
 }
 
 processResources {
