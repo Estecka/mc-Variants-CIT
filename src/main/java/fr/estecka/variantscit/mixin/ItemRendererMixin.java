@@ -46,7 +46,7 @@ public class ItemRendererMixin
 
 	// Trident and Spyglass
 	@WrapOperation(
-		// Why are there som nay different overloads of renderItem ?!?
+		// Why are there so many different overloads of renderItem ?!?
 		method="renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;Z)V",
 		require=2, at=@At( value="INVOKE", target="net/minecraft/client/render/model/BakedModelManager.getModel (Lnet/minecraft/client/util/ModelIdentifier;)Lnet/minecraft/client/render/model/BakedModel;")
 	)

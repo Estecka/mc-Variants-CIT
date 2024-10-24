@@ -18,7 +18,7 @@ import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.util.Identifier;
 
 @Mixin(BakedModelManager.class)
-public class BakedModelManagerMixin
+public class ModelLoaderMixin
 {
 	/**
 	 * I could probably use the constructor for JsonUnbakedModel instead, but it
