@@ -4,7 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ItemRendererMixin",
-		"ModelLoaderMixin"
+		"ModelBakerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -5,3 +5,5 @@ Initial Release
 ## 1.21.2
 ### No workaround:
 - (FAPI) `onInitializeModelLoader` renamed to `initalize`
+### Possible workaround:
+- (Yarn?) `ModelLoader` moved to `ModelBaker`, multiple internals renammed.

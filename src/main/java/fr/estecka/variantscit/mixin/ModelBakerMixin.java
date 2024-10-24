@@ -10,18 +10,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 
-@Mixin(ModelLoader.class)
-public class ModelLoaderMixin
+@Mixin(ModelBaker.class)
+public class ModelBakerMixin
 {
-	@Shadow private @Final Map<Identifier, UnbakedModel> unbakedModels;
-	@Shadow private @Final Map<ModelIdentifier, UnbakedModel> modelsToBake;
+	@Shadow private @Final Map<Identifier, UnbakedModel> resolvedModels;
+	@Shadow private @Final Map<ModelIdentifier, UnbakedModel> models;
 
 	static private final String ARBITRARY_MODEL = """
 		{
@@ -35,8 +35,8 @@ public class ModelLoaderMixin
 	@Unique
 	private void AddFromTexture(ModelIdentifier modelId, Identifier parent) {
 		JsonUnbakedModel model = JsonUnbakedModel.deserialize(ARBITRARY_MODEL.formatted(parent.toString(), modelId.id().toString()));
-		this.unbakedModels.put(modelId.id(), model);
-		this.modelsToBake.put(modelId, model);
+		this.resolvedModels.put(modelId.id(), model);
+		this.models.put(modelId, model);
 	}
 
 	/**
