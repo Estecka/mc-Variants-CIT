@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.mixin;
 
+import java.io.StringReader;
 import java.util.Map;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +35,8 @@ public class ModelBakerMixin
 
 	@Unique
 	private void AddFromTexture(ModelIdentifier modelId, Identifier parent) {
-		JsonUnbakedModel model = JsonUnbakedModel.deserialize(ARBITRARY_MODEL.formatted(parent.toString(), modelId.id().toString()));
+		StringReader reader = new StringReader(ARBITRARY_MODEL.formatted(parent.toString(), modelId.id().toString()));
+		JsonUnbakedModel model = JsonUnbakedModel.deserialize(reader);
 		this.resolvedModels.put(modelId.id(), model);
 		this.models.put(modelId, model);
 	}
