@@ -24,4 +24,4 @@ For example, here's a simplistic module that would change the texture of enchant
 	"modelParent": "item/generated"
 }
 ```
-Here, a book with the enchantment `minecraft:unbreaking` will use the texture stored at `/assets/minecraft/texture/item/book_cit/unbreaking.png`. This single module will work for every enchantment, vanilla or modded, so long as a corresponding texture exists.
+Here, a book with the enchantment `minecraft:unbreaking` will use the texture stored at `/assets/minecraft/texture/item/book_cit/unbreaking.png`. This single module will work for every possible enchantment, vanilla or modded, so long as a corresponding texture exists.

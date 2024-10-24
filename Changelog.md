@@ -37,6 +37,9 @@
 - Optimized some modules, reducing how often they recompute an item's model.
 - Fixed Trident and spyglass (in stack form) not being affected by CITs.
 ## 2.5
+### 2.5.0
 - Added the `painting_variant` module.
 - Added the `requiredEnchantments` parameter to the `enchantment` module.
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
+### 2.5.1
+- Updated for MC 1.21.2
