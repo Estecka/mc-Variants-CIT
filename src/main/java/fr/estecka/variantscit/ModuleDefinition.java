@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
-import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 import com.google.common.collect.ImmutableMap;
@@ -45,13 +44,13 @@ public record ModuleDefinition(
 	}
 
 	public @Nullable ModelIdentifier GetFallbackModelId(){
-		return fallbackModel.map(ModelLoadingConstants::toResourceModelId).orElse(null);
+		return fallbackModel.map(VariantsCitMod::ModelIdFromResource).orElse(null);
 	}
 
 	public Map<String, @Nullable ModelIdentifier> GetSpecialModelIds(){
 		Map<String, @Nullable ModelIdentifier> result = new HashMap<>();
 		for (var entry : this.specialModels.entrySet())
-			result.put(entry.getKey(), ModelLoadingConstants.toResourceModelId(entry.getValue()));
+			result.put(entry.getKey(), VariantsCitMod.ModelIdFromResource(entry.getValue()));
 		return result;
 	}
 }

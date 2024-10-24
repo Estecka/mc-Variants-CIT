@@ -1,28 +1,29 @@
 package fr.estecka.variantscit.mixin;
 
+import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.BakedModelManager;
+import net.minecraft.client.render.model.BlockStatesLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
 
-@Mixin(ModelLoader.class)
+@Mixin(BakedModelManager.class)
 public class ModelLoaderMixin
 {
-	@Shadow private @Final Map<Identifier, UnbakedModel> unbakedModels;
-	@Shadow private @Final Map<ModelIdentifier, UnbakedModel> modelsToBake;
-
+	/**
+	 * I could probably use the constructor for JsonUnbakedModel instead, but it
+	 * is unclear how parent-child inheritance works with it.
+	 */
 	static private final String ARBITRARY_MODEL = """
 		{
 			"parent": "%s",
@@ -33,22 +34,25 @@ public class ModelLoaderMixin
 	""";
 
 	@Unique
-	private void AddFromTexture(ModelIdentifier modelId, Identifier parent) {
-		JsonUnbakedModel model = JsonUnbakedModel.deserialize(ARBITRARY_MODEL.formatted(parent.toString(), modelId.id().toString()));
-		this.unbakedModels.put(modelId.id(), model);
-		this.modelsToBake.put(modelId, model);
+	private UnbakedModel CreateFromTexture(Identifier resourceId, Identifier parent) {
+		StringReader reader = new StringReader(ARBITRARY_MODEL.formatted(parent.toString(), resourceId.toString()));
+		JsonUnbakedModel model = JsonUnbakedModel.deserialize(reader);
+		return model;
 	}
 
-	/**
-	 * Injected right before the post-processing of `modelsToBake`.
-	 */
-	@Inject( method="<init>", at=@At(value="INVOKE", target="java/util/Map.values ()Ljava/util/Collection;") )
-	private void	AddVariantModels(BlockColors _0, Profiler profiler, Map<?,?> _2, Map<?,?> _3, CallbackInfo ci)
+
+	@Inject( method="collect", at=@At("HEAD"))
+	private void AddVariantModels(UnbakedModel missingModel, Map<Identifier, UnbakedModel> inputs, BlockStatesLoader.BlockStateDefinition definition, CallbackInfoReturnable<?> ci, @Local(argsOnly=true) LocalRef<Map<Identifier, UnbakedModel>> inputRef)
 	{
-		profiler.swap("variants-cit");
+		// Make mutable
+		inputs = new HashMap<>(inputs);
+		inputRef.set(inputs);
+
 		var models = VariantsCitMod.GetModelsToCreate();
 		VariantsCitMod.LOGGER.info("Creating {} item models from textures...", models.size());
-		for (var entry : VariantsCitMod.GetModelsToCreate().entrySet())
-			this.AddFromTexture(entry.getKey(), entry.getValue());
+		for (var entry : VariantsCitMod.GetModelsToCreate().entrySet()){
+			Identifier resourceId = entry.getKey().id().withPrefixedPath("item/");
+			inputs.put(resourceId, this.CreateFromTexture(resourceId, entry.getValue()));
+		}
 	}
 }
