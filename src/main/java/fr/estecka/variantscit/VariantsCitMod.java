@@ -61,7 +61,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	}
 
 	@Override
-	public void onInitializeModelLoader(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
+	public void initialize(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
 		++reloadcount;
 		result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 
