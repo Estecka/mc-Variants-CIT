@@ -19,7 +19,7 @@ jobs:
           name: Artifacts
           path: ./
       - name: Draft release
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: ./*.jar
           artifactErrorsFailBuild: true

@@ -5,6 +5,7 @@
 
 name: build
 on:
+  - pull_request
   - workflow_call
   - workflow_dispatch
 
@@ -14,7 +15,7 @@ jobs:
       matrix:
         # Use these Java versions
         java: [
-          21,    # Current Java LTS & minimum supported by Minecraft
+          21,    # Current LTS & minimum supported by Minecraft
         ]
     runs-on: ubuntu-22.04
     steps:
