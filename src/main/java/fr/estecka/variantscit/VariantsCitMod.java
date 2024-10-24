@@ -34,6 +34,16 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		return Map.copyOf(AUTOGEN);
 	}
 
+	/**
+	 * For some reason, Minecraft strips the "item/" off of item models.
+	 */
+	static public ModelIdentifier ModelIdFromResource(Identifier id){
+		String path = id.getPath();
+		if (path.startsWith("item/"))
+			path = path.substring("item/".length());
+		return ModelIdentifier.ofInventoryVariant(id.withPath(path));
+	}
+
 	@Override
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
@@ -63,7 +73,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	@Override
 	public void initialize(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
 		++reloadcount;
-		result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
+		// result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 
 		for (var e : result.uniqueModules.entrySet())
 			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());

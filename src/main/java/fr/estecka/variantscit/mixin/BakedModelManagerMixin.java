@@ -15,7 +15,6 @@ import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.BlockStatesLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 @Mixin(BakedModelManager.class)
@@ -35,8 +34,8 @@ public class BakedModelManagerMixin
 	""";
 
 	@Unique
-	private UnbakedModel CreateFromTexture(ModelIdentifier modelId, Identifier parent) {
-		StringReader reader = new StringReader(ARBITRARY_MODEL.formatted(parent.toString(), modelId.id().toString()));
+	private UnbakedModel CreateFromTexture(Identifier resourceId, Identifier parent) {
+		StringReader reader = new StringReader(ARBITRARY_MODEL.formatted(parent.toString(), resourceId.toString()));
 		JsonUnbakedModel model = JsonUnbakedModel.deserialize(reader);
 		return model;
 	}
@@ -51,7 +50,9 @@ public class BakedModelManagerMixin
 
 		var models = VariantsCitMod.GetModelsToCreate();
 		VariantsCitMod.LOGGER.info("Creating {} item models from textures...", models.size());
-		for (var entry : VariantsCitMod.GetModelsToCreate().entrySet())
-			inputs.put(entry.getKey().id(), this.CreateFromTexture(entry.getKey(), entry.getValue()));
+		for (var entry : VariantsCitMod.GetModelsToCreate().entrySet()){
+			Identifier resourceId = entry.getKey().id().withPrefixedPath("item/");
+			inputs.put(resourceId, this.CreateFromTexture(resourceId, entry.getValue()));
+		}
 	}
 }

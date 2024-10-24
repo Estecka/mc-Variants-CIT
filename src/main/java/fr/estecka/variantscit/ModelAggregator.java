@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import fr.estecka.variantscit.ModuleLoader.ProtoModule;
-import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -79,7 +78,7 @@ public class ModelAggregator
 
 			results.put(
 				Identifier.of(namespace, variantName),
-				ModelLoadingConstants.toResourceModelId(Identifier.of(namespace, modelName))
+				VariantsCitMod.ModelIdFromResource(Identifier.of(namespace, modelName))
 			);
 		}
 
@@ -105,7 +104,7 @@ public class ModelAggregator
 			.filter(e -> valid.contains(e.getValue()))
 			.collect(Collectors.toMap(
 				Map.Entry::getKey,
-				e-> ModelLoadingConstants.toResourceModelId(e.getValue())
+				e-> VariantsCitMod.ModelIdFromResource(e.getValue())
 			))
 			;
 	}
