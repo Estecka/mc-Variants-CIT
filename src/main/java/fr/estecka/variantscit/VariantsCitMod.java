@@ -13,6 +13,7 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fr.estecka.variantscit.mixin.NumericPropertiesAccessor;
 import fr.estecka.variantscit.modules.*;
 
 
@@ -63,11 +64,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 			return new EnchantedBookModule();
 		});
 
-		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
-		var potionPredicate = new PotionLevelPredicate();
-		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
-		ModelPredicateProviderRegistry.register(Items.SPLASH_POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
-		ModelPredicateProviderRegistry.register(Items.LINGERING_POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
+		NumericPropertiesAccessor.ID_MAPPER().put(EnchantedBookLevelPredicate.ID, EnchantedBookLevelPredicate.CODEC);
 	}
 
 	@Override
