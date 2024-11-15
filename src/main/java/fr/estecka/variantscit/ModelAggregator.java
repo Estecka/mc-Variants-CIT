@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier;
 public class ModelAggregator
 {
 	public final Set<Identifier> modelsToLoad = new HashSet<>();
+	public final Set<Identifier> itemsToCreate = new HashSet<>();
 	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>(); // Maps model ID to its parent
 
 	public VariantLibrary CreateLibrary(ProtoModule prototype, ResourceManager manager){
@@ -24,24 +25,29 @@ public class ModelAggregator
 		final var specials = new HashMap<>(prototype.definition().specialModels());
 		prototype.definition().fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
-		var varModels = FindVariants(manager, "models", prefix, ".json");
-		var speModels = FindSpecials(manager, "models", specials, ".json");
-		allVariants.putAll(varModels);
-		allSpecials.putAll(speModels);
-		this.modelsToLoad.addAll(varModels.values());
-		this.modelsToLoad.addAll(speModels.values());
+		var varItems  = FindVariants(manager, "items" , prefix, ".json");
+		var speItems  = FindSpecials(manager, "items" , specials, ".json");
+		allVariants.putAll(varItems);
+		allSpecials.putAll(speItems);
 
-		if (modelParent.isPresent())
-		{
-			var varTextures = FindVariants(manager, "textures", prefix, ".png" );
-			var speTextures = FindSpecials(manager, "textures", specials, ".png" );
-			varModels.keySet().forEach(varTextures::remove);
-			speModels.keySet().forEach(speTextures::remove);
-			allVariants.putAll(varTextures);
-			allSpecials.putAll(speTextures);
-			varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
-			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
-		}
+		// var varModels = FindVariants(manager, "models", prefix, ".json");
+		// var speModels = FindSpecials(manager, "models", specials, ".json");
+		// allVariants.putAll(varModels);
+		// allSpecials.putAll(speModels);
+		// this.modelsToLoad.addAll(varModels.values());
+		// this.modelsToLoad.addAll(speModels.values());
+
+		// if (modelParent.isPresent())
+		// {
+		// 	var varTextures = FindVariants(manager, "textures", prefix, ".png" );
+		// 	var speTextures = FindSpecials(manager, "textures", specials, ".png" );
+		// 	varModels.keySet().forEach(varTextures::remove);
+		// 	speModels.keySet().forEach(speTextures::remove);
+		// 	allVariants.putAll(varTextures);
+		// 	allSpecials.putAll(speTextures);
+		// 	varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
+		// 	speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
+		// }
 
 		allSpecials.remove(null);
 		return new VariantLibrary(
@@ -59,7 +65,8 @@ public class ModelAggregator
 	}
 
 	/**
-	 * Finds all models/textures for a given prefix.
+	 * Finds all resources of a given type, whose id start with the given prefix.
+	 * @param rootDirectory The type of the resources to look for.
 	 * @return Maps the variant ID to its corresponding model ID
 	 */
 	private Map<Identifier,Identifier> FindVariants(ResourceManager manager, String rootDirectory, String modelPrefix, String suffix){

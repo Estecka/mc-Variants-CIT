@@ -41,7 +41,10 @@ public class ModelLoaderMixin
 	}
 
 
-	@Inject( method="collect", at=@At("HEAD"))
+	/**
+	 * TODO: check injection point.
+	 */
+	// @Inject( method="collect", at=@At("HEAD"))
 	private void AddVariantModels(UnbakedModel missingModel, Map<Identifier, UnbakedModel> inputs, BlockStatesLoader.BlockStateDefinition definition, CallbackInfoReturnable<?> ci, @Local(argsOnly=true) LocalRef<Map<Identifier, UnbakedModel>> inputRef)
 	{
 		// Make mutable

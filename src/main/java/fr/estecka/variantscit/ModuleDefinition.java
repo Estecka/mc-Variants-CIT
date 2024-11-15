@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
@@ -36,9 +35,17 @@ public record ModuleDefinition(
 		.apply(builder, ModuleDefinition::new)
 	);
 
+	static private String Unitemify(String modelPrefix){
+		if (modelPrefix.startsWith("item/")){
+			VariantsCitMod.LOGGER.warn("Leading \"item/\" is no longer required in CIT model prefixes ({})", modelPrefix);
+			modelPrefix = modelPrefix.substring("item/".length());
+		}
+		return modelPrefix;
+	}
+
 	static public DataResult<String> ValidatePath(String path){
 		if (Identifier.isPathValid(path))
-			return DataResult.success(path);
+			return DataResult.success(Unitemify(path));
 		else
 			return DataResult.error(()->"Invalid character in path: "+path);
 	}
