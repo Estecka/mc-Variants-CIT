@@ -3,7 +3,6 @@ package fr.estecka.variantscit.modules;
 import java.util.Optional;
 import fr.estecka.variantscit.api.IVariantManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.decoration.painting.PaintingVariant;
@@ -36,7 +35,7 @@ extends AComponentCachingModule<NbtComponent>
 			return Optional.empty();
 	}
 
-	public ModelIdentifier GetModelForComponent(NbtComponent component, IVariantManager models){
+	public Identifier GetModelForComponent(NbtComponent component, IVariantManager models){
 		if (component == null)
 			return null;
 

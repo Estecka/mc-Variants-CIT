@@ -43,14 +43,20 @@ public record ModuleDefinition(
 			return DataResult.error(()->"Invalid character in path: "+path);
 	}
 
-	public @Nullable ModelIdentifier GetFallbackModelId(){
-		return fallbackModel.map(VariantsCitMod::ModelIdFromResource).orElse(null);
+	/**
+	 * @deprecated redundant
+	 */
+	public @Nullable Identifier GetFallbackModelId(){
+		return fallbackModel.orElse(null);
 	}
 
-	public Map<String, @Nullable ModelIdentifier> GetSpecialModelIds(){
-		Map<String, @Nullable ModelIdentifier> result = new HashMap<>();
+	/**
+	 * @deprecated redundant
+	 */
+	public Map<String, @Nullable Identifier> GetSpecialModelIds(){
+		Map<String, @Nullable Identifier> result = new HashMap<>();
 		for (var entry : this.specialModels.entrySet())
-			result.put(entry.getKey(), VariantsCitMod.ModelIdFromResource(entry.getValue()));
+			result.put(entry.getKey(), entry.getValue());
 		return result;
 	}
 }

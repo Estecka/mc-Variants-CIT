@@ -51,7 +51,7 @@ public class ModelLoaderMixin
 		var models = VariantsCitMod.GetModelsToCreate();
 		VariantsCitMod.LOGGER.info("Creating {} item models from textures...", models.size());
 		for (var entry : VariantsCitMod.GetModelsToCreate().entrySet()){
-			Identifier resourceId = entry.getKey().id().withPrefixedPath("item/");
+			Identifier resourceId = entry.getKey().withPrefixedPath("item/");
 			inputs.put(resourceId, this.CreateFromTexture(resourceId, entry.getValue()));
 		}
 	}

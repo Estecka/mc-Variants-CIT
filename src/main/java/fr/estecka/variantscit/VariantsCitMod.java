@@ -1,12 +1,11 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
+// import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+// import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
+// import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,36 +17,38 @@ import fr.estecka.variantscit.modules.*;
 
 
 public class VariantsCitMod
-implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Result>
+implements ClientModInitializer
+//, PreparableModelLoadingPlugin<ModuleLoader.Result>
 {
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public int reloadcount = 0;
 	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
-	static private Map<ModelIdentifier, Identifier> AUTOGEN = new HashMap<>();
+	static private Map<Identifier, Identifier> AUTOGEN = new HashMap<>();
 
 	static public @Nullable IItemModelProvider GetModule(Item itemType){
 		return MODULES.get(itemType);
 	}
 
-	static public Map<ModelIdentifier, Identifier> GetModelsToCreate(){
+	static public Map<Identifier, Identifier> GetModelsToCreate(){
 		return Map.copyOf(AUTOGEN);
 	}
 
 	/**
 	 * For some reason, Minecraft strips the "item/" off of item models.
 	 */
+	@Deprecated
 	static public ModelIdentifier ModelIdFromResource(Identifier id){
 		String path = id.getPath();
 		if (path.startsWith("item/"))
 			path = path.substring("item/".length());
-		return ModelIdentifier.ofInventoryVariant(id.withPath(path));
+		return new ModelIdentifier(id.withPath(path), "inventory");
 	}
 
 	@Override
 	public void onInitializeClient(){
-		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
+		// PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
 
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomDataModule.CODEC);
@@ -59,16 +60,19 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), new EnchantedBookModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), _0 -> {
-			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
-			return new EnchantedBookModule();
-		});
+		// ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), _0 -> {
+		// 	LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
+		// 	return new EnchantedBookModule();
+		// });
 
 		NumericPropertiesAccessor.ID_MAPPER().put(EnchantedBookLevelPredicate.ID, EnchantedBookLevelPredicate.CODEC);
 	}
 
-	@Override
-	public void initialize(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
+	/**
+	 * TODO: Find entry point
+	 */
+	// @Override
+	public void initialize(ModuleLoader.Result result/*, ModelLoadingPlugin.Context pluginContext*/){
 		++reloadcount;
 		// result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 

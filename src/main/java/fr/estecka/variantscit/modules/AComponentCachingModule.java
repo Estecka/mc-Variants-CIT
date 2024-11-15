@@ -5,9 +5,9 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 /**
  * Optimization for deterministic modules that may require expensive computation
@@ -27,7 +27,7 @@ implements ICitModule
 	 * immutable, so a cache  should never  need  to be  recomputed  for a given
 	 * identity.
 	 */
-	private final WeakHashMap<T, @Nullable ModelIdentifier> cachedModels = new WeakHashMap<>();
+	private final WeakHashMap<T, @Nullable Identifier> cachedModels = new WeakHashMap<>();
 	private int reloadCounts = 0;
 
 	public AComponentCachingModule(ComponentType<T> component){
@@ -36,7 +36,7 @@ implements ICitModule
 
 
 	@Override
-	public final ModelIdentifier GetItemModel(ItemStack stack, IVariantManager models){
+	public final Identifier GetItemModel(ItemStack stack, IVariantManager models){
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
@@ -53,5 +53,5 @@ implements ICitModule
 		return cachedModels.get(component);
 	}
 
-	public abstract ModelIdentifier GetModelForComponent(T component, IVariantManager models);
+	public abstract Identifier GetModelForComponent(T component, IVariantManager models);
 }

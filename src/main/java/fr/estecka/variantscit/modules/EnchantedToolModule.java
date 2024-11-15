@@ -7,7 +7,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.api.IVariantManager;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -32,7 +31,7 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 	}
 
 	@Override
-	public ModelIdentifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager models){
+	public Identifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager models){
 		if (enchants == null || enchants.isEmpty() || !this.Matches(enchants))
 			return null;
 

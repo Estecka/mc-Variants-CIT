@@ -7,18 +7,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import fr.estecka.variantscit.ModuleLoader.ProtoModule;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 public class ModelAggregator
 {
-	public final Set<ModelIdentifier> modelsToLoad = new HashSet<>();
-	public final Map<ModelIdentifier, Identifier> modelsToCreate = new HashMap<>();
+	public final Set<Identifier> modelsToLoad = new HashSet<>();
+	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>(); // Maps model ID to its parent
 
 	public VariantLibrary CreateLibrary(ProtoModule prototype, ResourceManager manager){
-		Map<Identifier,ModelIdentifier> allVariants = new HashMap<>();
-		Map<String,ModelIdentifier> allSpecials = new HashMap<>();
+		Map<Identifier,Identifier> allVariants = new HashMap<>();
+		Map<String,Identifier> allSpecials = new HashMap<>();
 
 		final String prefix = prototype.definition().modelPrefix();
 		final Optional<Identifier> modelParent = prototype.definition().modelParent();
@@ -52,19 +51,19 @@ public class ModelAggregator
 		);
 	}
 
-	private void AddModelToCreate(ModelIdentifier model, Identifier parent){
+	private void AddModelToCreate(Identifier model, Identifier parent){
 		if  (!this.modelsToCreate.containsKey(model))
 			modelsToCreate.put(model, parent);
 		else if (!modelsToCreate.get(model).equals(parent))
-			VariantsCitMod.LOGGER.error("Conflicting definitions for model {}", model.id());
+			VariantsCitMod.LOGGER.error("Conflicting definitions for model {}", model);
 	}
 
 	/**
 	 * Finds all models/textures for a given prefix.
 	 * @return Maps the variant ID to its corresponding model ID
 	 */
-	private Map<Identifier,ModelIdentifier> FindVariants(ResourceManager manager, String rootDirectory, String modelPrefix, String suffix){
-		Map<Identifier, ModelIdentifier> results = new HashMap<>();
+	private Map<Identifier,Identifier> FindVariants(ResourceManager manager, String rootDirectory, String modelPrefix, String suffix){
+		Map<Identifier, Identifier> results = new HashMap<>();
 
 		String fullPrefix = rootDirectory+'/'+modelPrefix;
 		String directory = fullPrefix.substring(0, fullPrefix.lastIndexOf('/'));
@@ -78,7 +77,7 @@ public class ModelAggregator
 
 			results.put(
 				Identifier.of(namespace, variantName),
-				VariantsCitMod.ModelIdFromResource(Identifier.of(namespace, modelName))
+				Identifier.of(namespace, modelName)
 			);
 		}
 
@@ -89,7 +88,7 @@ public class ModelAggregator
 	 * Finds which of the requested model/texture IDs are actually available.
 	 * @return The model/texture IDs
 	 */
-	private Map<String,ModelIdentifier> FindSpecials(ResourceManager manager, String rootDirectory, Map<String,Identifier> requested, String suffix){
+	private Map<String,Identifier> FindSpecials(ResourceManager manager, String rootDirectory, Map<String,Identifier> requested, String suffix){
 		Set<Identifier> valid = new HashSet<>();
 
 		// ResourceId to ModelId
@@ -102,9 +101,10 @@ public class ModelAggregator
 
 		return requested.entrySet().stream()
 			.filter(e -> valid.contains(e.getValue()))
+			// May be simplified
 			.collect(Collectors.toMap(
 				Map.Entry::getKey,
-				e-> VariantsCitMod.ModelIdFromResource(e.getValue())
+				Map.Entry::getValue
 			))
 			;
 	}

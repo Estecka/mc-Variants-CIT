@@ -1,12 +1,12 @@
 package fr.estecka.variantscit;
 
 import java.util.List;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 public interface IItemModelProvider
 {
-	ModelIdentifier GetModelForItem(ItemStack stack);
+	Identifier GetModelForItem(ItemStack stack);
 
 	static public IItemModelProvider OfList(List<? extends IItemModelProvider> providers){
 		if (providers.isEmpty())
@@ -15,7 +15,7 @@ public interface IItemModelProvider
 			return providers.get(0);
 
 		return (ItemStack stack)->{
-			ModelIdentifier id;
+			Identifier id;
 			for (var p : providers)
 				if (null != (id=p.GetModelForItem(stack)))
 					return id;
