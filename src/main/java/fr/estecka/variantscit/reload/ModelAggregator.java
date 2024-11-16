@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.reload;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import fr.estecka.variantscit.ModuleLoader.ProtoModule;
+import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.reload.ModuleLoader.ProtoModule;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 

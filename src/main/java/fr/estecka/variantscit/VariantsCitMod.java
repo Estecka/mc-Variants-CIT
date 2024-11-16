@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.estecka.variantscit.mixin.NumericPropertiesAccessor;
 import fr.estecka.variantscit.modules.*;
+import fr.estecka.variantscit.reload.ModuleLoader;
 
 
 public class VariantsCitMod

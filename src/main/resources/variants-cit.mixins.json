@@ -3,8 +3,8 @@
 	"package": "fr.estecka.variantscit.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"BakedModelManagerMixin",
 		"ItemModelManagerMixin",
-		"ModelLoaderMixin",
 		"NumericPropertiesAccessor"
 	],
 	"injectors": {

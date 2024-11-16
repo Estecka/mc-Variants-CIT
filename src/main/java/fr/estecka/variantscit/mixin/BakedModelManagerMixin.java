@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import fr.estecka.variantscit.ModuleLoader;
+import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.BlockStatesLoader;
@@ -20,7 +20,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 @Mixin(BakedModelManager.class)
-public class ModelLoaderMixin
+public class BakedModelManagerMixin
 {
 	@Inject( method="reload", at=@At("HEAD") )
 	private void reload(CallbackInfoReturnable<?> ci, @Local ResourceManager manager){

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.api.ICitModule;
+import fr.estecka.variantscit.reload.ModuleDefinition;
 // import fr.estecka.variantscit.api.ModuleRegistrar.ComplexCitModuleFactory;
 // import fr.estecka.variantscit.api.ModuleRegistrar.ParameterizedCitModuleFactory;
 // import fr.estecka.variantscit.api.ModuleRegistrar.SpecialCitModuleFactory;
