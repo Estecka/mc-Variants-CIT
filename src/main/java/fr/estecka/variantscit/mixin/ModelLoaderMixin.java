@@ -10,16 +10,23 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import fr.estecka.variantscit.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.BlockStatesLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 @Mixin(BakedModelManager.class)
 public class ModelLoaderMixin
 {
+	@Inject( method="reload", at=@At("HEAD") )
+	private void reload(CallbackInfoReturnable<?> ci, @Local ResourceManager manager){
+		new VariantsCitMod().initialize(ModuleLoader.ReloadModules(manager));
+	}
+
 	/**
 	 * I could probably use the constructor for JsonUnbakedModel instead, but it
 	 * is unclear how parent-child inheritance works with it.
@@ -39,7 +46,6 @@ public class ModelLoaderMixin
 		JsonUnbakedModel model = JsonUnbakedModel.deserialize(reader);
 		return model;
 	}
-
 
 	/**
 	 * TODO: check injection point.

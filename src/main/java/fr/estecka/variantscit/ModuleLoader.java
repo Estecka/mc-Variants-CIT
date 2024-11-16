@@ -56,7 +56,7 @@ public final class ModuleLoader
 		return CompletableFuture.supplyAsync(()->ReloadModules(resourceManager), executor);
 	}
 
-	static private ModuleLoader.Result ReloadModules(ResourceManager manager)
+	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
 		ModuleLoader.Result result = new ModuleLoader.Result();
 

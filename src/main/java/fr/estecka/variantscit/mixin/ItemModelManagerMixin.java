@@ -19,7 +19,7 @@ public class ItemModelManagerMixin
 		method="update(Lnet/minecraft/client/render/item/ItemRenderState;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;I)V",
 		at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
 	)
-	private @Nullable Identifier GetVariantModel(ItemStack stack, ComponentType<Identifier> type, Operation<Identifier> original)
+	private @Nullable Object GetVariantModel(ItemStack stack, ComponentType<Identifier> type, Operation<Identifier> original)
 	{
 		final IItemModelProvider module = VariantsCitMod.GetModule(stack.getItem());
 		Identifier modelId;
