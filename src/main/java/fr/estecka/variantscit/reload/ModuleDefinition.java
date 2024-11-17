@@ -1,10 +1,8 @@
 package fr.estecka.variantscit.reload;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jetbrains.annotations.Nullable;
 import net.minecraft.util.Identifier;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
@@ -18,6 +16,7 @@ public record ModuleDefinition(
 	Optional<List<Identifier>> targets,
 	int priority,
 	String modelPrefix,
+	boolean itemGen,
 	Optional<Identifier> modelParent,
 	Optional<Identifier> fallbackModel,
 	Map<String,Identifier> specialModels
@@ -29,6 +28,7 @@ public record ModuleDefinition(
 			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
+			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
 			Identifier.CODEC.optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
@@ -49,22 +49,5 @@ public record ModuleDefinition(
 			return DataResult.success(Unitemify(path));
 		else
 			return DataResult.error(()->"Invalid character in path: "+path);
-	}
-
-	/**
-	 * @deprecated redundant
-	 */
-	public @Nullable Identifier GetFallbackModelId(){
-		return fallbackModel.orElse(null);
-	}
-
-	/**
-	 * @deprecated redundant
-	 */
-	public Map<String, @Nullable Identifier> GetSpecialModelIds(){
-		Map<String, @Nullable Identifier> result = new HashMap<>();
-		for (var entry : this.specialModels.entrySet())
-			result.put(entry.getKey(), entry.getValue());
-		return result;
 	}
 }

@@ -14,9 +14,12 @@ import net.minecraft.util.Identifier;
 
 public class ModelAggregator
 {
-	public final Set<Identifier> modelsToLoad = new HashSet<>();
+	/**
+	 * Maps each model ID to its parents.
+	 */
+	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>();
 	public final Set<Identifier> itemsToCreate = new HashSet<>();
-	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>(); // Maps model ID to its parent
+	// public final Set<Identifier> modelsToLoad = new HashSet<>();
 
 	public VariantLibrary CreateLibrary(ProtoModule prototype, ResourceManager manager){
 		Map<Identifier,Identifier> allVariants = new HashMap<>();
@@ -27,33 +30,45 @@ public class ModelAggregator
 		final var specials = new HashMap<>(prototype.definition().specialModels());
 		prototype.definition().fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
-		var varItems  = FindVariants(manager, "items" , prefix, ".json");
-		var speItems  = FindSpecials(manager, "items" , specials, ".json");
-		allVariants.putAll(varItems);
-		allSpecials.putAll(speItems);
+		// Variants from items
+		{
+			var varItems  = FindVariants(manager, "items", prefix, ".json");
+			var speItems  = FindSpecials(manager, "items", specials, ".json");
+			allVariants.putAll(varItems);
+			allSpecials.putAll(speItems);
+		}
 
-		// var varModels = FindVariants(manager, "models", prefix, ".json");
-		// var speModels = FindSpecials(manager, "models", specials, ".json");
-		// allVariants.putAll(varModels);
-		// allSpecials.putAll(speModels);
-		// this.modelsToLoad.addAll(varModels.values());
-		// this.modelsToLoad.addAll(speModels.values());
+		// Variants from models
+		if (prototype.definition().itemGen())
+		{
+			var varModels = FindVariants(manager, "models/item", prefix, ".json");
+			var speModels = FindSpecials(manager, "models/item", specials, ".json");
+			allVariants.keySet().forEach(varModels::remove);
+			allSpecials.keySet().forEach(speModels::remove);
+			allVariants.putAll(varModels);
+			allSpecials.putAll(speModels);
+			this.itemsToCreate.addAll(varModels.values());
+			this.itemsToCreate.addAll(speModels.values());
+		}
 
-		// if (modelParent.isPresent())
-		// {
-		// 	var varTextures = FindVariants(manager, "textures", prefix, ".png" );
-		// 	var speTextures = FindSpecials(manager, "textures", specials, ".png" );
-		// 	varModels.keySet().forEach(varTextures::remove);
-		// 	speModels.keySet().forEach(speTextures::remove);
-		// 	allVariants.putAll(varTextures);
-		// 	allSpecials.putAll(speTextures);
-		// 	varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
-		// 	speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
-		// }
+		// Variants from textures
+		if (modelParent.isPresent())
+		{
+			var varTextures = FindVariants(manager, "textures/item", prefix, ".png");
+			var speTextures = FindSpecials(manager, "textures/item", specials, ".png");
+			allVariants.keySet().forEach(varTextures::remove);
+			allSpecials.keySet().forEach(speTextures::remove);
+			allVariants.putAll(varTextures);
+			allSpecials.putAll(speTextures);
+			this.itemsToCreate.addAll(varTextures.values());
+			this.itemsToCreate.addAll(speTextures.values());
+			varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
+			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
+		}
 
 		allSpecials.remove(null);
 		return new VariantLibrary(
-			prototype.definition().GetFallbackModelId(),
+			prototype.definition().fallbackModel().orElse(null),
 			allVariants,
 			allSpecials
 		);
@@ -79,14 +94,14 @@ public class ModelAggregator
 		for (Identifier fileId : manager.findResources(directory, id -> id.getPath().startsWith(fullPrefix) && id.getPath().endsWith(suffix)).keySet())
 		{
 			String namespace = fileId.getNamespace();
-			String modelName, variantName;
-			modelName = fileId.getPath();
-			modelName = modelName.substring((rootDirectory+'/').length(), modelName.length()-suffix.length());
-			variantName = modelName.substring(modelPrefix.length());
+			String assetName, variantName;
+			assetName = fileId.getPath();
+			assetName = assetName.substring((rootDirectory+'/').length(), assetName.length()-suffix.length());
+			variantName = assetName.substring(modelPrefix.length());
 
 			results.put(
 				Identifier.of(namespace, variantName),
-				Identifier.of(namespace, modelName)
+				Identifier.of(namespace, assetName)
 			);
 		}
 
