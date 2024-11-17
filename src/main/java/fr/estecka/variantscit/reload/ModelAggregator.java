@@ -19,7 +19,6 @@ public class ModelAggregator
 	 */
 	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>();
 	public final Set<Identifier> itemsToCreate = new HashSet<>();
-	// public final Set<Identifier> modelsToLoad = new HashSet<>();
 
 	public VariantLibrary CreateLibrary(ProtoModule prototype, ResourceManager manager){
 		Map<Identifier,Identifier> allVariants = new HashMap<>();

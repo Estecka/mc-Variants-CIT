@@ -1,10 +1,6 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
-// import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-// import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-// import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
@@ -13,9 +9,7 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.mojang.serialization.MapCodec;
-
 import fr.estecka.variantscit.mixin.NumericPropertiesAccessor;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.ModuleLoader;
@@ -23,7 +17,6 @@ import fr.estecka.variantscit.reload.ModuleLoader;
 
 public class VariantsCitMod
 implements ClientModInitializer
-//, PreparableModelLoadingPlugin<ModuleLoader.Result>
 {
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
@@ -44,21 +37,8 @@ implements ClientModInitializer
 		return Set.copyOf(ITEM_AUTOGEN);
 	}
 
-	/**
-	 * For some reason, Minecraft strips the "item/" off of item models.
-	 */
-	@Deprecated
-	static public ModelIdentifier ModelIdFromResource(Identifier id){
-		String path = id.getPath();
-		if (path.startsWith("item/"))
-			path = path.substring("item/".length());
-		return new ModelIdentifier(id.withPath(path), "inventory");
-	}
-
 	@Override
 	public void onInitializeClient(){
-		// PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
-
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomDataModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);

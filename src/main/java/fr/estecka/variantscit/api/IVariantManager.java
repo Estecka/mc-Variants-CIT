@@ -5,13 +5,6 @@ import net.minecraft.util.Identifier;
 
 public interface IVariantManager
 {
-	// /**
-	//  * @deprecated  Will be removed alongside {@link ICitModule#GetItemVariant}.
-	//  * Use {@link #GetVariantModel} instead.
-	//  */
-	// @Deprecated
-	// public abstract @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack);
-
 	/**
 	 * @return  Whether this variant  has it's own model, ignoring  the fallback
 	 * model.

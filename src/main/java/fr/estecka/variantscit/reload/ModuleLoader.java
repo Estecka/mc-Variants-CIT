@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
@@ -17,7 +15,6 @@ import fr.estecka.variantscit.ModuleRegistry;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
-// import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -27,7 +24,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public final class ModuleLoader
-// implements DataLoader<ModuleLoader.Result>
 {
 	static public class Result {
 		public final HashMap<Identifier, BakedModule> uniqueModules = new HashMap<>();
@@ -51,14 +47,6 @@ public final class ModuleLoader
 		ProtoModule prototype,
 		BakedModule bakedModule
 	){}
-
-	/**
-	 * TODO: Find entry point.
-	 */
-	// @Override
-	public CompletableFuture<ModuleLoader.Result> load(ResourceManager resourceManager, Executor executor){
-		return CompletableFuture.supplyAsync(()->ReloadModules(resourceManager), executor);
-	}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{

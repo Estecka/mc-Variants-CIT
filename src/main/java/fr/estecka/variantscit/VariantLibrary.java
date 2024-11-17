@@ -8,9 +8,6 @@ import net.minecraft.util.Identifier;
 public final class VariantLibrary
 implements IVariantManager
 {
-	// @Deprecated
-	// private ICitModule module;
-
 	private final @Nullable Identifier fallbackModel;
 	/**
 	 * Maps variant IDs to model IDs.
@@ -27,17 +24,6 @@ implements IVariantManager
 		this.variantModels = variantModels;
 		this.specialModels = specialModels;
 	}
-
-	// @Deprecated
-	// public void SetModule(ICitModule module){
-	// 	this.module = module;
-	// }
-
-	// @Deprecated
-	// @Override
-	// public @Nullable ModelIdentifier GetModelVariantForItem(ItemStack stack){
-	// 	return GetVariantModel(module.GetItemVariant(stack));
-	// }
 
 	@Override
 	public boolean HasVariantModel(Identifier variant){

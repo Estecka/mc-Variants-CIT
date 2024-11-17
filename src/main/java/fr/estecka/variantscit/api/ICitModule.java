@@ -6,15 +6,6 @@ import net.minecraft.util.Identifier;
 
 public interface ICitModule
 {
-	// /**
-	//  * @deprecated Will  become  exclusive  to {@link ISimpleCitModule}. You may
-	//  * now implement that logic directly inside {@link #GetItemModel}.
-	//  */
-	// @Deprecated
-	// public default @Nullable Identifier GetItemVariant(ItemStack stack){
-	// 	return null;
-	// }
-
 	/**
 	 * The main logic for changing an items model.
 	 * 
