@@ -5,26 +5,13 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.IVariantManager;
 import net.minecraft.util.Identifier;
 
-public final class VariantLibrary
+public record VariantLibrary(
+	@Nullable Identifier fallbackModel,
+	Map<Identifier, Identifier> variantModels,
+	Map<String, Identifier> specialModels
+)
 implements IVariantManager
 {
-	private final @Nullable Identifier fallbackModel;
-	/**
-	 * Maps variant IDs to model IDs.
-	 */
-	private final Map<Identifier, Identifier> variantModels;
-	private final Map<String, Identifier> specialModels;
-
-	public VariantLibrary(
-		@Nullable Identifier fallbackModel,
-		Map<Identifier, Identifier> variantModels,
-		Map<String, Identifier> specialModels
-	){
-		this.fallbackModel = fallbackModel;
-		this.variantModels = variantModels;
-		this.specialModels = specialModels;
-	}
-
 	@Override
 	public boolean HasVariantModel(Identifier variant){
 		return this.variantModels.containsKey(variant);

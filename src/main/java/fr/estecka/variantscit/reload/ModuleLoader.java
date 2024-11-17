@@ -71,8 +71,8 @@ public final class ModuleLoader
 				continue;
 			}
 
-			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition, prototype.parameters);
-			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype, manager);
+			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
+			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype.definition, manager);
 			MetaModule meta = new MetaModule(
 				moduleId,
 				prototype,

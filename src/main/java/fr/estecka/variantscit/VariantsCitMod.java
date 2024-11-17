@@ -5,7 +5,6 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +22,9 @@ implements ClientModInitializer
 
 	static public int reloadcount = 0;
 	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
-	static private Map<Identifier, Identifier> MODEL_AUTOGEN = Map.of();
-	static private Set<Identifier> ITEM_AUTOGEN = Set.of();
 
 	static public @Nullable IItemModelProvider GetModule(Item itemType){
 		return MODULES.get(itemType);
-	}
-
-	static public Map<Identifier, Identifier> GetModelsToCreate(){
-		return Map.copyOf(MODEL_AUTOGEN);
-	}
-	static public Set<Identifier> GetItemsToCreate(){
-		return Set.copyOf(ITEM_AUTOGEN);
 	}
 
 	@Override
@@ -57,15 +47,11 @@ implements ClientModInitializer
 		NumericPropertiesAccessor.ID_MAPPER().put(EnchantedBookLevelPredicate.ID, EnchantedBookLevelPredicate.CODEC);
 	}
 
-	// @Override
-	public void initialize(ModuleLoader.Result result/*, ModelLoadingPlugin.Context pluginContext*/){
+	static public void OnResourceReload(ModuleLoader.Result result){
 		++reloadcount;
 
 		for (var e : result.uniqueModules.entrySet())
 			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
-
-		MODEL_AUTOGEN = result.modelAggregator.modelsToCreate;
-		ITEM_AUTOGEN = result.modelAggregator.itemsToCreate;
 
 		MODULES = new HashMap<>();
 		for (var entry : result.modulesPerItem.entrySet()){

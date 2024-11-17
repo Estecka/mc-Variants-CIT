@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.reload.ModuleLoader.ProtoModule;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
@@ -20,14 +19,14 @@ public class ModelAggregator
 	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>();
 	public final Set<Identifier> itemsToCreate = new HashSet<>();
 
-	public VariantLibrary CreateLibrary(ProtoModule prototype, ResourceManager manager){
+	public VariantLibrary CreateLibrary(ModuleDefinition definition, ResourceManager manager){
 		Map<Identifier,Identifier> allVariants = new HashMap<>();
 		Map<String,Identifier> allSpecials = new HashMap<>();
 
-		final String prefix = prototype.definition().modelPrefix();
-		final Optional<Identifier> modelParent = prototype.definition().modelParent();
-		final var specials = new HashMap<>(prototype.definition().specialModels());
-		prototype.definition().fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
+		final String prefix = definition.modelPrefix();
+		final Optional<Identifier> modelParent = definition.modelParent();
+		final var specials = new HashMap<>(definition.specialModels());
+		definition.fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
 		// Variants from items
 		{
@@ -38,7 +37,7 @@ public class ModelAggregator
 		}
 
 		// Variants from models
-		if (prototype.definition().itemGen())
+		if (definition.itemGen())
 		{
 			var varModels = FindVariants(manager, "models/item", prefix, ".json");
 			var speModels = FindSpecials(manager, "models/item", specials, ".json");
@@ -67,7 +66,7 @@ public class ModelAggregator
 
 		allSpecials.remove(null);
 		return new VariantLibrary(
-			prototype.definition().fallbackModel().orElse(null),
+			definition.fallbackModel().orElse(null),
 			allVariants,
 			allSpecials
 		);
