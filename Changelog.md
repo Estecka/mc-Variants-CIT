@@ -46,9 +46,9 @@
 
 # v3
 - Now using `items/` instead of `models/` as primary assets.
-- Added `itemsFromModels` options to modules. (Defaults to true)
-- Models and textures will now be searched for in `models/item/` and `textures/item/`, instead of `models/` and `items/`.
-- Stripping the first leading `item/` off of model prefixes, to maximise compatibility with older packs.
+- Added `itemsFromModels` options to modules. Defaults to true to provide backward compatibility.
+- Corresponding models and textures will now be searched for in `models/item/` and `textures/item/`, instead of `models/` and `items/`.
+- Fallback models, special models, and model prefixes will have their leading `item/` stripped off, in order to offer some backward compatibility with older packs.
 - Added the numeric property `variants-cit:stored_enchantment_level`, as a replacement for the `level` model override predicate
 #### Java API:
 - Removed deprecated methods

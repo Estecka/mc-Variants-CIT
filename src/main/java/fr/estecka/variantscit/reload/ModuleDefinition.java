@@ -30,23 +30,27 @@ public record ModuleDefinition(
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
-			Identifier.CODEC.optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
-			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
+			Identifier.CODEC.validate(ModuleDefinition::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
+			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(ModuleDefinition::UnItemify)).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);
 
-	static private String Unitemify(String modelPrefix){
+	static private String UnItemify(String modelPrefix){
 		if (modelPrefix.startsWith("item/")){
-			VariantsCitMod.LOGGER.warn("Leading \"item/\" is no longer required in CIT model prefixes ({})", modelPrefix);
+			VariantsCitMod.LOGGER.warn("Stripped leading \"item/\" from model path: \"{}\"", modelPrefix);
 			modelPrefix = modelPrefix.substring("item/".length());
 		}
 		return modelPrefix;
 	}
 
+	static private DataResult<Identifier> UnItemify(Identifier original){
+		return DataResult.success(Identifier.of(original.getNamespace(), UnItemify(original.getPath())));
+	}
+
 	static public DataResult<String> ValidatePath(String path){
 		if (Identifier.isPathValid(path))
-			return DataResult.success(Unitemify(path));
+			return DataResult.success(UnItemify(path));
 		else
 			return DataResult.error(()->"Invalid character in path: "+path);
 	}
