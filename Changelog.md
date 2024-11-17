@@ -43,3 +43,13 @@
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
 ### 2.5.1
 - Updated for MC 1.21.2
+
+# v3
+- Now using `items/` instead of `models/` as primary assets.
+- Added `itemsFromModels` options to modules. (Defaults to true)
+- Models and textures will now be searched for in `models/item/` and `textures/item/`, instead of `models/` and `items/`.
+- Stripping the first leading `item/` off of model prefixes, to maximise compatibility with older packs.
+- Added the numeric property `variants-cit:stored_enchantment_level`, as a replacement for the `level` model override predicate
+#### Java API:
+- Removed deprecated methods
+- Replaced all `ModelIdentifier`s with plain `Identifier`s.
