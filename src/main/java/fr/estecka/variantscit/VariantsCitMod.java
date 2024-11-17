@@ -13,6 +13,9 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mojang.serialization.MapCodec;
+
 import fr.estecka.variantscit.mixin.NumericPropertiesAccessor;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.ModuleLoader;
@@ -66,10 +69,10 @@ implements ClientModInitializer
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), new EnchantedBookModule());
-		// ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), _0 -> {
-		// 	LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
-		// 	return new EnchantedBookModule();
-		// });
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(()->{
+			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
+			return new EnchantedBookModule();
+		}));
 
 		NumericPropertiesAccessor.ID_MAPPER().put(EnchantedBookLevelPredicate.ID, EnchantedBookLevelPredicate.CODEC);
 	}
