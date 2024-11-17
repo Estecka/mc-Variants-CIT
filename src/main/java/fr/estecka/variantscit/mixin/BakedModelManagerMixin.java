@@ -2,31 +2,31 @@ package fr.estecka.variantscit.mixin;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
+import net.minecraft.client.model.ItemAssetsLoader;
+import net.minecraft.client.render.item.model.BasicItemModel;
+import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.render.model.BlockStatesLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+@Unique
 @Mixin(BakedModelManager.class)
 public class BakedModelManagerMixin
 {
-	@Inject( method="reload", at=@At("HEAD") )
-	private void reload(CallbackInfoReturnable<?> ci, @Local ResourceManager manager){
-		new VariantsCitMod().initialize(ModuleLoader.ReloadModules(manager));
-	}
-
 	/**
 	 * I could probably use the constructor for JsonUnbakedModel instead, but it
 	 * is unclear how parent-child inheritance works with it.
@@ -40,28 +40,48 @@ public class BakedModelManagerMixin
 		}
 	""";
 
-	@Unique
-	private UnbakedModel CreateFromTexture(Identifier resourceId, Identifier parent) {
-		StringReader reader = new StringReader(ARBITRARY_MODEL.formatted(parent.toString(), resourceId.toString()));
+	static private UnbakedModel ModelFromTexture(Identifier assetId, Identifier parent) {
+		StringReader reader = new StringReader(ARBITRARY_MODEL.formatted(parent.toString(), assetId.toString()));
 		JsonUnbakedModel model = JsonUnbakedModel.deserialize(reader);
 		return model;
 	}
 
-	/**
-	 * TODO: check injection point.
-	 */
-	// @Inject( method="collect", at=@At("HEAD"))
-	private void AddVariantModels(UnbakedModel missingModel, Map<Identifier, UnbakedModel> inputs, BlockStatesLoader.BlockStateDefinition definition, CallbackInfoReturnable<?> ci, @Local(argsOnly=true) LocalRef<Map<Identifier, UnbakedModel>> inputRef)
-	{
-		// Make mutable
-		inputs = new HashMap<>(inputs);
-		inputRef.set(inputs);
+	static private ItemModel.Unbaked ItemFromModel(Identifier assetId) {
+		return new BasicItemModel.Unbaked(assetId.withPrefixedPath("item/"), List.of());
+	}
 
-		var models = VariantsCitMod.GetModelsToCreate();
-		VariantsCitMod.LOGGER.info("Creating {} item models from textures...", models.size());
-		for (var entry : VariantsCitMod.GetModelsToCreate().entrySet()){
-			Identifier resourceId = entry.getKey().withPrefixedPath("item/");
-			inputs.put(resourceId, this.CreateFromTexture(resourceId, entry.getValue()));
-		}
+	@Inject( method="reload", at=@At("HEAD") )
+	private void reload(CallbackInfoReturnable<?> ci, @Local ResourceManager manager){
+		new VariantsCitMod().initialize(ModuleLoader.ReloadModules(manager));
+	}
+
+	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/render/model/BakedModelManager.reloadModels(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
+	static private CompletableFuture<Map<Identifier,UnbakedModel>> AddVariantModels(CompletableFuture<Map<Identifier,UnbakedModel>> original) {
+		return original.thenApply( (allModels)->{
+			allModels = new HashMap<Identifier, UnbakedModel>(allModels);
+	
+			var models = VariantsCitMod.GetModelsToCreate();
+			VariantsCitMod.LOGGER.info("Creating {} models from textures...", models.size());
+			for (var entry : models.entrySet()){
+				Identifier resourceId = entry.getKey().withPrefixedPath("item/");
+				allModels.put(resourceId, ModelFromTexture(resourceId, entry.getValue()));
+			}
+	
+			return allModels;
+		});
+	}
+
+	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/model/ItemAssetsLoader.load(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
+	static private CompletableFuture<ItemAssetsLoader.Result> AddVariantItems(CompletableFuture<ItemAssetsLoader.Result> original) {
+		return original.thenApply( (result)->{
+			var allItems = new HashMap<Identifier, ItemModel.Unbaked>(result.models());
+		
+			var items = VariantsCitMod.GetItemsToCreate();
+			VariantsCitMod.LOGGER.info("Creating {} items from models...", items.size());
+			for (Identifier assetId : items){
+				allItems.put(assetId, ItemFromModel(assetId));
+			}
+			return new ItemAssetsLoader.Result(allItems);
+		});
 	}
 }
