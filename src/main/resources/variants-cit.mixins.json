@@ -4,8 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"BakedModelManagerMixin",
-		"ItemModelManagerMixin",
-		"NumericPropertiesAccessor"
+		"ItemModelManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

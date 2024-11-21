@@ -1,6 +1,7 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.render.item.property.numeric.NumericProperties;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
@@ -9,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.mixin.NumericPropertiesAccessor;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.ModuleLoader;
 
@@ -44,7 +44,7 @@ implements ClientModInitializer
 			return new EnchantedBookModule();
 		}));
 
-		NumericPropertiesAccessor.ID_MAPPER().put(EnchantedBookLevelPredicate.ID, EnchantedBookLevelPredicate.CODEC);
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){

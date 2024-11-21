@@ -2,19 +2,16 @@ package fr.estecka.variantscit.modules;
 
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.render.item.property.numeric.NumericProperty;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 public class EnchantedBookLevelPredicate
 implements NumericProperty
 {
-	static public final Identifier ID = Identifier.of(VariantsCitMod.MODID, "stored_enchantment_level");
 	static public final MapCodec<EnchantedBookLevelPredicate> CODEC = MapCodec.unit(new EnchantedBookLevelPredicate());
 
 	@Override
