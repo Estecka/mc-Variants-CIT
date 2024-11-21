@@ -18,9 +18,9 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fr.estecka.variantscit.reload.ModelAggregator;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
+import net.minecraft.client.item.ItemAsset;
 import net.minecraft.client.model.ItemAssetsLoader;
 import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
@@ -50,8 +50,10 @@ public class BakedModelManagerMixin
 		return model;
 	}
 
-	static private ItemModel.Unbaked ItemFromModel(Identifier assetId) {
-		return new BasicItemModel.Unbaked(assetId.withPrefixedPath("item/"), List.of());
+	static private ItemAsset ItemFromModel(Identifier assetId) {
+		var unbaked = new BasicItemModel.Unbaked(assetId.withPrefixedPath("item/"), List.of());
+		var properties = new ItemAsset.class_10543(true);
+		return new ItemAsset(unbaked, properties);
 	}
 
 	@Inject( method="reload", at=@At("HEAD") )
@@ -77,10 +79,10 @@ public class BakedModelManagerMixin
 		});
 	}
 
-	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/model/ItemAssetsLoader.load(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
+	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/model/ItemAssetsLoader.method_65929(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
 	static private CompletableFuture<ItemAssetsLoader.Result> AddVariantItems(CompletableFuture<ItemAssetsLoader.Result> original, @Share("result") LocalRef<ModelAggregator> resultRef) {
 		return original.thenApply( (result)->{
-			var allItems = new HashMap<Identifier, ItemModel.Unbaked>(result.models());
+			var allItems = new HashMap<Identifier, ItemAsset>(result.contents());
 		
 			Set<Identifier> items = resultRef.get().itemsToCreate;
 			VariantsCitMod.LOGGER.info("Creating {} items from models...", items.size());
