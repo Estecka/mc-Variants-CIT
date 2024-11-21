@@ -121,14 +121,8 @@ public class ModelAggregator
 		for (Identifier fileId : manager.findResources(rootDirectory, id->resourceIds.keySet().contains(id)).keySet())
 			valid.add(resourceIds.get(fileId));
 
-		return requested.entrySet().stream()
-			.filter(e -> valid.contains(e.getValue()))
-			// May be simplified
-			.collect(Collectors.toMap(
-				Map.Entry::getKey,
-				Map.Entry::getValue
-			))
-			;
+		requested.entrySet().removeIf(e -> !valid.contains(e.getValue()));
+		return requested;
 	}
 
 }
