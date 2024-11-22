@@ -65,6 +65,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 			return new EnchantedBookModule();
 		});
 
+		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("bucket_entity_age"), new BucketAgePredicate());
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();
 		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("amplifier"), potionPredicate);

@@ -45,3 +45,4 @@
 - Updated for MC 1.21.2
 ### 2.6.0
 - Added `bucket_entity_data` module.
+- Added `bucket_entity_age` model predicate.
