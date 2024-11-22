@@ -12,7 +12,7 @@
 		"sources": "https://github.com/Estecka/mc-Variants-CIT",
 		"issues":  "https://github.com/Estecka/mc-Variants-CIT/issues"
 	},
-	"license": "EUPL",
+	"license": "EUPL-1.2",
 	"icon": "assets/variants-cit/icon.png",
 	"environment": "client",
 	"entrypoints": {
