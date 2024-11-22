@@ -50,10 +50,12 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
 
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("block_entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("bucket_entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), NbtStringModule.CreateCodec(DataComponentTypes.CUSTOM_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantedToolModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
