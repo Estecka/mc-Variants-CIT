@@ -43,3 +43,5 @@
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
 ### 2.5.1
 - Updated for MC 1.21.2
+### 2.6.0
+- Added `bucket_entity_data` module.
