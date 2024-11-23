@@ -1,6 +1,7 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.render.item.model.ItemModelTypes;
 import net.minecraft.client.render.item.property.numeric.NumericProperties;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.selectors.DynamicRangeDispatchUnbaked;
 
 
 public class VariantsCitMod
@@ -45,6 +47,7 @@ implements ClientModInitializer
 		}));
 
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
+		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){

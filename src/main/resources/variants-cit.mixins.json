@@ -5,7 +5,9 @@
 	"mixins": [
 		"BakedModelManagerMixin",
 		"ItemModelTypesMixin",
-		"ItemModelManagerMixin"
+		"ItemModelManagerMixin",
+		"ReferencedModelsCollectorMixin",
+		"ReferencedModelsCollectorMixin$ResolverImplMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
