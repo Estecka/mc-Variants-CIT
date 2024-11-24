@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.util.ModelIdentifier;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
@@ -49,9 +50,12 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
 
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), CustomDataModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("block_entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
+		ModuleRegistry.Register(Identifier.ofVanilla("bucket_entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
+		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), NbtStringModule.CreateCodec(DataComponentTypes.CUSTOM_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantedToolModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
@@ -63,6 +67,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 			return new EnchantedBookModule();
 		});
 
+		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("bucket_entity_age"), new BucketAgePredicate());
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
 		var potionPredicate = new PotionLevelPredicate();
 		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
