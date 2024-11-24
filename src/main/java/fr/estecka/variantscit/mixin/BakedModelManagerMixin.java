@@ -79,7 +79,7 @@ public class BakedModelManagerMixin
 		});
 	}
 
-	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/model/ItemAssetsLoader.method_65929(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
+	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/item/ItemAssetsLoader.load(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
 	static private CompletableFuture<ItemAssetsLoader.Result> AddVariantItems(CompletableFuture<ItemAssetsLoader.Result> original, @Share("result") LocalRef<ModelAggregator> resultRef) {
 		return original.thenApply( (result)->{
 			var allItems = new HashMap<Identifier, ItemAsset>(result.contents());
