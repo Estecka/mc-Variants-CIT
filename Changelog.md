@@ -58,5 +58,7 @@ Since v2.5:
 - Java API: Removed all deprecated methods.
 - Java API: Replaced all `ModelIdentifier`s with plain `Identifier`s.
 ## v3.1
+- Added module types from v2.6
+- Added numeric properties `custom_data`, `bucket_entity_data`, `entity_data` and `block_entity_data`, as a replacement for the `bucket_entity_age` predicate.
 - Added a mechanism to automatically populate `dispatch_range`'s entries.
 - Added a mechanism to make modded item states compatible with vanilla.
