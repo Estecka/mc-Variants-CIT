@@ -6,27 +6,29 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
 
-public class CustomDataModule
+public class NbtStringModule
 extends ASimpleComponentCachingModule<NbtComponent>
 {
-	static public final MapCodec<CustomDataModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			Codec.STRING.optionalFieldOf("nbtKey").deprecated(0).validate(_0 -> {
-				VariantsCitMod.LOGGER.warn("The custom_data parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
-				return DataResult.success(_0);
-			}).forGetter(s->Optional.empty()),
-			Codec.STRING.optionalFieldOf("nbtPath").forGetter(s->Optional.empty()),
-			Codec.BOOL.fieldOf("caseSensitive").orElse(true).forGetter(s->s.caseSensitive)
-		)
-		.apply(builder, CustomDataModule::new)
-	);
+	static public final MapCodec<NbtStringModule> CreateCodec(ComponentType<NbtComponent> componentType){
+			return RecordCodecBuilder.mapCodec(builder->builder
+				.group(
+					Codec.STRING.optionalFieldOf("nbtKey").deprecated(0).validate(_0 -> {
+						VariantsCitMod.LOGGER.warn("The custom_data parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
+						return DataResult.success(_0);
+					}).forGetter(s->Optional.empty()),
+					Codec.STRING.optionalFieldOf("nbtPath").forGetter(s->Optional.empty()),
+					Codec.BOOL.fieldOf("caseSensitive").orElse(true).forGetter(s->s.caseSensitive)
+				)
+				.apply(builder, (a,b,c)->new NbtStringModule(componentType, a, b, c))
+			);
+		}
 
 	/**
 	 * TODO: implement proper getter for the codec.
@@ -34,10 +36,10 @@ extends ASimpleComponentCachingModule<NbtComponent>
 	private final String[] path;
 	private final boolean caseSensitive;
 
-	private CustomDataModule(Optional<String> key, Optional<String> path, boolean caseSensitive)
+	private NbtStringModule(ComponentType<NbtComponent> dataType, Optional<String> key, Optional<String> path, boolean caseSensitive)
 	throws IllegalStateException
 	{
-		super(DataComponentTypes.CUSTOM_DATA);
+		super(dataType);
 		this.caseSensitive = caseSensitive;
 		if (path.isPresent())
 			this.path = ParsePath(path.get());

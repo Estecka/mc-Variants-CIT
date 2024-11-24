@@ -43,9 +43,13 @@
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
 ### 2.5.1
 - Updated for MC 1.21.2
+### 2.6.0
+- Added the modules `bucket_entity_data`, `entity_data` and `block_entity_data`.
+- Added `bucket_entity_age` model predicate.
 
 # v3
 ## v3.0
+Since v2.5:
 - Now using `items/` instead of `models/` as primary assets.
 - Added `itemsFromModels` options to modules. Defaults to true to provide backward compatibility.
 - Corresponding models and textures will now be searched for in `models/item/` and `textures/item/`, instead of `models/` and `items/`.
@@ -55,4 +59,4 @@
 - Java API: Replaced all `ModelIdentifier`s with plain `Identifier`s.
 ## v3.1
 - Added a mechanism to automatically populate `dispatch_range`'s entries.
-- Added a mechanism to make modded item states compatible with vanilla..
+- Added a mechanism to make modded item states compatible with vanilla.
