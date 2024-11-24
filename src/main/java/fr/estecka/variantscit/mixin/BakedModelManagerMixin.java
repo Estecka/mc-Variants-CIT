@@ -19,7 +19,7 @@ import fr.estecka.variantscit.reload.ModelAggregator;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.item.ItemAsset;
-import net.minecraft.client.model.ItemAssetsLoader;
+import net.minecraft.client.item.ItemAssetsLoader;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.UnbakedModel;
@@ -52,7 +52,7 @@ public class BakedModelManagerMixin
 
 	static private ItemAsset ItemFromModel(Identifier assetId) {
 		var unbaked = new BasicItemModel.Unbaked(assetId.withPrefixedPath("item/"), List.of());
-		var properties = new ItemAsset.class_10543(true);
+		var properties = new ItemAsset.Properties(true);
 		return new ItemAsset(unbaked, properties);
 	}
 
