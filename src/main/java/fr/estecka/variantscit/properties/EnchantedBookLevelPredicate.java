@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.modules;
+package fr.estecka.variantscit.properties;
 
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;

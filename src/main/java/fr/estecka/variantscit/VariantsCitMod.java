@@ -12,9 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import fr.estecka.variantscit.selectors.DynamicRangeDispatchUnbaked;
+import fr.estecka.variantscit.modules.*;
+import fr.estecka.variantscit.properties.*;
+import fr.estecka.variantscit.selectors.*;
 
 
 public class VariantsCitMod
@@ -50,6 +51,7 @@ implements ClientModInitializer
 			return new EnchantedBookModule();
 		}));
 
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "bucket_entity_number"), NbtNumberProperty.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
 		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
 	}
