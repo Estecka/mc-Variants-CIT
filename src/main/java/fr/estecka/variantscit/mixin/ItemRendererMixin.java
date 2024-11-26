@@ -16,6 +16,7 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import fr.estecka.variantscit.IItemModelProvider;
 import fr.estecka.variantscit.VariantsCitMod;
 
@@ -41,7 +42,10 @@ public class ItemRendererMixin
 	// Most items
 	@WrapOperation( method="getModel", require=1, at=@At( value="INVOKE", target="net/minecraft/client/render/item/ItemModels.getModel (Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;") )
 	private BakedModel	GetItemStackModel(ItemModels models, ItemStack stack, Operation<BakedModel> original) {
-		return GetVariantModel(bakedModelManager, stack, ()->original.call(models, stack));
+		if (stack.isOf(Items.TRIDENT))
+			return original.call(models, stack);
+		else
+			return GetVariantModel(bakedModelManager, stack, ()->original.call(models, stack));
 	}
 
 	// Trident and Spyglass
