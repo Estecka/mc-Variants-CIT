@@ -49,4 +49,6 @@
 - Added `bucket_entity_age` model predicate.
 ### 2.6.1
 - Fixed rendering of triden in hand.
+## 2.7
+- Added the option `levelSeparator` to the module `stored_enchantment`
 
