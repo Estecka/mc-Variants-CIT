@@ -43,6 +43,12 @@
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
 ### 2.5.1
 - Updated for MC 1.21.2
+## 2.6
 ### 2.6.0
 - Added the modules `bucket_entity_data`, `entity_data` and `block_entity_data`.
 - Added `bucket_entity_age` model predicate.
+### 2.6.1
+- Fixed rendering of trident in hand.
+## 2.7
+- Added the option `levelSeparator` to the module `stored_enchantment`
+
