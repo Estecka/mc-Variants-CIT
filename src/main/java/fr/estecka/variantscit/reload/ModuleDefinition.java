@@ -38,7 +38,7 @@ public record ModuleDefinition(
 
 	static private String UnItemify(String modelPrefix){
 		if (modelPrefix.startsWith("item/")){
-			VariantsCitMod.LOGGER.warn("Stripped leading \"item/\" from model path: \"{}\"", modelPrefix);
+			// VariantsCitMod.LOGGER.warn("Stripped leading \"item/\" from model path: \"{}\"", modelPrefix);
 			modelPrefix = modelPrefix.substring("item/".length());
 		}
 		return modelPrefix;
