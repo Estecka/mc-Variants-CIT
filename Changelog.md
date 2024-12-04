@@ -43,12 +43,17 @@
 - Started looking for modules in `variants-cit`, marked `variant-cits` as deprecated.
 ### 2.5.1
 - Updated for MC 1.21.2
+## 2.6
 ### 2.6.0
 - Added the modules `bucket_entity_data`, `entity_data` and `block_entity_data`.
 - Added `bucket_entity_age` model predicate.
+### 2.6.1
+- Fixed rendering of trident in hand.
+## 2.7
+- Added the option `levelSeparator` to the module `stored_enchantment`
 
 # v3
-## v3.0
+## 3.0
 Since v2.5:
 - Now using `items/` instead of `models/` as primary assets.
 - Added `itemsFromModels` options to modules. Defaults to true to provide backward compatibility.
@@ -57,8 +62,10 @@ Since v2.5:
 - Added the numeric property `variants-cit:stored_enchantment_level`, as a replacement for the `level` model override predicate
 - Java API: Removed all deprecated methods.
 - Java API: Replaced all `ModelIdentifier`s with plain `Identifier`s.
-## v3.1
+## 3.1
 - Added module types from v2.6
 - Added numeric properties `custom_data`, `bucket_entity_data`, `entity_data` and `block_entity_data`, as a replacement for the `bucket_entity_age` predicate.
 - Added a mechanism to automatically populate `dispatch_range`'s entries.
 - Added a mechanism to make modded item states compatible with vanilla.
+## 3.2
+- Added the option `levelSeparator` to the module `stored_enchantment` (Merged with v2.7)

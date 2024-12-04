@@ -45,8 +45,8 @@ implements ClientModInitializer
 		ModuleRegistry.Register(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), new EnchantedBookModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(()->{
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), EnchantedBookModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(() -> {
 			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
 			return new EnchantedBookModule();
 		}));
