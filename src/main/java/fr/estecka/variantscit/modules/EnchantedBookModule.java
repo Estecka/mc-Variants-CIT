@@ -5,7 +5,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.api.IVariantManager;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.util.Identifier;
@@ -32,7 +31,7 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 	}
 
 	@Override
-	public ModelIdentifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager modelProvider){
+	public Identifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager modelProvider){
 		if (enchants == null || enchants.isEmpty())
 			return null;
 		else if (enchants.getSize() > 1)

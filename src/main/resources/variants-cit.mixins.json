@@ -3,8 +3,11 @@
 	"package": "fr.estecka.variantscit.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ItemRendererMixin",
-		"ModelLoaderMixin"
+		"BakedModelManagerMixin",
+		"ItemModelTypesMixin",
+		"ItemModelManagerMixin",
+		"ReferencedModelsCollectorMixin",
+		"ReferencedModelsCollectorMixin$ResolverImplMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

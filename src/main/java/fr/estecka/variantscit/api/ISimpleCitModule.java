@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.api;
 
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -18,7 +17,7 @@ extends ICitModule
 	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
 
 	@Override
-	public default @Nullable ModelIdentifier GetItemModel(ItemStack stack, IVariantManager modelProvider){
+	public default @Nullable Identifier GetItemModel(ItemStack stack, IVariantManager modelProvider){
 		return modelProvider.GetVariantModel(GetItemVariant(stack));
 	}
 }

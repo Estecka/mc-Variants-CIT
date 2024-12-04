@@ -1,23 +1,22 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.reload;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jetbrains.annotations.Nullable;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
 
 public record ModuleDefinition(
 	Identifier type,
 	Optional<List<Identifier>> targets,
 	int priority,
 	String modelPrefix,
+	boolean itemGen,
 	Optional<Identifier> modelParent,
 	Optional<Identifier> fallbackModel,
 	Map<String,Identifier> specialModels
@@ -29,28 +28,30 @@ public record ModuleDefinition(
 			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
+			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
-			Identifier.CODEC.optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
-			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
+			Identifier.CODEC.validate(ModuleDefinition::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
+			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(ModuleDefinition::UnItemify)).fieldOf("special").orElse(ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);
 
+	static private String UnItemify(String modelPrefix){
+		if (modelPrefix.startsWith("item/")){
+			// VariantsCitMod.LOGGER.warn("Stripped leading \"item/\" from model path: \"{}\"", modelPrefix);
+			modelPrefix = modelPrefix.substring("item/".length());
+		}
+		return modelPrefix;
+	}
+
+	static private DataResult<Identifier> UnItemify(Identifier original){
+		return DataResult.success(Identifier.of(original.getNamespace(), UnItemify(original.getPath())));
+	}
+
 	static public DataResult<String> ValidatePath(String path){
 		if (Identifier.isPathValid(path))
-			return DataResult.success(path);
+			return DataResult.success(UnItemify(path));
 		else
 			return DataResult.error(()->"Invalid character in path: "+path);
-	}
-
-	public @Nullable ModelIdentifier GetFallbackModelId(){
-		return fallbackModel.map(VariantsCitMod::ModelIdFromResource).orElse(null);
-	}
-
-	public Map<String, @Nullable ModelIdentifier> GetSpecialModelIds(){
-		Map<String, @Nullable ModelIdentifier> result = new HashMap<>();
-		for (var entry : this.specialModels.entrySet())
-			result.put(entry.getKey(), VariantsCitMod.ModelIdFromResource(entry.getValue()));
-		return result;
 	}
 }

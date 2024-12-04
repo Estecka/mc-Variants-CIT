@@ -1,57 +1,38 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.util.ModelIdentifier;
+import net.minecraft.client.render.item.model.ItemModelTypes;
+import net.minecraft.client.render.item.property.numeric.NumericProperties;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.mojang.serialization.MapCodec;
-
+import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.modules.*;
+import fr.estecka.variantscit.properties.*;
+import fr.estecka.variantscit.selectors.*;
 
 
 public class VariantsCitMod
-implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Result>
+implements ClientModInitializer
 {
 	static public final String MODID = "variants-cit";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public int reloadcount = 0;
 	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
-	static private Map<ModelIdentifier, Identifier> AUTOGEN = new HashMap<>();
 
 	static public @Nullable IItemModelProvider GetModule(Item itemType){
 		return MODULES.get(itemType);
 	}
 
-	static public Map<ModelIdentifier, Identifier> GetModelsToCreate(){
-		return Map.copyOf(AUTOGEN);
-	}
-
-	/**
-	 * For some reason, Minecraft strips the "item/" off of item models.
-	 */
-	static public ModelIdentifier ModelIdFromResource(Identifier id){
-		String path = id.getPath();
-		if (path.startsWith("item/"))
-			path = path.substring("item/".length());
-		return ModelIdentifier.ofInventoryVariant(id.withPath(path));
-	}
-
 	@Override
 	public void onInitializeClient(){
-		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
-
 		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("block_entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("bucket_entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
@@ -70,23 +51,20 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 			return new EnchantedBookModule();
 		}));
 
-		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("bucket_entity_age"), new BucketAgePredicate());
-		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
-		var potionPredicate = new PotionLevelPredicate();
-		ModelPredicateProviderRegistry.register(Items.POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
-		ModelPredicateProviderRegistry.register(Items.SPLASH_POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
-		ModelPredicateProviderRegistry.register(Items.LINGERING_POTION, Identifier.ofVanilla("amplifier"), potionPredicate);
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "block_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "bucket_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "custom_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.CUSTOM_DATA));
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.ENTITY_DATA));
+		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
+		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
 	}
 
-	@Override
-	public void initialize(ModuleLoader.Result result, ModelLoadingPlugin.Context pluginContext){
+	static public void OnResourceReload(ModuleLoader.Result result){
 		++reloadcount;
-		// result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 
 		for (var e : result.uniqueModules.entrySet())
 			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
 
-		AUTOGEN = result.modelAggregator.modelsToCreate;
 		MODULES = new HashMap<>();
 		for (var entry : result.modulesPerItem.entrySet()){
 			MODULES.put(

@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.reload;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,13 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import fr.estecka.variantscit.BakedModule;
+import fr.estecka.variantscit.ModuleRegistry;
+import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin.DataLoader;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -23,7 +24,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public final class ModuleLoader
-implements DataLoader<ModuleLoader.Result>
 {
 	static public class Result {
 		public final HashMap<Identifier, BakedModule> uniqueModules = new HashMap<>();
@@ -48,12 +48,7 @@ implements DataLoader<ModuleLoader.Result>
 		BakedModule bakedModule
 	){}
 
-	@Override
-	public CompletableFuture<ModuleLoader.Result> load(ResourceManager resourceManager, Executor executor){
-		return CompletableFuture.supplyAsync(()->ReloadModules(resourceManager), executor);
-	}
-
-	static private ModuleLoader.Result ReloadModules(ResourceManager manager)
+	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
 		ModuleLoader.Result result = new ModuleLoader.Result();
 
@@ -76,8 +71,8 @@ implements DataLoader<ModuleLoader.Result>
 				continue;
 			}
 
-			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition, prototype.parameters);
-			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype, manager);
+			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
+			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype.definition, manager);
 			MetaModule meta = new MetaModule(
 				moduleId,
 				prototype,
