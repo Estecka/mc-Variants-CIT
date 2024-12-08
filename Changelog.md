@@ -48,7 +48,10 @@
 - Added the modules `bucket_entity_data`, `entity_data` and `block_entity_data`.
 - Added `bucket_entity_age` model predicate.
 ### 2.6.1
-- Fixed rendering of triden in hand.
+- Fixed rendering of trident in hand.
 ## 2.7
+### 2.7.0
 - Added the option `levelSeparator` to the module `stored_enchantment`
+### 2.7.1
+- `custom_data` and siblings will now accept numeric data
 

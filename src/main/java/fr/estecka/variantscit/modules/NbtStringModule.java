@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.nbt.AbstractNbtNumber;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtString;
@@ -61,7 +62,7 @@ extends ASimpleComponentCachingModule<NbtComponent>
 		else
 			return null;
 
-		if (!(nbt instanceof NbtString))
+		if (!(nbt instanceof NbtString) && !(nbt instanceof AbstractNbtNumber))
 			return null;
 
 		String rawVariant = nbt.asString();
