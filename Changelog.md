@@ -50,7 +50,10 @@
 ### 2.6.1
 - Fixed rendering of trident in hand.
 ## 2.7
+### 2.7.0
 - Added the option `levelSeparator` to the module `stored_enchantment`
+### 2.7.1
+- `custom_data` and siblings will now accept numeric data
 
 # v3
 ## 3.0
@@ -68,4 +71,7 @@ Since v2.5:
 - Added a mechanism to automatically populate `dispatch_range`'s entries.
 - Added a mechanism to make modded item states compatible with vanilla.
 ## 3.2
+### 3.2.0
 - Added the option `levelSeparator` to the module `stored_enchantment` (Merged with v2.7)
+### 3.2.1
+- `custom_data` and siblings will now accept numeric data (v2.7.1)
