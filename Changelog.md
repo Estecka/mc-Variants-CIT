@@ -50,5 +50,8 @@
 ### 2.6.1
 - Fixed rendering of trident in hand.
 ## 2.7
+### 2.7.0
 - Added the option `levelSeparator` to the module `stored_enchantment`
+### 2.7.1
+- `custom_data` and siblings will now accept numeric data
 
