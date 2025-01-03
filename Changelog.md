@@ -51,7 +51,9 @@
 - Fixed rendering of trident in hand.
 ## 2.7
 ### 2.7.0
-- Added the option `levelSeparator` to the module `stored_enchantment`
+- Added the option `levelSeparator` to the module `stored_enchantment`.
 ### 2.7.1
 - `custom_data` and siblings will now accept numeric data
+## 2.8
+- Added the modules `trim`, `trim_pattern` and `trim_material`.
 
