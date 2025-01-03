@@ -57,6 +57,9 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
 			return new EnchantedBookModule();
 		}));
+		ModuleRegistry.Register(Identifier.ofVanilla("trim"), new TrimModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("trim_material"), new TrimPatternModule());
 
 		ModelPredicateProviderRegistry.register(Identifier.ofVanilla("bucket_entity_age"), new BucketAgePredicate());
 		ModelPredicateProviderRegistry.register(Items.ENCHANTED_BOOK, Identifier.ofVanilla("level"), new EnchantedBookLevelPredicate());
