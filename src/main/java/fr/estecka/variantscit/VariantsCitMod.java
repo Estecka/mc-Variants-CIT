@@ -50,6 +50,9 @@ implements ClientModInitializer
 			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
 			return new EnchantedBookModule();
 		}));
+		ModuleRegistry.Register(Identifier.ofVanilla("trim"), new TrimModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("trim_material"), new TrimPatternModule());
 
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "block_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "bucket_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));

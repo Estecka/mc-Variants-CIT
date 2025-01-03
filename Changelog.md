@@ -51,9 +51,11 @@
 - Fixed rendering of trident in hand.
 ## 2.7
 ### 2.7.0
-- Added the option `levelSeparator` to the module `stored_enchantment`
+- Added the option `levelSeparator` to the module `stored_enchantment`.
 ### 2.7.1
-- `custom_data` and siblings will now accept numeric data
+- `custom_data` and siblings will now accept numeric data.
+## 2.8
+- Added the modules `trim`, `trim_pattern` and `trim_material`.
 
 # v3
 ## 3.0
@@ -72,6 +74,8 @@ Since v2.5:
 - Added a mechanism to make modded item states compatible with vanilla.
 ## 3.2
 ### 3.2.0
-- Added the option `levelSeparator` to the module `stored_enchantment` (Merged with v2.7)
+- Added the option `levelSeparator` to the module `stored_enchantment`. (Merged with v2.7)
 ### 3.2.1
-- `custom_data` and siblings will now accept numeric data (v2.7.1)
+- `custom_data` and siblings will now accept numeric data. (v2.7.1)
+## 3.3
+- Added the modules `trim`, `trim_pattern` and `trim_material`. (Merged with v2.8)
