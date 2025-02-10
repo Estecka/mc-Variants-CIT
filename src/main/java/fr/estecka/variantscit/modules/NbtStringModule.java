@@ -54,16 +54,16 @@ extends ASimpleComponentCachingModule<NbtComponent>
 		if (component==null || (nbt=component.getNbt())==null)
 			return null;
 
-		for (int i=0; i<path.length; ++i)
-		if  (nbt instanceof NbtCompound compound)
-			nbt = compound.get(path[i]);
+		nbt = NbtPath.Resolve(nbt, this.path);
+
+		String rawVariant;
+		if (nbt instanceof NbtString)
+			rawVariant = nbt.asString();
+		else if (nbt instanceof AbstractNbtNumber number)
+			rawVariant = number.numberValue().toString();
 		else
 			return null;
 
-		if (!(nbt instanceof NbtString) && !(nbt instanceof AbstractNbtNumber))
-			return null;
-
-		String rawVariant = nbt.asString();
 		if (!caseSensitive)
 			rawVariant = rawVariant.toLowerCase();
 
