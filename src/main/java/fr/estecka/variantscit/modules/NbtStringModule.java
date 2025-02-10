@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.NbtComponent;
@@ -24,26 +25,23 @@ extends ASimpleComponentCachingModule<NbtComponent>
 						VariantsCitMod.LOGGER.warn("The custom_data parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
 						return DataResult.success(_0);
 					}).forGetter(s->Optional.empty()),
-					Codec.STRING.optionalFieldOf("nbtPath").forGetter(s->Optional.empty()),
+					CodecUtil.NBTPATH_CODEC.optionalFieldOf("nbtPath").forGetter(s->Optional.of(s.path)),
 					Codec.BOOL.fieldOf("caseSensitive").orElse(true).forGetter(s->s.caseSensitive)
 				)
 				.apply(builder, (a,b,c)->new NbtStringModule(componentType, a, b, c))
 			);
 		}
 
-	/**
-	 * TODO: implement proper getter for the codec.
-	 */
 	private final String[] path;
 	private final boolean caseSensitive;
 
-	private NbtStringModule(ComponentType<NbtComponent> dataType, Optional<String> key, Optional<String> path, boolean caseSensitive)
+	private NbtStringModule(ComponentType<NbtComponent> dataType, Optional<String> key, Optional<String[]> path, boolean caseSensitive)
 	throws IllegalStateException
 	{
 		super(dataType);
 		this.caseSensitive = caseSensitive;
 		if (path.isPresent())
-			this.path = ParsePath(path.get());
+			this.path = path.get();
 		else if (key.isPresent())
 			this.path = new String[]{ key.get() };
 		else
@@ -70,17 +68,5 @@ extends ASimpleComponentCachingModule<NbtComponent>
 			rawVariant = rawVariant.toLowerCase();
 
 		return Identifier.tryParse(rawVariant);
-	}
-
-	static private String[] ParsePath(String rawPath)
-	throws IllegalStateException
-	{
-		String[] result = rawPath.split("\\.");
-
-		for (String s : result)
-			if (s.isEmpty())
-				throw new IllegalStateException("Malformatted path: "+rawPath);
-
-		return result;
 	}
 }

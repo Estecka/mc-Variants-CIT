@@ -1,10 +1,9 @@
 package fr.estecka.variantscit.modules;
 
-import java.util.List;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.AbstractNbtNumber;
@@ -21,16 +20,16 @@ extends ASimpleComponentCachingModule<T>
 	static public final MapCodec<ComponentDataModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(mod -> mod.componentType),
-			Codec.STRING.listOf().fieldOf("nbtPath").forGetter(s->List.of(s.path))
+			CodecUtil.NBTPATH_CODEC.fieldOf("nbtPath").forGetter(s->s.path)
 		)
 		.apply(builder, (type,path) -> new ComponentDataModule(type, path))
 	);
 
 	private final String[] path;
 
-	public ComponentDataModule(ComponentType<T> type, List<String> path){
+	public ComponentDataModule(ComponentType<T> type, String[] path){
 		super(type);
-		this.path = path.toArray(i->new String[i]);
+		this.path = path;
 	}
 
 	@Override

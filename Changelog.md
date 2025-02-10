@@ -58,4 +58,5 @@
 - Added the modules `trim`, `trim_pattern` and `trim_material`.
 ## 2.9
 - Added the module `component_data`.
+- `nbtPath` parameters can now be specified as an array of strings.
 
