@@ -56,4 +56,6 @@
 - `custom_data` and siblings will now accept numeric data
 ## 2.8
 - Added the modules `trim`, `trim_pattern` and `trim_material`.
+## 2.9
+- Added the module `component_data`.
 
