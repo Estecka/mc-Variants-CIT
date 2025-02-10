@@ -7,9 +7,11 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.component.ComponentType;
+import net.minecraft.nbt.AbstractNbtNumber;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
@@ -44,7 +46,9 @@ extends ASimpleComponentCachingModule<T>
 		if (nbt == null)
 			return null;
 
-		return GetVariantFromData(nbt);
+		Identifier id = GetVariantFromData(nbt);
+		// VariantsCitMod.LOGGER.info("component_data: {}", id);
+		return id;
 	}
 
 	private NbtElement GetComponentNbt(T component){
@@ -68,10 +72,17 @@ extends ASimpleComponentCachingModule<T>
 	}
 
 	private Identifier GetVariantFromData(NbtElement nbt){
-		String rawVariant = nbt.asString();
+		String data;
+		if (nbt instanceof NbtString)
+			data = nbt.asString();
+		else if (nbt instanceof AbstractNbtNumber number)
+			data = number.numberValue().toString();
+		else
+			return null;
+		
 		// if (!caseSensitive)
-		// 	rawVariant = rawVariant.toLowerCase();
+		// 	data = data.toLowerCase();
 
-		return Identifier.tryParse(rawVariant);
+		return Identifier.tryParse(data);
 	}
 }
