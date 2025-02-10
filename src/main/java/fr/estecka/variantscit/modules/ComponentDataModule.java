@@ -3,11 +3,10 @@ package fr.estecka.variantscit.modules;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.NbtPath;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.AbstractNbtNumber;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtString;
@@ -20,7 +19,7 @@ extends ASimpleComponentCachingModule<T>
 	static public final MapCodec<ComponentDataModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(mod -> mod.componentType),
-			CodecUtil.NBTPATH_CODEC.fieldOf("nbtPath").forGetter(s->s.path)
+			NbtPath.CODEC.fieldOf("nbtPath").forGetter(s->s.path)
 		)
 		.apply(builder, (type,path) -> new ComponentDataModule(type, path))
 	);
@@ -41,7 +40,7 @@ extends ASimpleComponentCachingModule<T>
 		if (nbt == null)
 			return null;
 
-		nbt = Resolve(nbt);
+		nbt = NbtPath.Resolve(nbt, this.path);
 		if (nbt == null)
 			return null;
 
@@ -58,16 +57,6 @@ extends ASimpleComponentCachingModule<T>
 			VariantsCitMod.LOGGER.error( result.error().get().message() );
 			return null;
 		}
-	}
-
-	private NbtElement Resolve(NbtElement nbt){
-		for (int i=0; i<path.length; ++i)
-		if  (nbt instanceof NbtCompound compound)
-			nbt = compound.get(path[i]);
-		else
-			return null;
-
-		return nbt;
 	}
 
 	private Identifier GetVariantFromData(NbtElement nbt){

@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.NbtPath;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.NbtComponent;
@@ -25,7 +25,7 @@ extends ASimpleComponentCachingModule<NbtComponent>
 						VariantsCitMod.LOGGER.warn("The custom_data parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
 						return DataResult.success(_0);
 					}).forGetter(s->Optional.empty()),
-					CodecUtil.NBTPATH_CODEC.optionalFieldOf("nbtPath").forGetter(s->Optional.of(s.path)),
+					NbtPath.CODEC.optionalFieldOf("nbtPath").forGetter(s->Optional.of(s.path)),
 					Codec.BOOL.fieldOf("caseSensitive").orElse(true).forGetter(s->s.caseSensitive)
 				)
 				.apply(builder, (a,b,c)->new NbtStringModule(componentType, a, b, c))

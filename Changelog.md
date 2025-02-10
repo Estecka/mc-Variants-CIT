@@ -59,4 +59,5 @@
 ## 2.9
 - Added the module `component_data`.
 - `nbtPath` parameters can now be specified as an array of strings.
+- `nbtPath` parameters can navigate through arrays.
 
