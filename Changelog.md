@@ -60,4 +60,4 @@
 - Added the module `component_data`.
 - `nbtPath` parameters can now be specified as an array of strings.
 - `nbtPath` parameters can navigate through arrays.
-
+- Fixed `custom_data` and related adding a type suffix to numeric data.
