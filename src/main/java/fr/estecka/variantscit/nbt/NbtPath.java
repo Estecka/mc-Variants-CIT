@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.nbt;
 
 import java.util.List;
 import com.mojang.serialization.Codec;
