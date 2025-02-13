@@ -6,6 +6,7 @@ import java.util.Map;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
 
 public class Substitution
 {
@@ -15,6 +16,7 @@ public class Substitution
 	}
 
 	static public final Codec<Substitution> CODEC = Codec.STRING.comapFlatMap(Substitution::Parse, Substitution::toString);
+	static public final Codec<String> VARNAME_CODEC = Codecs.NON_EMPTY_STRING.validate(Substitution::ValidateVarname);
 
 	private Token[] tokens;
 
@@ -111,7 +113,7 @@ public class Substitution
 		
 		if (input.startsWith("${")
 		&& (end = input.indexOf("}")) > 2
-		&& Word.IsStringValid( name = input.substring(2, end-1) )
+		&& IsVarnameValid( name = input.substring(2, end-1) )
 		){
 			return new Parsed<>(
 				new Variable(name),
@@ -120,5 +122,24 @@ public class Substitution
 		}
 		else
 			throw new IllegalArgumentException("Invalid variable format");
+	}
+
+	static public final DataResult<String> ValidateVarname(String input){
+		if (IsVarnameValid(input))
+			return DataResult.success(input);
+		else
+			return DataResult.error(()->"Invalid character in string: "+input);
+	}
+
+	static public final boolean IsVarnameValid(String input){
+		for (int i=0; i<input.length(); ++i)
+			if (!IsVarcharValid(input.charAt(i)))
+				return false;
+
+		return true;
+	}
+
+	static public final boolean IsVarcharValid(char c){
+		return 'a' <= c && c <= 'z';
 	}
 }

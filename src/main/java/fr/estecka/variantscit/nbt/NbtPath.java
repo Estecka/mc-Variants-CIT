@@ -3,7 +3,6 @@ package fr.estecka.variantscit.nbt;
 import java.util.List;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-
 import net.minecraft.nbt.AbstractNbtList;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
