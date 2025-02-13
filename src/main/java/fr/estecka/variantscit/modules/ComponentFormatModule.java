@@ -5,7 +5,7 @@ import java.util.Map;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.nbt.NbtPath;
+import fr.estecka.variantscit.nbt.NbtAdapter;
 import fr.estecka.variantscit.nbt.Substitution;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
@@ -13,32 +13,32 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
-public class ArbitraryFormatModule<T>
+public class ComponentFormatModule<T>
 extends AArbitraryComponentModule<T>
 {
-	static public final MapCodec<ArbitraryFormatModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<ComponentFormatModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(m->m.componentType),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, NbtPath.CODEC).fieldOf("variables").forGetter(m->m.variables)
+			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, NbtAdapter.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
-		.apply(builder, ArbitraryFormatModule::new)
+		.apply(builder, ComponentFormatModule::new)
 	);
 
 	private final Substitution format;
-	private final Map<String, String[]> variables;
+	private final Map<String, NbtAdapter> varGetters;
 
-	public ArbitraryFormatModule(ComponentType<T> type, Substitution format, Map<String, String[]> variables){
+	public ComponentFormatModule(ComponentType<T> type, Substitution format, Map<String, NbtAdapter> variables){
 		super(type);
 		this.format = format;
-		this.variables = Map.copyOf(variables);
+		this.varGetters = Map.copyOf(variables);
 	}
 
 	public Identifier GetVariantForNbt(NbtElement nbt){
 		Map<String,String> values = new HashMap<>();
 
-		for (var entry : this.variables.entrySet()){
-			String data = this.GetNestedData(nbt, entry.getValue());
+		for (var entry : this.varGetters.entrySet()){
+			String data = entry.getValue().ResolveData(nbt);
 			if (data == null)
 				return null;
 			values.put(entry.getKey(), data);
