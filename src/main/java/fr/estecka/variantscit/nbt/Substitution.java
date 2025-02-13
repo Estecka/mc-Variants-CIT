@@ -101,7 +101,7 @@ public class Substitution
 		if (Identifier.isPathValid(literal))
 			return new Parsed<>( new Literal(literal), input.substring(end) );
 		else {
-			throw new IllegalArgumentException("Invalid character in path");
+			throw new IllegalArgumentException("Invalid character in path: "+literal);
 		}
 	}
 
@@ -113,11 +113,11 @@ public class Substitution
 		
 		if (input.startsWith("${")
 		&& (end = input.indexOf("}")) > 2
-		&& IsVarnameValid( name = input.substring(2, end-1) )
+		&& IsVarnameValid( name = input.substring(2, end) )
 		){
 			return new Parsed<>(
 				new Variable(name),
-				input.substring(end)
+				input.substring(end+1)
 			);
 		}
 		else
