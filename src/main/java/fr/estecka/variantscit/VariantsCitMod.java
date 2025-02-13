@@ -51,6 +51,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		ModuleRegistry.Register(Identifier.ofVanilla("entity_data"), NbtStringModule.CreateCodec(DataComponentTypes.ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("multi_component_format"), MultiComponentFormatModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());

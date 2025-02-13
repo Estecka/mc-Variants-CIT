@@ -38,7 +38,7 @@ extends ASimpleItemCachingModule
 
 
 	@Override
-	public Predicate<ItemStack> GetValidator(ItemStack stack){
+	public Predicate<ItemStack> IsDirty(ItemStack stack){
 		ArmorTrim trim = stack.get(TRIM);
 		return (futureStack) -> futureStack.get(TRIM) != trim;
 	}

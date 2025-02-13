@@ -3,8 +3,10 @@ package fr.estecka.variantscit.nbt;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import net.minecraft.nbt.AbstractNbtNumber;
@@ -15,15 +17,17 @@ import net.minecraft.util.StringIdentifiable;
 
 public class NbtAdapter
 {
+	static public final MapCodec<NbtAdapter> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
+		.group(
+			NbtPath.CODEC.fieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
+			EInput.CODEC.fieldOf("input").orElse(EInput.LITERAL).forGetter(adp -> adp.type),
+			CodecUtil.OneOrMany(EFilter.CODEC).fieldOf("filter").orElse(List.of()).forGetter(adp -> List.of(adp.filters))
+		)
+		.apply(builder, NbtAdapter::new)
+	);
+
 	static public final Codec<NbtAdapter> CODEC = Codec.withAlternative(
-		RecordCodecBuilder.create(builder->builder
-			.group(
-				NbtPath.CODEC.fieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
-				EInput.CODEC.fieldOf("input").orElse(EInput.LITERAL).forGetter(adp -> adp.type),
-				CodecUtil.OneOrMany(EFilter.CODEC).fieldOf("filter").orElse(List.of()).forGetter(adp -> List.of(adp.filters))
-			)
-			.apply(builder, NbtAdapter::new)
-		),
+		Codec.of(MAP_CODEC.encoder(), MAP_CODEC.decoder()),
 		NbtPath.CODEC.xmap(path->new NbtAdapter(path, EInput.LITERAL, List.of()), adp->adp.nbtPath)
 	);
 
@@ -79,7 +83,7 @@ public class NbtAdapter
 			this.lambda = lambda;
 		}
 
-		public String Accept(NbtElement nbt){
+		public @Nullable String Accept(NbtElement nbt){
 			return this.lambda.apply(nbt);
 		}
 	
@@ -127,7 +131,7 @@ public class NbtAdapter
 				;
 		}
 
-		public String Transform(String nbt){
+		public @NotNull String Transform(String nbt){
 			return this.lambda.apply(nbt);
 		}
 	

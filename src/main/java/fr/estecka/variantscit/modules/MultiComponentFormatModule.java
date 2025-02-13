@@ -1,0 +1,87 @@
+package fr.estecka.variantscit.modules;
+
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.nbt.ComponentizedNbtAdapter;
+import fr.estecka.variantscit.nbt.Substitution;
+import net.minecraft.component.ComponentType;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
+
+public class MultiComponentFormatModule
+extends ASimpleItemCachingModule
+{
+	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+		.group(
+			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
+			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, ComponentizedNbtAdapter.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
+		)
+		.apply(builder, MultiComponentFormatModule::new)
+	);
+
+	private final Substitution format;
+	private final Map<String, ComponentizedNbtAdapter> varGetters;
+
+	public MultiComponentFormatModule(Substitution format, Map<String, ComponentizedNbtAdapter> variables){
+		this.format = format;
+		this.varGetters = Map.copyOf(variables);
+	}
+
+	@Override
+	public Predicate<ItemStack> IsDirty(ItemStack stack){
+		final Map<ComponentType<?>, Object> componentCache = new IdentityHashMap<>();
+		for (var adapter : this.varGetters.values()){
+			componentCache.computeIfAbsent(adapter.componentType(), type->stack.get(type));
+		}
+
+		return (ItemStack futureStack) -> {
+			for (var entry : componentCache.entrySet())
+				if (entry.getValue() != futureStack.get(entry.getKey()))
+					return true;
+
+			return false;
+		};
+	}
+
+	@Override
+	public Identifier RecomputeItemVariant(ItemStack stack){
+		Map<String,String> variables = new HashMap<>();
+		Map<ComponentType<?>, NbtElement> components = new IdentityHashMap<>();
+
+		for (var entry : this.varGetters.entrySet()){
+			NbtElement nbt = components.computeIfAbsent(entry.getValue().componentType(), type->GetComponentNbt(stack, type));
+			if (nbt == null)
+				return null;
+
+			String value = entry.getValue().nbtAdapter().ResolveData(nbt);
+			if (value == null)
+				return null;
+
+			variables.put(entry.getKey(), value);
+		}
+
+		String rawId = this.format.Substitute(variables);
+		Identifier id = Identifier.tryParse(rawId);
+		if (id == null)
+			VariantsCitMod.LOGGER.warn("Substitution resulted in an invalid identifier: \"{}\"", this.format);
+		return id;
+	}
+
+	static private <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){
+		var dataResult = type.getCodec().encodeStart(NbtOps.INSTANCE, stack.get(type));
+		if (dataResult.isSuccess())
+			return dataResult.getOrThrow();
+		else
+			return null;
+	}
+
+}
