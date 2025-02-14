@@ -9,6 +9,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
+/**
+ * @deprecated Kept around for future reference, but mostly replaced by {@link ASimpleMultiComponentCachingModule }
+ * Working, but a little to trigger happy on recomputation caches, as simply using
+ * an item will cause it to be recomputed.
+ */
+@Deprecated
 abstract class ASimpleItemCachingModule
 implements ISimpleCitModule
 {

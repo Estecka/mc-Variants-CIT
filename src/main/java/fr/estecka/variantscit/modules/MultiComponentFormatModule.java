@@ -3,7 +3,6 @@ package fr.estecka.variantscit.modules;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -19,7 +18,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
 public class MultiComponentFormatModule
-extends ASimpleItemCachingModule
+extends ASimpleMultiComponentCachingModule
 {
 	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -34,25 +33,9 @@ extends ASimpleItemCachingModule
 	private final Map<String, ComponentizedNbtAdapter> varGetters;
 
 	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String, ComponentizedNbtAdapter> variables){
-		super(debug);
+		super(debug, variables.values().stream().map(ComponentizedNbtAdapter::componentType));
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
-	}
-
-	@Override
-	public Predicate<ItemStack> IsDirty(ItemStack stack){
-		final Map<ComponentType<?>, Object> componentCache = new IdentityHashMap<>();
-		for (var adapter : this.varGetters.values()){
-			componentCache.computeIfAbsent(adapter.componentType(), type->stack.get(type));
-		}
-
-		return (ItemStack futureStack) -> {
-			for (var entry : componentCache.entrySet())
-				if (entry.getValue() != futureStack.get(entry.getKey()))
-					return true;
-
-			return false;
-		};
 	}
 
 	@Override
@@ -73,6 +56,7 @@ extends ASimpleItemCachingModule
 		}
 
 		String rawId = this.format.Substitute(variables);
+		variables.clear();
 		Identifier id = Identifier.tryParse(rawId);
 		if (debug)
 				VariantsCitMod.LOGGER.info("multi_component_format: \"{}\" -> \"{}\"", this.format, rawId);
