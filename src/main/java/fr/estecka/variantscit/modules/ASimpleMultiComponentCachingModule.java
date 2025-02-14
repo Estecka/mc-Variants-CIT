@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules;
 
 import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -11,48 +12,46 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
+/**
+ * Optimization for deterministic modules that may require expensive computation
+ * upon multiple components.
+ * 
+ * All the relevant components are hashed together, and the resulting variant is
+ * cached using the hash as key. A phantom reference is created for each relevant
+ * component, and a cache entry is cleared  when at least one of its component is
+ * reclaimed by the garbage collector.
+ */
 abstract class ASimpleMultiComponentCachingModule
 implements ISimpleCitModule
 {
 	protected final boolean debug;
 	private final ComponentType<?>[] componentTypes;
-	private final Int2ObjectMap<CacheEntry> cache = new Int2ObjectOpenHashMap<>();
+
+	private final Int2ObjectMap<Identifier> hashToVariant = new Int2ObjectOpenHashMap<>();
+	private final ReferenceQueue<Object> phantomQueue = new ReferenceQueue<>();
 
 	protected ASimpleMultiComponentCachingModule(boolean debug, Stream<ComponentType<?>> componentTypes){
 		this.debug = debug;
 		this.componentTypes = componentTypes.distinct().toArray(ComponentType[]::new);
 	}
 
-	@Override
-	public final Identifier GetItemVariant(ItemStack stack){
-		this.cache.values().removeIf(CacheEntry::isExpired);
-
-		int hash = this.HashStack(stack);
-		CacheEntry entry = this.cache.get(hash);
-		if (entry == null){
-			entry = this.CreateCacheEntry(stack);
-			this.cache.put(hash, entry);
-			if (debug)
-				VariantsCitMod.LOGGER.info("Cache size: {}", cache.size());
-		}
-
-		return entry.variant;
-	}
-
 	public abstract @Nullable Identifier RecomputeItemVariant(ItemStack stack);
 
-	private CacheEntry CreateCacheEntry(ItemStack stack){
-		Identifier variant = this.RecomputeItemVariant(stack);
-		PhantomReference<?>[] components = new PhantomReference[this.componentTypes.length];
-		CacheEntry entry = new CacheEntry(variant, components);
+	@Override
+	public final Identifier GetItemVariant(ItemStack stack){
+		this.ExpungeExpiredEntries();
 
-		for (int i=0; i<components.length; ++i){
-			Object cmp = stack.get(this.componentTypes[i]);
-			components[i] = (cmp != null) ? new PhantomReference<>(cmp, null) : null;
-			cmp = null;
+		int hash = this.HashStack(stack);
+		Identifier variant = this.hashToVariant.get(hash);
+		if (variant == null){
+			variant = this.RecomputeItemVariant(stack);
+			this.hashToVariant.put(hash, variant);
+			this.CreatePhantom(hash, stack);
+			if (debug)
+				VariantsCitMod.LOGGER.info("[multi_component] Cache size: {}", hashToVariant.size());
 		}
 
-		return entry;
+		return variant;
 	}
 
 	/**
@@ -62,25 +61,41 @@ implements ISimpleCitModule
 		int hash = 17;
 		for (var type : this.componentTypes){
 			Object cmp = stack.get(type);
-			// hash = hash*31 + ((cmp!=null) ? System.identityHashCode(cmp) : 0);
 			hash = hash*31 + ((cmp!=null) ? cmp.hashCode() : 0);
 		}
 		return hash;
 	}
 
 	/**
-	 * TODO: As-is, an entry where all components are null will never expire.
+	 * TODO: As-is, an entry where all registered components are null will never
+	 * expire. This is limited to one entry per module, so negligible.
 	 */
-	static private record CacheEntry(
-		Identifier variant,
-		PhantomReference<?>[] components
-	) {
-		public boolean isExpired(){
-			for (var ref : this.components)
-				if (ref != null && ref.refersTo(null))
-					return true;
+	private void CreatePhantom(int hash, ItemStack stack){
+		for (int i=0; i<this.componentTypes.length; ++i){
+			Object cmp = stack.get(this.componentTypes[i]);
+			if (cmp != null)
+				new HashedPhantomReference(hash, cmp, this.phantomQueue);
+		}
+	}
 
-			return false;
+	private void ExpungeExpiredEntries(){
+		HashedPhantomReference phantom;
+		while ((phantom=(HashedPhantomReference)phantomQueue.poll()) != null)
+			this.hashToVariant.remove(phantom.hash);
+	}
+
+	static private class HashedPhantomReference
+	extends PhantomReference<Object>
+	{
+		/**
+		 * The key of the entry associated that must be cleared along with this
+		 * reference.
+		 */
+		public final int hash;
+
+		public HashedPhantomReference(int hash, Object referent, ReferenceQueue<Object> queue){
+			super(referent, queue);
+			this.hash = hash;
 		}
 	}
 }
