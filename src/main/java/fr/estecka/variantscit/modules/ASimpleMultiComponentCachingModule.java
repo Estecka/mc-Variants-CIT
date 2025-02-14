@@ -42,16 +42,16 @@ implements ISimpleCitModule
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
-		Identifier variant = this.hashToVariant.get(hash);
-		if (variant == null){
-			variant = this.RecomputeItemVariant(stack);
+		if (hashToVariant.containsKey(hash))
+			return this.hashToVariant.get(hash);
+		else {
+			Identifier variant = this.RecomputeItemVariant(stack);
 			this.hashToVariant.put(hash, variant);
 			this.CreatePhantom(hash, stack);
 			if (debug)
 				VariantsCitMod.LOGGER.info("[multi_component] Cache size: {}", hashToVariant.size());
+			return variant;
 		}
-
-		return variant;
 	}
 
 	/**
