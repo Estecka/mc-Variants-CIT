@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.modules;
 
-import java.lang.ref.PhantomReference;
+import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +27,8 @@ implements ISimpleCitModule
 	protected final boolean debug;
 	private final ComponentType<?>[] componentTypes;
 
-	private final Int2ObjectMap<Identifier> hashToVariant = new Int2ObjectOpenHashMap<>();
-	private final ReferenceQueue<Object> phantomQueue = new ReferenceQueue<>();
+	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
+	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
 
 	protected ASimpleMultiComponentCachingModule(boolean debug, Stream<ComponentType<?>> componentTypes){
 		this.debug = debug;
@@ -42,17 +42,15 @@ implements ISimpleCitModule
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
-		if (hashToVariant.containsKey(hash))
-			return this.hashToVariant.get(hash);
-		else {
-			Identifier variant = this.RecomputeItemVariant(stack);
-			this.hashToVariant.put(hash, variant);
-			this.CreatePhantom(hash, stack);
+		CacheEntry entry = this.hashToVariant.get(hash);
+		if (entry == null) {
+			entry = this.CreateEntry(hash, stack);
 			if (debug)
 				VariantsCitMod.LOGGER.info("[multi_component] Cache size: {}", hashToVariant.size());
-			return variant;
 		}
+		return entry.variant;
 	}
+
 
 	/**
 	 * @see {@linkplain java.util.Arrays#hashCode(Object[])}
@@ -68,34 +66,45 @@ implements ISimpleCitModule
 
 	/**
 	 * TODO: As-is, an entry where all registered components are null will never
-	 * expire. This is limited to one entry per module, so negligible.
+	 * expire. This is limited to one entry per module, so it is negligible.
 	 */
-	private void CreatePhantom(int hash, ItemStack stack){
+	private CacheEntry CreateEntry(int hash, ItemStack stack){
+		Identifier variant = this.RecomputeItemVariant(stack);
+		WeakReference<?>[] phantoms = new WeakReference[componentTypes.length];
+
 		for (int i=0; i<this.componentTypes.length; ++i){
 			Object cmp = stack.get(this.componentTypes[i]);
 			if (cmp != null)
-				new HashedPhantomReference(hash, cmp, this.phantomQueue);
+				phantoms[i] = new HashedWeakReference(hash, cmp, this.expiredComponents);
 		}
+
+		CacheEntry entry = new CacheEntry(variant, phantoms);
+		this.hashToVariant.put(hash, entry);
+		return entry;
 	}
 
 	private void ExpungeExpiredEntries(){
-		HashedPhantomReference phantom;
-		while ((phantom=(HashedPhantomReference)phantomQueue.poll()) != null)
+		HashedWeakReference phantom;
+		while ((phantom=(HashedWeakReference)expiredComponents.poll()) != null){
 			this.hashToVariant.remove(phantom.hash);
+		}
 	}
 
-	static private class HashedPhantomReference
-	extends PhantomReference<Object>
+	static private class HashedWeakReference
+	extends WeakReference<Object>
 	{
 		/**
-		 * The key of the entry associated that must be cleared along with this
+		 * The key of the associated entry that must be cleared along with this
 		 * reference.
 		 */
 		public final int hash;
 
-		public HashedPhantomReference(int hash, Object referent, ReferenceQueue<Object> queue){
+		public HashedWeakReference(int hash, Object referent, ReferenceQueue<Object> queue){
 			super(referent, queue);
 			this.hash = hash;
 		}
 	}
+
+	static private record CacheEntry(Identifier variant, WeakReference<?>[] phantoms)
+	{}
 }
