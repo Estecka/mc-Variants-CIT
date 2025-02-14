@@ -47,7 +47,7 @@ extends AArbitraryComponentModule<T>
 		String rawId = this.format.Substitute(values);
 		Identifier id = Identifier.tryParse(rawId);
 		if (id == null)
-			VariantsCitMod.LOGGER.warn("Substitution resulted in an invalid identifier: {} \"{}\"", this.componentType, this.format);
+				VariantsCitMod.LOGGER.warn("Substitution resulted in an invalid identifier: \"{}\" -> \"{}\"", this.format, rawId);
 		return id;
 	}
 
