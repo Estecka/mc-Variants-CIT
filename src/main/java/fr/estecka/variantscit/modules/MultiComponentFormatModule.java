@@ -77,7 +77,11 @@ extends ASimpleItemCachingModule
 	}
 
 	static private <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){
-		var dataResult = type.getCodec().encodeStart(NbtOps.INSTANCE, stack.get(type));
+		T component = stack.get(type);
+		if (component == null)
+			return null;
+
+		var dataResult = type.getCodec().encodeStart(NbtOps.INSTANCE, component);
 		if (dataResult.isSuccess())
 			return dataResult.getOrThrow();
 		else
