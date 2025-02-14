@@ -20,7 +20,7 @@ public class NbtAdapter
 	static public final MapCodec<NbtAdapter> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			NbtPath.CODEC.fieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
-			EInput.CODEC.fieldOf("input").orElse(EInput.LITERAL).forGetter(adp -> adp.type),
+			EInput.CODEC.fieldOf("input").orElse(EInput.PRIMITIVE).forGetter(adp -> adp.type),
 			CodecUtil.OneOrMany(EFilter.CODEC).fieldOf("filter").orElse(List.of()).forGetter(adp -> List.of(adp.filters))
 		)
 		.apply(builder, NbtAdapter::new)
@@ -28,7 +28,7 @@ public class NbtAdapter
 
 	static public final Codec<NbtAdapter> CODEC = Codec.withAlternative(
 		Codec.of(MAP_CODEC.encoder(), MAP_CODEC.decoder()),
-		NbtPath.CODEC.xmap(path->new NbtAdapter(path, EInput.LITERAL, List.of()), adp->adp.nbtPath)
+		NbtPath.CODEC.xmap(path->new NbtAdapter(path, EInput.PRIMITIVE, List.of()), adp->adp.nbtPath)
 	);
 
 	private final String[] nbtPath;
@@ -59,7 +59,7 @@ public class NbtAdapter
 	public enum EInput
 	implements StringIdentifiable
 	{
-		LITERAL("literal", (nbt)->{
+		PRIMITIVE("primitive", (nbt)->{
 			if (nbt instanceof NbtString)
 				return nbt.asString();
 			else if (nbt instanceof AbstractNbtNumber number)
@@ -97,11 +97,11 @@ public class NbtAdapter
 	implements StringIdentifiable
 	{
 		NOOP("noop", Function.identity()),
-		CASE_INSENSITIVE("case_insensitive", String::toLowerCase),
+		LOWERCASE("lowercase", String::toLowerCase),
 
+		SANITIZED("sanitized", s->Sanitize(s, "[^a-zA-Z0-9_.-/:]")),
 		SANITIZED_PATH("sanitized_path", s->Sanitize(s, "[^a-zA-Z0-9_.-/]")),
 		SANITIZED_NAMESPACE("sanitized_namespace", s->Sanitize(s, "[^a-zA-Z0-9_.-]")),
-		SANITIZED_ID("sanitized", s->Sanitize(s, "[^a-zA-Z0-9_.-/:]")),
 
 		DISCARD_NAMESPACE("discard_namespace", s->{
 			int split = s.lastIndexOf(':');
