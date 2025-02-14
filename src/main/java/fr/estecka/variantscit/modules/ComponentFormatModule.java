@@ -34,6 +34,8 @@ extends AArbitraryComponentModule<T>
 		super(type, debug);
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
+
+		this.format.MatchWarning(variables.keySet());
 	}
 
 	public Identifier GetVariantForNbt(NbtElement nbt){

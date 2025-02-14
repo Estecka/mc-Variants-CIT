@@ -3,8 +3,10 @@ package fr.estecka.variantscit.nbt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
@@ -37,6 +39,24 @@ public class Substitution
 		for (Token t : this.tokens)
 			builder.append(t.toString());
 		return builder.toString();
+	}
+
+	public boolean Matches(Set<String> varnames){
+		int matchcount = 0;
+		for (Token token : this.tokens)
+		if (token instanceof Variable varToken){
+			if (!varnames.contains(varToken.name))
+				return false;
+			else
+				++matchcount;
+		}
+
+		return matchcount == varnames.size();
+	}
+
+	public void MatchWarning(Set<String> varnames){
+		if (!this.Matches(varnames))
+			VariantsCitMod.LOGGER.warn("Format \"{}\" does not match the provided list of variables.", this);
 	}
 
 

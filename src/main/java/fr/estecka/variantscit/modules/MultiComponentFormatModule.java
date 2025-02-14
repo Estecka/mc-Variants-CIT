@@ -36,6 +36,8 @@ extends ASimpleMultiComponentCachingModule
 		super(debug, variables.values().stream().map(ComponentizedNbtAdapter::componentType));
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
+
+		this.format.MatchWarning(variables.keySet());
 	}
 
 	@Override
