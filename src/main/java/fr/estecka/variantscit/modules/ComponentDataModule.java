@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.nbt.NbtAdapter;
@@ -14,6 +15,7 @@ extends AArbitraryComponentModule<T>
 	static public final MapCodec<ComponentDataModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(mod -> mod.componentType),
+			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			NbtAdapter.MAP_CODEC.forGetter(m->m.adapter)
 		)
 		.apply(builder, ComponentDataModule::new)
@@ -21,8 +23,8 @@ extends AArbitraryComponentModule<T>
 
 	private final NbtAdapter adapter;
 
-	public ComponentDataModule(ComponentType<T> type, NbtAdapter adapter){
-		super(type);
+	public ComponentDataModule(ComponentType<T> type, boolean debug, NbtAdapter adapter){
+		super(type, debug);
 		this.adapter = adapter;
 	}
 

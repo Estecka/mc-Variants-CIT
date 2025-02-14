@@ -5,6 +5,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -22,6 +23,7 @@ extends ASimpleItemCachingModule
 {
 	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
+			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, ComponentizedNbtAdapter.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
@@ -31,7 +33,8 @@ extends ASimpleItemCachingModule
 	private final Substitution format;
 	private final Map<String, ComponentizedNbtAdapter> varGetters;
 
-	public MultiComponentFormatModule(Substitution format, Map<String, ComponentizedNbtAdapter> variables){
+	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String, ComponentizedNbtAdapter> variables){
+		super(debug);
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 	}
@@ -71,8 +74,8 @@ extends ASimpleItemCachingModule
 
 		String rawId = this.format.Substitute(variables);
 		Identifier id = Identifier.tryParse(rawId);
-		if (id == null)
-				VariantsCitMod.LOGGER.warn("Substitution resulted in an invalid identifier: \"{}\" -> \"{}\"", this.format, rawId);
+		if (debug)
+				VariantsCitMod.LOGGER.info("multi_component_format: \"{}\" -> \"{}\"", this.format, rawId);
 		return id;
 	}
 

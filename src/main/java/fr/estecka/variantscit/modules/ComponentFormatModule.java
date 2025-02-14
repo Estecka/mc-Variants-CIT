@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -19,6 +20,7 @@ extends AArbitraryComponentModule<T>
 	static public final MapCodec<ComponentFormatModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(m->m.componentType),
+			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, NbtAdapter.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
@@ -28,8 +30,8 @@ extends AArbitraryComponentModule<T>
 	private final Substitution format;
 	private final Map<String, NbtAdapter> varGetters;
 
-	public ComponentFormatModule(ComponentType<T> type, Substitution format, Map<String, NbtAdapter> variables){
-		super(type);
+	public ComponentFormatModule(ComponentType<T> type, boolean debug, Substitution format, Map<String, NbtAdapter> variables){
+		super(type, debug);
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 	}

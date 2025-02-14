@@ -12,9 +12,14 @@ import net.minecraft.util.Identifier;
 abstract class ASimpleItemCachingModule
 implements ISimpleCitModule
 {
-	final WeakHashMap<ItemStack, CacheEntry> cache = new WeakHashMap<>();
+	protected final boolean debug;
+	private final WeakHashMap<ItemStack, CacheEntry> cache = new WeakHashMap<>();
 
 	protected record CacheEntry(@Nullable Identifier variant, Predicate<ItemStack> isDirty) {}
+
+	protected ASimpleItemCachingModule(boolean debug){
+		this.debug = debug;
+	}
 
 	@Override
 	public final Identifier GetItemVariant(ItemStack stack){
@@ -23,7 +28,8 @@ implements ISimpleCitModule
 		if (entry == null || entry.isDirty.test(stack)){
 			entry = new CacheEntry(this.RecomputeItemVariant(stack), this.IsDirty(stack).and(ItemTypeValidator(stack)));
 			cache.put(stack, entry);
-			VariantsCitMod.LOGGER.warn("Item Cache: [{}] {}", cache.size(), entry.variant);
+			if (debug)
+				VariantsCitMod.LOGGER.info("Cache size: {}", cache.size());
 		}
 
 		return entry.variant;

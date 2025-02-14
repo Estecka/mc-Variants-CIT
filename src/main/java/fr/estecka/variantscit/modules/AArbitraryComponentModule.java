@@ -12,10 +12,12 @@ public abstract class AArbitraryComponentModule<T>
 extends ASimpleComponentCachingModule<T>
 {
 	private final Codec<T> componentCodec;
+	protected final boolean debug;
 
-	public AArbitraryComponentModule(ComponentType<T> type){
+	public AArbitraryComponentModule(ComponentType<T> type, boolean debug){
 		super(type);
 		this.componentCodec = type.getCodecOrThrow();
+		this.debug = debug;
 	}
 
 	@Override
@@ -26,7 +28,8 @@ extends ASimpleComponentCachingModule<T>
 		NbtElement nbt = GetComponentNbt(component);
 
 		Identifier id = this.GetVariantForNbt(nbt);
-		// VariantsCitMod.LOGGER.info("component_data: {}", id);
+		if (debug)
+			VariantsCitMod.LOGGER.info("component_data: {} -> {}", componentType, id);
 		return id;
 	}
 
