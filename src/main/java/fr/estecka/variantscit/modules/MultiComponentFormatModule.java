@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.modules;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -43,10 +42,9 @@ extends ASimpleMultiComponentCachingModule
 	@Override
 	public Identifier RecomputeItemVariant(ItemStack stack){
 		Map<String,String> variables = new HashMap<>();
-		Map<ComponentType<?>, NbtElement> components = new IdentityHashMap<>();
 
 		for (var entry : this.varGetters.entrySet()){
-			NbtElement nbt = components.computeIfAbsent(entry.getValue().componentType(), type->GetComponentNbt(stack, type));
+			NbtElement nbt = GetComponentNbt(stack, entry.getValue().componentType());
 			if (nbt == null)
 				return null;
 
