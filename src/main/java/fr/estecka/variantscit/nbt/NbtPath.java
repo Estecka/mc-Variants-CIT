@@ -229,7 +229,7 @@ public final class NbtPath
 			}
 
 			return new Parsed(
-				new ArrayIndex(index),
+				new MapIndex(index),
 				input.substring(end+1)
 			);
 		}

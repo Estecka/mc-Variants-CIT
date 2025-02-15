@@ -2,7 +2,10 @@ package fr.estecka.variantscit.modules;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+
 import fr.estecka.variantscit.VariantsCitMod;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
@@ -11,6 +14,8 @@ import net.minecraft.util.Identifier;
 public abstract class AArbitraryComponentModule<T>
 extends ASimpleComponentCachingModule<T>
 {
+	static private final MinecraftClient client = MinecraftClient.getInstance();
+
 	private final Codec<T> componentCodec;
 	protected final boolean debug;
 
@@ -36,7 +41,12 @@ extends ASimpleComponentCachingModule<T>
 	public abstract Identifier GetVariantForNbt(NbtElement nbt);
 
 	private NbtElement GetComponentNbt(T component){
-		DataResult<NbtElement> result = componentCodec.encodeStart(NbtOps.INSTANCE, component);
+		DynamicOps<NbtElement> nbtOps = NbtOps.INSTANCE;
+		// Enables encoding of data from dynamic registries
+		if (client.world != null)
+			nbtOps = client.world.getRegistryManager().getOps(nbtOps);
+
+		DataResult<NbtElement> result = componentCodec.encodeStart(nbtOps, component);
 		if (result.isSuccess())
 			return result.getOrThrow();
 		else {
