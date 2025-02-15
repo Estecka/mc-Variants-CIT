@@ -1,60 +1,242 @@
 package fr.estecka.variantscit.nbt;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.nbt.AbstractNbtList;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.util.Identifier;
 
 public final class NbtPath
 {
-	static private final Codec<String[]> STRING_ARRAY = Codec.STRING.listOf().xmap(
-		list -> list.toArray(i->new String[i]),
-		array -> List.of(array)
-	);
+	static public final Codec<NbtPath> CODEC = Codec.STRING.comapFlatMap(NbtPath::Parse, NbtPath::toString);
 
-	static public final Codec<String[]> CODEC = Codec.withAlternative(
-		STRING_ARRAY,
-		Codec.of(STRING_ARRAY, Codec.STRING.flatMap(NbtPath::DotSeparatedPath))
-	);
+	@Deprecated
+	static public final Codec<NbtPath> LEGACY_CODEC = Codec.withAlternative(CODEC, Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString));
 
-	static public DataResult<String[]> DotSeparatedPath(String rawPath)
-	throws IllegalStateException
-	{
-		if (rawPath.isEmpty())
-			return DataResult.success(new String[0]);
-	
-		String[] result = rawPath.split("\\.");
-		return DataResult.success(result);
+	@Deprecated
+	static public final Codec<NbtPath> NBTKEY_CODEC = Codec.STRING.xmap(s->new NbtPath(new Token[]{new MapKey(s)}), NbtPath::toString);
+
+	private final Token[] tokens;
+
+	private NbtPath(Token[] tokens){
+		this.tokens = tokens;
+	}
+	private NbtPath(List<Token> tokens){
+		this.tokens = tokens.toArray(Token[]::new);
 	}
 
-	static public NbtElement Resolve(NbtElement nbt, String[] path){
-		for (int i=0; i<path.length; ++i)
-		if  (nbt instanceof NbtCompound compound)
-			nbt = compound.get(path[i]);
-		else if (nbt instanceof AbstractNbtList list){
-			nbt = ResolveIndex(list, path[i]);
-			if (nbt == null)
-				return null;
+	public @Nullable NbtElement Resolve(NbtElement nbt){
+		for (Token tk : this.tokens){
+			nbt = tk.Resolve(nbt);
+			if (nbt == null) return null;
 		}
-		else
-			return null;
 
 		return nbt;
 	}
 
-	static private NbtElement ResolveIndex(AbstractNbtList<?> list, String rawIndex){
-		int index;
-		try {
-			index = Integer.parseUnsignedInt(rawIndex);
-		} catch (NumberFormatException e){
-			return null;
+
+/******************************************************************************/
+/* # Parser                                                                   */
+/******************************************************************************/
+
+	private record Parsed(Token token, String remainder)
+	{}
+
+	@Deprecated
+	static public DataResult<NbtPath> DotSeparatedPath(String rawPath)
+	throws IllegalStateException
+	{
+		if (rawPath.isEmpty())
+			return DataResult.success(new NbtPath(new Token[0]));
+	
+		String[] names = rawPath.split("\\.");
+		Token[] tokens = new Token[names.length];
+
+		return DataResult.success(new NbtPath(tokens));
+	}
+
+	static public DataResult<NbtPath> Parse(final String input){
+		final Function<String,Parsed>[] parsers = new Function[3];
+		parsers[0] = MapKey::Next;
+		parsers[1] = ArrayIndex::Next;
+		parsers[2] = MapIndex::Next;
+
+		List<Token> tokens = new ArrayList<>();
+		String remainder = input;
+
+		while (!remainder.isEmpty()){
+			Parsed result = null;
+			for (int i=0; i<parsers.length && result == null; ++i)
+				result = parsers[i].apply(remainder);
+
+			if (result == null)
+				return DataResult.error(()->"Invalid token in path: "+input, new NbtPath(tokens));
+			else {
+				tokens.add(result.token);
+				remainder = result.remainder;
+			}
 		}
 
-		if (list.size() <= index)
-			return null;
+		return DataResult.success(new NbtPath(tokens));
+	}
 
-		return list.get(index);
+	@Override
+	public String toString(){
+		StringBuilder builder = new StringBuilder();
+		for (Token tk : this.tokens)
+			builder.append(tk.toString());
+
+		return builder.toString();
+	}
+
+
+/******************************************************************************/
+/* # Tokens                                                                   */
+/******************************************************************************/
+
+	static private interface Token {
+		@Nullable NbtElement Resolve(NbtElement nbt);
+	}
+
+	static private record MapKey(String name)
+	implements Token
+	{
+		@Override
+		public NbtElement Resolve(NbtElement nbt){
+			if (nbt instanceof NbtCompound compound)
+				return compound.get(name);
+			else
+				return null;
+		}
+
+		@Override
+		public String toString(){
+			return "."+name;
+		}
+
+		static private Parsed Next(String input){
+			if (input.length() < 2 || input.charAt(0) != '.')
+				return null;
+	
+			int end;
+			for (end=1; end<input.length(); ++end)
+				if (!Identifier.isCharValid(input.charAt(end)))
+					break;
+	
+			return new Parsed(
+				new MapKey(input.substring(1, end)),
+				input.substring(end)
+			);
+		}
+	}
+
+	static private record ArrayIndex(int index)
+	implements Token
+	{
+		@Override
+		public NbtElement Resolve(NbtElement nbt){
+			if (!(nbt instanceof AbstractNbtList<?> list))
+				return null;
+
+			int size = list.size();
+			if (index < -size || size <= index)
+				return null;
+
+			if (index >= 0)
+				return list.get(index);
+			else
+				return list.get(size+index);
+		}
+
+		@Override
+		public String toString(){
+			return "["+index+"]";
+		}
+
+		static private Parsed Next(String input){
+			if (input.length() < 3 || input.charAt(0) != '[')
+				return null;
+
+			int end = input.indexOf(']');
+			if (end < 0)
+				return null;
+
+			
+			int index;
+			try {
+				index = Integer.parseUnsignedInt(input.substring(1, end));
+			} catch (NumberFormatException e){
+				return null;
+			}
+
+			return new Parsed(
+				new ArrayIndex(index),
+				input.substring(end+1)
+			);
+		}
+	}
+
+	static private record MapIndex(int index)
+	implements Token
+	{
+		@Override
+		public NbtElement Resolve(NbtElement nbt){
+			if (!(nbt instanceof NbtCompound compound))
+				return null;
+
+			int size = compound.getSize();
+			if (index < -size || size <= index)
+				return null;
+
+			int i = index;
+			if (i < 0) i += size;
+
+			String key = null;
+			for (String k : compound.getKeys())
+			if (i-- <= 0){
+				key = k;
+				break;
+			}
+
+			if (key == null)
+				return null;
+
+			NbtCompound result = new NbtCompound();
+			result.putString("key", key);
+			result.put("value", compound.get(key));
+			return result;
+		}
+
+		static private Parsed Next(String input){
+			if (input.length() < 3 || input.charAt(0) != '{')
+				return null;
+
+			int end = input.indexOf('}');
+			if (end < 0)
+				return null;
+
+			
+			int index;
+			try {
+				index = Integer.parseUnsignedInt(input.substring(1, end));
+			} catch (NumberFormatException e){
+				return null;
+			}
+
+			return new Parsed(
+				new ArrayIndex(index),
+				input.substring(end+1)
+			);
+		}
+
+		@Override
+		public String toString(){
+			return "{"+index+"}";
+		}
 	}
 }

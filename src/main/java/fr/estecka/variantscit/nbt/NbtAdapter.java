@@ -17,7 +17,7 @@ import net.minecraft.util.StringIdentifiable;
 
 public class NbtAdapter
 {
-	static public final MapCodec<NbtAdapter> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<NbtAdapter> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			NbtPath.CODEC.fieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
 			EInput.CODEC.fieldOf("input").orElse(EInput.PRIMITIVE).forGetter(adp -> adp.type),
@@ -27,23 +27,35 @@ public class NbtAdapter
 	);
 
 	static public final Codec<NbtAdapter> CODEC = Codec.withAlternative(
-		Codec.of(MAP_CODEC.encoder(), MAP_CODEC.decoder()),
+		MAPCODEC.codec(),
 		NbtPath.CODEC.xmap(path->new NbtAdapter(path, EInput.PRIMITIVE, List.of()), adp->adp.nbtPath)
 	);
 
-	private final String[] nbtPath;
+	@Deprecated
+	static public final MapCodec<NbtAdapter> LEGACY_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
+		.group(
+			CodecUtil.MapWithAlternative(
+				NbtPath.LEGACY_CODEC.fieldOf("nbtPath"),
+				NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
+			).forGetter(s->s.nbtPath),
+			Codec.BOOL.fieldOf("caseSensitive").forGetter(s->true)
+		)
+		.apply(builder, (path, lowercase) -> new NbtAdapter(path, EInput.PRIMITIVE, lowercase?List.of(EFilter.LOWERCASE):List.of()))
+	);
+
+	private final NbtPath nbtPath;
 	private final EInput type;
 	private final EFilter[] filters;
 
 
-	protected NbtAdapter(String[] nbtPath, EInput type, List<EFilter> filters){
+	protected NbtAdapter(NbtPath nbtPath, EInput type, List<EFilter> filters){
 		this.nbtPath = nbtPath;
 		this.type = type;
 		this.filters = filters.toArray(EFilter[]::new);
 	}
 
 	public final @Nullable String ResolveData(NbtElement nbt){
-		nbt = NbtPath.Resolve(nbt, nbtPath);
+		nbt = this.nbtPath.Resolve(nbt);
 		if (nbt == null)
 			return null;
 

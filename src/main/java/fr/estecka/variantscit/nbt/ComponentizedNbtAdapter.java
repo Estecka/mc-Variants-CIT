@@ -12,7 +12,7 @@ public record ComponentizedNbtAdapter(
 	static public final Codec<ComponentizedNbtAdapter> CODEC = RecordCodecBuilder.create(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ComponentizedNbtAdapter::componentType),
-			NbtAdapter.MAP_CODEC.forGetter(ComponentizedNbtAdapter::nbtAdapter)
+			NbtAdapter.MAPCODEC.forGetter(ComponentizedNbtAdapter::nbtAdapter)
 		)
 		.apply(builder, ComponentizedNbtAdapter::new)
 	);

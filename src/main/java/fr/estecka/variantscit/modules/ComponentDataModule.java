@@ -16,7 +16,7 @@ extends AArbitraryComponentModule<T>
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(mod -> mod.componentType),
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
-			NbtAdapter.MAP_CODEC.forGetter(m->m.adapter)
+			NbtAdapter.MAPCODEC.forGetter(m->m.adapter)
 		)
 		.apply(builder, ComponentDataModule::new)
 	);
