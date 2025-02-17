@@ -2,23 +2,23 @@ package fr.estecka.variantscit.modules;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.nbt.ComponentizedNbtAdapter;
 import fr.estecka.variantscit.nbt.Substitution;
-import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
 public class MultiComponentFormatModule
 extends ASimpleMultiComponentCachingModule
 {
+
+
 	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
@@ -44,7 +44,7 @@ extends ASimpleMultiComponentCachingModule
 		Map<String,String> variables = new HashMap<>();
 
 		for (var entry : this.varGetters.entrySet()){
-			NbtElement nbt = GetComponentNbt(stack, entry.getValue().componentType());
+			NbtElement nbt = CodecUtil.GetComponentNbt(stack, entry.getValue().componentType());
 			if (nbt == null)
 				return null;
 
@@ -62,17 +62,4 @@ extends ASimpleMultiComponentCachingModule
 				VariantsCitMod.LOGGER.info("multi_component_format: \"{}\" -> \"{}\"", this.format, rawId);
 		return id;
 	}
-
-	static private <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){
-		T component = stack.get(type);
-		if (component == null)
-			return null;
-
-		var dataResult = type.getCodec().encodeStart(NbtOps.INSTANCE, component);
-		if (dataResult.isSuccess())
-			return dataResult.getOrThrow();
-		else
-			return null;
-	}
-
 }
