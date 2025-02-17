@@ -17,8 +17,8 @@ import net.minecraft.util.Identifier;
  * upon multiple components.
  * 
  * All the relevant components are hashed together, and the resulting variant is
- * cached using the hash as key. A phantom reference is created for each relevant
- * component, and a cache entry is cleared  when at least one of its component is
+ * cached using  the hash as key. A weak reference is  created for each relevant
+ * component, and a cache entry is cleared when at least one of its component is
  * reclaimed by the garbage collector.
  */
 abstract class ASimpleMultiComponentCachingModule
