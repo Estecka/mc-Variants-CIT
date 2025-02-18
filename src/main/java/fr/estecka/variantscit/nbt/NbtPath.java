@@ -122,12 +122,14 @@ public final class NbtPath
 		static private Parsed Next(String input){
 			if (input.length() < 2 || input.charAt(0) != '.')
 				return null;
-	
+
 			int end;
-			for (end=1; end<input.length(); ++end)
-				if (!Identifier.isCharValid(input.charAt(end)))
+			for (end=1; end<input.length(); ++end){
+				char c = input.charAt(end);
+				if (!Identifier.isCharValid(c) || c == '.')
 					break;
-	
+			}
+
 			return new Parsed(
 				new MapKey(input.substring(1, end)),
 				input.substring(end)
