@@ -19,7 +19,7 @@ public class CodecUtil
 		var listCodec = original.listOf();
 		return Codec.withAlternative(
 			listCodec,
-			Codec.of(listCodec, original.map(t->List.of(t)))
+			Codec.of(listCodec, original.map(List::of))
 		);
 	}
 

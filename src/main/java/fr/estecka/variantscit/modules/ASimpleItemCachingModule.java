@@ -10,9 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 /**
- * @deprecated Kept around for future reference, but mostly replaced by {@link ASimpleMultiComponentCachingModule }
- * Working, but a little to trigger happy on recomputation caches, as simply using
- * an item will cause it to be recomputed.
+ * @deprecated  Kept  around  for  future  reference,  but  mostly  replaced  by
+ * {@link ASimpleMultiComponentCachingModule }. This  implementation is working,
+ * but is  a little too  trigger happy  on recomputating caches; simply using an
+ * item will cause it to be recomputed.
  */
 @Deprecated
 abstract class ASimpleItemCachingModule

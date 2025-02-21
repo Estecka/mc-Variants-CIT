@@ -35,6 +35,7 @@ implements ISimpleCitModule
 		this.componentTypes = componentTypes.distinct().toArray(ComponentType[]::new);
 	}
 
+	// TODO: Ensure child classes can't access unregistered non-cachable
 	public abstract @Nullable Identifier RecomputeItemVariant(ItemStack stack);
 
 	@Override
@@ -70,23 +71,23 @@ implements ISimpleCitModule
 	 */
 	private CacheEntry CreateEntry(int hash, ItemStack stack){
 		Identifier variant = this.RecomputeItemVariant(stack);
-		WeakReference<?>[] phantoms = new WeakReference[componentTypes.length];
+		WeakReference<?>[] weakRefs = new WeakReference[componentTypes.length];
 
-		for (int i=0; i<this.componentTypes.length; ++i){
-			Object cmp = stack.get(this.componentTypes[i]);
+		for (int i=0; i<componentTypes.length; ++i){
+			Object cmp = stack.get(componentTypes[i]);
 			if (cmp != null)
-				phantoms[i] = new HashedWeakReference(hash, cmp, this.expiredComponents);
+				weakRefs[i] = new HashedWeakReference(hash, cmp, this.expiredComponents);
 		}
 
-		CacheEntry entry = new CacheEntry(variant, phantoms);
+		CacheEntry entry = new CacheEntry(variant, weakRefs);
 		this.hashToVariant.put(hash, entry);
 		return entry;
 	}
 
 	private void ExpungeExpiredEntries(){
-		HashedWeakReference phantom;
-		while ((phantom=(HashedWeakReference)expiredComponents.poll()) != null){
-			this.hashToVariant.remove(phantom.hash);
+		HashedWeakReference weakRef;
+		while ((weakRef=(HashedWeakReference)expiredComponents.poll()) != null){
+			this.hashToVariant.remove(weakRef.hash);
 		}
 	}
 
@@ -105,6 +106,11 @@ implements ISimpleCitModule
 		}
 	}
 
-	static private record CacheEntry(Identifier variant, WeakReference<?>[] phantoms)
+	/**
+	 * Weak references are kept around so that the weak reference itself doesn't
+	 * get garbage collected before its referee. Otherwise, references will not
+	 * get enqueued, and the cache will never be cleared.
+	 */
+	static private record CacheEntry(Identifier variant, WeakReference<?>[] components)
 	{}
 }
