@@ -120,7 +120,7 @@ public class NbtAdapter
 			return (split < 0) ? s : s.substring(split);
 		}),
 		DISCARD_PATH("discard_path", s->{
-			int split = s.indexOf(':');
+			int split = s.lastIndexOf(':');
 			return (split < 0) ? "" : s.substring(0, split);
 		}),
 		;
