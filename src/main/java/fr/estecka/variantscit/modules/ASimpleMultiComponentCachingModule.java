@@ -35,7 +35,7 @@ implements ISimpleCitModule
 		this.componentTypes = componentTypes.distinct().toArray(ComponentType[]::new);
 	}
 
-	// TODO: Ensure child classes can't access unregistered non-cachable
+	// TODO: Ensure child classes can't access unregistered non-cached components.
 	public abstract @Nullable Identifier RecomputeItemVariant(ItemStack stack);
 
 	@Override
@@ -108,7 +108,7 @@ implements ISimpleCitModule
 
 	/**
 	 * Weak references are kept around so that the weak reference itself doesn't
-	 * get garbage collected before its referee. Otherwise, references will not
+	 * get garbage collected  before its referee. Otherwise, references will not
 	 * get enqueued, and the cache will never be cleared.
 	 */
 	static private record CacheEntry(Identifier variant, WeakReference<?>[] components)
