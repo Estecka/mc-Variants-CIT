@@ -11,7 +11,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import net.minecraft.nbt.AbstractNbtNumber;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 
@@ -83,6 +85,13 @@ public class NbtAdapter
 		NUMBER("number", (nbt)-> (nbt instanceof AbstractNbtNumber number) ? number.numberValue().toString() : null),
 		STRING("string", (nbt)-> (nbt instanceof NbtString) ? nbt.asString() : null),
 		IDENTIFIER("identifier", (nbt)-> (nbt instanceof NbtString && Identifier.tryParse(nbt.asString()) != null) ? nbt.asString() : null),
+		RICH_TEXT("rich_text", (nbt)->{
+			var result = TextCodecs.STRINGIFIED_CODEC.parse(NbtOps.INSTANCE, nbt);
+			if (result.isSuccess())
+				return result.getOrThrow().getString();
+			else
+				return null;
+		}),
 		;
 
 		static public final Codec<EInput> CODEC = StringIdentifiable.createCodec(EInput::values);
