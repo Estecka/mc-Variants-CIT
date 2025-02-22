@@ -22,8 +22,8 @@ public class NbtAdapter
 	static public final MapCodec<NbtAdapter> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			NbtPath.CODEC.fieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
-			EInput.CODEC.fieldOf("input").orElse(EInput.PRIMITIVE).forGetter(adp -> adp.type),
-			CodecUtil.OneOrMany(EFilter.CODEC).fieldOf("filter").orElse(List.of()).forGetter(adp -> List.of(adp.filters))
+			EInput.CODEC.fieldOf("expect").orElse(EInput.PRIMITIVE).forGetter(adp -> adp.type),
+			CodecUtil.OneOrMany(ETransform.CODEC).fieldOf("transform").orElse(List.of()).forGetter(adp -> List.of(adp.transforms))
 		)
 		.apply(builder, NbtAdapter::new)
 	);
@@ -42,18 +42,18 @@ public class NbtAdapter
 			).forGetter(s->s.nbtPath),
 			Codec.BOOL.fieldOf("caseSensitive").forGetter(s->true)
 		)
-		.apply(builder, (path, lowercase) -> new NbtAdapter(path, EInput.PRIMITIVE, lowercase?List.of(EFilter.LOWERCASE):List.of()))
+		.apply(builder, (path, lowercase) -> new NbtAdapter(path, EInput.PRIMITIVE, lowercase?List.of(ETransform.LOWERCASE):List.of()))
 	);
 
 	private final NbtPath nbtPath;
 	private final EInput type;
-	private final EFilter[] filters;
+	private final ETransform[] transforms;
 
 
-	protected NbtAdapter(NbtPath nbtPath, EInput type, List<EFilter> filters){
+	protected NbtAdapter(NbtPath nbtPath, EInput type, List<ETransform> filters){
 		this.nbtPath = nbtPath;
 		this.type = type;
-		this.filters = filters.toArray(EFilter[]::new);
+		this.transforms = filters.toArray(ETransform[]::new);
 	}
 
 	public final @Nullable String ResolveData(NbtElement nbt){
@@ -65,7 +65,7 @@ public class NbtAdapter
 		if (data == null)
 			return null;
 
-		for (EFilter filter : this.filters)
+		for (ETransform filter : this.transforms)
 			data = filter.Transform(data);
 		return data;
 	}
@@ -114,15 +114,15 @@ public class NbtAdapter
 	
 	}
 
-	public enum EFilter
+	public enum ETransform
 	implements StringIdentifiable
 	{
 		NOOP("noop", Function.identity()),
 		LOWERCASE("lowercase", String::toLowerCase),
 
-		SANITIZED("sanitized", s->Sanitize(s, "[^a-zA-Z0-9_.-/:]")),
-		SANITIZED_PATH("sanitized_path", s->Sanitize(s, "[^a-zA-Z0-9_.-/]")),
-		SANITIZED_NAMESPACE("sanitized_namespace", s->Sanitize(s, "[^a-zA-Z0-9_.-]")),
+		SANITIZE("sanitize", s->Sanitize(s, "[^a-zA-Z0-9_.-/:]")),
+		SANITIZE_PATH("sanitize_path", s->Sanitize(s, "[^a-zA-Z0-9_.-/]")),
+		SANITIZE_NAMESPACE("sanitize_namespace", s->Sanitize(s, "[^a-zA-Z0-9_.-]")),
 
 		DISCARD_NAMESPACE("discard_namespace", s->{
 			int split = s.lastIndexOf(':');
@@ -134,12 +134,12 @@ public class NbtAdapter
 		}),
 		;
 	
-		static public final Codec<EFilter> CODEC = StringIdentifiable.createCodec(EFilter::values);
+		static public final Codec<ETransform> CODEC = StringIdentifiable.createCodec(ETransform::values);
 	
 		private final String name;
 		private final Function<String,String> lambda;
 	
-		private EFilter(String name, Function<String,String> lambda){
+		private ETransform(String name, Function<String,String> lambda){
 			this.name = name;
 			this.lambda = lambda;
 		}
