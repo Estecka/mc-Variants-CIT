@@ -14,23 +14,24 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
-public class ComponentFormatModule<T>
+@Deprecated
+public class SingleComponentFormatModule<T>
 extends AArbitraryComponentModule<T>
 {
-	static public final MapCodec<ComponentFormatModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<SingleComponentFormatModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(m->m.componentType),
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, NbtAdapter.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
-		.apply(builder, ComponentFormatModule::new)
+		.apply(builder, SingleComponentFormatModule::new)
 	);
 
 	private final Substitution format;
 	private final Map<String, NbtAdapter> varGetters;
 
-	public ComponentFormatModule(ComponentType<T> type, boolean debug, Substitution format, Map<String, NbtAdapter> variables){
+	public SingleComponentFormatModule(ComponentType<T> type, boolean debug, Substitution format, Map<String, NbtAdapter> variables){
 		super(type, debug);
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
