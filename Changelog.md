@@ -60,6 +60,6 @@
 - Added modules: `component_data` and `component_format`.
 - `custom_data` etc. now accept parameters similar to the `component_data` module.
 - `custom_data` etc.'s `nbtPath` can now navigate through arrays and key sets.
-- `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `trandform`
+- `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `transform`
 - Fixed `custom_data` etc. adding a type suffix to numeric data.
 - Modules may now specify `items` as a single value instead of an array.
