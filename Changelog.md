@@ -57,9 +57,9 @@
 ## 2.8
 - Added the modules `trim`, `trim_pattern` and `trim_material`.
 ## 2.9
-- Added modules: `component_data`, `component_format`, and `multi_component_format`.
+- Added modules: `component_data` and `component_format`.
 - `custom_data` etc. now accept parameters similar to the `component_data` module.
 - `custom_data` etc.'s `nbtPath` can now navigate through arrays and key sets.
-- `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `filter`
+- `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `trandform`
 - Fixed `custom_data` etc. adding a type suffix to numeric data.
 - Modules may now specify `items` as a single value instead of an array.
