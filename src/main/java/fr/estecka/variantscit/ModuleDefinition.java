@@ -26,7 +26,7 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
-			Identifier.CODEC.listOf().optionalFieldOf("items").forGetter(ModuleDefinition::targets),
+			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
