@@ -29,7 +29,7 @@
 - It's now possible to apply a single module to multiple items.
 - Added the module `enchantment` for tools and armours.
 - `stored_enchantments` (plural) is being renamed to `stored_enchantment` (singular).
-- `custom_data` may now look for variants inside nested pathes. The parameter `nbtKey` is being renamed to `nbtPath`.
+- `custom_data` may now look for variants inside nested pathes. The parameter `nbtKey` is being deprecated in favor of `nbtPath`.
 - `custom_name` will now always convert all names into valid identifiers. The case sensitivity option was removed.
 - `custom_name`'s special names are now case-sensitive.
 ## 2.4
@@ -56,6 +56,13 @@
 - `custom_data` and siblings will now accept numeric data.
 ## 2.8
 - Added the modules `trim`, `trim_pattern` and `trim_material`.
+## 2.9
+- Added modules: `component_data` and `component_format`.
+- `custom_data` etc. now accept parameters similar to the `component_data` module.
+- `custom_data` etc.'s `nbtPath` can now navigate through arrays and key sets.
+- `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `transform`
+- Fixed `custom_data` etc. adding a type suffix to numeric data.
+- Modules may now specify `items` as a single value instead of an array.
 
 # v3
 ## 3.0
@@ -76,6 +83,13 @@ Since v2.5:
 ### 3.2.0
 - Added the option `levelSeparator` to the module `stored_enchantment`. (Merged with v2.7)
 ### 3.2.1
-- `custom_data` and siblings will now accept numeric data. (v2.7.1)
+- `custom_data` and siblings will now accept numeric data. (Merged with v2.7.1)
 ## 3.3
 - Added the modules `trim`, `trim_pattern` and `trim_material`. (Merged with v2.8)
+## 3.4
+- Added modules: `component_data` and `component_format`. (Merged with v2.9)
+- `custom_data` etc. now accept parameters similar to the `component_data` module.
+- `custom_data` etc.'s `nbtPath` can now navigate through arrays and key sets.
+- `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `transform`
+- Fixed `custom_data` etc. adding a type suffix to numeric data.
+- Modules may now specify `items` as a single value instead of an array.
