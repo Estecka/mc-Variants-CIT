@@ -14,13 +14,54 @@ This is an overview, please see the [wiki](https://github.com/Estecka/mc-Variant
 The format revolves around item variants being automatically associated to models or textures with matching names.
 Instead of defining a condition for every CIT, you define a single rule that governs all CITs in a collection, (so-called **modules**). This modules defines what item is affected, how to figure out its variants, and where their models are located.
 
-For example, here's a simplistic module that would change the texture of enchanted books :
+For example, here's a simple module that would change the texture of enchanted books :
 ```json
 {
 	"type": "stored_enchantment",
-	"items": ["enchanted_book"],
+	"items": "minecraft:enchanted_book",
 	"modelPrefix": "item/book_cit/",
-	"modelParent": "item/generated"
+	"modelParent": "item/generated",
+	"parameters": {
+		"levelSeparator": "_lvl_"
+	}
 }
 ```
-Here, a book with the enchantment `minecraft:unbreaking` will use the texture stored at `/assets/minecraft/texture/item/book_cit/unbreaking.png`. This single module will work for every possible enchantment, vanilla or modded, so long as a corresponding texture exists.
+Here, a book with the enchantment `minecraft:unbreaking` at level 2 will have the variant ID `minecraft:unbreaking_lvl_2`, and thus use the texture stored at `/assets/minecraft/texture/item/book_cit/unbreaking_lvl_2.png`. 
+This single module will work for every possible enchantment, vanilla or modded, so long as a corresponding texture exists.
+
+The module type above has a purpose-made logic for enchanted books. If no module type exists for a specific component, you can still use more generic modules to get a variant from any component:
+
+```json
+{
+	"type": "component_data",
+	"items": "minecraft:suspicious_stew",
+	"modelPrefix": "item/suspicious_stew_cit/",
+	"parameters": {
+		"componentType": "suspicious_stew_effects",
+		"nbtPath": "[0].id"
+	}
+}
+```
+
+At a higher level, you can create variants by combining multiple pieces of data from multiple components:
+```json
+{
+	"type": "component_format",
+	"items": "minecraft:diamond_sword",
+	"modelPrefix": "item/trimmed_diamond_sword/",
+	"parameters":{
+		"format": "${pattern}_${material}",
+		"variables": {
+			"pattern": {
+				"componentType": "trim",
+				"nbtPath": ".pattern"
+			},
+			"material": {
+				"componentType": "trim",
+				"nbtPath": ".material",
+				"transform": "discard_namespace"
+			}
+		}
+	}
+}
+```
