@@ -87,9 +87,12 @@ Since v2.5:
 ## 3.3
 - Added the modules `trim`, `trim_pattern` and `trim_material`. (Merged with v2.8)
 ## 3.4
+### 3.4.0
 - Added modules: `component_data` and `component_format`. (Merged with v2.9)
 - `custom_data` etc. now accept parameters similar to the `component_data` module.
 - `custom_data` etc.'s `nbtPath` can now navigate through arrays and key sets.
 - `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `transform`
 - Fixed `custom_data` etc. adding a type suffix to numeric data.
 - Modules may now specify `items` as a single value instead of an array.
+### 3.4.1
+- Fixed special models not loading properly. (Regression introduced in v3.0)

@@ -25,7 +25,7 @@ public class ModelAggregator
 
 		final String prefix = definition.modelPrefix();
 		final Optional<Identifier> modelParent = definition.modelParent();
-		final var specials = new HashMap<>(definition.specialModels());
+		final var specials = Map.copyOf(definition.specialModels());
 		definition.fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
 		// Variants from items
@@ -110,7 +110,7 @@ public class ModelAggregator
 	 * Finds which of the requested model/texture IDs are actually available.
 	 * @return The model/texture IDs
 	 */
-	private Map<String,Identifier> FindSpecials(ResourceManager manager, String rootDirectory, Map<String,Identifier> requested, String suffix){
+	private HashMap<String,Identifier> FindSpecials(ResourceManager manager, String rootDirectory, Map<String,Identifier> requested, String suffix){
 		Set<Identifier> valid = new HashSet<>();
 
 		// ResourceId to ModelId
@@ -121,8 +121,9 @@ public class ModelAggregator
 		for (Identifier fileId : manager.findResources(rootDirectory, id->resourceIds.keySet().contains(id)).keySet())
 			valid.add(resourceIds.get(fileId));
 
-		requested.entrySet().removeIf(e -> !valid.contains(e.getValue()));
-		return requested;
+		var result = new HashMap<>(requested);
+		result.entrySet().removeIf(e -> !valid.contains(e.getValue()));
+		return result;
 	}
 
 }
