@@ -25,7 +25,7 @@ public class ModelAggregator
 
 		final String prefix = definition.modelPrefix();
 		final Optional<Identifier> modelParent = definition.modelParent();
-		final var specials = Map.copyOf(definition.specialModels());
+		final var specials = new HashMap<>(definition.specialModels());
 		definition.fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
 		// Variants from items

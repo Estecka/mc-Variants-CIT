@@ -96,3 +96,5 @@ Since v2.5:
 - Modules may now specify `items` as a single value instead of an array.
 ### 3.4.1
 - Fixed special models not loading properly. (Regression introduced in v3.0)
+### 3.4.2
+- Fixed crash when loading a fallback model. (Regression introduced in v3.4.1)
