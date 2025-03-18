@@ -63,3 +63,5 @@
 - `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `transform`
 - Fixed `custom_data` etc. adding a type suffix to numeric data.
 - Modules may now specify `items` as a single value instead of an array.
+## 2.10
+- Added module: `item_count`
