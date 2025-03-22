@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.nbt;
+package fr.estecka.variantscit.format;
 
 import java.util.ArrayList;
 import java.util.List;

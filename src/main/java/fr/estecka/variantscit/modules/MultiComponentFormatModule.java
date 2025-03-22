@@ -7,8 +7,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.nbt.ComponentizedNbtAdapter;
-import fr.estecka.variantscit.nbt.Substitution;
+import fr.estecka.variantscit.format.Substitution;
+import fr.estecka.variantscit.format.properties.ItemComponentProperty;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
@@ -23,16 +23,16 @@ extends ASimpleMultiComponentCachingModule
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, ComponentizedNbtAdapter.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
+			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, ItemComponentProperty.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
 
 	private final Substitution format;
-	private final Map<String, ComponentizedNbtAdapter> varGetters;
+	private final Map<String, ItemComponentProperty> varGetters;
 
-	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String, ComponentizedNbtAdapter> variables){
-		super(debug, variables.values().stream().map(ComponentizedNbtAdapter::componentType));
+	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String, ItemComponentProperty> variables){
+		super(debug, variables.values().stream().map(ItemComponentProperty::componentType));
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 

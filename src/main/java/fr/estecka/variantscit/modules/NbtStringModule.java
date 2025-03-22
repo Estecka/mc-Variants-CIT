@@ -4,7 +4,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.nbt.NbtAdapter;
+import fr.estecka.variantscit.format.NbtAdapter;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.nbt.NbtElement;

@@ -3,7 +3,8 @@ package fr.estecka.variantscit.modules;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.nbt.NbtAdapter;
+
+import fr.estecka.variantscit.format.NbtAdapter;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
