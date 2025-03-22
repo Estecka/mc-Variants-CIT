@@ -35,10 +35,9 @@ public class NbtAdapter
 			CodecUtil.MapWithAlternative(
 				NbtPath.LEGACY_CODEC.fieldOf("nbtPath"),
 				NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
-			).forGetter(s->s.nbtPath),
-			Codec.BOOL.fieldOf("caseSensitive").forGetter(s->true)
+			).forGetter(s->s.nbtPath)
 		)
-		.apply(builder, (path, lowercase) -> new NbtAdapter(path, EInput.PRIMITIVE))
+		.apply(builder, (path) -> new NbtAdapter(path, EInput.PRIMITIVE))
 	);
 
 	private final NbtPath nbtPath;

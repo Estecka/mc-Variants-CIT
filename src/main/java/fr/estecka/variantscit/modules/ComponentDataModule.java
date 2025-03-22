@@ -3,7 +3,8 @@ package fr.estecka.variantscit.modules;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
+import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.format.ETransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
@@ -15,18 +16,33 @@ extends AArbitraryComponentModule<T>
 {
 	static public final MapCodec<ComponentDataModule<?>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(mod -> mod.componentType),
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
-			NbtAdapter.MAPCODEC.forGetter(m->m.adapter)
+			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(o->o.componentType),
+			NbtAdapter.MAPCODEC.forGetter(o->o.adapter),
+			ETransform.ARRAY_CODEC.fieldOf("transforms").orElse(new ETransform[0]).forGetter(o->o.transforms),
+			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->o.debug)
 		)
 		.apply(builder, ComponentDataModule::new)
 	);
 
-	private final NbtAdapter adapter;
+	@Deprecated
+	static public final <T> MapCodec<ComponentDataModule<?>> CreateLegacyCodec(ComponentType<T> componentType){
+		return RecordCodecBuilder.mapCodec(builder->builder
+			.group(
+				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.adapter),
+				CodecUtil.MapWithAlternative(ETransform.ARRAY_CODEC.fieldOf("transform"), ETransform.LEGACY_CODEC.fieldOf("lowercase")).forGetter(o->o.transforms),
+				Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o -> o.debug)
+			)
+			.apply(builder, (adapter, transform, debug) -> new ComponentDataModule<T>(componentType, adapter, transform, debug))
+		);
+	}
 
-	public ComponentDataModule(ComponentType<T> type, boolean debug, NbtAdapter adapter){
+	private final NbtAdapter adapter;
+	private final ETransform[] transforms;
+
+	public ComponentDataModule(ComponentType<T> type, NbtAdapter adapter, ETransform[] transforms, boolean debug){
 		super(type, debug);
 		this.adapter = adapter;
+		this.transforms = transforms;
 	}
 
 	@Override
@@ -35,6 +51,7 @@ extends AArbitraryComponentModule<T>
 		if (data == null)
 			return null;
 
+		ETransform.Transform(transforms, data);
 		return Identifier.tryParse(data);
 	}
 }

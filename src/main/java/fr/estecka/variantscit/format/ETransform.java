@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.util.StringIdentifiable;
 
 public enum ETransform
@@ -30,6 +32,14 @@ implements StringIdentifiable
 
 	static public final Codec<ETransform> CODEC = StringIdentifiable.createCodec(ETransform::values);
 	static public final Codec<ETransform[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(ETransform[]::new), array->List.<ETransform>of(array));
+	@Deprecated
+	static public final Codec<ETransform[]> LEGACY_CODEC = Codec.BOOL.xmap(
+		lowercase -> lowercase ? new ETransform[]{LOWERCASE} : new ETransform[0],
+		transform -> true
+	).validate(_0 -> {
+		VariantsCitMod.LOGGER.warn("The parameter `caseSensitive:true` is being deprecated. Use `transform:lowercase` instead.");
+		return DataResult.success(_0);
+	});
 
 	private final String name;
 	private final Function<String,String> lambda;
