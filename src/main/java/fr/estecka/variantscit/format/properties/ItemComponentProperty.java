@@ -2,8 +2,8 @@ package fr.estecka.variantscit.format.properties;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.format.ETransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
@@ -12,14 +12,16 @@ import net.minecraft.registry.Registries;
 
 public record ItemComponentProperty(
 	ComponentType<?> componentType,
-	NbtAdapter nbtAdapter
+	NbtAdapter nbtAdapter,
+	ETransform[] transforms
 )
 implements IStringProperty
 {
 	static public final Codec<ItemComponentProperty> CODEC = RecordCodecBuilder.create(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
-			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter)
+			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter),
+			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(new ETransform[0]).forGetter(ItemComponentProperty::transforms)
 		)
 		.apply(builder, ItemComponentProperty::new)
 	);
@@ -35,7 +37,10 @@ implements IStringProperty
 		NbtElement nbt = CodecUtil.GetComponentNbt(stack, this.componentType);
 		if (nbt == null)
 			return null;
-		else
-			return this.nbtAdapter.ResolveData(nbt);
+
+		String result = this.nbtAdapter.ResolveData(nbt);
+		if (result != null)
+			result = ETransform.Transform(this.transforms, result);
+		return result;
 	}
 }
