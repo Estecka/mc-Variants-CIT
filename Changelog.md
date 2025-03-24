@@ -65,5 +65,6 @@
 - Modules may now specify `items` as a single value instead of an array.
 ## 2.10
 - Added module: `item_count`
+- Module `component_format` can now use the item type as a variable.
 - Fixed `component_format` not accepting "`:`" as a valid character
 - Fixed `discard_namespace` not discarding the "`:`" separator

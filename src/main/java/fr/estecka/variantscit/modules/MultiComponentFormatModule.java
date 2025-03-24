@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.IStringProperty;
+import fr.estecka.variantscit.format.properties.ItemComponentProperty;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
@@ -19,7 +20,7 @@ extends ASimpleMultiComponentCachingModule
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IStringProperty.REGISTRY.codec).fieldOf("variables").forGetter(m->m.varGetters)
+			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, Codec.withAlternative(IStringProperty.REGISTRY.codec, ItemComponentProperty.CODEC)).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
@@ -51,7 +52,7 @@ extends ASimpleMultiComponentCachingModule
 		variables.clear();
 		Identifier id = Identifier.tryParse(rawId);
 		if (debug)
-				VariantsCitMod.LOGGER.info("multi_component_format: \"{}\" -> \"{}\"", this.format, rawId);
+			VariantsCitMod.LOGGER.info("component_format: \"{}\" -> \"{}\"", this.format, rawId);
 		return id;
 	}
 }
