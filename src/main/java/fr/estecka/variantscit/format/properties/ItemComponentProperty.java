@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.format.properties;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.format.ETransform;
@@ -17,7 +17,7 @@ public record ItemComponentProperty(
 )
 implements IStringProperty
 {
-	static public final Codec<ItemComponentProperty> CODEC = RecordCodecBuilder.create(builder->builder
+	static public final MapCodec<ItemComponentProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
 			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter),

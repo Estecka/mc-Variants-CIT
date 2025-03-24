@@ -20,7 +20,7 @@ extends ASimpleMultiComponentCachingModule
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, Codec.withAlternative(IStringProperty.REGISTRY.codec, ItemComponentProperty.CODEC)).fieldOf("variables").forGetter(m->m.varGetters)
+			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, Codec.withAlternative(IStringProperty.REGISTRY.codec, ItemComponentProperty.MAP_CODEC.codec())).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);

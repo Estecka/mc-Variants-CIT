@@ -8,6 +8,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Encoder;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.util.Identifier;
 
 public class DecodableRegistry<T>
@@ -39,15 +40,27 @@ public class DecodableRegistry<T>
 		);
 	}
 
-
-	public void Register(Identifier key, T value){
-		entries.put(key, Codec.unit(value));
+	public void Register(Identifier key, T unit){
+		entries.put(key, Codec.withAlternative(Codec.unit(unit), Identifier.CODEC.xmap(k->unit, u->key)));
 	}
 
-	public void Register(Identifier key, Codec<? extends T> value){
+	public void Register(Identifier key, MapCodec<? extends T> mapCodec){
 		if (valueKey != null)
-			value = value.fieldOf(valueKey).codec();
-		entries.put(key, value);
+			mapCodec = mapCodec.fieldOf(valueKey);
+		entries.put(key, mapCodec.codec());
+	}
+
+	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
+		if (valueKey != null)
+			mapCodec = mapCodec.fieldOf(valueKey);
+		
+		Codec<U> codec = Codec.withAlternative(
+			mapCodec.codec(),
+			// Basically a unit codec, but will apply to plain identifiers, not to misconfigured maps.
+			Identifier.CODEC.xmap(k->unit, u->key)
+		);
+
+		entries.put(key, codec);
 	}
 
 	public Codec<? extends T> GetCodec(Identifier type){
