@@ -33,6 +33,11 @@ implements IStringProperty
 	}
 
 	@Override
+	public Object GetReference(ItemStack stack) {
+		return stack.get(this.componentType);
+	}
+
+	@Override
 	public String GetPropertyString(ItemStack stack){
 		NbtElement nbt = CodecUtil.GetComponentNbt(stack, this.componentType);
 		if (nbt == null)

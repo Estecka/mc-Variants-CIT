@@ -12,13 +12,13 @@ import net.minecraft.util.Identifier;
 
 public class DecodableRegistry<T>
 {
-	private final Map<Identifier, Codec<T>> entries = new HashMap<>();
+	private final Map<Identifier, Codec<? extends T>> entries = new HashMap<>();
 
 	private final String typeKey;
 	private final String valueKey;
 
 	public final Codec<Identifier> typeCodec;
-	public final Codec<T> valueCodec;
+	public final Codec<T> codec;
 
 	public DecodableRegistry(String typeKey){
 		this(typeKey, null);
@@ -33,7 +33,7 @@ public class DecodableRegistry<T>
 			Identifier.CODEC.fieldOf(this.typeKey).codec()
 		);
 
-		this.valueCodec = Codec.of(
+		this.codec = Codec.of(
 			Encoder.error("Encoding not supported"),
 			this::Decode
 		);
@@ -44,13 +44,13 @@ public class DecodableRegistry<T>
 		entries.put(key, Codec.unit(value));
 	}
 
-	public void Register(Identifier key, Codec<T> value){
+	public void Register(Identifier key, Codec<? extends T> value){
 		if (valueKey != null)
 			value = value.fieldOf(valueKey).codec();
 		entries.put(key, value);
 	}
 
-	public Codec<T> GetCodec(Identifier type){
+	public Codec<? extends T> GetCodec(Identifier type){
 		return this.entries.get(type);
 	}
 
@@ -59,8 +59,8 @@ public class DecodableRegistry<T>
 		if (!typeResult.isSuccess())
 			return typeResult.map(_0->null);
 
-		Codec<T> codec = this.entries.get(typeResult.getOrThrow().getFirst());
-		return codec.decode(ops, data);
+		Codec<? extends T> codec = this.entries.get(typeResult.getOrThrow().getFirst());
+		return codec.decode(ops, data).map(o->o.mapFirst(u->u));
 	}
 
 	public <I> DataResult<Pair<T,I>> Decode(Dynamic<I> data){
