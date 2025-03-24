@@ -22,7 +22,7 @@ implements StringIdentifiable
 
 	DISCARD_NAMESPACE("discard_namespace", s->{
 		int split = s.lastIndexOf(':');
-		return (split < 0) ? s : s.substring(split);
+		return (split < 0) ? s : s.substring(split+1);
 	}),
 	DISCARD_PATH("discard_path", s->{
 		int split = s.lastIndexOf(':');

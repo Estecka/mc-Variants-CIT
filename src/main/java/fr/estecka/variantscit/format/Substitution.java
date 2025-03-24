@@ -118,7 +118,7 @@ public class Substitution
 
 		String literal = input.substring(0, end);
 
-		if (Identifier.isPathValid(literal))
+		if (Identifier.tryParse(literal) != null)
 			return new Parsed<>( new Literal(literal), input.substring(end) );
 		else {
 			throw new IllegalArgumentException("Invalid character in path: "+literal);

@@ -29,6 +29,6 @@ implements IStringProperty
 
 	@Override
 	public String GetPropertyString(ItemStack stack){
-		return stack.getItem().toString();
+		return ETransform.Transform(transforms, stack.getItem().toString());
 	}
 }
