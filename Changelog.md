@@ -66,6 +66,6 @@
 ## 2.10
 - Added module: `item_count`
 - Module `component_format` can now use the item type as a variable.
-- Fixed `component_format` not accepting "`:`" as a valid character
+- Fixed `component_format` not accepting "`:`" as a valid character in the format.
 - Fixed `discard_namespace` not discarding the "`:`" separator
 - Fixed `nbtPath` no longer accepting uppercases as valid characters. (Regression in 2.9)
