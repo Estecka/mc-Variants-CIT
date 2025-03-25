@@ -29,7 +29,7 @@ extends AArbitraryComponentModule<T>
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.adapter),
-				CodecUtil.MapWithAlternative(ETransform.ARRAY_CODEC.fieldOf("transform"), ETransform.LEGACY_CODEC.fieldOf("lowercase")).forGetter(o->o.transforms),
+				CodecUtil.MapWithAlternative(ETransform.ARRAY_CODEC.fieldOf("transform"), ETransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(ETransform.EMPTY).forGetter(o->o.transforms),
 				Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o -> o.debug)
 			)
 			.apply(builder, (adapter, transform, debug) -> new ComponentDataModule<T>(componentType, adapter, transform, debug))
