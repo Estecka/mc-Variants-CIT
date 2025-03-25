@@ -11,7 +11,7 @@ implements IStringProperty
 {
 	static public final MapCodec<ItemTypeProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(instance->
 		instance.group(
-			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(new ETransform[0]).forGetter(ItemTypeProperty::transforms)
+			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(ETransform.EMPTY).forGetter(ItemTypeProperty::transforms)
 		)
 		.apply(instance, ItemTypeProperty::new)
 	);

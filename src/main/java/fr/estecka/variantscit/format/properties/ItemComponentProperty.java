@@ -21,7 +21,7 @@ implements IStringProperty
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
 			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter),
-			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(new ETransform[0]).forGetter(ItemComponentProperty::transforms)
+			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(ETransform.EMPTY).forGetter(ItemComponentProperty::transforms)
 		)
 		.apply(builder, ItemComponentProperty::new)
 	);

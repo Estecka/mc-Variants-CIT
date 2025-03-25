@@ -18,7 +18,7 @@ extends AArbitraryComponentModule<T>
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(o->o.componentType),
 			NbtAdapter.MAPCODEC.forGetter(o->o.adapter),
-			ETransform.ARRAY_CODEC.fieldOf("transforms").orElse(new ETransform[0]).forGetter(o->o.transforms),
+			ETransform.ARRAY_CODEC.fieldOf("transforms").orElse(ETransform.EMPTY).forGetter(o->o.transforms),
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->o.debug)
 		)
 		.apply(builder, ComponentDataModule::new)

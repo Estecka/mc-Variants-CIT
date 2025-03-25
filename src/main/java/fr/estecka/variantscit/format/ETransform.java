@@ -30,11 +30,13 @@ implements StringIdentifiable
 	}),
 	;
 
+	static public final ETransform[] EMPTY = new ETransform[0];
+
 	static public final Codec<ETransform> CODEC = StringIdentifiable.createCodec(ETransform::values);
 	static public final Codec<ETransform[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(ETransform[]::new), array->List.<ETransform>of(array));
 	@Deprecated
 	static public final Codec<ETransform[]> LEGACY_CODEC = Codec.BOOL.xmap(
-		lowercase -> lowercase ? new ETransform[]{LOWERCASE} : new ETransform[0],
+		lowercase -> lowercase ? new ETransform[]{LOWERCASE} : ETransform.EMPTY,
 		transform -> true
 	).validate(_0 -> {
 		VariantsCitMod.LOGGER.warn("The parameter `caseSensitive:true` is being deprecated. Use `transform:lowercase` instead.");
