@@ -30,15 +30,11 @@ public class NbtAdapter
 	);
 
 	@Deprecated
-	static public final MapCodec<NbtAdapter> LEGACY_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			CodecUtil.MapWithAlternative(
-				NbtPath.LEGACY_CODEC.fieldOf("nbtPath"),
-				NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
-			).forGetter(s->s.nbtPath)
-		)
-		.apply(builder, (path) -> new NbtAdapter(path, EInput.PRIMITIVE))
-	);
+	static public final MapCodec<NbtAdapter> LEGACY_MAPCODEC = CodecUtil.MapWithAlternatives(
+		NbtPath.CODEC.fieldOf("nbtPath"),
+		NbtPath.DOT_SEPARATED_CODEC.fieldOf("nbtPath"),
+		NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
+	).xmap((path)->new NbtAdapter(path,EInput.PRIMITIVE), (adp)->adp.nbtPath);
 
 	private final NbtPath nbtPath;
 	private final EInput type;

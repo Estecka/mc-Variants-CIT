@@ -27,6 +27,27 @@ public class CodecUtil
 		return MapCodec.assumeMapUnsafe(Codec.withAlternative(primary.codec(), alternative.codec()));
 	}
 
+	@SafeVarargs
+	static public <T> Codec<T> WithAlternatives(Codec<T> primary, Codec<T>... altArray){
+		int i = altArray.length - 1;
+		Codec<T> alternative = altArray[i];
+
+		for (i=i-1; i>=0; --i){
+			alternative = Codec.withAlternative(altArray[i], alternative);
+		}
+
+		return Codec.withAlternative(primary, alternative);
+	}
+
+	@SafeVarargs
+	static public <T> MapCodec<T> MapWithAlternatives(MapCodec<T> primaryMap, MapCodec<T>... mapArray){
+		@SuppressWarnings("unchecked")
+		Codec<T>[] codecArray = new Codec[mapArray.length];
+		for (int i=0; i<mapArray.length; ++i)
+			codecArray[i] = mapArray[i].codec();
+		return MapCodec.assumeMapUnsafe(WithAlternatives(primaryMap.codec(), codecArray));
+	}
+
 	static public <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){
 		T component = stack.get(type);
 		if (component == null)

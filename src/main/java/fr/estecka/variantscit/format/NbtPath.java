@@ -17,7 +17,7 @@ public final class NbtPath
 	static public final Codec<NbtPath> CODEC = Codec.STRING.comapFlatMap(NbtPath::Parse, NbtPath::toString);
 
 	@Deprecated
-	static public final Codec<NbtPath> LEGACY_CODEC = Codec.withAlternative(CODEC, Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString)).validate(_0 -> {
+	static public final Codec<NbtPath> DOT_SEPARATED_CODEC = Codec.withAlternative(CODEC, Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString)).validate(_0 -> {
 		VariantsCitMod.LOGGER.warn("The value of `nbtPath` Uses an obsolete path format. Please add a `.` at the start of the path.");
 		return DataResult.success(_0);
 	});
