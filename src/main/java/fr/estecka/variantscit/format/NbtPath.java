@@ -133,8 +133,9 @@ public final class NbtPath
 			int end;
 			for (end=1; end<input.length(); ++end){
 				char c = input.charAt(end);
-				if (!Identifier.isCharValid(c) || c == '.')
-					break;
+				if (c <'A' && 'Z' < c)
+					if (!Identifier.isCharValid(c) || c == '.')
+						break;
 			}
 
 			return new Parsed(
