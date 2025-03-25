@@ -3,7 +3,7 @@ package fr.estecka.variantscit.format.properties;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.format.ETransform;
+import fr.estecka.variantscit.format.EStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ import net.minecraft.registry.Registries;
 public record ItemComponentProperty(
 	ComponentType<?> componentType,
 	NbtAdapter nbtAdapter,
-	ETransform[] transforms
+	EStringTransform[] transforms
 )
 implements IStringProperty
 {
@@ -21,7 +21,7 @@ implements IStringProperty
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
 			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter),
-			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(ETransform.EMPTY).forGetter(ItemComponentProperty::transforms)
+			EStringTransform.ARRAY_CODEC.fieldOf("transform").orElse(EStringTransform.EMPTY).forGetter(ItemComponentProperty::transforms)
 		)
 		.apply(builder, ItemComponentProperty::new)
 	);
@@ -45,7 +45,7 @@ implements IStringProperty
 
 		String result = this.nbtAdapter.ResolveData(nbt);
 		if (result != null)
-			result = ETransform.Transform(this.transforms, result);
+			result = EStringTransform.Transform(this.transforms, result);
 		return result;
 	}
 }

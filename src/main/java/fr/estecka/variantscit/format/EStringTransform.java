@@ -10,7 +10,7 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.util.StringIdentifiable;
 
-public enum ETransform
+public enum EStringTransform
 implements StringIdentifiable
 {
 	NOOP("noop", Function.identity()),
@@ -30,13 +30,13 @@ implements StringIdentifiable
 	}),
 	;
 
-	static public final ETransform[] EMPTY = new ETransform[0];
+	static public final EStringTransform[] EMPTY = new EStringTransform[0];
 
-	static public final Codec<ETransform> CODEC = StringIdentifiable.createCodec(ETransform::values);
-	static public final Codec<ETransform[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(ETransform[]::new), array->List.<ETransform>of(array));
+	static public final Codec<EStringTransform> CODEC = StringIdentifiable.createCodec(EStringTransform::values);
+	static public final Codec<EStringTransform[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(EStringTransform[]::new), array->List.<EStringTransform>of(array));
 	@Deprecated
-	static public final Codec<ETransform[]> LEGACY_CODEC = Codec.BOOL.xmap(
-		lowercase -> lowercase ? new ETransform[]{LOWERCASE} : ETransform.EMPTY,
+	static public final Codec<EStringTransform[]> LEGACY_CODEC = Codec.BOOL.xmap(
+		lowercase -> lowercase ? new EStringTransform[]{LOWERCASE} : EStringTransform.EMPTY,
 		transform -> true
 	).validate(_0 -> {
 		VariantsCitMod.LOGGER.warn("The parameter `caseSensitive:true` is being deprecated. Use `transform:lowercase` instead.");
@@ -46,7 +46,7 @@ implements StringIdentifiable
 	private final String name;
 	private final Function<String,String> lambda;
 
-	private ETransform(String name, Function<String,String> lambda){
+	private EStringTransform(String name, Function<String,String> lambda){
 		this.name = name;
 		this.lambda = lambda;
 	}
@@ -59,8 +59,8 @@ implements StringIdentifiable
 			;
 	}
 
-	static public String Transform(ETransform[] transforms, String input){
-		for (ETransform t : transforms)
+	static public String Transform(EStringTransform[] transforms, String input){
+		for (EStringTransform t : transforms)
 			input = t.Transform(input);
 		return input;
 	}

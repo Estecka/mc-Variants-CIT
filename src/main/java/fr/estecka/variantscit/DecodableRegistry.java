@@ -41,7 +41,7 @@ public class DecodableRegistry<T>
 	}
 
 	public void Register(Identifier key, T unit){
-		entries.put(key, Codec.withAlternative(Codec.unit(unit), Identifier.CODEC.xmap(k->unit, u->key)));
+		entries.put(key, Codec.withAlternative(Codec.unit(unit), IdToUnitCodc(key, unit)));
 	}
 
 	public void Register(Identifier key, MapCodec<? extends T> mapCodec){
@@ -56,11 +56,18 @@ public class DecodableRegistry<T>
 		
 		Codec<U> codec = Codec.withAlternative(
 			mapCodec.codec(),
-			// Basically a unit codec, but will apply to plain identifiers, not to misconfigured maps.
-			Identifier.CODEC.xmap(k->unit, u->key)
+			IdToUnitCodc(key, unit)
 		);
 
 		entries.put(key, codec);
+	}
+
+	/**
+	 * Basically a unit codec, but will apply to plain identifiers, not to misconfigured maps.
+	 * The vanilla unit codec on the other hand, will fail to apply to primitive types.
+	 */
+	static public <T> Codec<T> IdToUnitCodc(Identifier key, T unit){
+		return Identifier.CODEC.xmap(k->unit, u->key);
 	}
 
 	public Codec<? extends T> GetCodec(Identifier type){

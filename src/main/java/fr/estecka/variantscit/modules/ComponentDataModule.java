@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.format.ETransform;
+import fr.estecka.variantscit.format.EStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
@@ -18,7 +18,7 @@ extends AArbitraryComponentModule<T>
 		.group(
 			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(o->o.componentType),
 			NbtAdapter.MAPCODEC.forGetter(o->o.adapter),
-			ETransform.ARRAY_CODEC.fieldOf("transforms").orElse(ETransform.EMPTY).forGetter(o->o.transforms),
+			EStringTransform.ARRAY_CODEC.fieldOf("transforms").orElse(EStringTransform.EMPTY).forGetter(o->o.transforms),
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->o.debug)
 		)
 		.apply(builder, ComponentDataModule::new)
@@ -29,7 +29,7 @@ extends AArbitraryComponentModule<T>
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.adapter),
-				CodecUtil.MapWithAlternative(ETransform.ARRAY_CODEC.fieldOf("transform"), ETransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(ETransform.EMPTY).forGetter(o->o.transforms),
+				CodecUtil.MapWithAlternative(EStringTransform.ARRAY_CODEC.fieldOf("transform"), EStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(EStringTransform.EMPTY).forGetter(o->o.transforms),
 				Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o -> o.debug)
 			)
 			.apply(builder, (adapter, transform, debug) -> new ComponentDataModule<T>(componentType, adapter, transform, debug))
@@ -37,9 +37,9 @@ extends AArbitraryComponentModule<T>
 	}
 
 	private final NbtAdapter adapter;
-	private final ETransform[] transforms;
+	private final EStringTransform[] transforms;
 
-	public ComponentDataModule(ComponentType<T> type, NbtAdapter adapter, ETransform[] transforms, boolean debug){
+	public ComponentDataModule(ComponentType<T> type, NbtAdapter adapter, EStringTransform[] transforms, boolean debug){
 		super(type, debug);
 		this.adapter = adapter;
 		this.transforms = transforms;
@@ -51,7 +51,7 @@ extends AArbitraryComponentModule<T>
 		if (data == null)
 			return null;
 
-		ETransform.Transform(transforms, data);
+		EStringTransform.Transform(transforms, data);
 		return Identifier.tryParse(data);
 	}
 }

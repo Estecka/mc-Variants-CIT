@@ -1,20 +1,14 @@
 package fr.estecka.variantscit.format.properties;
 
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.format.ETransform;
+import fr.estecka.variantscit.format.EStringTransform;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public record ItemTypeProperty(ETransform[] transforms)
+public record ItemTypeProperty(EStringTransform[] transforms)
 implements IStringProperty
 {
-	static public final MapCodec<ItemTypeProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(instance->
-		instance.group(
-			ETransform.ARRAY_CODEC.fieldOf("transform").orElse(ETransform.EMPTY).forGetter(ItemTypeProperty::transforms)
-		)
-		.apply(instance, ItemTypeProperty::new)
-	);
+	static public final MapCodec<ItemTypeProperty> MAP_CODEC = EStringTransform.ARRAY_CODEC.fieldOf("transform").orElse(EStringTransform.EMPTY).xmap(ItemTypeProperty::new, ItemTypeProperty::transforms);
 
 	@Override
 	public int GetPropertyHash(ItemStack stack){
@@ -28,6 +22,6 @@ implements IStringProperty
 
 	@Override
 	public String GetPropertyString(ItemStack stack){
-		return ETransform.Transform(transforms, stack.getItem().toString());
+		return EStringTransform.Transform(transforms, stack.getItem().toString());
 	}
 }
