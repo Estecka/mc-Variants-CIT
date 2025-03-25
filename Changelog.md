@@ -69,3 +69,4 @@
 - Fixed `component_format` not accepting "`:`" as a valid character in the format.
 - Fixed `discard_namespace` not discarding the "`:`" separator
 - Fixed `nbtPath` no longer accepting uppercases as valid characters. (Regression in 2.9)
+- Fixed some legacy `nbtPath` format no longer working. (Regression in 2.9)

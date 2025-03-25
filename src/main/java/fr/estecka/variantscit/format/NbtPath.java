@@ -2,6 +2,7 @@ package fr.estecka.variantscit.format;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -63,6 +64,8 @@ public final class NbtPath
 	
 		String[] names = rawPath.split("\\.");
 		Token[] tokens = new Token[names.length];
+		for (int i=0; i<names.length; ++i)
+			tokens[i] = new MapKey(names[i]);
 
 		return DataResult.success(new NbtPath(tokens));
 	}
