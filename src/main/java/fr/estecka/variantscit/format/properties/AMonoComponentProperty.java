@@ -23,7 +23,7 @@ implements IStringProperty
 
 	@Override
 	public final int GetPropertyHash(ItemStack stack) {
-		return Objects.hashCode(stack);
+		return Objects.hashCode(GetReference(stack));
 	}
 
 	@Override

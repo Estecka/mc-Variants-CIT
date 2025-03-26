@@ -1,8 +1,8 @@
 package fr.estecka.variantscit.modules;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -16,7 +16,7 @@ implements ICitModule
 {
 	static public final MapCodec<ItemCountModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.STRING.fieldOf("namespace").orElse("minecraft").forGetter(o->o.namespace)
+			CodecUtil.IDENTIFIER_NAMESPACE.fieldOf("namespace").orElse("minecraft").forGetter(o->o.namespace)
 		)
 		.apply(builder, ItemCountModule::new)
 	);
