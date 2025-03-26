@@ -1,6 +1,9 @@
 package fr.estecka.variantscit.format.properties;
 
 import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.nbt.NbtCompound;
@@ -9,6 +12,14 @@ import net.minecraft.nbt.NbtElement;
 public class EntityAgeMapProperty
 extends AMonoComponentProperty<NbtComponent>
 {
+	static public final MapCodec<EntityAgeMapProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->
+		builder.group(
+			Codec.STRING.fieldOf("adult").orElse("").forGetter(o->o.adult),
+			Codec.STRING.fieldOf("baby").orElse("_baby").forGetter(o->o.baby)
+		)
+		.apply(builder, EntityAgeMapProperty::new)
+	);
+
 	private final String adult, baby;
 
 	public EntityAgeMapProperty(String adult, String baby){

@@ -40,7 +40,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 	public void onInitializeClient(){
 		PreparableModelLoadingPlugin.register(new ModuleLoader(), this);
 
-		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), new AxolotlBucketModule());
+		ModuleRegistry.Register(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("block_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("bucket_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("component_data"), ComponentDataModule.CODEC);

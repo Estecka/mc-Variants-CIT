@@ -3,6 +3,7 @@ package fr.estecka.variantscit;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.MinecraftClient;
@@ -10,10 +11,14 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.Identifier;
 
 public class CodecUtil
 {
 	static private final MinecraftClient client = MinecraftClient.getInstance();
+
+	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isPathValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
+	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
 		var listCodec = original.listOf();

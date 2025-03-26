@@ -9,6 +9,8 @@ import net.minecraft.nbt.NbtElement;
 public class AxolotlVariantProperty
 extends AMonoComponentProperty<NbtComponent>
 {
+	static public final AxolotlVariantProperty UNIT = new AxolotlVariantProperty();
+
 	public AxolotlVariantProperty(){
 		super(DataComponentTypes.BUCKET_ENTITY_DATA);
 	}
