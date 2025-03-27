@@ -9,6 +9,7 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.format.properties.ItemComponentProperty;
+import fr.estecka.variantscit.format.properties.TransformableProperty;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
@@ -20,7 +21,7 @@ extends ASimpleMultiComponentCachingModule
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, Codec.withAlternative(IStringProperty.REGISTRY.codec, ItemComponentProperty.MAP_CODEC.codec())).fieldOf("variables").forGetter(m->m.varGetters)
+			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, Codec.withAlternative(IStringProperty.REGISTRY.codec, TransformableProperty.CodecOf(ItemComponentProperty.MAP_CODEC).codec())).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
