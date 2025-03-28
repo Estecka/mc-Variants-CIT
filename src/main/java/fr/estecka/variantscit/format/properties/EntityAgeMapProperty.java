@@ -12,10 +12,12 @@ import net.minecraft.nbt.NbtElement;
 public class EntityAgeMapProperty
 extends AMonoComponentProperty<NbtComponent>
 {
+	static public final EntityAgeMapProperty UNIT = new EntityAgeMapProperty("", "_baby");
+
 	static public final MapCodec<EntityAgeMapProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
-			Codec.STRING.fieldOf("adult").orElse("").forGetter(o->o.adult),
-			Codec.STRING.fieldOf("baby").orElse("_baby").forGetter(o->o.baby)
+			Codec.STRING.fieldOf("adult").orElse(UNIT.adult).forGetter(o->o.adult),
+			Codec.STRING.fieldOf("baby").orElse(UNIT.baby).forGetter(o->o.baby)
 		)
 		.apply(builder, EntityAgeMapProperty::new)
 	);

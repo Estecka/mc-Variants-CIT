@@ -28,7 +28,7 @@ public class CodecUtil
 		);
 	}
 
-	static public <T> MapCodec<T> MapWithAlternative(MapCodec<T> primary, MapCodec<T> alternative){
+	static public <T> MapCodec<T> MapWithAlternative(MapCodec<T> primary, MapCodec<? extends T> alternative){
 		return MapCodec.assumeMapUnsafe(Codec.withAlternative(primary.codec(), alternative.codec()));
 	}
 

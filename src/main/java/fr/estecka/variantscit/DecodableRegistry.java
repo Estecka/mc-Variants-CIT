@@ -1,88 +1,115 @@
 package fr.estecka.variantscit;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
-import com.mojang.datafixers.util.Pair;
+import java.util.stream.Stream;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.CompressorHolder;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Encoder;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
+import com.mojang.serialization.MapEncoder;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import net.minecraft.util.Identifier;
 
 public class DecodableRegistry<T>
 {
-	public interface IDecoWrapper<T> extends Function<MapCodec<? extends T>, MapDecoder<? extends T>> {}
+	public interface IMapWrapper<T> extends Function<MapCodec<? extends T>, MapDecoder<? extends T>> {}
 
-	private final Map<Identifier, Decoder<? extends T>> entries = new HashMap<>();
+	private final Map<Identifier, T> units = new HashMap<>();
+	private final Map<Identifier, MapDecoder<? extends T>> mapCodecs = new HashMap<>();
 
 	private final String typeKey;
-	private final IDecoWrapper<T> valueWrapper;
+	private final IMapWrapper<T> mapWrapper;
 
-	public final Decoder<Identifier> typeCodec;
-	public final Codec<T> codec;
+	private final MapDecoder<Identifier> typeCodec;
+	public final Codec<T> unitCodec = Identifier.CODEC.flatXmap(
+		key -> this.units.containsKey(key) ?
+			DataResult.success(units.get(key)) :
+			DataResult.error(()->"Unknown key: "+key),
+		obj -> this.units.containsValue(obj) ?
+			DataResult.success(units.entrySet().stream().filter(e->obj.equals(e.getValue())).map(Entry::getKey).findFirst().get()) :
+			DataResult.error(()->"Unknown unit")
+	);
+	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
+	public final Codec<T> codec = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
 
 	public DecodableRegistry(String typeKey){
 		this(typeKey, c->c);
 	}
 
-	public DecodableRegistry(String typeKey, IDecoWrapper<T> valueWrapper){
+	public DecodableRegistry(String typeKey, IMapWrapper<T> mapWrapper){
 		this.typeKey = typeKey;
-		this.valueWrapper = valueWrapper;
-
-		this.typeCodec = Codec.withAlternative(
-			Identifier.CODEC,
-			Identifier.CODEC.fieldOf(this.typeKey).codec()
-		);
-
-		this.codec = Codec.of(
-			Encoder.error("Encoding not supported"),
-			this::Decode
-		);
+		this.mapWrapper = mapWrapper;
+		this.typeCodec = Identifier.CODEC.fieldOf(this.typeKey);
 	}
 
-	public void Register(Identifier key, T unit){
+	public void RegisterUnit(Identifier key, T unit){
 		this.Register(key, MapCodec.unit(unit), unit);
 	}
 
-	public void Register(Identifier key, MapCodec<? extends T> mapCodec){
-		entries.put(key, valueWrapper.apply(mapCodec).decoder());
+	public void RegisterMap(Identifier key, MapCodec<? extends T> mapCodec){
+		this.mapCodecs.put(key, mapWrapper.apply(mapCodec));
 	}
 
 	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
-		entries.put(key, Codec.withAlternative(
-			Codec.<T>of(Encoder.error("Encoding not supported"), valueWrapper.apply(mapCodec).decoder().map(o->o)),
-			IdToUnitCodec(key, unit)
-		));
+		this.units.put(key, unit);
+		this.RegisterMap(key, mapCodec);
 	}
 
-	/**
-	 * Basically a unit codec, but will apply to plain identifiers, not to misconfigured maps.
-	 * The vanilla unit codec on the other hand, will fail to apply to primitive types.
-	 */
-	static public <T> Codec<T> IdToUnitCodec(Identifier key, T unit){
-		return Identifier.CODEC.xmap(k->unit, u->key);
+	public MapDecoder<? extends T> GetDecoder(Identifier type){
+		return this.mapCodecs.get(type);
 	}
 
-	public Decoder<? extends T> GetDecoder(Identifier type){
-		return this.entries.get(type);
+	private class MapDecoderImpl
+	extends CompressorHolder
+	implements MapDecoder<T>
+	{
+		@Override
+		public <I> DataResult<T> decode(DynamicOps<I> ops, MapLike<I> data){
+			var typeResult = typeCodec.decode(ops, data);
+			if (!typeResult.isSuccess())
+				return typeResult.map(_0->null);
+	
+			Identifier type = typeResult.getOrThrow();
+			MapDecoder<? extends T> codec = mapCodecs.get(type);
+			if (codec == null)
+				return DataResult.error(()->"Unknown key: "+type);
+			else
+				return codec.decode(ops, data).map(o->o);
+		}
+
+		@Override
+		public <K> Stream<K> keys(DynamicOps<K> ops) {
+			Stream<K> result = Stream.of(ops.createString(typeKey));
+
+			Iterator<Stream<K>> it = mapCodecs.values().stream().map(o->o.keys(ops)).iterator();
+			while (it.hasNext()){
+				result = Stream.concat(result, it.next());
+			}
+
+			return result;
+		}
 	}
 
-	public <I> DataResult<Pair<T,I>> Decode(DynamicOps<I> ops, I data){
-		var typeResult = this.typeCodec.decode(ops, data);
-		if (!typeResult.isSuccess())
-			return typeResult.map(_0->null);
+	private class MapEncoderImpl
+	extends CompressorHolder
+	implements MapEncoder<T>
+	{
+		@Override
+		public <O> RecordBuilder<O> encode(T input, DynamicOps<O> ops, RecordBuilder<O> prefix) {
+			DataResult<MapLike<O>> result = DataResult.error(()->"Encoding not supported");
+			return result.map(map->prefix).result().orElse(prefix.withErrorsFrom(result));
+		}
 
-		Decoder<? extends T> codec = this.entries.get(typeResult.getOrThrow().getFirst());
-		return codec.decode(ops, data).map(o->o.mapFirst(u->u));
+		@Override
+		public <K> Stream<K> keys(DynamicOps<K> ops) {
+			return Stream.of();
+		}
 	}
-
-	public <I> DataResult<Pair<T,I>> Decode(Dynamic<I> data){
-		return this.Decode(data.getOps(), data.getValue());
-	}
-
 }
