@@ -20,7 +20,7 @@ extends ASimpleMultiComponentCachingModule
 {
 	static public final MapCodec<ComponentDataModule<IStringProperty>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			CodecUtil.MapWithAlternative(IStringProperty.REGISTRY.mapCodec, ItemComponentProperty.TRANSFORMABLE_CODEC).forGetter(o->o.property),
+			IStringProperty.MAP_CODEC.forGetter(o->o.property),
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->o.debug)
 		)
 		.apply(builder, ComponentDataModule::new)

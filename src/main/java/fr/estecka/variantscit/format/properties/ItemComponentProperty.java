@@ -23,8 +23,6 @@ implements IStringProperty
 		.apply(builder, ItemComponentProperty::new)
 	);
 
-	static public final MapCodec<TransformableProperty<ItemComponentProperty>> TRANSFORMABLE_CODEC = TransformableProperty.CodecOf(MAP_CODEC);
-
 	@Override
 	public int GetPropertyHash(ItemStack stack){
 		Object cmp = stack.get(this.componentType);
