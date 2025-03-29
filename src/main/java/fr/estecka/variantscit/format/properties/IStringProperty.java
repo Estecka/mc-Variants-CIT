@@ -18,7 +18,7 @@ public interface IStringProperty
 	}};
 
 	static public MapCodec<IStringProperty> MAP_CODEC = CodecUtil.MapWithAlternative(REGISTRY.mapCodec, TransformableProperty.CodecOf(ItemComponentProperty.MAP_CODEC));
-	static public Codec<IStringProperty> CODEC = MAP_CODEC.codec();
+	static public Codec<IStringProperty> CODEC = Codec.withAlternative(REGISTRY.unitCodec, MAP_CODEC.codec());
 
 	/**
 	 * Used  for  caching  the variant IDs  associated  with  a given  property.
