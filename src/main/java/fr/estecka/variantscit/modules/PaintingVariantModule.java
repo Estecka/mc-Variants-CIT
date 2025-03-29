@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.Optional;
 import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.component.DataComponentTypes;
@@ -40,7 +41,7 @@ extends AComponentCachingModule<NbtComponent>
 		if (component == null)
 			return null;
 
-		String rawVariant = component.getNbt().getString("variant");
+		String rawVariant = PaintingVariantProperty.UNIT.GetPropertyString(component);
 		if (rawVariant == null)
 			return null;
 

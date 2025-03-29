@@ -15,6 +15,7 @@ public interface IStringProperty
 		this.RegisterMap(Identifier.ofVanilla("item_component"), ItemComponentProperty.MAP_CODEC);
 		this.RegisterUnit(Identifier.ofVanilla("item_count"), new ItemCountProperty());
 		this.RegisterUnit(Identifier.ofVanilla("item_type"), new ItemTypeProperty());
+		this.RegisterUnit(Identifier.ofVanilla("painting_variant"), PaintingVariantProperty.UNIT);
 	}};
 
 	static public MapCodec<IStringProperty> MAP_CODEC = CodecUtil.MapWithAlternative(REGISTRY.mapCodec, TransformableProperty.CodecOf(ItemComponentProperty.MAP_CODEC));
