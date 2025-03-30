@@ -1,9 +1,6 @@
-package fr.estecka.variantscit.nbt;
+package fr.estecka.variantscit.format;
 
-import java.text.Normalizer;
-import java.util.List;
 import java.util.function.Function;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -22,38 +19,30 @@ public class NbtAdapter
 	static public final MapCodec<NbtAdapter> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			NbtPath.CODEC.fieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
-			EInput.CODEC.fieldOf("expect").orElse(EInput.PRIMITIVE).forGetter(adp -> adp.type),
-			CodecUtil.OneOrMany(ETransform.CODEC).fieldOf("transform").orElse(List.of()).forGetter(adp -> List.of(adp.transforms))
+			EInput.CODEC.fieldOf("expect").orElse(EInput.PRIMITIVE).forGetter(adp -> adp.type)
 		)
 		.apply(builder, NbtAdapter::new)
 	);
 
 	static public final Codec<NbtAdapter> CODEC = Codec.withAlternative(
 		MAPCODEC.codec(),
-		NbtPath.CODEC.xmap(path->new NbtAdapter(path, EInput.PRIMITIVE, List.of()), adp->adp.nbtPath)
+		NbtPath.CODEC.xmap(path->new NbtAdapter(path, EInput.PRIMITIVE), adp->adp.nbtPath)
 	);
 
 	@Deprecated
-	static public final MapCodec<NbtAdapter> LEGACY_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			CodecUtil.MapWithAlternative(
-				NbtPath.LEGACY_CODEC.fieldOf("nbtPath"),
-				NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
-			).forGetter(s->s.nbtPath),
-			Codec.BOOL.fieldOf("caseSensitive").forGetter(s->true)
-		)
-		.apply(builder, (path, lowercase) -> new NbtAdapter(path, EInput.PRIMITIVE, lowercase?List.of(ETransform.LOWERCASE):List.of()))
-	);
+	static public final MapCodec<NbtAdapter> LEGACY_MAPCODEC = CodecUtil.MapWithAlternatives(
+		NbtPath.CODEC.fieldOf("nbtPath"),
+		NbtPath.DOT_SEPARATED_CODEC.fieldOf("nbtPath"),
+		NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
+	).xmap((path)->new NbtAdapter(path,EInput.PRIMITIVE), (adp)->adp.nbtPath);
 
 	private final NbtPath nbtPath;
 	private final EInput type;
-	private final ETransform[] transforms;
 
 
-	protected NbtAdapter(NbtPath nbtPath, EInput type, List<ETransform> filters){
+	protected NbtAdapter(NbtPath nbtPath, EInput type){
 		this.nbtPath = nbtPath;
 		this.type = type;
-		this.transforms = filters.toArray(ETransform[]::new);
 	}
 
 	public final @Nullable String ResolveData(NbtElement nbt){
@@ -65,8 +54,6 @@ public class NbtAdapter
 		if (data == null)
 			return null;
 
-		for (ETransform filter : this.transforms)
-			data = filter.Transform(data);
 		return data;
 	}
 
@@ -114,52 +101,4 @@ public class NbtAdapter
 	
 	}
 
-	public enum ETransform
-	implements StringIdentifiable
-	{
-		NOOP("noop", Function.identity()),
-		LOWERCASE("lowercase", String::toLowerCase),
-
-		SANITIZE("sanitize", s->Sanitize(s, "[^a-zA-Z0-9_.-/:]")),
-		SANITIZE_PATH("sanitize_path", s->Sanitize(s, "[^a-zA-Z0-9_.-/]")),
-		SANITIZE_NAMESPACE("sanitize_namespace", s->Sanitize(s, "[^a-zA-Z0-9_.-]")),
-
-		DISCARD_NAMESPACE("discard_namespace", s->{
-			int split = s.lastIndexOf(':');
-			return (split < 0) ? s : s.substring(split);
-		}),
-		DISCARD_PATH("discard_path", s->{
-			int split = s.lastIndexOf(':');
-			return (split < 0) ? "" : s.substring(0, split);
-		}),
-		;
-	
-		static public final Codec<ETransform> CODEC = StringIdentifiable.createCodec(ETransform::values);
-	
-		private final String name;
-		private final Function<String,String> lambda;
-	
-		private ETransform(String name, Function<String,String> lambda){
-			this.name = name;
-			this.lambda = lambda;
-		}
-
-		static private String Sanitize(String input, String charset){
-			return Normalizer.normalize(input, Normalizer.Form.NFD)
-				.replace(' ', '_')
-				.toLowerCase()
-				.replaceAll(charset, "")
-				;
-		}
-
-		public @NotNull String Transform(String nbt){
-			return this.lambda.apply(nbt);
-		}
-	
-		@Override public String asString(){
-			return this.name;
-		}
-	
-	}
-	
 }

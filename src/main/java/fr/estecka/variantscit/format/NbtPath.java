@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.nbt;
+package fr.estecka.variantscit.format;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.nbt.AbstractNbtList;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -16,10 +17,16 @@ public final class NbtPath
 	static public final Codec<NbtPath> CODEC = Codec.STRING.comapFlatMap(NbtPath::Parse, NbtPath::toString);
 
 	@Deprecated
-	static public final Codec<NbtPath> LEGACY_CODEC = Codec.withAlternative(CODEC, Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString));
+	static public final Codec<NbtPath> DOT_SEPARATED_CODEC = Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString).validate(_0 -> {
+		VariantsCitMod.LOGGER.warn("The value of `nbtPath` Uses an obsolete path format. Please add a `.` at the start of the path.");
+		return DataResult.success(_0);
+	});
 
 	@Deprecated
-	static public final Codec<NbtPath> NBTKEY_CODEC = Codec.STRING.xmap(s->new NbtPath(new Token[]{new MapKey(s)}), NbtPath::toString);
+	static public final Codec<NbtPath> NBTKEY_CODEC = Codec.STRING.xmap(s->new NbtPath(new Token[]{new MapKey(s)}), NbtPath::toString).validate(_0 -> {
+		VariantsCitMod.LOGGER.warn("The parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
+		return DataResult.success(_0);
+	});
 
 	private final Token[] tokens;
 
@@ -56,6 +63,8 @@ public final class NbtPath
 	
 		String[] names = rawPath.split("\\.");
 		Token[] tokens = new Token[names.length];
+		for (int i=0; i<names.length; ++i)
+			tokens[i] = new MapKey(names[i]);
 
 		return DataResult.success(new NbtPath(tokens));
 	}
@@ -126,8 +135,9 @@ public final class NbtPath
 			int end;
 			for (end=1; end<input.length(); ++end){
 				char c = input.charAt(end);
-				if (!Identifier.isCharValid(c) || c == '.')
-					break;
+				if (c < 'A' || 'Z' < c)
+					if (!Identifier.isCharValid(c) || c == '.')
+						break;
 			}
 
 			return new Parsed(
