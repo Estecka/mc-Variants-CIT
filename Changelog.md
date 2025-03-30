@@ -63,6 +63,14 @@
 - `custom_data` etc.'s `caseSensitive` option is being deprecated in favor of `transform`
 - Fixed `custom_data` etc. adding a type suffix to numeric data.
 - Modules may now specify `items` as a single value instead of an array.
+## 2.10
+- Added module: `item_count`
+- Module `axolotl_variant` now has built-in support for baby variants.
+- Modules `component_data` and `component_format` can now use non-component and non-nbt based properties: `item_type`, `axolotl_variant`, `bucket_entity_age`, `painting_variant`.
+- Fixed `component_format` not accepting "`:`" as a valid character in the format.
+- Fixed `discard_namespace` not discarding the "`:`" separator
+- Fixed `nbtPath` no longer accepting uppercases as valid characters. (Regression in 2.9)
+- Fixed some legacy `nbtPath` format no longer working. (Regression in 2.9)
 
 # v3
 ## 3.0
@@ -98,3 +106,12 @@ Since v2.5:
 - Fixed special models not loading properly. (Regression introduced in v3.0)
 ### 3.4.2
 - Fixed crash when loading a fallback model. (Regression introduced in v3.4.1)
+## 3.5
+(Merged with v2.10)
+- Added module: `item_count`
+- Module `axolotl_variant` now has built-in support for baby variants.
+- Modules `component_data` and `component_format` can now use non-component and non-nbt based properties: `item_type`, `axolotl_variant`, `bucket_entity_age`, `painting_variant`.
+- Fixed `component_format` not accepting "`:`" as a valid character in the format.
+- Fixed `discard_namespace` not discarding the "`:`" separator
+- Fixed `nbtPath` no longer accepting uppercases as valid characters. (Regression in 3.4)
+- Fixed some legacy `nbtPath` format no longer working. (Regression in 3.4)
