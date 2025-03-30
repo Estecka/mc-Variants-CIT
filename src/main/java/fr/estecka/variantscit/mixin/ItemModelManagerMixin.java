@@ -16,7 +16,7 @@ import fr.estecka.variantscit.VariantsCitMod;
 public class ItemModelManagerMixin
 {
 	@WrapOperation(
-		method="update(Lnet/minecraft/client/render/item/ItemRenderState;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;I)V",
+		method="update",
 		at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
 	)
 	private @Nullable Object GetVariantModel(ItemStack stack, ComponentType<Identifier> type, Operation<Identifier> original)

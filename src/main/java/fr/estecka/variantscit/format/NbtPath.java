@@ -152,7 +152,7 @@ public final class NbtPath
 	{
 		@Override
 		public NbtElement Resolve(NbtElement nbt){
-			if (!(nbt instanceof AbstractNbtList<?> list))
+			if (!(nbt instanceof AbstractNbtList list))
 				return null;
 
 			int size = list.size();
@@ -160,9 +160,9 @@ public final class NbtPath
 				return null;
 
 			if (index >= 0)
-				return list.get(index);
+				return list.method_10534(index); // get
 			else
-				return list.get(size+index);
+				return list.method_10534(size+index); // get
 		}
 
 		@Override

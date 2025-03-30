@@ -115,3 +115,7 @@ Since v2.5:
 - Fixed `discard_namespace` not discarding the "`:`" separator
 - Fixed `nbtPath` no longer accepting uppercases as valid characters. (Regression in 3.4)
 - Fixed some legacy `nbtPath` format no longer working. (Regression in 3.4)
+
+# v4
+Since v3.5:
+- Removed item state extensions

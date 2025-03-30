@@ -5,10 +5,10 @@ import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.decoration.painting.PaintingVariant;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -21,10 +21,10 @@ import net.minecraft.world.World;
  * actual reloading of painting variants.
  */
 public class PaintingVariantModule
-extends AComponentCachingModule<NbtComponent>
+extends AComponentCachingModule<RegistryEntry<PaintingVariant>>
 {
 	public PaintingVariantModule(){
-		super(DataComponentTypes.ENTITY_DATA);
+		super(DataComponentTypes.PAINTING_VARIANT);
 	}
 
 	static public Optional<Registry<PaintingVariant>> GetPaintingRegistry(){
@@ -36,17 +36,11 @@ extends AComponentCachingModule<NbtComponent>
 			return Optional.empty();
 	}
 
-	public Identifier GetModelForComponent(NbtComponent component, IVariantManager models){
+	public Identifier GetModelForComponent(RegistryEntry<PaintingVariant> component, IVariantManager models){
 		if (component == null)
 			return null;
-
-		String rawVariant = PaintingVariantProperty.UNIT.GetPropertyString(component);
-		if (rawVariant == null)
-			return null;
-
-		Identifier variantId = Identifier.tryParse(rawVariant);
-		if (variantId == null)
-			return models.GetSpecialModel("invalid");
+		
+		Identifier variantId = PaintingVariantProperty.UNIT.GetPropertyId(component);
 
 		var registry = GetPaintingRegistry();
 		if (registry.isPresent() && !registry.get().containsId(variantId))

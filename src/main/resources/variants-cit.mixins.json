@@ -4,10 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"BakedModelManagerMixin",
-		"ItemModelTypesMixin",
-		"ItemModelManagerMixin",
-		"ReferencedModelsCollectorMixin",
-		"ReferencedModelsCollectorMixin$ResolverImplMixin"
+		"ItemModelManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

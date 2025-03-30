@@ -15,6 +15,6 @@ implements ISimpleCitModule
 		if (component == null)
 			return null;
 
-		return component.song().key().getValue();
+		return component.song().getKey().get().getValue();
 	}
 }

@@ -61,8 +61,8 @@ public class NbtAdapter
 	implements StringIdentifiable
 	{
 		PRIMITIVE("primitive", (nbt)->{
-			if (nbt instanceof NbtString)
-				return nbt.asString();
+			if (nbt instanceof NbtString string)
+				return string.value();
 			else if (nbt instanceof AbstractNbtNumber number)
 				return number.numberValue().toString();
 			else
@@ -70,10 +70,10 @@ public class NbtAdapter
 		}),
 
 		NUMBER("number", (nbt)-> (nbt instanceof AbstractNbtNumber number) ? number.numberValue().toString() : null),
-		STRING("string", (nbt)-> (nbt instanceof NbtString) ? nbt.asString() : null),
-		IDENTIFIER("identifier", (nbt)-> (nbt instanceof NbtString) ? Identifier.tryParse(nbt.asString()).toString() : null),
+		STRING("string", (nbt)-> (nbt instanceof NbtString string) ? string.value() : null),
+		IDENTIFIER("identifier", (nbt)-> (nbt instanceof NbtString string) ? Identifier.tryParse(string.value()).toString() : null),
 		RICH_TEXT("rich_text", (nbt)->{
-			var result = TextCodecs.STRINGIFIED_CODEC.parse(NbtOps.INSTANCE, nbt);
+			var result = TextCodecs.CODEC.parse(NbtOps.INSTANCE, nbt);
 			if (result.isSuccess())
 				return result.getOrThrow().getString();
 			else

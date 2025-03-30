@@ -7,7 +7,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 
 public class EntityAgeMapProperty
 extends AMonoComponentProperty<NbtComponent>
@@ -34,10 +33,10 @@ extends AMonoComponentProperty<NbtComponent>
 	public @NotNull String GetPropertyString(NbtComponent bucket) {
 		NbtCompound nbt;
 
-		if (bucket == null || (nbt=bucket.getNbt()) == null || !nbt.contains("Age", NbtElement.NUMBER_TYPE))
+		if (bucket == null || (nbt=bucket.getNbt()) == null)
 			return adult;
 
-		float age = nbt.getFloat("Age");
+		float age = nbt.getFloat("Age", 0);
 		return (age>=0) ? adult : baby;
 	}
 }
