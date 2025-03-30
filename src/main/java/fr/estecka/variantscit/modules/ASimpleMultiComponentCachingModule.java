@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ISimpleCitModule;
+import fr.estecka.variantscit.format.properties.IStringProperty;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -25,14 +25,14 @@ abstract class ASimpleMultiComponentCachingModule
 implements ISimpleCitModule
 {
 	protected final boolean debug;
-	private final ComponentType<?>[] componentTypes;
+	private final IStringProperty[] properties;
 
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
 	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
 
-	protected ASimpleMultiComponentCachingModule(boolean debug, Stream<ComponentType<?>> componentTypes){
+	protected ASimpleMultiComponentCachingModule(boolean debug, Stream<IStringProperty> properties){
 		this.debug = debug;
-		this.componentTypes = componentTypes.distinct().toArray(ComponentType[]::new);
+		this.properties = properties.distinct().toArray(IStringProperty[]::new);
 	}
 
 	// TODO: Ensure child classes can't access unregistered non-cached components.
@@ -58,9 +58,8 @@ implements ISimpleCitModule
 	 */
 	private int HashStack(ItemStack stack){
 		int hash = 17;
-		for (var type : this.componentTypes){
-			Object cmp = stack.get(type);
-			hash = hash*31 + ((cmp!=null) ? cmp.hashCode() : 0);
+		for (var prop : this.properties){
+			hash = hash*31 + prop.GetPropertyHash(stack);
 		}
 		return hash;
 	}
@@ -71,10 +70,10 @@ implements ISimpleCitModule
 	 */
 	private CacheEntry CreateEntry(int hash, ItemStack stack){
 		Identifier variant = this.RecomputeItemVariant(stack);
-		WeakReference<?>[] weakRefs = new WeakReference[componentTypes.length];
+		WeakReference<?>[] weakRefs = new WeakReference[properties.length];
 
-		for (int i=0; i<componentTypes.length; ++i){
-			Object cmp = stack.get(componentTypes[i]);
+		for (int i=0; i<properties.length; ++i){
+			Object cmp = properties[i].GetReference(stack);
 			if (cmp != null)
 				weakRefs[i] = new HashedWeakReference(hash, cmp, this.expiredComponents);
 		}
