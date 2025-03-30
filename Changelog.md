@@ -66,7 +66,7 @@
 ## 2.10
 - Added module: `item_count`
 - Module `axolotl_variant` now has built-in support for baby variants.
-- Modules `component_data` and `component_format` can now use non-component and non-nbt based properties: `item_type`, `axolotl_variant`, `bucket_entity_age`
+- Modules `component_data` and `component_format` can now use non-component and non-nbt based properties: `item_type`, `axolotl_variant`, `bucket_entity_age`, `painting_variant`.
 - Fixed `component_format` not accepting "`:`" as a valid character in the format.
 - Fixed `discard_namespace` not discarding the "`:`" separator
 - Fixed `nbtPath` no longer accepting uppercases as valid characters. (Regression in 2.9)
