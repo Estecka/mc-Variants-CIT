@@ -109,7 +109,7 @@ public final class ModuleLoader
 	static private Set<RegistryEntry<Item>> ItemsFromTarget(List<Identifier> targets){
 		Set<RegistryEntry<Item>> result = new HashSet<>();
 		targets.stream()
-			.map(id->Registries.ITEM.getEntry(id).get())
+			.map(id->Registries.ITEM.getEntry(id).orElse(null))
 			.filter(o->o!=null)
 			.forEach(result::add)
 			;
