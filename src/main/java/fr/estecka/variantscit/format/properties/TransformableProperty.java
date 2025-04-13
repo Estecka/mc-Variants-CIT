@@ -4,17 +4,17 @@ import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.format.EStringTransform;
+import fr.estecka.variantscit.format.IStringTransform;
 import net.minecraft.item.ItemStack;
 
-public record TransformableProperty<T extends IStringProperty>(T inner, EStringTransform[] transform, Optional<String> fallback)
+public record TransformableProperty<T extends IStringProperty>(T inner, IStringTransform[] transform, Optional<String> fallback)
 implements IStringProperty
 {
 	static public <T extends IStringProperty> MapCodec<TransformableProperty<T>> CodecOf(MapCodec<T> inner){
 		return RecordCodecBuilder.<TransformableProperty<T>>mapCodec(builder->
 			builder.group(
 				inner.forGetter(TransformableProperty::inner),
-				EStringTransform.ARRAY_CODEC.fieldOf("transform").orElse(EStringTransform.EMPTY).forGetter(TransformableProperty::transform),
+				IStringTransform.ARRAY_CODEC.fieldOf("transform").orElse(IStringTransform.EMPTY).forGetter(TransformableProperty::transform),
 				Codec.STRING.optionalFieldOf("fallback").forGetter(TransformableProperty::fallback)
 			).apply(builder, TransformableProperty::new)
 		);
@@ -35,7 +35,7 @@ implements IStringProperty
 		String result = inner.GetPropertyString(stack);
 
 		if (result != null)
-			result = EStringTransform.Transform(transform, result);
+			result = IStringTransform.Transform(transform, result);
 
 		if (result == null)
 			result = fallback.orElse(null);

@@ -7,7 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.format.EStringTransform;
+import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.format.properties.ItemComponentProperty;
@@ -43,7 +43,7 @@ extends ASimpleMultiComponentCachingModule
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter()),
-				CodecUtil.MapWithAlternative(EStringTransform.ARRAY_CODEC.fieldOf("transform"), EStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(EStringTransform.EMPTY).forGetter(o->o.transform())
+				CodecUtil.MapWithAlternative(IStringTransform.ARRAY_CODEC.fieldOf("transform"), IStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(IStringTransform.EMPTY).forGetter(o->o.transform())
 			)
 			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty(componentType, adapter), transform, Optional.empty()))
 		);
