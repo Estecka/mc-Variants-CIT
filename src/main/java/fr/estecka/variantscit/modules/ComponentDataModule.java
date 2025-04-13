@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -44,7 +45,7 @@ extends ASimpleMultiComponentCachingModule
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter()),
 				CodecUtil.MapWithAlternative(EStringTransform.ARRAY_CODEC.fieldOf("transform"), EStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(EStringTransform.EMPTY).forGetter(o->o.transform())
 			)
-			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty(componentType, adapter), transform))
+			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty(componentType, adapter), transform, Optional.empty()))
 		);
 	}
 

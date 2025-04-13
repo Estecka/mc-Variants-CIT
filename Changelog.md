@@ -74,3 +74,6 @@
 - Fixed some legacy `nbtPath` format no longer working. (Regression in 2.9)
 ### 2.10.1
 - Fixed crash when loading an inexistent item name.
+- Fixed crash when loading an inexistent item name.
+## 2.11
+- Item properties may now take a fallback.
