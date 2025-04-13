@@ -77,3 +77,5 @@
 - Fixed crash when loading an inexistent item name.
 ## 2.11
 - Item properties may now take a fallback.
+- Added a regex transform.
+- Fixed overly lenient json parsing silently failing and falling back.
