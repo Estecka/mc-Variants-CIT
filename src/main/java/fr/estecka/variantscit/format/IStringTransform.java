@@ -27,8 +27,11 @@ extends Function<String,String>
 	});
 
 	static public String Transform(IStringTransform[] transforms, String input){
-		for (IStringTransform t : transforms)
+		for (IStringTransform t : transforms) {
 			input = t.apply(input);
+			if (input == null)
+				break;
+		}
 		return input;
 	}
 
