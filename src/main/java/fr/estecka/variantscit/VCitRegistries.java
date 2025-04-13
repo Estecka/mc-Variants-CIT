@@ -2,6 +2,7 @@ package fr.estecka.variantscit;
 
 import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.format.IStringTransform;
+import fr.estecka.variantscit.format.RegexTransform;
 import fr.estecka.variantscit.format.properties.*;
 
 public final class VCitRegistries
@@ -24,5 +25,6 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize"),           IStringTransform.Sanitize("[^a-zA-Z0-9_.-/:]"));
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_path"),      IStringTransform.Sanitize("[^a-zA-Z0-9_.-/]"));
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_namespace"), IStringTransform.Sanitize("[^a-zA-Z0-9_.-]"));
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("regex"), RegexTransform.MAPCODEC);
 	}
 }
