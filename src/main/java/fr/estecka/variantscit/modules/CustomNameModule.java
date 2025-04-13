@@ -16,7 +16,7 @@ extends ASimpleComponentCachingModule<Text>
 	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(p->p.debug),
-			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).fieldOf("specialNames").orElse(Map.of()).forGetter(p->p.specialNames)
+			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).optionalFieldOf("specialNames", Map.of()).forGetter(p->p.specialNames)
 		)
 		.apply(builder, CustomNameModule::new)
 	);

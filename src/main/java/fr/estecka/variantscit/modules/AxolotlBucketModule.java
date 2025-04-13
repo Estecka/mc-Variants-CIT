@@ -17,8 +17,8 @@ public final class AxolotlBucketModule
 	static public final MapCodec<ICitModule> CODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->false),
-			CodecUtil.IDENTIFIER_PATH.fieldOf("adultSuffix").orElse("").forGetter(o->""),
-			CodecUtil.IDENTIFIER_PATH.fieldOf("babySuffix").orElse("_baby").forGetter(o->"")
+			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(o->""),
+			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(o->"")
 		)
 		.apply(builder, AxolotlBucketModule::Create)
 	);

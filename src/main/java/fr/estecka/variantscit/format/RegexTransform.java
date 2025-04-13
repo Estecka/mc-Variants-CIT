@@ -14,7 +14,7 @@ implements IStringTransform
 	static public final MapCodec<RegexTransform> MAPCODEC = RecordCodecBuilder.mapCodec(instance ->
 		instance.group(
 			Codec.STRING.comapFlatMap(RegexTransform::ParsePattern, Pattern::toString).fieldOf("regex").forGetter(RegexTransform::pattern),
-			Codec.STRING.fieldOf("substitution").orElse("$0").forGetter(RegexTransform::substitution)
+			Codec.STRING.optionalFieldOf("substitution", "$0").forGetter(RegexTransform::substitution)
 		).apply(instance, RegexTransform::new)
 	);
 
