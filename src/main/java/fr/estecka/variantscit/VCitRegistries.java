@@ -7,8 +7,8 @@ import fr.estecka.variantscit.format.properties.*;
 
 public final class VCitRegistries
 {
-	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", TransformableProperty::CodecOf);
-	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("transform");
+	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
+	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("transform", Identifier.ofVanilla("regex"));
 
 	static {
 		ITEM_PROPERTIES.RegisterUnit(Identifier.ofVanilla("axolotl_variant"), AxolotlVariantProperty.UNIT);

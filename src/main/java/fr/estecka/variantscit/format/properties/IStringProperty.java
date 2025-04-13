@@ -2,14 +2,13 @@ package fr.estecka.variantscit.format.properties;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import net.minecraft.item.ItemStack;
 
 public interface IStringProperty
 {
-	static public MapCodec<IStringProperty> MAP_CODEC = CodecUtil.MapWithAlternative(VCitRegistries.ITEM_PROPERTIES.mapCodec, TransformableProperty.CodecOf(ItemComponentProperty.MAP_CODEC));
-	static public Codec<IStringProperty> CODEC = Codec.withAlternative(VCitRegistries.ITEM_PROPERTIES.unitCodec, MAP_CODEC.codec());
+	static public MapCodec<IStringProperty> MAP_CODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec;
+	static public Codec<IStringProperty> CODEC = VCitRegistries.ITEM_PROPERTIES.codec;
 	/**
 	 * Used  for  caching  the variant IDs  associated  with  a given  property.
 	 * Typically the hash of {@link #GetReference}.
