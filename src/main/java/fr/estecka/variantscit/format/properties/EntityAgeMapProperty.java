@@ -16,8 +16,8 @@ extends AMonoComponentProperty<NbtComponent>
 
 	static public final MapCodec<EntityAgeMapProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
-			Codec.STRING.fieldOf("adult").orElse(UNIT.adult).forGetter(o->o.adult),
-			Codec.STRING.fieldOf("baby").orElse(UNIT.baby).forGetter(o->o.baby)
+			Codec.STRING.optionalFieldOf("adult", UNIT.adult).forGetter(o->o.adult),
+			Codec.STRING.optionalFieldOf("baby", UNIT.baby).forGetter(o->o.baby)
 		)
 		.apply(builder, EntityAgeMapProperty::new)
 	);

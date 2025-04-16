@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.BakedModule;
@@ -68,6 +69,7 @@ public final class ModuleLoader
 				;
 			if (targets.isEmpty()){
 				result.ignoredModules.add(moduleId);
+				VariantsCitMod.LOGGER.warn("Module {} has no valid target and was ignored.", moduleId);
 				continue;
 			}
 
@@ -142,7 +144,7 @@ public final class ModuleLoader
 		try {
 			json = JsonHelper.deserialize(resource.getReader());
 		}
-		catch (IOException e){
+		catch (IOException|JsonParseException e){
 			return DataResult.error(e::toString);
 		}
 
