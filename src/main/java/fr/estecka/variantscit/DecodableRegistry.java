@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.CompressorHolder;
 import com.mojang.serialization.DataResult;
@@ -40,13 +41,20 @@ public class DecodableRegistry<T>
 	public final Codec<T> codec = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
 
 	public DecodableRegistry(String typeKey){
-		this(typeKey, c->c);
+		this(typeKey, null, c->c);
 	}
 
-	public DecodableRegistry(String typeKey, IMapWrapper<T> mapWrapper){
+	public DecodableRegistry(String typeKey, Identifier defaultId){
+		this(typeKey, defaultId, c->c);
+	}
+
+	public DecodableRegistry(String typeKey, @Nullable Identifier defaultId, IMapWrapper<T> mapWrapper){
 		this.typeKey = typeKey;
 		this.mapWrapper = mapWrapper;
-		this.typeCodec = Identifier.CODEC.fieldOf(this.typeKey);
+		if (defaultId == null)
+			this.typeCodec = Identifier.CODEC.fieldOf(this.typeKey);
+		else
+			this.typeCodec = Identifier.CODEC.optionalFieldOf(this.typeKey, defaultId);
 	}
 
 	public void RegisterUnit(Identifier key, T unit){
