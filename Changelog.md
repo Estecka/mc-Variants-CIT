@@ -1,7 +1,7 @@
 # v1
 ## 1.0
 ### 1.0.0
-- Initial Release
+- Initial Release as Enchants-CIT
 ### 1.0.1
 - Fixed an incompatibility with ModernFix
 ## 1.1
@@ -74,6 +74,11 @@
 - Fixed some legacy `nbtPath` format no longer working. (Regression in 2.9)
 ### 2.10.1
 - Fixed crash when loading an inexistent item name.
+## 2.11
+- Item properties may now take a fallback.
+- Added a regex transform.
+- Fixed overly lenient json parsing silently failing and falling back.
+- Fixed a crash on malformed json.
 
 # v3
 ## 3.0
@@ -121,10 +126,21 @@ Since v2.5:
 - Fixed some legacy `nbtPath` format no longer working. (Regression in 3.4)
 ### 3.5.1
 - Fixed crash when loading an inexistent item name.
+## 3.6
+- Item properties may now take a fallback.
+- Added a regex transform.
+- Fixed overly lenient json parsing silently failing and falling back.
+- Fixed a crash on malformed json.
 
 # v4
+## 4.0
 ### 4.0.0
 Since v3.5:
 - Removed item state extensions
 ### 4.0.1
 - Fixed crash when loading an inexistent item name.
+## 4.1
+- Item properties may now take a fallback.
+- Added a regex transform.
+- Fixed overly lenient json parsing silently failing and falling back.
+- Fixed a crash on malformed json.
