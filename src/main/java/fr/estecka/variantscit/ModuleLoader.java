@@ -74,6 +74,7 @@ implements DataLoader<ModuleLoader.Result>
 				;
 			if (targets.isEmpty()){
 				result.ignoredModules.add(moduleId);
+				VariantsCitMod.LOGGER.warn("Module {} has no valid target and was ignored.", moduleId);
 				continue;
 			}
 
