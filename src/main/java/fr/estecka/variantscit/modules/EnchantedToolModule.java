@@ -19,7 +19,7 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 {
 	static public final MapCodec<EnchantedToolModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.unboundedMap(Identifier.CODEC, Codec.INT).fieldOf("requiredEnchantments").orElse(Map.of()).forGetter(p->p.precondition)
+			Codec.unboundedMap(Identifier.CODEC, Codec.INT).optionalFieldOf("requiredEnchantments", Map.of()).forGetter(p->p.precondition)
 		)
 		.apply(builder, EnchantedToolModule::new)
 	);

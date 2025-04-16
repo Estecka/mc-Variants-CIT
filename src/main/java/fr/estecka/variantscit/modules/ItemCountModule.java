@@ -16,7 +16,7 @@ implements ICitModule
 {
 	static public final MapCodec<ItemCountModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			CodecUtil.IDENTIFIER_NAMESPACE.fieldOf("namespace").orElse("minecraft").forGetter(o->o.namespace)
+			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(o->o.namespace)
 		)
 		.apply(builder, ItemCountModule::new)
 	);

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.api.ICitModule;
@@ -73,6 +74,7 @@ implements DataLoader<ModuleLoader.Result>
 				;
 			if (targets.isEmpty()){
 				result.ignoredModules.add(moduleId);
+				VariantsCitMod.LOGGER.warn("Module {} has no valid target and was ignored.", moduleId);
 				continue;
 			}
 
@@ -147,7 +149,7 @@ implements DataLoader<ModuleLoader.Result>
 		try {
 			json = JsonHelper.deserialize(resource.getReader());
 		}
-		catch (IOException e){
+		catch (IOException|JsonParseException e){
 			return DataResult.error(e::toString);
 		}
 
