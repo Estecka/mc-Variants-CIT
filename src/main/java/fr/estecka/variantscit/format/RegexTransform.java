@@ -3,10 +3,12 @@ package fr.estecka.variantscit.format;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
 
 public record RegexTransform(Pattern pattern, String substitution)
 implements IStringTransform
@@ -30,9 +32,14 @@ implements IStringTransform
 	@Override
 	public String apply(String input) {
 		Matcher match = this.pattern.matcher(input);
-		if (!match.matches())
-			return null;
-		else
+		if (match.matches())
+		try {
 			return match.replaceAll(this.substitution);
+		}
+		catch(IndexOutOfBoundsException|IllegalArgumentException e){
+			VariantsCitMod.LOGGER.error("Error in regex substitution: {}\n{}]", this.substitution, ExceptionUtils.getStackTrace(e));
+		}
+
+		return null;
 	}
 }

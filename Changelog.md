@@ -75,10 +75,13 @@
 ### 2.10.1
 - Fixed crash when loading an inexistent item name.
 ## 2.11
+### 2.11.0
 - Item properties may now take a fallback.
 - Added a regex transform.
 - Fixed overly lenient json parsing silently failing and falling back.
 - Fixed a crash on malformed json.
+### 2.11.1
+- Fixed crash on invalid regex substitution strings.
 
 # v3
 ## 3.0
@@ -127,7 +130,10 @@ Since v2.5:
 ### 3.5.1
 - Fixed crash when loading an inexistent item name.
 ## 3.6
+### 3.6.0
 - Item properties may now take a fallback.
 - Added a regex transform.
 - Fixed overly lenient json parsing silently failing and falling back.
 - Fixed a crash on malformed json.
+### 3.6.1
+- Fixed crash on invalid regex substitution strings.
