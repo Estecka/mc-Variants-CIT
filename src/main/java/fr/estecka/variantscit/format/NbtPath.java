@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 public final class NbtPath
 {
 	static public final Codec<NbtPath> CODEC = Codec.STRING.comapFlatMap(NbtPath::Parse, NbtPath::toString);
+	static public final NbtPath IDENTITY = new NbtPath(new Token[0]);
 
 	@Deprecated
 	static public final Codec<NbtPath> DOT_SEPARATED_CODEC = Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString).validate(_0 -> {
