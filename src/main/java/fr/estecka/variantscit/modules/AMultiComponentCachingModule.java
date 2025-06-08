@@ -52,7 +52,7 @@ implements ICitModule
 		if (entry == null) {
 			entry = this.CreateEntry(hash, stack, library);
 			if (debug)
-				VariantsCitMod.LOGGER.info("[multi_component] Cache size: {}", hashToVariant.size());
+				VariantsCitMod.LOGGER.info("[multi_component] Cache size: {}; Id: {}", hashToVariant.size(), String.valueOf(entry.variant));
 		}
 		return entry.variant;
 	}

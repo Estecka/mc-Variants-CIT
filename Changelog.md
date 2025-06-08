@@ -86,3 +86,4 @@
 - `nbtPath` is now optional and defaults to using the whole component as data.
 - `rich_text` now supports arrays of texts. (E.g: lore component)
 - Added options `matchAll` and `validate` to the regex transform.
+- Added `durability` module.
