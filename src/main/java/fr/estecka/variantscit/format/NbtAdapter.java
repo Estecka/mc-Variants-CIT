@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.format;
 
+import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.AbstractNbtNumber;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -73,15 +75,29 @@ public class NbtAdapter
 		STRING("string", (nbt)-> (nbt instanceof NbtString) ? nbt.asString() : null),
 		IDENTIFIER("identifier", (nbt)-> (nbt instanceof NbtString) ? Identifier.tryParse(nbt.asString()).toString() : null),
 		RICH_TEXT("rich_text", (nbt)->{
-			var result = TextCodecs.STRINGIFIED_CODEC.parse(NbtOps.INSTANCE, nbt);
-			if (result.isSuccess())
-				return result.getOrThrow().getString();
-			else
-				return null;
+			var text = TextCodecs.STRINGIFIED_CODEC.parse(NbtOps.INSTANCE, nbt);
+			if (text.isSuccess())
+				return text.getOrThrow().getString();
+
+			var multiline = TextCodecs.STRINGIFIED_CODEC.sizeLimitedListOf(256).parse(NbtOps.INSTANCE, nbt);
+			if (multiline.isSuccess())
+				return Concat(multiline.getOrThrow());
+
+			return null;
 		}),
 		;
 
 		static public final Codec<EInput> CODEC = StringIdentifiable.createCodec(EInput::values);
+
+		static private final String Concat(List<Text> lines){
+			StringBuilder builder = new StringBuilder();
+			for (var l : lines) {
+				builder.append(l.getString());
+				builder.append('\n');
+			}
+
+			return builder.toString();
+		}
 
 		private final String name;
 		private final Function<NbtElement,String> lambda;
