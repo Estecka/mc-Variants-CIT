@@ -83,5 +83,6 @@
 ### 2.11.1
 - Fixed crash on invalid regex substitution strings.
 ## 2.12
-- `nbtPath` is now optional and defaults to an empty string.
+- `nbtPath` is now optional and defaults to using the whole component as data.
 - `rich_text` now supports arrays of texts. (E.g: lore component)
+- Added options `matchAll` and `validate` to the regex transform.
