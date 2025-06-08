@@ -82,3 +82,5 @@
 - Fixed a crash on malformed json.
 ### 2.11.1
 - Fixed crash on invalid regex substitution strings.
+## 2.12
+- `nbtPath` is now optional and defaults to an empty string.
