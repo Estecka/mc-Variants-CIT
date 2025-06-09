@@ -87,3 +87,4 @@
 - `rich_text` now supports arrays of texts. (E.g: lore component)
 - Added options `matchAll` and `validate` to the regex transform.
 - Added `durability` module.
+- Format variables now accept upper-cases, numbers and low-dashes

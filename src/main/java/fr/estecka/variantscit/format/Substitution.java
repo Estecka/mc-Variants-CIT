@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -19,6 +20,7 @@ public class Substitution
 
 	static public final Codec<Substitution> CODEC = Codec.STRING.comapFlatMap(Substitution::Parse, Substitution::toString);
 	static public final Codec<String> VARNAME_CODEC = Codecs.NON_EMPTY_STRING.validate(Substitution::ValidateVarname);
+	static public final Pattern VARNAME_REGEX = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
 	private Token[] tokens;
 
@@ -152,11 +154,7 @@ public class Substitution
 	}
 
 	static public final boolean IsVarnameValid(String input){
-		for (int i=0; i<input.length(); ++i)
-			if (!IsVarcharValid(input.charAt(i)))
-				return false;
-
-		return true;
+		return VARNAME_REGEX.matcher(input).matches();
 	}
 
 	static public final boolean IsVarcharValid(char c){
