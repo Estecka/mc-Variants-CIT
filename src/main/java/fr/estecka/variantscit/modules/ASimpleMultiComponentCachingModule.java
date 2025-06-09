@@ -16,7 +16,7 @@ extends AMultiComponentCachingModule
 	}
 
 	public abstract @Nullable Identifier RecomputeItemVariant(ItemStack stack);
-	
+
 	@Override
 	public @Nullable ModelIdentifier RecomputeItemModel(ItemStack stack, IVariantManager library) {
 		Identifier variant = this.RecomputeItemVariant(stack);
