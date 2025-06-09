@@ -88,3 +88,6 @@
 - Added options `matchAll` and `validate` to the regex transform.
 - Added `durability` module.
 - Format variables now accept upper-cases, numbers and low-dashes
+- Added `auto` data type for `expect`.
+- `expect` now defaults to `auto`.
+- `expect` now accept arrays.
