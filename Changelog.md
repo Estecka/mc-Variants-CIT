@@ -83,11 +83,11 @@
 ### 2.11.1
 - Fixed crash on invalid regex substitution strings.
 ## 2.12
-- `nbtPath` is now optional and defaults to using the whole component as data.
-- `rich_text` now supports arrays of texts. (E.g: lore component)
-- Added options `matchAll` and `validate` to the regex transform.
 - Added `durability` module.
-- Format variables now accept upper-cases, numbers and low-dashes
-- Added `auto` data type for `expect`.
+- Added options `matchAll` and `validate` to the regex transform.
+- Added `rich_text_array` data type. (E.g: lore component)
+- Added `auto` data type.
 - `expect` now defaults to `auto`.
 - `expect` now accept arrays.
+- `nbtPath` is now optional and defaults to using the whole component as data.
+- Format variables now accept upper-cases, numbers and low-dashes
