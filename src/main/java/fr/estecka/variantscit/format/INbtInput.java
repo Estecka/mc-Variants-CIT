@@ -20,24 +20,38 @@ extends Function<NbtElement,String>
 
 	static public final Codec<INbtInput> CODEC = VCitRegistries.NBT_INPUTS.codec;
 	static public final Codec<INbtInput[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(INbtInput[]::new), array->List.<INbtInput>of(array));
+	static public final Codec<INbtInput> GROUP_CODEC = ARRAY_CODEC.xmap(INbtInput::Grouped, type -> type instanceof Group group ? group.content() : new INbtInput[]{ type } );
 
-	static public INbtInput Grouped(INbtInput... group){
-		if (group.length == 1)
-			return group[0];
-
-		return (NbtElement nbt) -> {
-			for (int i=0; i<group.length; ++i){
-				String result = group[i].apply(nbt);
+	public record Group(INbtInput... content)
+	implements INbtInput
+	{
+		public String apply(NbtElement nbt){
+			for (int i=0; i<content.length; ++i){
+				String result = content[i].apply(nbt);
 				if (result != null)
 					return result;
 			}
 			return null;
-		};
+		}
+
+	}
+
+	static public INbtInput Grouped(INbtInput... group){
+		if (group.length == 1)
+			return group[0];
+		else
+			return new Group(group);
 	}
 
 	static public String String (NbtElement nbt) { return nbt instanceof NbtString string ? string.asString() : null; }
 	static public String Number (NbtElement nbt) { return nbt instanceof AbstractNbtNumber number ? number.numberValue().toString() : null; }
-	static public String Identifier (NbtElement nbt) { return nbt instanceof NbtString string ? Identifier.tryParse(nbt.asString()).toString() : null; }
+	static public String Identifier (NbtElement nbt) {
+		Identifier id;
+		if (nbt instanceof NbtString && null != (id=Identifier.tryParse(nbt.asString())))
+			return id.toString();
+		else
+			return null;
+	}
 
 	static public String RichText(NbtElement nbt){
 		var text = TextCodecs.STRINGIFIED_CODEC.parse(NbtOps.INSTANCE, nbt);
