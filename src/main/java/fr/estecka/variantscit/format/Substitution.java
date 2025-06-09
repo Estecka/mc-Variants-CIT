@@ -156,8 +156,4 @@ public class Substitution
 	static public final boolean IsVarnameValid(String input){
 		return VARNAME_REGEX.matcher(input).matches();
 	}
-
-	static public final boolean IsVarcharValid(char c){
-		return 'a' <= c && c <= 'z';
-	}
 }
