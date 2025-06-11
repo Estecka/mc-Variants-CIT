@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 public interface INbtInput
 extends Function<NbtElement,String>
 {
-	static public final INbtInput AUTO = Grouped(INbtInput::String, INbtInput::Number, INbtInput::RichText, INbtInput::RichTextArray);
+	static public final INbtInput AUTO = Grouped(INbtInput::RichText, INbtInput::String, INbtInput::Number, INbtInput::RichTextArray);
 
 	static public final Codec<INbtInput> CODEC = VCitRegistries.NBT_INPUTS.codec;
 	static public final Codec<INbtInput[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(INbtInput[]::new), array->List.<INbtInput>of(array));
