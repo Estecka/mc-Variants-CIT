@@ -92,4 +92,5 @@
 - `expect` now defaults to `auto`.
 - `expect` now accept arrays.
 - `nbtPath` is now optional and defaults to using the whole component as data.
+- Added simplified mono-string syntax for ItemComponent properties.
 - Format variables now accept upper-cases, numbers and low-dashes

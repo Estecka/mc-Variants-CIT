@@ -33,7 +33,7 @@ public class NbtAdapter
 	private final NbtPath nbtPath;
 	private final INbtInput type;
 
-	protected NbtAdapter(NbtPath nbtPath, INbtInput type){
+	public NbtAdapter(NbtPath nbtPath, INbtInput type){
 		this.nbtPath = nbtPath;
 		this.type = type;
 	}
