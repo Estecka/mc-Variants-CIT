@@ -85,6 +85,8 @@
 ## 2.12
 - Added `durability` module.
 - Added options `matchAll` and `validate` to the regex transform.
+- Added `sanitize_auto` transform.
+- `transform` now defaults to `sanitize_auto`
 - Added `rich_text_array` data type. (E.g: lore component)
 - Added `auto` data type.
 - `expect` now defaults to `auto`.
