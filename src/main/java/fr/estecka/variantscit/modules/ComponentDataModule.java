@@ -7,6 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import fr.estecka.variantscit.format.properties.IStringProperty;
@@ -34,7 +35,10 @@ extends ASimpleMultiComponentCachingModule
 				LegacyPropertyCodec(componentType).forGetter(o->o.property),
 				Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o -> o.debug)
 			)
-			.apply(builder, (property, debug) -> new ComponentDataModule<>(property, debug))
+			.apply(builder, (property, debug) -> {
+				VariantsCitMod.LOGGER.warn("Module types `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data` are being deprecated. Use `component_data` instead.");
+				return new ComponentDataModule<>(property, debug);
+			})
 		);
 	}
 
