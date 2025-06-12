@@ -31,11 +31,11 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("regex"),               RegexTransform.MAPCODEC);
 
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("auto"),            INbtInput.AUTO);
+		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("primitive"),       INbtInput.PRIMITIVE);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("string"),          INbtInput::String);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("number"),          INbtInput::Number);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("identifier"),      INbtInput::Identifier);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text"),       INbtInput::RichText);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text_array"), INbtInput::RichTextArray);
-		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("primitive"),       INbtInput.Grouped(INbtInput::String, INbtInput::Number));
 	}
 }

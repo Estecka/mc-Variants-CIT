@@ -14,7 +14,7 @@ implements IStringProperty
 		return RecordCodecBuilder.<TransformableProperty<T>>mapCodec(builder->
 			builder.group(
 				inner.forGetter(TransformableProperty::inner),
-				IStringTransform.ARRAY_CODEC.optionalFieldOf("transform", IStringTransform.AUTO).forGetter(TransformableProperty::transform),
+				IStringTransform.ARRAY_CODEC.optionalFieldOf("transform", IStringTransform.EMPTY).forGetter(TransformableProperty::transform),
 				Codec.STRING.optionalFieldOf("fallback").forGetter(TransformableProperty::fallback)
 			).apply(builder, TransformableProperty::new)
 		);

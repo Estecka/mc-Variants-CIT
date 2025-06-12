@@ -12,7 +12,7 @@ public class NbtAdapter
 	static public final MapCodec<NbtAdapter> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			NbtPath.CODEC.optionalFieldOf("nbtPath", NbtPath.IDENTITY).forGetter(adp -> adp.nbtPath),
-			INbtInput.GROUP_CODEC.optionalFieldOf("expect", INbtInput.AUTO).forGetter(adp -> adp.type)
+			INbtInput.GROUP_CODEC.optionalFieldOf("expect", INbtInput.PRIMITIVE).forGetter(adp -> adp.type)
 		)
 		.apply(builder, NbtAdapter::new)
 	);
