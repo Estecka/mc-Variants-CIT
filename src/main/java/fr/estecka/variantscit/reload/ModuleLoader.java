@@ -30,7 +30,7 @@ public final class ModuleLoader
 		public final HashMap<Identifier, BakedModule> uniqueModules = new HashMap<>();
 		public final HashSet<Identifier> ignoredModules = new HashSet<>();
 		public final Map<RegistryEntry<Item>,List<MetaModule>> modulesPerItem = new HashMap<>();
-		public final ModelAggregator modelAggregator = new ModelAggregator();
+		public final ItemVariantAggregator modelAggregator = new ItemVariantAggregator();
 	}
 
 	static record ProtoModule (
