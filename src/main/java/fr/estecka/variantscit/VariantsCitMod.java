@@ -6,13 +6,16 @@ import net.minecraft.client.render.item.property.numeric.NumericProperties;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.properties.*;
 import fr.estecka.variantscit.selectors.*;
@@ -25,10 +28,14 @@ implements ClientModInitializer
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public int reloadcount = 0;
-	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
+	static private Map<Item, IItemModelProvider> ITEM_MODULES  = new HashMap<>();
+	static private Map<Item, IItemModelProvider> EQUIP_MODULES = new HashMap<>();
 
-	static public @Nullable IItemModelProvider GetModule(Item itemType){
-		return MODULES.get(itemType);
+	static public @Nullable IItemModelProvider GetItemModule(Item itemType){
+		return ITEM_MODULES.get(itemType);
+	}
+	static public @Nullable IItemModelProvider GetEquipmentModule(Item itemType){
+		return EQUIP_MODULES.get(itemType);
 	}
 
 	@Override
@@ -69,16 +76,56 @@ implements ClientModInitializer
 	static public void OnResourceReload(ModuleLoader.Result result){
 		++reloadcount;
 
-		for (var e : result.uniqueModules.entrySet())
-			LOGGER.info("Found {} variants for VCIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
+		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
+		Map<Item, List<BakedModule>> equipModules = new HashMap<>();
 
-		MODULES = new HashMap<>();
-		for (var entry : result.modulesPerItem.entrySet()){
-			MODULES.put(
-				entry.getKey().value(),
-				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.bakedModule()).toList() )
+		for (MetaModule meta : result.orderedModules)
+		{
+			VariantLibrary itemLib  = meta.itemLibrary();
+			VariantLibrary equipLib = meta.equipLibrary();
+
+			if (meta.targets().isEmpty()) {
+				LOGGER.warn("Ignored VCIT module with no valid target {}", meta.id());
+				continue;
+			}
+
+			// // Will prevent dry-run debugging
+			// if (itemLib.isEmpty() && equipLib.isEmpty()){
+			// 	LOGGER.warn("Ignored VCIT modules with no models {}", meta.id());
+			// 	continue;
+			// }
+
+			int itemCount  = itemLib.GetVariantCount();
+			int equipCount = equipLib.GetVariantCount();
+			if (itemCount <= 0 && equipCount <= 0)
+				LOGGER.warn("Found no variant for VCIT module {}", meta.id());
+			if (itemCount > 0)
+				LOGGER.info("Found {} item_model variants for VCIT module {}", itemCount, meta.id());
+			if (equipCount > 0)
+				LOGGER.info("Found {} equipment variants for CIT module {}",  equipCount, meta.id());
+
+
+			for (Item itemType : meta.targets()){
+				if (!itemLib .isEmpty()) itemModules .computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(itemLib,  meta.logic()));
+				if (!equipLib.isEmpty()) equipModules.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(equipLib, meta.logic()));
+			}
+		}
+
+		ITEM_MODULES  = CombineModules(itemModules);
+		EQUIP_MODULES = CombineModules(equipModules);
+	}
+
+	static private Map<Item, IItemModelProvider> CombineModules(Map<Item, List<BakedModule>> moduleListPerItem){
+		Map<Item, IItemModelProvider> result = new HashMap<>();
+
+		for (var entry : moduleListPerItem.entrySet()){
+			result.put(
+				entry.getKey(),
+				IItemModelProvider.OfList( entry.getValue() )
 			);
 		}
+
+		return result;
 	}
 
 }

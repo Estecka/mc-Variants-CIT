@@ -21,7 +21,7 @@ public class ItemModelManagerMixin
 	)
 	private @Nullable Object GetVariantModel(ItemStack stack, ComponentType<Identifier> type, Operation<Identifier> original)
 	{
-		final IItemModelProvider module = VariantsCitMod.GetModule(stack.getItem());
+		final IItemModelProvider module = VariantsCitMod.GetItemModule(stack.getItem());
 		Identifier modelId;
 
 		if (module == null || (modelId=module.GetModelForItem(stack)) == null)

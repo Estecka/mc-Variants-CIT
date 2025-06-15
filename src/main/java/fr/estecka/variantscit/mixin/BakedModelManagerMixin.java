@@ -59,7 +59,7 @@ public class BakedModelManagerMixin
 	@Inject( method="reload", at=@At("HEAD") )
 	private void reload(CallbackInfoReturnable<?> ci, @Local(argsOnly=true) ResourceManager manager, @Share("result") LocalRef<ItemVariantAggregator> resultRef){
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(manager);
-		resultRef.set(result.modelAggregator);
+		resultRef.set(result.itemAggregator);
 		VariantsCitMod.OnResourceReload(result);
 	}
 
