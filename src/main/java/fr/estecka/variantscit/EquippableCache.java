@@ -3,6 +3,9 @@ package fr.estecka.variantscit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.component.ComponentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.equipment.EquipmentAssetKeys;
@@ -25,11 +28,10 @@ public class EquippableCache
 	}
 
 	static private EquippableComponent CopyWithAssetId(EquippableComponent original, Identifier id){
-		var assetId = RegistryKey.of(EquipmentAssetKeys.REGISTRY_KEY, id);
 		return new EquippableComponent(
 			original.slot(),
 			original.equipSound(),
-			Optional.of(assetId),
+			Optional.of(RegistryKey.of(EquipmentAssetKeys.REGISTRY_KEY, id)),
 			original.cameraOverlay(),
 			original.allowedEntities(),
 			original.dispensable(),
@@ -39,18 +41,24 @@ public class EquippableCache
 	}
 
 	/**
-	 * See: {@link fr.estecka.variantscit.mixin.FeatureRendererMixin}
+	 * Mixin injection.
+	 * See: {@link fr.estecka.variantscit.mixin.FeatureRendererMixins}
 	 */
-	public Object FeatureRendererMixin(Object originalObj, ItemStack stack){
-		if (!(originalObj instanceof EquippableComponent original))
-			return originalObj;
+	public Object GetEquipableVariant(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		Object original = originalOp.call(stack, type);
 
-		IItemModelProvider module = VariantsCitMod.GetEquipmentModule(stack.getItem());
+		if (type != DataComponentTypes.EQUIPPABLE
+		|| !(original instanceof EquippableComponent equipable) )
+		{
+			return original;
+		}
+
+		final IItemModelProvider module = VariantsCitMod.GetEquipmentModule(stack.getItem());
 		Identifier assetId;
 
 		if (module == null || (assetId=module.GetModelForItem(stack)) == null)
 			return original;
 		else
-			return GetWithAssetId(original, assetId);
+			return GetWithAssetId(equipable, assetId);
 	}
 }
