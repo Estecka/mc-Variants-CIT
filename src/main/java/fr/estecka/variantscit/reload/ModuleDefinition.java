@@ -61,7 +61,7 @@ public record ModuleDefinition(
 		if (this.features.isPresent())
 			return this.features.get();
 		else if (moduleId.getPath().startsWith("item/"))
-			return List.of(EModuleFeature.ITEM);
+			return List.of(EModuleFeature.ITEM_MODEL);
 		else if (moduleId.getPath().startsWith("equipment/"))
 			return List.of(EModuleFeature.EQUIPMENT);
 		else

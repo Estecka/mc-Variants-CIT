@@ -83,38 +83,23 @@ implements ClientModInitializer
 
 		for (MetaModule meta : result.orderedModules)
 		{
-			VariantLibrary itemLib  = meta.itemLibrary();
-			VariantLibrary equipLib = meta.equipLibrary();
-
-			if (meta.targets().isEmpty()) {
-				LOGGER.warn("Ignored VCIT module with no valid item {}", meta.id());
-				continue;
-			}
-
-			// // Will prevent dry-run debugging
-			// if (itemLib.isEmpty() && equipLib.isEmpty()){
-			// 	LOGGER.warn("Ignored VCIT modules with no models {}", meta.id());
-			// 	continue;
-			// }
-
-			int itemCount  = itemLib.GetVariantCount();
-			int equipCount = equipLib.GetVariantCount();
-			if (itemCount <= 0 && equipCount <= 0)
-				LOGGER.warn("Found no variant for VCIT module {}", meta.id());
-			if (itemCount > 0)
-				LOGGER.info("Found {} item_model variants for VCIT module {}", itemCount, meta.id());
-			if (equipCount > 0)
-				LOGGER.info("Found {} equipment variants for CIT module {}",  equipCount, meta.id());
-
-
-			for (Item itemType : meta.targets()){
-				if (!itemLib .isEmpty()) itemModules .computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(itemLib,  meta.logic()));
-				if (!equipLib.isEmpty()) equipModules.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(equipLib, meta.logic()));
-			}
+			if (meta.itemLibrary() .isPresent()) BakeModule("item_model", meta, meta.itemLibrary ().get(), itemModules );
+			if (meta.equipLibrary().isPresent()) BakeModule("equippable",  meta, meta.equipLibrary().get(), equipModules);
 		}
 
 		ITEM_MODULES  = CombineModules(itemModules);
 		EQUIP_MODULES = CombineModules(equipModules);
+	}
+
+	static private void BakeModule(String featureName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+		if (lib.isEmpty())
+			LOGGER.warn("Empty VCIT module {} for feature {}", meta.id(), featureName);
+		else
+			LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), featureName, meta.id());
+
+		for (Item itemType : meta.targets()){
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
+		}
 	}
 
 	static private Map<Item, IItemModelProvider> CombineModules(Map<Item, List<BakedModule>> moduleListPerItem){

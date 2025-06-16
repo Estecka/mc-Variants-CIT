@@ -6,21 +6,21 @@ import net.minecraft.util.StringIdentifiable;
 public enum EModuleFeature
 implements StringIdentifiable
 {
-	ITEM("item"),
-	EQUIPMENT("equipment"),
+	ITEM_MODEL("item_model"),
+	EQUIPMENT ("equippable"),
 	;
 
 	static public final Codec<EModuleFeature> CODEC = StringIdentifiable.createCodec(EModuleFeature::values);
 
-	public final String prefix;
+	public final String name;
 
-	private EModuleFeature(String prefix){
-		this.prefix = prefix;
+	private EModuleFeature(String name){
+		this.name = name;
 	}
 
 	@Override
 	public String asString() {
-		return prefix;
+		return name;
 	}
 
 }

@@ -44,15 +44,14 @@ public final class ModuleLoader
 		Identifier id,
 		int priority,
 		Set<Item> targets,
-		VariantLibrary itemLibrary,
-		VariantLibrary equipLibrary,
+		Optional<VariantLibrary> itemLibrary,
+		Optional<VariantLibrary> equipLibrary,
 		ICitModule logic
 		
 	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
-		final VariantLibrary EMPTY = new VariantLibrary(null, Map.of(), Map.of());
 		ModuleLoader.Result result = new ModuleLoader.Result();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
@@ -76,31 +75,30 @@ public final class ModuleLoader
 				.map(ModuleLoader::ItemsFromTarget)
 				.orElseGet(()->ItemsFromModuleId(moduleId))
 				;
-			// TODO: Figure-out wether to keep this.
-			// if (targets.isEmpty()){
-			// 	VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
-			// 	continue;
-			// }
+			if (targets.isEmpty()){
+				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
+				continue;
+			}
 
 			if (prototype.definition.modelPrefix().isEmpty())
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
-			VariantLibrary itemLibrary = EMPTY;
-			VariantLibrary equipLibrary = EMPTY;
+			VariantLibrary itemLibrary = null;
+			VariantLibrary equipLibrary = null;
 
 			for (EModuleFeature f : enabledFeatures)
 			switch (f) {
-				case ITEM:      itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
-				case EQUIPMENT: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
+				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
+				case EQUIPMENT:  equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
 			}
 
 			MetaModule meta = new MetaModule(
 				moduleId,
 				prototype.definition.priority(),
 				targets,
-				itemLibrary,
-				equipLibrary,
+				Optional.ofNullable(itemLibrary),
+				Optional.ofNullable(equipLibrary),
 				moduleLogic
 			);
 
