@@ -28,6 +28,7 @@ implements ClientModInitializer
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public int reloadcount = 0;
+	static public final EquippableCache EQUIPABLES = new EquippableCache();
 	static private Map<Item, IItemModelProvider> ITEM_MODULES  = new HashMap<>();
 	static private Map<Item, IItemModelProvider> EQUIP_MODULES = new HashMap<>();
 
@@ -75,6 +76,7 @@ implements ClientModInitializer
 
 	static public void OnResourceReload(ModuleLoader.Result result){
 		++reloadcount;
+		EQUIPABLES.Clear();
 
 		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
 		Map<Item, List<BakedModule>> equipModules = new HashMap<>();

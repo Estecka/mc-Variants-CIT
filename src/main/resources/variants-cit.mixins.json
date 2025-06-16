@@ -4,6 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"BakedModelManagerMixin",
+		"FeatureRendererMixin",
 		"ItemModelTypesMixin",
 		"ItemModelManagerMixin",
 		"ReferencedModelsCollectorMixin",
