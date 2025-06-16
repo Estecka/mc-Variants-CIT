@@ -87,7 +87,7 @@ implements ClientModInitializer
 			VariantLibrary equipLib = meta.equipLibrary();
 
 			if (meta.targets().isEmpty()) {
-				LOGGER.warn("Ignored VCIT module with no valid target {}", meta.id());
+				LOGGER.warn("Ignored VCIT module with no valid item {}", meta.id());
 				continue;
 			}
 

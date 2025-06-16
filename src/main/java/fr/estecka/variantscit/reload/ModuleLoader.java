@@ -52,17 +52,25 @@ public final class ModuleLoader
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
+		final VariantLibrary EMPTY = new VariantLibrary(null, Map.of(), Map.of());
 		ModuleLoader.Result result = new ModuleLoader.Result();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
-		Warn(resources);
+		ObsoletePathWarning(resources);
 		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(manager.findResources("variants-cit/equipment", id->id.getPath().endsWith(".json")));
 
 		for (var entry : resources.entrySet())
 		try {
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
+
+			List<EModuleFeature> enabledFeatures = prototype.definition().GetEnabledFeatures(moduleId);
+			if (enabledFeatures.isEmpty()){
+				VariantsCitMod.LOGGER.warn("Ignored CIT module with no feature: {}", moduleId);
+				continue;
+			}
 
 			Set<Item> targets = prototype.definition.targets()
 				.map(ModuleLoader::ItemsFromTarget)
@@ -70,7 +78,6 @@ public final class ModuleLoader
 				;
 			// TODO: Figure-out wether to keep this.
 			// if (targets.isEmpty()){
-			// 	result.ignoredModules.add(moduleId);
 			// 	VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
 			// 	continue;
 			// }
@@ -79,8 +86,14 @@ public final class ModuleLoader
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
-			VariantLibrary itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager);
-			VariantLibrary equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager);
+			VariantLibrary itemLibrary = EMPTY;
+			VariantLibrary equipLibrary = EMPTY;
+
+			for (EModuleFeature f : enabledFeatures)
+			switch (f) {
+				case ITEM:      itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
+				case EQUIPMENT: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
+			}
 
 			MetaModule meta = new MetaModule(
 				moduleId,
@@ -102,7 +115,7 @@ public final class ModuleLoader
 		return result;
 	}
 
-	static private void Warn(Map<Identifier, Resource> resources){
+	static private void ObsoletePathWarning(Map<Identifier, Resource> resources){
 		if (!resources.isEmpty()){
 			String names = "";
 			for (Identifier id : resources.keySet()) {

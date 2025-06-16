@@ -10,10 +10,10 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.VariantsCitMod;
 
 public record ModuleDefinition(
 	Identifier type,
+	Optional<List<EModuleFeature>> features,
 	Optional<List<Identifier>> targets,
 	int priority,
 	String modelPrefix,
@@ -26,6 +26,7 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
+			CodecUtil.OneOrMany(EModuleFeature.CODEC).optionalFieldOf("features").forGetter(ModuleDefinition::features),
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
@@ -54,5 +55,16 @@ public record ModuleDefinition(
 			return DataResult.success(UnItemify(path));
 		else
 			return DataResult.error(()->"Invalid character in path: "+path);
+	}
+
+	public List<EModuleFeature> GetEnabledFeatures(Identifier moduleId){
+		if (this.features.isPresent())
+			return this.features.get();
+		else if (moduleId.getPath().startsWith("item/"))
+			return List.of(EModuleFeature.ITEM);
+		else if (moduleId.getPath().startsWith("equipment/"))
+			return List.of(EModuleFeature.EQUIPMENT);
+		else
+			throw new IllegalArgumentException("Not a valid module ID: "+moduleId.toString());
 	}
 }
