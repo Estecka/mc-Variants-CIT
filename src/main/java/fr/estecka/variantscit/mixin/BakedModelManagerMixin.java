@@ -52,7 +52,7 @@ public class BakedModelManagerMixin
 
 	static private ItemAsset ItemFromModel(Identifier assetId) {
 		var unbaked = new BasicItemModel.Unbaked(assetId.withPrefixedPath("item/"), List.of());
-		var properties = new ItemAsset.Properties(true);
+		var properties = new ItemAsset.Properties(true, false);
 		return new ItemAsset(unbaked, properties);
 	}
 
