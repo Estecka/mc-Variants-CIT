@@ -36,6 +36,7 @@ implements ClientModInitializer
 		ModuleRegistry.Register(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("durability"), DurabilityModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantedToolModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
@@ -58,7 +59,7 @@ implements ClientModInitializer
 		++reloadcount;
 
 		for (var e : result.uniqueModules.entrySet())
-			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
+			LOGGER.info("Found {} variants for VCIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
 
 		MODULES = new HashMap<>();
 		for (var entry : result.modulesPerItem.entrySet()){
