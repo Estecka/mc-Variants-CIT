@@ -82,3 +82,14 @@
 - Fixed a crash on malformed json.
 ### 2.11.1
 - Fixed crash on invalid regex substitution strings.
+## 2.12
+- Added `durability` module.
+- Added options `matchAll` and `validate` to the regex transform.
+- Added `sanitize_auto` transform.
+- Added `rich_text_array` data type. (E.g: lore component)
+- Added `auto` data type.
+- `expect` now accept arrays.
+- `nbtPath` is now optional and defaults to using the whole component as data.
+- Added simplified mono-string syntax for ItemComponent properties.
+- Format variables now accept upper-cases, numbers and low-dashes
+- Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)

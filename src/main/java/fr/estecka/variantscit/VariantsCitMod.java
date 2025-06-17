@@ -47,6 +47,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		ModuleRegistry.Register(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("durability"), DurabilityModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantedToolModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
@@ -78,7 +79,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 
 		for (var e : result.uniqueModules.entrySet())
-			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
+			LOGGER.info("Found {} variants for VCIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
 
 		AUTOGEN = result.modelAggregator.modelsToCreate;
 		MODULES = new HashMap<>();

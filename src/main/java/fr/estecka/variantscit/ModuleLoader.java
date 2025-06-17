@@ -74,9 +74,12 @@ implements DataLoader<ModuleLoader.Result>
 				;
 			if (targets.isEmpty()){
 				result.ignoredModules.add(moduleId);
-				VariantsCitMod.LOGGER.warn("Module {} has no valid target and was ignored.", moduleId);
+				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
 				continue;
 			}
+
+			if (prototype.definition.modelPrefix().equals("item/"))
+				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition, prototype.parameters);
 			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype, manager);
@@ -92,7 +95,7 @@ implements DataLoader<ModuleLoader.Result>
 			}
 		}
 		catch (IllegalStateException e){
-			VariantsCitMod.LOGGER.error("Error in CIT module {}: {}", entry.getKey(), e);
+			VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", entry.getKey(), e);
 		}
 
 		// Sort highest priorities first.
@@ -109,7 +112,7 @@ implements DataLoader<ModuleLoader.Result>
 				names += ' ';
 				names += ModuleIdFromResourceId(id).toString();
 			}
-			VariantsCitMod.LOGGER.warn("Some CIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
+			VariantsCitMod.LOGGER.warn("Some VCIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
 		}
 	}
 
