@@ -38,7 +38,7 @@ extends ASimpleComponentCachingModule<Text>
 		
 		name = this.Transform(name);
 		if (debug)
-			VariantsCitMod.LOGGER.info("[custom_name CIT] #{} \"{}\" -> `{}`", super.cachedVariants.size(), text.getString(), name);
+			VariantsCitMod.LOGGER.info("[custom_name VCIT] #{} \"{}\" -> `{}`", super.cachedVariants.size(), text.getString(), name);
 		return Identifier.tryParse(name);
 	}
 

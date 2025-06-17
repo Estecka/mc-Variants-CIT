@@ -79,7 +79,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		result.modelAggregator.modelsToLoad.stream().map(ModelIdentifier::id).forEach(pluginContext::addModels);
 
 		for (var e : result.uniqueModules.entrySet())
-			LOGGER.info("Found {} variants for CIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
+			LOGGER.info("Found {} variants for VCIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
 
 		AUTOGEN = result.modelAggregator.modelsToCreate;
 		MODULES = new HashMap<>();
