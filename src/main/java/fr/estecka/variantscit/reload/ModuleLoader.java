@@ -12,6 +12,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import fr.estecka.variantscit.BakedModule;
+import fr.estecka.variantscit.IItemModelProvider;
 import fr.estecka.variantscit.ModuleRegistry;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -26,7 +28,8 @@ import net.minecraft.util.JsonHelper;
 public final class ModuleLoader
 {
 	static public class Result {
-		public final List<MetaModule> orderedModules = new ArrayList<>();
+		public final Map<Item, IItemModelProvider> itemModules  = new HashMap<>();
+		public final Map<Item, IItemModelProvider> equipModules = new HashMap<>();
 		public final ItemVariantAggregator  itemAggregator  = new ItemVariantAggregator ();
 		public final EquipVariantAggregator equipAggregator = new EquipVariantAggregator();
 	}
@@ -52,7 +55,8 @@ public final class ModuleLoader
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
-		ModuleLoader.Result result = new ModuleLoader.Result();
+		final ModuleLoader.Result result = new ModuleLoader.Result();
+		final List<MetaModule> modules = new ArrayList<>();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
@@ -102,14 +106,16 @@ public final class ModuleLoader
 				moduleLogic
 			);
 
-			result.orderedModules.add(meta);
+			modules.add(meta);
 		}
 		catch (IllegalStateException e){
 			VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", entry.getKey(), e);
 		}
 
 		// Sort highest priorities first.
-		result.orderedModules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
+		modules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
+
+		BakeModules(result, modules);
 		return result;
 	}
 
@@ -182,4 +188,40 @@ public final class ModuleLoader
 			return DataResult.error(e::toString);
 		}
 	}
+
+	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
+		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
+		Map<Item, List<BakedModule>> equipModules = new HashMap<>();
+	
+		for (MetaModule meta : modules)
+		{
+			if (meta.itemLibrary() .isPresent()) BakeModuleFeature("item_model", meta, meta.itemLibrary ().get(), itemModules );
+			if (meta.equipLibrary().isPresent()) BakeModuleFeature("equippable", meta, meta.equipLibrary().get(), equipModules);
+		}
+
+		BakeItem(result.itemModules,  itemModules );
+		BakeItem(result.equipModules, equipModules);
+	}
+
+	static private void BakeModuleFeature(String featureName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+		if (lib.isEmpty())
+			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", featureName, meta.id());
+		else
+			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), featureName, meta.id());
+
+		for (Item itemType : meta.targets()){
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
+		}
+	}
+
+	static private void BakeItem(Map<Item, IItemModelProvider> result, Map<Item, List<BakedModule>> moduleListPerItem){
+		for (var entry : moduleListPerItem.entrySet()){
+			result.put(
+				entry.getKey(),
+				IItemModelProvider.OfList( entry.getValue() )
+			);
+		}
+	}
+
+
 }

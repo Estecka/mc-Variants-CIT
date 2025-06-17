@@ -6,16 +6,13 @@ import net.minecraft.client.render.item.property.numeric.NumericProperties;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.properties.*;
 import fr.estecka.variantscit.selectors.*;
@@ -77,42 +74,8 @@ implements ClientModInitializer
 	static public void OnResourceReload(ModuleLoader.Result result){
 		++reloadcount;
 		EQUIPABLES.Clear();
-
-		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
-		Map<Item, List<BakedModule>> equipModules = new HashMap<>();
-
-		for (MetaModule meta : result.orderedModules)
-		{
-			if (meta.itemLibrary() .isPresent()) BakeModule("item_model", meta, meta.itemLibrary ().get(), itemModules );
-			if (meta.equipLibrary().isPresent()) BakeModule("equippable",  meta, meta.equipLibrary().get(), equipModules);
-		}
-
-		ITEM_MODULES  = CombineModules(itemModules);
-		EQUIP_MODULES = CombineModules(equipModules);
-	}
-
-	static private void BakeModule(String featureName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
-		if (lib.isEmpty())
-			LOGGER.warn("Empty VCIT module {} for feature {}", meta.id(), featureName);
-		else
-			LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), featureName, meta.id());
-
-		for (Item itemType : meta.targets()){
-			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
-		}
-	}
-
-	static private Map<Item, IItemModelProvider> CombineModules(Map<Item, List<BakedModule>> moduleListPerItem){
-		Map<Item, IItemModelProvider> result = new HashMap<>();
-
-		for (var entry : moduleListPerItem.entrySet()){
-			result.put(
-				entry.getKey(),
-				IItemModelProvider.OfList( entry.getValue() )
-			);
-		}
-
-		return result;
+		ITEM_MODULES  = result.itemModules;
+		EQUIP_MODULES = result.equipModules;
 	}
 
 }
