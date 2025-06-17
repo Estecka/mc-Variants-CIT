@@ -57,6 +57,7 @@ public record ModuleDefinition(
 			return DataResult.error(()->"Invalid character in path: "+path);
 	}
 
+	@Deprecated
 	public List<EModuleFeature> GetEnabledFeatures(Identifier moduleId){
 		if (this.features.isPresent())
 			return this.features.get();

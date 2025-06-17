@@ -58,7 +58,7 @@ public final class ModuleLoader
 		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
 		ObsoletePathWarning(resources);
 		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
-		resources.putAll(manager.findResources("variants-cit/equipment", id->id.getPath().endsWith(".json")));
+		// resources.putAll(manager.findResources("variants-cit/equipment", id->id.getPath().endsWith(".json")));
 
 		for (var entry : resources.entrySet())
 		try {
