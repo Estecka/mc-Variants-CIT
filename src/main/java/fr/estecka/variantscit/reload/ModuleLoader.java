@@ -90,7 +90,7 @@ public final class ModuleLoader
 			for (EModuleFeature f : enabledFeatures)
 			switch (f) {
 				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
-				case EQUIPMENT:  equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
+				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
 			}
 
 			MetaModule meta = new MetaModule(

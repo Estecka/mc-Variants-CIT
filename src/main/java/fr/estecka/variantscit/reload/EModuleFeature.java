@@ -7,7 +7,7 @@ public enum EModuleFeature
 implements StringIdentifiable
 {
 	ITEM_MODEL("item_model"),
-	EQUIPMENT ("equippable"),
+	EQUIPPABLE("equippable"),
 	;
 
 	static public final Codec<EModuleFeature> CODEC = StringIdentifiable.createCodec(EModuleFeature::values);
