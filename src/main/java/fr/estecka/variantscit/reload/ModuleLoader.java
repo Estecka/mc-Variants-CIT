@@ -69,8 +69,8 @@ public final class ModuleLoader
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			List<EModuleFeature> enabledFeatures = prototype.definition().GetEnabledFeatures(moduleId);
-			if (enabledFeatures.isEmpty()){
+			List<EModuleAspect> enabledAspects = prototype.definition().GetEnabledAspects(moduleId);
+			if (enabledAspects.isEmpty()){
 				VariantsCitMod.LOGGER.warn("Ignored CIT module with no feature: {}", moduleId);
 				continue;
 			}
@@ -91,8 +91,8 @@ public final class ModuleLoader
 			VariantLibrary itemLibrary = null;
 			VariantLibrary equipLibrary = null;
 
-			for (EModuleFeature f : enabledFeatures)
-			switch (f) {
+			for (EModuleAspect a : enabledAspects)
+			switch (a) {
 				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
 				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
 			}

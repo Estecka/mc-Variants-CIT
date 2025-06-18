@@ -13,7 +13,7 @@ import fr.estecka.variantscit.CodecUtil;
 
 public record ModuleDefinition(
 	Identifier type,
-	Optional<List<EModuleFeature>> features,
+	Optional<List<EModuleAspect>> features,
 	Optional<List<Identifier>> targets,
 	int priority,
 	String modelPrefix,
@@ -26,7 +26,7 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
-			CodecUtil.OneOrMany(EModuleFeature.CODEC).optionalFieldOf("features").forGetter(ModuleDefinition::features),
+			CodecUtil.OneOrMany(EModuleAspect.CODEC).optionalFieldOf("aspect").forGetter(ModuleDefinition::features),
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
@@ -58,13 +58,13 @@ public record ModuleDefinition(
 	}
 
 	@Deprecated
-	public List<EModuleFeature> GetEnabledFeatures(Identifier moduleId){
+	public List<EModuleAspect> GetEnabledAspects(Identifier moduleId){
 		if (this.features.isPresent())
 			return this.features.get();
 		else if (moduleId.getPath().startsWith("item/"))
-			return List.of(EModuleFeature.ITEM_MODEL);
+			return List.of(EModuleAspect.ITEM_MODEL);
 		else if (moduleId.getPath().startsWith("equipment/"))
-			return List.of(EModuleFeature.EQUIPPABLE);
+			return List.of(EModuleAspect.EQUIPPABLE);
 		else
 			throw new IllegalArgumentException("Not a valid module ID: "+moduleId.toString());
 	}
