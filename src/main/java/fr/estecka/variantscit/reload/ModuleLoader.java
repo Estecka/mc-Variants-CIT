@@ -71,7 +71,7 @@ public final class ModuleLoader
 
 			List<EModuleAspect> enabledAspects = prototype.definition().GetEnabledAspects(moduleId);
 			if (enabledAspects.isEmpty()){
-				VariantsCitMod.LOGGER.warn("Ignored CIT module with no feature: {}", moduleId);
+				VariantsCitMod.LOGGER.warn("Ignored CIT module with no aspect: {}", moduleId);
 				continue;
 			}
 
@@ -195,19 +195,19 @@ public final class ModuleLoader
 	
 		for (MetaModule meta : modules)
 		{
-			if (meta.itemLibrary() .isPresent()) BakeModuleFeature("item_model", meta, meta.itemLibrary ().get(), itemModules );
-			if (meta.equipLibrary().isPresent()) BakeModuleFeature("equippable", meta, meta.equipLibrary().get(), equipModules);
+			if (meta.itemLibrary() .isPresent()) BakeAspectedModule("item_model", meta, meta.itemLibrary ().get(), itemModules );
+			if (meta.equipLibrary().isPresent()) BakeAspectedModule("equippable", meta, meta.equipLibrary().get(), equipModules);
 		}
 
 		BakeItem(result.itemModules,  itemModules );
 		BakeItem(result.equipModules, equipModules);
 	}
 
-	static private void BakeModuleFeature(String featureName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+	static private void BakeAspectedModule(String aspectName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
 		if (lib.isEmpty())
-			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", featureName, meta.id());
+			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", aspectName, meta.id());
 		else
-			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), featureName, meta.id());
+			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), aspectName, meta.id());
 
 		for (Item itemType : meta.targets()){
 			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));

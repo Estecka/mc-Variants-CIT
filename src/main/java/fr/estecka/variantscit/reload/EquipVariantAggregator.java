@@ -18,7 +18,7 @@ extends AVariantAggregator
 		final var specials = new HashMap<>(definition.specialModels());
 		definition.fallbackModel().ifPresent(fallback -> specials.put(null, fallback));
 
-		// Variants from items
+		// Variants from equipments
 		{
 			var varItems  = FindVariants(manager, "equipment", prefix, ".json");
 			var speItems  = FindSpecials(manager, "equipment", specials, ".json");
