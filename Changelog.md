@@ -159,6 +159,8 @@ Since v2.5:
 - Added simplified mono-string syntax for ItemComponent properties.
 - Format variables now accept upper-cases, numbers and low-dashes
 - Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)
+## 3.8
+- Modules can now override the `assetId` of the `equippable` component, and change the look of equipped armor.
 
 # v4
 ## 4.0
@@ -186,3 +188,5 @@ Since v3.5:
 - Added simplified mono-string syntax for ItemComponent properties.
 - Format variables now accept upper-cases, numbers and low-dashes
 - Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)
+## 4.3
+- Modules can now override the `assetId` of the `equippable` component, and change the look of equipped armor.

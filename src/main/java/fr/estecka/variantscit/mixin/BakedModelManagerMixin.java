@@ -15,7 +15,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import fr.estecka.variantscit.reload.ModelAggregator;
+import fr.estecka.variantscit.reload.ItemVariantAggregator;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.item.ItemAsset;
@@ -57,14 +57,14 @@ public class BakedModelManagerMixin
 	}
 
 	@Inject( method="reload", at=@At("HEAD") )
-	private void reload(CallbackInfoReturnable<?> ci, @Local(argsOnly=true) ResourceManager manager, @Share("result") LocalRef<ModelAggregator> resultRef){
+	private void reload(CallbackInfoReturnable<?> ci, @Local(argsOnly=true) ResourceManager manager, @Share("result") LocalRef<ItemVariantAggregator> resultRef){
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(manager);
-		resultRef.set(result.modelAggregator);
+		resultRef.set(result.itemAggregator);
 		VariantsCitMod.OnResourceReload(result);
 	}
 
 	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/render/model/BakedModelManager.reloadModels(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-	static private CompletableFuture<Map<Identifier,UnbakedModel>> AddVariantModels(CompletableFuture<Map<Identifier,UnbakedModel>> original, @Share("result") LocalRef<ModelAggregator> resultRef) {
+	static private CompletableFuture<Map<Identifier,UnbakedModel>> AddVariantModels(CompletableFuture<Map<Identifier,UnbakedModel>> original, @Share("result") LocalRef<ItemVariantAggregator> resultRef) {
 		return original.thenApply( (allModels)->{
 			allModels = new HashMap<Identifier, UnbakedModel>(allModels);
 	
@@ -80,11 +80,11 @@ public class BakedModelManagerMixin
 	}
 
 	@ModifyExpressionValue( method="reload", at=@At(value="INVOKE", target="net/minecraft/client/item/ItemAssetsLoader.load(Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-	static private CompletableFuture<ItemAssetsLoader.Result> AddVariantItems(CompletableFuture<ItemAssetsLoader.Result> original, @Share("result") LocalRef<ModelAggregator> resultRef) {
+	static private CompletableFuture<ItemAssetsLoader.Result> AddVariantItems(CompletableFuture<ItemAssetsLoader.Result> original, @Share("result") LocalRef<ItemVariantAggregator> resultRef) {
 		return original.thenApply( (result)->{
 			var allItems = new HashMap<Identifier, ItemAsset>(result.contents());
 		
-			Set<Identifier> items = resultRef.get().itemsToCreate;
+			Set<Identifier> items = resultRef.get().itemStatesToCreate;
 			VariantsCitMod.LOGGER.info("Creating {} items from models...", items.size());
 			for (Identifier assetId : items){
 				allItems.put(assetId, ItemFromModel(assetId));

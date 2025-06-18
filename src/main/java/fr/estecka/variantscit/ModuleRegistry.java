@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 
 public final class ModuleRegistry
 {
+	// TODO: Use `fieldOf("parameters")` instead of that thing.
 	@FunctionalInterface
 	static private interface ModuleFactory {
 		ICitModule build(JsonObject customData) throws IllegalStateException;
