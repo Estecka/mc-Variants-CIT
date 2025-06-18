@@ -33,4 +33,11 @@ implements IVariantManager
 	public int GetVariantCount(){
 		return this.variantModels.size();
 	}
+
+	public boolean isEmpty(){
+		return this.variantModels.isEmpty()
+		    && this.specialModels.isEmpty()
+		    && this.fallbackModel == null
+		    ;
+	}
 }

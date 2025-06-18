@@ -4,6 +4,12 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"BakedModelManagerMixin",
+		"FeatureRendererMixin$Armor",
+		"FeatureRendererMixin$Cape",
+		"FeatureRendererMixin$Elytra",
+		"FeatureRendererMixin$Horse",
+		"FeatureRendererMixin$Llama",
+		"FeatureRendererMixin$Wolf",
 		"ItemModelTypesMixin",
 		"ItemModelManagerMixin",
 		"ReferencedModelsCollectorMixin",

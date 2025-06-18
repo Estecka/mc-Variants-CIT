@@ -25,10 +25,15 @@ implements ClientModInitializer
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	static public int reloadcount = 0;
-	static private Map<Item, IItemModelProvider> MODULES = new HashMap<>();
+	static public final EquippableCache EQUIPABLES = new EquippableCache();
+	static private Map<Item, IItemModelProvider> ITEM_MODULES  = new HashMap<>();
+	static private Map<Item, IItemModelProvider> EQUIP_MODULES = new HashMap<>();
 
-	static public @Nullable IItemModelProvider GetModule(Item itemType){
-		return MODULES.get(itemType);
+	static public @Nullable IItemModelProvider GetItemModule(Item itemType){
+		return ITEM_MODULES.get(itemType);
+	}
+	static public @Nullable IItemModelProvider GetEquipmentModule(Item itemType){
+		return EQUIP_MODULES.get(itemType);
 	}
 
 	@Override
@@ -68,17 +73,9 @@ implements ClientModInitializer
 
 	static public void OnResourceReload(ModuleLoader.Result result){
 		++reloadcount;
-
-		for (var e : result.uniqueModules.entrySet())
-			LOGGER.info("Found {} variants for VCIT module {}", e.getValue().library().GetVariantCount(), e.getKey());
-
-		MODULES = new HashMap<>();
-		for (var entry : result.modulesPerItem.entrySet()){
-			MODULES.put(
-				entry.getKey().value(),
-				IItemModelProvider.OfList( entry.getValue().stream().map(meta->meta.bakedModule()).toList() )
-			);
-		}
+		EQUIPABLES.Clear();
+		ITEM_MODULES  = result.itemModules;
+		EQUIP_MODULES = result.equipModules;
 	}
 
 }
