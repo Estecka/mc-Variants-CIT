@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 
 public class EquippableCache
 {
+	// TODO: Cache may needs to be cleared from times to times, same as component-cahing modules.
 	private final Map<EquippableComponent, Map<Identifier, EquippableComponent>> cache = new HashMap<>();
 
 	public void Clear(){
