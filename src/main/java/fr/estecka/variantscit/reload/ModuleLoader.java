@@ -6,19 +6,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.BakedModule;
+import fr.estecka.variantscit.IItemModelProvider;
 import fr.estecka.variantscit.ModuleRegistry;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -27,10 +28,10 @@ import net.minecraft.util.JsonHelper;
 public final class ModuleLoader
 {
 	static public class Result {
-		public final HashMap<Identifier, BakedModule> uniqueModules = new HashMap<>();
-		public final HashSet<Identifier> ignoredModules = new HashSet<>();
-		public final Map<RegistryEntry<Item>,List<MetaModule>> modulesPerItem = new HashMap<>();
-		public final ModelAggregator modelAggregator = new ModelAggregator();
+		public final Map<Item, IItemModelProvider> itemModules  = new HashMap<>();
+		public final Map<Item, IItemModelProvider> equipModules = new HashMap<>();
+		public final ItemVariantAggregator  itemAggregator  = new ItemVariantAggregator ();
+		public final EquipVariantAggregator equipAggregator = new EquipVariantAggregator();
 	}
 
 	static record ProtoModule (
@@ -39,36 +40,46 @@ public final class ModuleLoader
 	){}
 
 	/**
-	 * Contains all the data  pertaining to  a module file. Most of this data is
-	 * only  relevant  to  the  resource-loading  phase, and  will be  discarded
-	 * afterward.
+	 * Contains all the processed data about a module. Some of that data is only
+	 * relevant to the resource-loading phase, and will be discarded at the end.
 	 */
 	static public record MetaModule (
 		Identifier id,
-		ProtoModule prototype,
-		BakedModule bakedModule
+		int priority,
+		Set<Item> targets,
+		Optional<VariantLibrary> itemLibrary,
+		Optional<VariantLibrary> equipLibrary,
+		ICitModule logic
+		
 	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
-		ModuleLoader.Result result = new ModuleLoader.Result();
+		final ModuleLoader.Result result = new ModuleLoader.Result();
+		final List<MetaModule> modules = new ArrayList<>();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
-		Warn(resources);
+		ObsoletePathWarning(resources);
 		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+		// resources.putAll(manager.findResources("variants-cit/equipment", id->id.getPath().endsWith(".json")));
 
 		for (var entry : resources.entrySet())
 		try {
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			Set<RegistryEntry<Item>> targets = prototype.definition.targets()
+			List<EModuleAspect> enabledAspects = prototype.definition().GetEnabledAspects(moduleId);
+			if (enabledAspects.isEmpty()){
+				VariantsCitMod.LOGGER.warn("Ignored CIT module with no aspect: {}", moduleId);
+				continue;
+			}
+
+			Set<Item> targets = prototype.definition.targets()
 				.map(ModuleLoader::ItemsFromTarget)
 				.orElseGet(()->ItemsFromModuleId(moduleId))
 				;
 			if (targets.isEmpty()){
-				result.ignoredModules.add(moduleId);
 				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
 				continue;
 			}
@@ -77,30 +88,38 @@ public final class ModuleLoader
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
-			VariantLibrary library = result.modelAggregator.CreateLibrary(prototype.definition, manager);
+			VariantLibrary itemLibrary = null;
+			VariantLibrary equipLibrary = null;
+
+			for (EModuleAspect a : enabledAspects)
+			switch (a) {
+				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
+				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
+			}
+
 			MetaModule meta = new MetaModule(
 				moduleId,
-				prototype,
-				new BakedModule(library, moduleLogic)
+				prototype.definition.priority(),
+				targets,
+				Optional.ofNullable(itemLibrary),
+				Optional.ofNullable(equipLibrary),
+				moduleLogic
 			);
 
-			result.uniqueModules.put(moduleId, meta.bakedModule());
-			for (var item : targets){
-				result.modulesPerItem.computeIfAbsent(item, __->new ArrayList<>()).add(meta);
-			}
+			modules.add(meta);
 		}
 		catch (IllegalStateException e){
 			VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", entry.getKey(), e);
 		}
 
 		// Sort highest priorities first.
-		for (List<MetaModule> modules : result.modulesPerItem.values()){
-			modules.sort((a,b) -> -Integer.compare(a.prototype.definition.priority(), b.prototype.definition.priority()));
-		}
+		modules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
+
+		BakeModules(result, modules);
 		return result;
 	}
 
-	static private void Warn(Map<Identifier, Resource> resources){
+	static private void ObsoletePathWarning(Map<Identifier, Resource> resources){
 		if (!resources.isEmpty()){
 			String names = "";
 			for (Identifier id : resources.keySet()) {
@@ -111,21 +130,22 @@ public final class ModuleLoader
 		}
 	}
 
-	static private Set<RegistryEntry<Item>> ItemsFromTarget(List<Identifier> targets){
-		Set<RegistryEntry<Item>> result = new HashSet<>();
+	static private Set<Item> ItemsFromTarget(List<Identifier> targets){
+		Set<Item> result = new HashSet<>();
 		targets.stream()
-			.map(id->Registries.ITEM.getEntry(id).orElse(null))
-			.filter(o->o!=null)
+			.map(id->Registries.ITEM.getEntry(id))
+			.filter(Optional::isPresent)
+			.map(opt->opt.get().value())
 			.forEach(result::add)
 			;
 		return result;
 	}
 
-	static private Set<RegistryEntry<Item>> ItemsFromModuleId(Identifier moduleId){
+	static private Set<Item> ItemsFromModuleId(Identifier moduleId){
 		Identifier itemId = ItemIdFromModuleId(moduleId);
 
 		if (Registries.ITEM.containsId(itemId))
-			return Set.of(Registries.ITEM.getEntry(itemId).get());
+			return Set.of(Registries.ITEM.getEntry(itemId).get().value());
 		else
 			return Set.of();
 	}
@@ -168,4 +188,40 @@ public final class ModuleLoader
 			return DataResult.error(e::toString);
 		}
 	}
+
+	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
+		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
+		Map<Item, List<BakedModule>> equipModules = new HashMap<>();
+	
+		for (MetaModule meta : modules)
+		{
+			if (meta.itemLibrary() .isPresent()) BakeAspectedModule("item_model", meta, meta.itemLibrary ().get(), itemModules );
+			if (meta.equipLibrary().isPresent()) BakeAspectedModule("equippable", meta, meta.equipLibrary().get(), equipModules);
+		}
+
+		BakeItem(result.itemModules,  itemModules );
+		BakeItem(result.equipModules, equipModules);
+	}
+
+	static private void BakeAspectedModule(String aspectName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+		if (lib.isEmpty())
+			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", aspectName, meta.id());
+		else
+			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), aspectName, meta.id());
+
+		for (Item itemType : meta.targets()){
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
+		}
+	}
+
+	static private void BakeItem(Map<Item, IItemModelProvider> result, Map<Item, List<BakedModule>> moduleListPerItem){
+		for (var entry : moduleListPerItem.entrySet()){
+			result.put(
+				entry.getKey(),
+				IItemModelProvider.OfList( entry.getValue() )
+			);
+		}
+	}
+
+
 }

@@ -5,20 +5,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
-public class ModelAggregator
+public class ItemVariantAggregator
+extends AVariantAggregator
 {
 	/**
 	 * Maps each model ID to its parents.
 	 */
 	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>();
-	public final Set<Identifier> itemsToCreate = new HashSet<>();
+	public final Set<Identifier> itemStatesToCreate = new HashSet<>();
 
+	@Override
 	public VariantLibrary CreateLibrary(ModuleDefinition definition, ResourceManager manager){
 		Map<Identifier,Identifier> allVariants = new HashMap<>();
 		Map<String,Identifier> allSpecials = new HashMap<>();
@@ -45,8 +46,8 @@ public class ModelAggregator
 			allSpecials.keySet().forEach(speModels::remove);
 			allVariants.putAll(varModels);
 			allSpecials.putAll(speModels);
-			this.itemsToCreate.addAll(varModels.values());
-			this.itemsToCreate.addAll(speModels.values());
+			this.itemStatesToCreate.addAll(varModels.values());
+			this.itemStatesToCreate.addAll(speModels.values());
 		}
 
 		// Variants from textures
@@ -58,8 +59,8 @@ public class ModelAggregator
 			allSpecials.keySet().forEach(speTextures::remove);
 			allVariants.putAll(varTextures);
 			allSpecials.putAll(speTextures);
-			this.itemsToCreate.addAll(varTextures.values());
-			this.itemsToCreate.addAll(speTextures.values());
+			this.itemStatesToCreate.addAll(varTextures.values());
+			this.itemStatesToCreate.addAll(speTextures.values());
 			varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
 			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
 		}
@@ -77,53 +78,6 @@ public class ModelAggregator
 			modelsToCreate.put(model, parent);
 		else if (!modelsToCreate.get(model).equals(parent))
 			VariantsCitMod.LOGGER.error("Conflicting definitions for model {}", model);
-	}
-
-	/**
-	 * Finds all resources of a given type, whose id start with the given prefix.
-	 * @param rootDirectory The type of the resources to look for.
-	 * @return Maps the variant ID to its corresponding model ID
-	 */
-	private Map<Identifier,Identifier> FindVariants(ResourceManager manager, String rootDirectory, String modelPrefix, String suffix){
-		Map<Identifier, Identifier> results = new HashMap<>();
-
-		String fullPrefix = rootDirectory+'/'+modelPrefix;
-		String directory = fullPrefix.substring(0, fullPrefix.lastIndexOf('/'));
-		for (Identifier fileId : manager.findResources(directory, id -> id.getPath().startsWith(fullPrefix) && id.getPath().endsWith(suffix)).keySet())
-		{
-			String namespace = fileId.getNamespace();
-			String assetName, variantName;
-			assetName = fileId.getPath();
-			assetName = assetName.substring((rootDirectory+'/').length(), assetName.length()-suffix.length());
-			variantName = assetName.substring(modelPrefix.length());
-
-			results.put(
-				Identifier.of(namespace, variantName),
-				Identifier.of(namespace, assetName)
-			);
-		}
-
-		return results;
-	}
-
-	/**
-	 * Finds which of the requested model/texture IDs are actually available.
-	 * @return The model/texture IDs
-	 */
-	private HashMap<String,Identifier> FindSpecials(ResourceManager manager, String rootDirectory, Map<String,Identifier> requested, String suffix){
-		Set<Identifier> valid = new HashSet<>();
-
-		// ResourceId to ModelId
-		Map<Identifier, Identifier> resourceIds = requested.values().stream().collect(Collectors.toMap(
-			id -> id.withPrefixedPath(rootDirectory+'/').withSuffixedPath(suffix),
-			id -> id
-		));
-		for (Identifier fileId : manager.findResources(rootDirectory, id->resourceIds.keySet().contains(id)).keySet())
-			valid.add(resourceIds.get(fileId));
-
-		var result = new HashMap<>(requested);
-		result.entrySet().removeIf(e -> !valid.contains(e.getValue()));
-		return result;
 	}
 
 }

@@ -15,3 +15,5 @@ Initial Release
 - `NbtElement::asString` no longer works on non-string, and is now wrapped in an optional.
 - The structures of Goat Horn and Music Disc components have changed, now using Lazy Registry Entries.
 - `Text` components are no longer stored in stringified form.
+- `EquippableComponent` takes new field.
+- `HorseArmorFeatureRenderer` was replaced with `SaddleFeatureRenderer`
