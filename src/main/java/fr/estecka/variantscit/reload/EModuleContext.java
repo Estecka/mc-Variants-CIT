@@ -3,18 +3,18 @@ package fr.estecka.variantscit.reload;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringIdentifiable;
 
-public enum EModuleAspect
+public enum EModuleContext
 implements StringIdentifiable
 {
 	ITEM_MODEL("item_model"),
 	EQUIPPABLE("equippable"),
 	;
 
-	static public final Codec<EModuleAspect> CODEC = StringIdentifiable.createCodec(EModuleAspect::values);
+	static public final Codec<EModuleContext> CODEC = StringIdentifiable.createCodec(EModuleContext::values);
 
 	public final String name;
 
-	private EModuleAspect(String name){
+	private EModuleContext(String name){
 		this.name = name;
 	}
 
