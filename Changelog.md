@@ -160,7 +160,10 @@ Since v2.5:
 - Format variables now accept upper-cases, numbers and low-dashes
 - Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)
 ## 3.8
+### 3.8.0
 - Modules can now override the `assetId` of the `equippable` component, and change the look of equipped armor.
+### 3.8.1
+- Renaming the `aspect` field to `context`
 
 # v4
 ## 4.0
@@ -189,4 +192,7 @@ Since v3.5:
 - Format variables now accept upper-cases, numbers and low-dashes
 - Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)
 ## 4.3
+### 4.3.0
 - Modules can now override the `assetId` of the `equippable` component, and change the look of equipped armor.
+### 4.3.1
+- Renaming the `aspect` field to `context`

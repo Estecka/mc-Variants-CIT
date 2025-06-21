@@ -13,7 +13,7 @@ import fr.estecka.variantscit.CodecUtil;
 
 public record ModuleDefinition(
 	Identifier type,
-	Optional<List<EModuleAspect>> aspects,
+	Optional<List<EModuleContext>> contexts,
 	Optional<List<Identifier>> targets,
 	int priority,
 	String modelPrefix,
@@ -26,7 +26,7 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
-			CodecUtil.OneOrMany(EModuleAspect.CODEC).optionalFieldOf("aspect").forGetter(ModuleDefinition::aspects),
+			CodecUtil.OptionalWithAlias(CodecUtil.OneOrMany(EModuleContext.CODEC), "context", "aspect").forGetter(ModuleDefinition::contexts),
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
@@ -58,13 +58,13 @@ public record ModuleDefinition(
 	}
 
 	@Deprecated
-	public List<EModuleAspect> GetEnabledAspects(Identifier moduleId){
-		if (this.aspects.isPresent())
-			return this.aspects.get();
+	public List<EModuleContext> GetEnabledContexts(Identifier moduleId){
+		if (this.contexts.isPresent())
+			return this.contexts.get();
 		else if (moduleId.getPath().startsWith("item/"))
-			return List.of(EModuleAspect.ITEM_MODEL);
+			return List.of(EModuleContext.ITEM_MODEL);
 		else if (moduleId.getPath().startsWith("equipment/"))
-			return List.of(EModuleAspect.EQUIPPABLE);
+			return List.of(EModuleContext.EQUIPPABLE);
 		else
 			throw new IllegalArgumentException("Not a valid module ID: "+moduleId.toString());
 	}

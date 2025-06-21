@@ -1,6 +1,8 @@
 package fr.estecka.variantscit;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -20,6 +22,16 @@ public class CodecUtil
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isPathValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 
+	/**
+	 * Functions to be used in `validate()` on deprecated codecs.
+	 */
+	static public <T> Function<T,DataResult<T>> WithWarning(String warning, Object... args){
+		return o->{
+			VariantsCitMod.LOGGER.warn(warning, args);
+			return DataResult.success(o);
+		};
+	}
+
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
 		var listCodec = original.listOf();
 		return Codec.withAlternative(
@@ -29,7 +41,12 @@ public class CodecUtil
 	}
 
 	static public <T> MapCodec<T> MapWithAlternative(MapCodec<T> primary, MapCodec<? extends T> alternative){
-		return MapCodec.assumeMapUnsafe(Codec.withAlternative(primary.codec(), alternative.codec()));
+		return MapCodec.assumeMapUnsafe(
+			Codec.withAlternative(
+				primary.codec(),
+				alternative.codec()
+			)
+		);
 	}
 
 	@SafeVarargs
@@ -51,6 +68,20 @@ public class CodecUtil
 		for (int i=0; i<mapArray.length; ++i)
 			codecArray[i] = mapArray[i].codec();
 		return MapCodec.assumeMapUnsafe(WithAlternatives(primaryMap.codec(), codecArray));
+	}
+
+	static public <T> MapCodec<T> WithAlias(Codec<T> codec, String primary, String alias){
+		return MapWithAlternative(
+				codec.fieldOf(primary),
+				codec.fieldOf(alias).validate(WithWarning("VCIT field `{}` is deprecated. Use `context` instead.", alias))
+			);
+	}
+
+	static public <T> MapCodec<Optional<T>> OptionalWithAlias(Codec<T> codec, String primary, String alias){
+		return WithAlias(codec, primary, alias)
+			.xmap(Optional::of, Optional::get)
+			.orElse(Optional.empty())
+			;
 	}
 
 	static public <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){

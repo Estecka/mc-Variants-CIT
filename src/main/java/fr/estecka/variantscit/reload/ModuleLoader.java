@@ -69,9 +69,9 @@ public final class ModuleLoader
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			List<EModuleAspect> enabledAspects = prototype.definition().GetEnabledAspects(moduleId);
-			if (enabledAspects.isEmpty()){
-				VariantsCitMod.LOGGER.warn("Ignored CIT module with no aspect: {}", moduleId);
+			List<EModuleContext> contexts = prototype.definition().GetEnabledContexts(moduleId);
+			if (contexts.isEmpty()){
+				VariantsCitMod.LOGGER.warn("Ignored VCIT module with no context: {}", moduleId);
 				continue;
 			}
 
@@ -91,8 +91,8 @@ public final class ModuleLoader
 			VariantLibrary itemLibrary = null;
 			VariantLibrary equipLibrary = null;
 
-			for (EModuleAspect a : enabledAspects)
-			switch (a) {
+			for (EModuleContext c : contexts)
+			switch (c) {
 				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
 				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
 			}
@@ -195,19 +195,19 @@ public final class ModuleLoader
 	
 		for (MetaModule meta : modules)
 		{
-			if (meta.itemLibrary() .isPresent()) BakeAspectedModule("item_model", meta, meta.itemLibrary ().get(), itemModules );
-			if (meta.equipLibrary().isPresent()) BakeAspectedModule("equippable", meta, meta.equipLibrary().get(), equipModules);
+			if (meta.itemLibrary() .isPresent()) BakeModuleContext("item_model", meta, meta.itemLibrary ().get(), itemModules );
+			if (meta.equipLibrary().isPresent()) BakeModuleContext("equippable", meta, meta.equipLibrary().get(), equipModules);
 		}
 
 		BakeItem(result.itemModules,  itemModules );
 		BakeItem(result.equipModules, equipModules);
 	}
 
-	static private void BakeAspectedModule(String aspectName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
 		if (lib.isEmpty())
-			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", aspectName, meta.id());
+			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", contextName, meta.id());
 		else
-			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), aspectName, meta.id());
+			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
 
 		for (Item itemType : meta.targets()){
 			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
