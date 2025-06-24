@@ -3,6 +3,7 @@ package fr.estecka.variantscit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
@@ -14,8 +15,11 @@ import net.minecraft.util.Identifier;
 
 public class EquippableCache
 {
-	// TODO: Cache may needs to be cleared from times to times, same as component-cahing modules.
-	private final Map<EquippableComponent, Map<Identifier, EquippableComponent>> cache = new HashMap<>();
+	/**
+	 * Key 1: Maps original components to a list of their known variations.
+	 * Key 2: Maps variant ID to the modified copy of the component.
+	 */
+	private final WeakHashMap<EquippableComponent, Map<Identifier, EquippableComponent>> cache = new WeakHashMap<>();
 
 	public void Clear(){
 		this.cache.clear();
