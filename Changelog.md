@@ -163,7 +163,9 @@ Since v2.5:
 ### 3.8.0
 - Modules can now override the `assetId` of the `equippable` component, and change the look of equipped armor.
 ### 3.8.1
-- Renaming the `aspect` field to `context`
+- Renaming the `aspect` field to `context`.
+### 3.8.2
+- Made equippable cache use a weak map.
 
 # v4
 ## 4.0
@@ -195,4 +197,6 @@ Since v3.5:
 ### 4.3.0
 - Modules can now override the `assetId` of the `equippable` component, and change the look of equipped armor.
 ### 4.3.1
-- Renaming the `aspect` field to `context`
+- Renaming the `aspect` field to `context`.
+### 4.3.2
+- Made equippable cache use a weak map.
