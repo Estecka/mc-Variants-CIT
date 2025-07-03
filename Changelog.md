@@ -200,3 +200,5 @@ Since v3.5:
 - Renaming the `aspect` field to `context`.
 ### 4.3.2
 - Made equippable cache use a weak map.
+### 4.3.3
+- Updated for MC 1.21.7
