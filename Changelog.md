@@ -202,3 +202,5 @@ Since v3.5:
 - Made equippable cache use a weak map.
 ### 4.3.3
 - Updated for MC 1.21.7
+### 4.3.4
+- Updated for MC 1.21.8
