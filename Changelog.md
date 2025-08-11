@@ -93,3 +93,9 @@
 - Added simplified mono-string syntax for ItemComponent properties.
 - Format variables now accept upper-cases, numbers and low-dashes
 - Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)
+## 2.13
+Unified the `enchantment` and `stored_enchantment`:
+- `enchantment` can now include an enchantment's level in the variant id.
+- `enchantment` can now use the `multi` special model.
+- `stored_enchantment` can now apply CITs to books with multiple enchantments, if `multi` is left undefined.
+- `stored_enchantment` can now use the `requiredEnchantments` parameter, for CITs based on multiple enchantments.
