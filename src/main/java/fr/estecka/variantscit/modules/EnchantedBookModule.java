@@ -10,6 +10,11 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.util.Identifier;
 
+/**
+ * @deprecated Only used by the deprecated name `stored_enchantments` (plural),
+ * which could be replaced with the newer {@link EnchantmentModule}.
+ */
+@Deprecated(forRemoval=true)
 public class EnchantedBookModule
 extends AComponentCachingModule<ItemEnchantmentsComponent>
 {

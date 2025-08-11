@@ -14,6 +14,10 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
+/**
+ * @deprecated Replaced with {@link EnchantmentModule}.
+ */
+@Deprecated(forRemoval=true)
 public class EnchantedToolModule
 extends AComponentCachingModule<ItemEnchantmentsComponent>
 {
