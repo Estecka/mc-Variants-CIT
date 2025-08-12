@@ -11,6 +11,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ implements ClientModInitializer, PreparableModelLoadingPlugin<ModuleLoader.Resul
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.STORED_ENCHANTMENTS));
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(() -> {
 			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
-			return new EnchantedBookModule();
+			return new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty());
 		}));
 		ModuleRegistry.Register(Identifier.ofVanilla("trim"), new TrimModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
