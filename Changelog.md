@@ -99,3 +99,4 @@ Unified the `enchantment` and `stored_enchantment`:
 - `enchantment` can now use the `multi` special model.
 - `stored_enchantment` can now apply CITs to books with multiple enchantments, if `multi` is left undefined.
 - `stored_enchantment` can now use the `requiredEnchantments` parameter, for CITs based on multiple enchantments.
+- Fixed faulty performance optimisation on a few specific modules.
