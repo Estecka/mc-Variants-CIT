@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.Map;
 import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -44,53 +45,61 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 	}
 
 	@Override
-	public ModelIdentifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager modelProvider){
+	public ModelIdentifier GetModelForComponent(ItemEnchantmentsComponent enchants, IVariantManager library)
+	{
 		if (enchants == null || enchants.isEmpty() || !this.MatchesPrecondition(enchants))
 			return null;
 
-		if (enchants.getSize() > 1 && null != modelProvider.GetSpecialModel("multi"))
-			return modelProvider.GetSpecialModel("multi");
+		if (enchants.getSize() > precondition.size()+1 && null != library.GetSpecialModel("multi"))
+			return library.GetSpecialModel("multi");
 
-		Entry<RegistryEntry<Enchantment>> bestFit = null;
-		for (var contestant : enchants.getEnchantmentEntries()){
-			if (!this.precondition.containsKey(contestant.getKey().getKey().get().getValue())
-			&&  CompareEnchants(contestant, bestFit, modelProvider) > 0
-			){
-				bestFit = contestant;
-			}
-		}
-
+		Entry<RegistryEntry<Enchantment>> bestFit = GetBestEnchant(enchants, library);
 		if (bestFit == null)
 			return null;
 		else if (separator.isEmpty())
-			return modelProvider.GetVariantModel(bestFit.getKey().getKey().get().getValue());
+			return library.GetVariantModel(bestFit.getKey().getKey().get().getValue());
 		else {
-			int level = bestFit.getIntValue();
-			Identifier variantId = bestFit.getKey().getKey().get().getValue();
-
-			Identifier baseId = variantId.withSuffixedPath(separator.get());
-			for (int i=level; 0<=i; --i)
-			{
-				Identifier leveledId = baseId.withSuffixedPath(String.valueOf(i));
-				if (modelProvider.HasVariantModel(leveledId)){
-					variantId = leveledId;
-					break;
-				}
-			}
-
-			return modelProvider.GetVariantModel(variantId);
+			return this.GetLeveledModel(bestFit, library);
 		}
 	}
 
-	private int CompareEnchants(Entry<RegistryEntry<Enchantment>> a, Entry<RegistryEntry<Enchantment>> b, IVariantManager models){
+	private boolean MatchesPrecondition(ItemEnchantmentsComponent component){
+		// Cast the component, so that the keys are plain identifiers, instead
+		// of registry entries.
+		Object2IntOpenHashMap<Identifier> enchants = new Object2IntOpenHashMap<>();
+		for (var entry : component.getEnchantmentEntries())
+			enchants.put(entry.getKey().getKey().get().getValue(), entry.getIntValue());
+
+		for (var condition : this.precondition.entrySet()) {
+			if (enchants.getInt(condition.getKey()) < condition.getValue())
+				return false;
+		}
+
+		return true;
+	}
+
+	private @Nullable Entry<RegistryEntry<Enchantment>> GetBestEnchant(ItemEnchantmentsComponent enchants, IVariantManager library){
+		Entry<RegistryEntry<Enchantment>> bestFit = null;
+		for (var enchant : enchants.getEnchantmentEntries()){
+			if (!this.precondition.containsKey(enchant.getKey().getKey().get().getValue())
+			&&  CompareEnchants(enchant, bestFit, library) > 0
+			){
+				bestFit = enchant;
+			}
+		}
+
+		return bestFit;
+	}
+
+	private int CompareEnchants(Entry<RegistryEntry<Enchantment>> a, Entry<RegistryEntry<Enchantment>> b, IVariantManager library){
 		int result = 0;
 
 		if (a == null) return -1;
 		if (b == null) return 1;
 
 		result = Boolean.compare(
-			models.HasVariantModel(a.getKey().getKey().get().getValue()),
-			models.HasVariantModel(b.getKey().getKey().get().getValue())
+			this.HasVariantModel(a, library),
+			this.HasVariantModel(b, library)
 		);
 		if (result != 0) return result;
 
@@ -103,15 +112,24 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 		return result;
 	}
 
-	private boolean MatchesPrecondition(ItemEnchantmentsComponent component){
-		Object2IntOpenHashMap<Identifier> enchants = new Object2IntOpenHashMap<>();
-		for (var entry : component.getEnchantmentEntries())
-			enchants.put(entry.getKey().getKey().get().getValue(), entry.getIntValue());
+	private ModelIdentifier GetLeveledModel(Entry<RegistryEntry<Enchantment>> enchant, IVariantManager library){
+		int level = enchant.getIntValue();
+		Identifier variantId = enchant.getKey().getKey().get().getValue();
 
-		for (var condition : this.precondition.entrySet())
-			if (enchants.getInt(condition.getKey()) < condition.getValue())
-				return false;
+		Identifier baseId = variantId.withSuffixedPath(separator.get());
+		for (int i=level; 0<=i; --i)
+		{
+			Identifier leveledId = baseId.withSuffixedPath(String.valueOf(i));
+			if (library.HasVariantModel(leveledId)){
+				variantId = leveledId;
+				break;
+			}
+		}
 
-		return true;
+		return library.GetVariantModel(variantId);
+	}
+
+	private boolean HasVariantModel(Entry<RegistryEntry<Enchantment>> enchant, IVariantManager library){
+		return null != GetLeveledModel(enchant, library);
 	}
 }
