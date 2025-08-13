@@ -56,11 +56,8 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 		Entry<RegistryEntry<Enchantment>> bestFit = GetBestEnchant(enchants, library);
 		if (bestFit == null)
 			return null;
-		else if (separator.isEmpty())
-			return library.GetVariantModel(bestFit.getKey().getKey().get().getValue());
-		else {
-			return this.GetLeveledModel(bestFit, library);
-		}
+		else
+			return this.GetEnchantModel(bestFit, library);
 	}
 
 	private boolean MatchesPrecondition(ItemEnchantmentsComponent component){
@@ -112,17 +109,20 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 		return result;
 	}
 
-	private ModelIdentifier GetLeveledModel(Entry<RegistryEntry<Enchantment>> enchant, IVariantManager library){
-		int level = enchant.getIntValue();
+	private ModelIdentifier GetEnchantModel(Entry<RegistryEntry<Enchantment>> enchant, IVariantManager library){
 		Identifier variantId = enchant.getKey().getKey().get().getValue();
 
-		Identifier baseId = variantId.withSuffixedPath(separator.get());
-		for (int i=level; 0<=i; --i)
-		{
-			Identifier leveledId = baseId.withSuffixedPath(String.valueOf(i));
-			if (library.HasVariantModel(leveledId)){
-				variantId = leveledId;
-				break;
+		if (separator.isPresent()) {
+			int level = enchant.getIntValue();
+			Identifier baseId = variantId.withSuffixedPath(separator.get());
+
+			for (int i=level; 0<=i; --i)
+			{
+				Identifier leveledId = baseId.withSuffixedPath(String.valueOf(i));
+				if (library.HasVariantModel(leveledId)){
+					variantId = leveledId;
+					break;
+				}
 			}
 		}
 
@@ -130,6 +130,6 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 	}
 
 	private boolean HasVariantModel(Entry<RegistryEntry<Enchantment>> enchant, IVariantManager library){
-		return null != GetLeveledModel(enchant, library);
+		return null != GetEnchantModel(enchant, library);
 	}
 }
