@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ implements ClientModInitializer
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		ModuleRegistry.Register(Identifier.ofVanilla("durability"), DurabilityModule.CODEC);
-		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantedToolModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
 		ModuleRegistry.Register(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		ModuleRegistry.Register(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC);
@@ -54,10 +55,10 @@ implements ClientModInitializer
 		ModuleRegistry.Register(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
-		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), EnchantedBookModule.CODEC);
+		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.STORED_ENCHANTMENTS));
 		ModuleRegistry.Register(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(() -> {
 			LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
-			return new EnchantedBookModule();
+			return new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty());
 		}));
 		ModuleRegistry.Register(Identifier.ofVanilla("trim"), new TrimModule());
 		ModuleRegistry.Register(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
