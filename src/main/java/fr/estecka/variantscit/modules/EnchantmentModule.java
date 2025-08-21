@@ -21,11 +21,11 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 {
 	static public final MapCodec<EnchantmentModule> CreateCodec(ComponentType<ItemEnchantmentsComponent> targetComponent){
 		return RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			// TODO: Figure out how to restrict it to specific classes
-			// Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
-			Codec.unboundedMap(Identifier.CODEC, Codec.INT).optionalFieldOf("requiredEnchantments", Map.of()).forGetter(o->o.precondition),
-			Codec.STRING.optionalFieldOf("levelSeparator").forGetter(o->o.separator)
+			.group(
+				// TODO: Figure out how to restrict it to specific classes
+				// Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
+				Codec.unboundedMap(Identifier.CODEC, Codec.INT).optionalFieldOf("requiredEnchantments", Map.of()).forGetter(o->o.precondition),
+				Codec.STRING.optionalFieldOf("levelSeparator").forGetter(o->o.separator)
 			)
 			.apply(builder, (pre,sep)->new EnchantmentModule(targetComponent, pre, sep))
 		);
