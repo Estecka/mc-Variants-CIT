@@ -69,7 +69,7 @@ public final class ModuleLoader
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			List<EModuleContext> contexts = prototype.definition().GetEnabledContexts(moduleId);
+			List<EModuleContext> contexts = prototype.definition().contexts();
 			if (contexts.isEmpty()){
 				VariantsCitMod.LOGGER.warn("Ignored VCIT module with no context: {}", moduleId);
 				continue;

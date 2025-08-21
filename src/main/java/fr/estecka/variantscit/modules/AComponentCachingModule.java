@@ -41,8 +41,10 @@ implements ICitModule
 		if (component == null)
 			return null;
 
-		if (this.reloadCounts != VariantsCitMod.reloadcount)
+		if (this.reloadCounts != VariantsCitMod.reloadcount){
+			this.reloadCounts = VariantsCitMod.reloadcount;
 			cachedModels.clear();
+		}
 		/**
 		 * Do  not  use  computeIfAbsent! It would  attempt  to  recompute  null
 		 * values, which are valid to cache.
