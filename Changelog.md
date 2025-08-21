@@ -93,6 +93,13 @@
 - Added simplified mono-string syntax for ItemComponent properties.
 - Format variables now accept upper-cases, numbers and low-dashes
 - Marked module types `custom_data`, `entity_data`, `bucket_entity_data` or `block_entity_data` as deprecated. (Use `component_data` instead.)
+## 2.13
+- Fixed faulty performance optimisation on a few specific modules.
+- Unified the `enchantment` and `stored_enchantment` modules:
+	- `enchantment` can now include an enchantment's level in the variant id, and use the `multi` special model.
+	- `stored_enchantment` will now apply CITs to books with multiple enchantments, if `multi` is left undefined.
+	- `stored_enchantment` can now use the `requiredEnchantments` parameter.
+	- The `multi` special model will only count enchantments outside of the requirements.
 
 # v3
 ## 3.0
@@ -166,6 +173,14 @@ Since v2.5:
 - Renaming the `aspect` field to `context`.
 ### 3.8.2
 - Made equippable cache use a weak map.
+## 3.9
+- Removed the previously deprecated `aspect` field.
+- Fixed faulty performance optimisation on a few specific modules.
+- Unified the `enchantment` and `stored_enchantment` modules:
+	- `enchantment` can now include an enchantment's level in the variant id, and use the `multi` special model.
+	- `stored_enchantment` will now apply CITs to books with multiple enchantments, if `multi` is left undefined.
+	- `stored_enchantment` can now use the `requiredEnchantments` parameter.
+	- The `multi` special model will only count enchantments outside of the requirements.
 
 # v4
 ## 4.0
@@ -200,3 +215,11 @@ Since v3.5:
 - Renaming the `aspect` field to `context`.
 ### 4.3.2
 - Made equippable cache use a weak map.
+## 4.4
+- Removed the previously deprecated `aspect` field.
+- Fixed faulty performance optimisation on a few specific modules.
+- Unified the `enchantment` and `stored_enchantment` modules:
+	- `enchantment` can now include an enchantment's level in the variant id, and use the `multi` special model.
+	- `stored_enchantment` will now apply CITs to books with multiple enchantments, if `multi` is left undefined.
+	- `stored_enchantment` can now use the `requiredEnchantments` parameter.
+	- The `multi` special model will only count enchantments outside of the requirements.
