@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import net.minecraft.client.util.ModelIdentifier;
@@ -20,6 +21,8 @@ extends AMultiComponentCachingModule
 	@Override
 	public @Nullable ModelIdentifier RecomputeItemModel(ItemStack stack, IVariantManager library) {
 		Identifier variant = this.RecomputeItemVariant(stack);
+		if (debug)
+			VariantsCitMod.LOGGER.info("[ASimpleMultiComponent] Variant Id: {}", variant);
 		return library.GetVariantModel(variant);
 	}
 }

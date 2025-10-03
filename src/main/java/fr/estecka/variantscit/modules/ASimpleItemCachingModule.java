@@ -36,7 +36,7 @@ implements ISimpleCitModule
 			entry = new CacheEntry(this.RecomputeItemVariant(stack), this.IsDirty(stack).and(ItemTypeValidator(stack)));
 			cache.put(stack, entry);
 			if (debug)
-				VariantsCitMod.LOGGER.info("Cache size: {}", cache.size());
+				VariantsCitMod.LOGGER.info("[ASimpleItem] Cache size: {}; Variant id: {}", cache.size(), entry.variant);
 		}
 
 		return entry.variant;
