@@ -39,8 +39,13 @@ extends ASimpleMultiComponentCachingModule
 	public Identifier RecomputeItemVariant(ItemStack stack){
 		Map<String,String> variables = new HashMap<>();
 
+		if (debug)
+			VariantsCitMod.LOGGER.info("[component_format] {}", this.format);
+
 		for (var entry : this.varGetters.entrySet()){
 			String value = entry.getValue().GetPropertyString(stack);
+			if (debug)
+				VariantsCitMod.LOGGER.info("\t${{}} -> {}", entry.getKey(), value);
 			if (value == null)
 				return null;
 
@@ -48,10 +53,10 @@ extends ASimpleMultiComponentCachingModule
 		}
 
 		String rawId = this.format.Substitute(variables);
+		if (debug)
+			VariantsCitMod.LOGGER.info("\t= {}", rawId);
 		variables.clear();
 		Identifier id = Identifier.tryParse(rawId);
-		if (debug)
-			VariantsCitMod.LOGGER.info("component_format: \"{}\" -> \"{}\"", this.format, rawId);
 		return id;
 	}
 }
