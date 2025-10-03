@@ -21,3 +21,9 @@ Initial Release
 ## 1.21.6
 - `ItemAsset.Property::new` takes an extra argument
 - `EquippableComponent` takes new fields.
+
+## 1.21.9
+### No workaround:
+- The signature of `BakedModelManager::reload` has changed. The `ResourceManager` passed as argument is now wrapped into another data type.
+### Possible workaround:
+- `NbtComponent::getNbt` was removed. use `copyNbt`, or create an accessor.

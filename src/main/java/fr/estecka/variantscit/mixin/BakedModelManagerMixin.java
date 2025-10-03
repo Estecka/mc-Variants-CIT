@@ -24,7 +24,7 @@ import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
 
 @Unique
@@ -57,8 +57,8 @@ public class BakedModelManagerMixin
 	}
 
 	@Inject( method="reload", at=@At("HEAD") )
-	private void reload(CallbackInfoReturnable<?> ci, @Local(argsOnly=true) ResourceManager manager, @Share("result") LocalRef<ItemVariantAggregator> resultRef){
-		ModuleLoader.Result result = ModuleLoader.ReloadModules(manager);
+	private void reload(CallbackInfoReturnable<?> ci, @Local(argsOnly=true) ResourceReloader.Store store, @Share("result") LocalRef<ItemVariantAggregator> resultRef){
+		ModuleLoader.Result result = ModuleLoader.ReloadModules(store.getResourceManager());
 		resultRef.set(result.itemAggregator);
 		VariantsCitMod.OnResourceReload(result);
 	}

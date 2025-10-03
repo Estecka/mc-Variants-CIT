@@ -33,7 +33,8 @@ extends AMonoComponentProperty<NbtComponent>
 	public @NotNull String GetPropertyString(NbtComponent bucket) {
 		NbtCompound nbt;
 
-		if (bucket == null || (nbt=bucket.getNbt()) == null)
+		// TODO: Directly access the Nbt if performances become a concern.
+		if (bucket == null || (nbt=bucket.copyNbt()) == null)
 			return adult;
 
 		float age = nbt.getFloat("Age", 0);
