@@ -30,7 +30,7 @@ extends ASimpleComponentCachingModule<T>
 
 		Identifier id = this.GetVariantForNbt(nbt);
 		if (debug)
-			VariantsCitMod.LOGGER.info("component_data: {} -> {}", componentType, id);
+			VariantsCitMod.LOGGER.info("[AArbitraryComponent] {} -> {}", componentType, id);
 		return id;
 	}
 
