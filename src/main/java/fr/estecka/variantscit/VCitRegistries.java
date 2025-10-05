@@ -1,6 +1,7 @@
 package fr.estecka.variantscit;
 
 import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.format.CharRemapTransform;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.RegexTransform;
@@ -28,6 +29,7 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_auto"),      IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("char_remap"),          CharRemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("regex"),               RegexTransform.MAPCODEC);
 
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("auto"),            INbtInput.AUTO);
