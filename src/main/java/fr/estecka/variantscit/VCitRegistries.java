@@ -1,11 +1,10 @@
 package fr.estecka.variantscit;
 
 import net.minecraft.util.Identifier;
-import fr.estecka.variantscit.format.CharRemapTransform;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
-import fr.estecka.variantscit.format.RegexTransform;
 import fr.estecka.variantscit.format.properties.*;
+import fr.estecka.variantscit.format.transforms.*;
 
 public final class VCitRegistries
 {
