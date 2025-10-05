@@ -28,6 +28,7 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_auto"),      IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("char_remap"),          CharRemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("remap"),               RemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("regex"),               RegexTransform.MAPCODEC);
