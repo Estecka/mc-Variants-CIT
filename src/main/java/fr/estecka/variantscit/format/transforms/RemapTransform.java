@@ -15,7 +15,7 @@ implements IStringTransform
 	static public final MapCodec<RemapTransform> MAPCODEC = RecordCodecBuilder.mapCodec(builder ->
 		builder.group(
 			Codec.BOOL.optionalFieldOf("validate", false).forGetter(RemapTransform::required),
-			Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("names").forGetter(RemapTransform::map)
+			Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("map").forGetter(RemapTransform::map)
 		)
 		.apply(builder, RemapTransform::new)
 	);
