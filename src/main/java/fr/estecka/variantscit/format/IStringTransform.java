@@ -1,11 +1,9 @@
 package fr.estecka.variantscit.format;
 
 import java.text.Normalizer;
-import java.util.List;
 import java.util.function.Function;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.util.Identifier;
@@ -14,31 +12,22 @@ import net.minecraft.util.Identifier;
 public interface IStringTransform
 extends Function<String,String>
 {
-	static public final IStringTransform[] EMPTY = new IStringTransform[0];
-	static public final IStringTransform[] AUTO  = new IStringTransform[]{ IStringTransform::AutoSanitize };
+	static public final IStringTransform NOOP               = o->o;
 	static public final IStringTransform SANITIZE           = Sanitize("[^a-zA-Z0-9_.-/:]");
 	static public final IStringTransform SANITIZE_PATH      = Sanitize("[^a-zA-Z0-9_.-/]");
 	static public final IStringTransform SANITIZE_NAMESPACE = Sanitize("[^a-zA-Z0-9_.-]");
+	static public final IStringTransform SANITIZE_AUTO      = IStringTransform::AutoSanitize;
+	static public final IStringTransform LOWERCASE          = String::toLowerCase;
 
 	static public final Codec<IStringTransform> CODEC = VCitRegistries.TRANSFORMS.codec;
-	static public final Codec<IStringTransform[]> ARRAY_CODEC = CodecUtil.OneOrMany(CODEC).xmap(list->list.toArray(IStringTransform[]::new), array->List.<IStringTransform>of(array));
 	@Deprecated
-	static public final Codec<IStringTransform[]> LEGACY_CODEC = Codec.BOOL.xmap(
-		lowercase -> lowercase ? new IStringTransform[]{String::toLowerCase} : IStringTransform.EMPTY,
+	static public final Codec<IStringTransform> LEGACY_CODEC = Codec.BOOL.xmap(
+		lowercase -> lowercase ? IStringTransform.LOWERCASE : IStringTransform.NOOP,
 		transform -> true
 	).validate(_0 -> {
 		VariantsCitMod.LOGGER.warn("The parameter `caseSensitive:true` is being deprecated. Use `transform:lowercase` instead.");
 		return DataResult.success(_0);
 	});
-
-	static public String Transform(IStringTransform[] transforms, String input){
-		for (IStringTransform t : transforms) {
-			input = t.apply(input);
-			if (input == null)
-				break;
-		}
-		return input;
-	}
 
 	static public IStringTransform Sanitize(String charset){
 		return input -> Normalizer.normalize(input, Normalizer.Form.NFD)

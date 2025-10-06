@@ -44,8 +44,12 @@ implements IStringTransform
 	}
 
 	@Override
-	public String apply(String t) {
-		// TODO Auto-generated method stub
-		return null;
+	public String apply(String input) {
+		for (IStringTransform t : subTransforms) {
+			input = t.apply(input);
+			if (input == null)
+				return null;
+		}
+		return input;
 	}
 }
