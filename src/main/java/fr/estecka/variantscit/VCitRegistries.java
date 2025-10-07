@@ -9,7 +9,7 @@ import fr.estecka.variantscit.format.transforms.*;
 public final class VCitRegistries
 {
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
-	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("transform", Identifier.ofVanilla("regex"));
+	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("type", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static {
@@ -30,7 +30,6 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_auto"),      IStringTransform::AutoSanitize);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("alternative"),         AlternativeTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(Identifier.ofVanilla("optional"),            OptionalTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("charset_remap"),       CharRemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("remap"),               RemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("regex"),               RegexTransform.MAPCODEC);

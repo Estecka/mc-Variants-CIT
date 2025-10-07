@@ -14,7 +14,7 @@ implements IStringTransform
 		;
 
 	static public final MapCodec<IStringTransform> MAPCODEC = IStringTransform.CODEC.listOf()
-		.fieldOf("transform")
+		.fieldOf("subTransforms")
 		.xmap(SuccessiveTransform::Wrap, SuccessiveTransform::Unwrap)
 		;
 

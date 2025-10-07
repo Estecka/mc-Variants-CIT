@@ -75,4 +75,15 @@ public class CodecUtil
 			return null;
 		}
 	}
+
+	/**
+	 * Downcast the decoder's result to a superclass. This strips the codec of
+	 * its encoding abilities.
+	 */
+	static public <SUPER, SUB extends SUPER> MapCodec<SUPER> Anonymize(MapCodec<SUB> original){
+		return original.flatXmap(
+			o->DataResult.success((SUPER)o),
+			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
+		);
+	}
 }
