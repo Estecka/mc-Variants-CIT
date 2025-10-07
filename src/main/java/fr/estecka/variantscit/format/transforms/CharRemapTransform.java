@@ -39,21 +39,6 @@ implements IStringTransform
 		return result.toString();
 	}
 
-	static private Char2ObjectMap<@Nullable Character> StringsToMap(String source, String destination){
-		Char2ObjectMap<@Nullable Character> map = new Char2ObjectArrayMap<>();
-
-		for (int i=0; i<source.length(); ++i)
-		{
-			char key = source.charAt(i);
-			if (i < destination.length())
-				map.put(key, (Character)destination.charAt(i));
-			else
-				map.put(key, null);
-		}
-
-		return map;
-	}
-
 	static private record StringCharmap(String source, String destination)
 	{
 		static public final MapCodec<StringCharmap> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
