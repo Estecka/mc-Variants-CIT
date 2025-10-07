@@ -103,3 +103,6 @@
 	- The `multi` special model will only count enchantments outside of the requirements.
 ### 2.13.1
 - Made the debug options for `component_data` and `component_format` a bit more verbose.
+## 2.14
+- Added transforms: `alternative`, `remap`, `char_remap`.
+- All transforms can now be marked as optional, or take a fallback.
