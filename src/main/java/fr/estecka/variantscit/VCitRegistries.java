@@ -9,7 +9,7 @@ import fr.estecka.variantscit.format.transforms.*;
 public final class VCitRegistries
 {
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
-	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("type", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
+	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static {
