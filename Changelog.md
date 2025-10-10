@@ -104,5 +104,5 @@
 ### 2.13.1
 - Made the debug options for `component_data` and `component_format` a bit more verbose.
 ## 2.14
-- Added transforms: `null`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
+- Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.

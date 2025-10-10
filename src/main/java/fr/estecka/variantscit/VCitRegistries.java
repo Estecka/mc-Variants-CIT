@@ -29,6 +29,7 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_auto"),      IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("test"),                TestTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("alternative"),         AlternativeTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST);
