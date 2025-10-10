@@ -7,7 +7,7 @@ public record TestTransform(IStringTransform subTransform)
 implements IStringTransform
 {
 	static public final MapCodec<TestTransform> MAPCODEC = SuccessiveTransform.CODEC
-		.fieldOf("subTransform")
+		.fieldOf("tester")
 		.xmap(TestTransform::new, TestTransform::subTransform)
 		;
 
