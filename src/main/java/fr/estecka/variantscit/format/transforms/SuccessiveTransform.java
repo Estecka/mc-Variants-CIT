@@ -27,7 +27,7 @@ implements IStringTransform
 
 	static public IStringTransform Wrap(List<IStringTransform> sub){
 		if (sub.size() == 0)
-			return o->o;
+			return IStringTransform.NOOP;
 		else if (sub.size() == 1)
 			return sub.get(0);
 		else
