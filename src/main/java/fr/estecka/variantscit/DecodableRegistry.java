@@ -111,7 +111,7 @@ public class DecodableRegistry<T>
 	{
 		@Override
 		public <O> RecordBuilder<O> encode(T input, DynamicOps<O> ops, RecordBuilder<O> prefix) {
-			DataResult<MapLike<O>> result = DataResult.error(()->"Encoding not supported");
+			DataResult<MapLike<O>> result = DataResult.error(()->"Encoding not supported by DecodableRegistry");
 			return result.map(map->prefix).result().orElse(prefix.withErrorsFrom(result));
 		}
 

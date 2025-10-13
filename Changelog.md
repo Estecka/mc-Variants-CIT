@@ -103,6 +103,9 @@
 	- The `multi` special model will only count enchantments outside of the requirements.
 ### 2.13.1
 - Made the debug options for `component_data` and `component_format` a bit more verbose.
+## 2.14
+- Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
+- All transforms can now be marked as optional, or take a fallback.
 
 # v3
 ## 3.0
@@ -187,6 +190,9 @@ Since v2.5:
 	- The `multi` special model will only count enchantments outside of the requirements.
 ### 3.9.1
 - Made the debug options for `component_data` and `component_format` a bit more verbose.
+## 3.10
+- Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
+- All transforms can now be marked as optional, or take a fallback.
 
 # v4
 ## 4.0
@@ -236,3 +242,6 @@ Since v3.5:
 	- The `multi` special model will only count enchantments outside of the requirements.
 ### 4.4.1
 - Made the debug options for `component_data` and `component_format` a bit more verbose.
+## 4.5
+- Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
+- All transforms can now be marked as optional, or take a fallback.

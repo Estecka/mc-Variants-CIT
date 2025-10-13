@@ -13,6 +13,7 @@ import fr.estecka.variantscit.format.NbtAdapter;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.format.properties.ItemComponentProperty;
 import fr.estecka.variantscit.format.properties.TransformableProperty;
+import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -47,7 +48,7 @@ extends ASimpleMultiComponentCachingModule
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter()),
-				CodecUtil.MapWithAlternative(IStringTransform.ARRAY_CODEC.fieldOf("transform"), IStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(IStringTransform.EMPTY).forGetter(o->o.transform())
+				CodecUtil.MapWithAlternative(SuccessiveTransform.CODEC.fieldOf("transform"), IStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(IStringTransform.NOOP).forGetter(o->o.transform())
 			)
 			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty(componentType, adapter), transform, Optional.empty()))
 		);
