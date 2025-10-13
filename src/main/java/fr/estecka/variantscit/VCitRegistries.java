@@ -1,6 +1,8 @@
 package fr.estecka.variantscit;
 
 import net.minecraft.util.Identifier;
+import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.properties.*;
@@ -11,6 +13,7 @@ public final class VCitRegistries
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
 	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
+	static public final DecodableRegistry<UnbakedModule<?>> MODULE_TYPES = new DecodableRegistry<>("type");
 
 	static {
 		ITEM_PROPERTIES.RegisterUnit(Identifier.ofVanilla("axolotl_variant"), AxolotlVariantProperty.UNIT);
@@ -45,5 +48,19 @@ public final class VCitRegistries
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("identifier"),      INbtInput::Identifier);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text"),       INbtInput::RichText);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text_array"), INbtInput::RichTextArray);
+	}
+
+	static public void RegisterSimpleModule(Identifier id, MapCodec<ICitModule> mapcodec){
+		MODULE_TYPES.RegisterMap(
+			id,
+			mapcodec.xmap(
+				parameters -> new UnbakedModule<>(BakedModule::new, parameters),
+				UnbakedModule::parameters
+			)
+		);
+	}
+
+	static public void RegisterSimpleModule(Identifier id, ICitModule unit){
+		RegisterSimpleModule(id, MapCodec.unit(unit));
 	}
 }
