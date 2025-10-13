@@ -84,7 +84,7 @@ implements IStringProperty
 
 		return DataResult.success(new TransformableProperty<>(
 			new ItemComponentProperty(component, new NbtAdapter(path, INbtInput.AUTO)),
-			IStringTransform.AUTO,
+			IStringTransform.SANITIZE_AUTO,
 			Optional.empty()
 		));
 	}
