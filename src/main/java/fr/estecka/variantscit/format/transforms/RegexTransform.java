@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.format;
+package fr.estecka.variantscit.format.transforms;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,8 +9,9 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.format.IStringTransform;
 
-public record RegexTransform(Pattern pattern, String substitution, boolean matchAll, boolean validate)
+public record RegexTransform(Pattern pattern, String substitution, boolean matchAll, @Deprecated boolean validate)
 implements IStringTransform
 {
 	static public final MapCodec<RegexTransform> MAPCODEC = RecordCodecBuilder.mapCodec(instance ->
