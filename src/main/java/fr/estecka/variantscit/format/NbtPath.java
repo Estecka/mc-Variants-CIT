@@ -71,6 +71,7 @@ public final class NbtPath
 	}
 
 	static public DataResult<NbtPath> Parse(final String input){
+		@SuppressWarnings("unchecked")
 		final Function<String,Parsed>[] parsers = new Function[3];
 		parsers[0] = MapKey::Next;
 		parsers[1] = ArrayIndex::Next;
