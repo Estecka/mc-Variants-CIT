@@ -3,13 +3,13 @@ package fr.estecka.variantscit;
 import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
-import fr.estecka.variantscit.format.RegexTransform;
 import fr.estecka.variantscit.format.properties.*;
+import fr.estecka.variantscit.format.transforms.*;
 
 public final class VCitRegistries
 {
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
-	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("transform", Identifier.ofVanilla("regex"));
+	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static {
@@ -20,7 +20,8 @@ public final class VCitRegistries
 		ITEM_PROPERTIES.RegisterUnit(Identifier.ofVanilla("item_type"), new ItemTypeProperty());
 		ITEM_PROPERTIES.RegisterUnit(Identifier.ofVanilla("painting_variant"), PaintingVariantProperty.UNIT);
 
-		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("noop"),               s->s);
+		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("noop"),               IStringTransform.NOOP);
+		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("null"),               IStringTransform.NULL);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("lowercase"),          String::toLowerCase);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("discard_path"),       IStringTransform::DiscardPath);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("discard_namespace"),  IStringTransform::DiscardNamespace);
@@ -28,6 +29,13 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_auto"),      IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("test"),                TestTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("successive"),          SuccessiveTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("alternative"),         AlternativeTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("blacklist"),           FilterlistTransform.MAPCODEC_BLACKLIST);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("charset_remap"),       CharRemapTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(Identifier.ofVanilla("remap"),               RemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(Identifier.ofVanilla("regex"),               RegexTransform.MAPCODEC);
 
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("auto"),            INbtInput.AUTO);
