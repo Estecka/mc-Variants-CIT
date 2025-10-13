@@ -12,8 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.IItemModelProvider;
-import fr.estecka.variantscit.UnbakedModule;
+import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.item.Item;
@@ -26,8 +25,8 @@ import net.minecraft.util.JsonHelper;
 public final class ModuleLoader
 {
 	static public class Result {
-		public final Map<Item, IItemModelProvider> itemModules  = new HashMap<>();
-		public final Map<Item, IItemModelProvider> equipModules = new HashMap<>();
+		public final Map<Item, IBakedModule> itemModules  = new HashMap<>();
+		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
 		public final ItemVariantAggregator  itemAggregator  = new ItemVariantAggregator ();
 		public final EquipVariantAggregator equipAggregator = new EquipVariantAggregator();
 	}
@@ -186,8 +185,8 @@ public final class ModuleLoader
 	}
 
 	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
-		Map<Item, List<IItemModelProvider>> itemModules  = new HashMap<>();
-		Map<Item, List<IItemModelProvider>> equipModules = new HashMap<>();
+		Map<Item, List<IBakedModule>> itemModules  = new HashMap<>();
+		Map<Item, List<IBakedModule>> equipModules = new HashMap<>();
 	
 		for (MetaModule meta : modules)
 		{
@@ -199,7 +198,7 @@ public final class ModuleLoader
 		BakeItem(result.equipModules, equipModules);
 	}
 
-	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<IItemModelProvider>> output){
+	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<IBakedModule>> output){
 		if (lib.isEmpty())
 			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", contextName, meta.id());
 		else
@@ -210,11 +209,11 @@ public final class ModuleLoader
 		}
 	}
 
-	static private void BakeItem(Map<Item, IItemModelProvider> result, Map<Item, List<IItemModelProvider>> moduleListPerItem){
+	static private void BakeItem(Map<Item, IBakedModule> result, Map<Item, List<IBakedModule>> moduleListPerItem){
 		for (var entry : moduleListPerItem.entrySet()){
 			result.put(
 				entry.getKey(),
-				IItemModelProvider.OfList( entry.getValue() )
+				IBakedModule.OfList( entry.getValue() )
 			);
 		}
 	}

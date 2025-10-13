@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.properties.*;
 import fr.estecka.variantscit.selectors.*;
 
@@ -24,13 +25,13 @@ implements ClientModInitializer
 
 	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
-	static private Map<Item, IItemModelProvider> ITEM_MODULES  = new HashMap<>();
-	static private Map<Item, IItemModelProvider> EQUIP_MODULES = new HashMap<>();
+	static private Map<Item, IBakedModule> ITEM_MODULES  = new HashMap<>();
+	static private Map<Item, IBakedModule> EQUIP_MODULES = new HashMap<>();
 
-	static public @Nullable IItemModelProvider GetItemModule(Item itemType){
+	static public @Nullable IBakedModule GetItemModule(Item itemType){
 		return ITEM_MODULES.get(itemType);
 	}
-	static public @Nullable IItemModelProvider GetEquipmentModule(Item itemType){
+	static public @Nullable IBakedModule GetEquipmentModule(Item itemType){
 		return EQUIP_MODULES.get(itemType);
 	}
 
