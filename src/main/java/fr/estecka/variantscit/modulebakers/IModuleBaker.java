@@ -6,5 +6,5 @@ import fr.estecka.variantscit.api.IVariantManager;
 @FunctionalInterface
 public interface IModuleBaker<T>
 {
-	IItemModelProvider Bake(IVariantManager library, T logic);
+	IItemModelProvider Bake(IVariantManager library, T parameters);
 }

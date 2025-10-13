@@ -1,21 +1,51 @@
 package fr.estecka.variantscit;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.util.Identifier;
+import java.util.Map;
+import java.util.Optional;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.properties.*;
 import fr.estecka.variantscit.format.transforms.*;
+import fr.estecka.variantscit.modulebakers.IModuleBaker;
+import fr.estecka.variantscit.modules.*;
 
 public final class VCitRegistries
 {
+	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type");
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
 	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
-	static public final DecodableRegistry<UnbakedModule<?>> MODULE_TYPES = new DecodableRegistry<>("type");
 
 	static {
+		RegisterSimpleModule(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC);
+		RegisterSimpleModule(Identifier.ofVanilla("block_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
+		RegisterSimpleModule(Identifier.ofVanilla("bucket_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
+		RegisterSimpleModule(Identifier.ofVanilla("component_data"), ComponentDataModule.CODEC);
+		RegisterSimpleModule(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
+		RegisterSimpleModule(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
+		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
+		RegisterSimpleModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC);
+		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
+		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
+		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
+		RegisterSimpleModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC);
+		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
+		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
+		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
+		RegisterSimpleModule(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
+		RegisterSimpleModule(Identifier.ofVanilla("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.STORED_ENCHANTMENTS));
+		RegisterSimpleModule(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(() -> {
+			VariantsCitMod.LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
+			return new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty());
+		}));
+		RegisterSimpleModule(Identifier.ofVanilla("trim"), new TrimModule());
+		RegisterSimpleModule(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
+		RegisterSimpleModule(Identifier.ofVanilla("trim_material"), new TrimPatternModule());
+
 		ITEM_PROPERTIES.RegisterUnit(Identifier.ofVanilla("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(Identifier.ofVanilla("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
 		ITEM_PROPERTIES.RegisterMap(Identifier.ofVanilla("item_component"), ItemComponentProperty.MAP_CODEC);
@@ -50,14 +80,15 @@ public final class VCitRegistries
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text_array"), INbtInput::RichTextArray);
 	}
 
-	static public void RegisterSimpleModule(Identifier id, MapCodec<ICitModule> mapcodec){
-		MODULE_TYPES.RegisterMap(
-			id,
-			mapcodec.xmap(
-				parameters -> new UnbakedModule<>(BakedModule::new, parameters),
-				UnbakedModule::parameters
-			)
-		);
+	static public <T> void RegisterCustomModule(Identifier id, IModuleBaker<T> baker, MapCodec<T> mapcodec){
+		MODULES.RegisterMap(id, mapcodec.xmap(
+			parameters -> new UnbakedModule<>(baker, parameters),
+			UnbakedModule::parameters
+		));
+	}
+
+	static public void RegisterSimpleModule(Identifier id, MapCodec<? extends ICitModule> mapcodec){
+		RegisterCustomModule(id, BakedModule::new, mapcodec);
 	}
 
 	static public void RegisterSimpleModule(Identifier id, ICitModule unit){
