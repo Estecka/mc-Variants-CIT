@@ -10,9 +10,12 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.UnbakedModule;
+import fr.estecka.variantscit.VCitRegistries;
 
 public record ModuleDefinition(
-	Identifier type,
+	@Deprecated Identifier type,
+	UnbakedModule<?> module,
 	List<EModuleContext> contexts,
 	Optional<List<Identifier>> targets,
 	int priority,
@@ -26,6 +29,7 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
+			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::module),
 			CodecUtil.OneOrMany(EModuleContext.CODEC).optionalFieldOf("context", List.of(EModuleContext.ITEM_MODEL)).forGetter(ModuleDefinition::contexts),
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),

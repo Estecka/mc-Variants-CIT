@@ -48,6 +48,10 @@ public class DecodableRegistry<T>
 		this(typeKey, defaultId, c->c);
 	}
 
+	public DecodableRegistry(String typeKey, IMapWrapper<T> mapWrapper){
+		this(typeKey, null, mapWrapper);
+	}
+
 	public DecodableRegistry(String typeKey, @Nullable Identifier defaultId, IMapWrapper<T> mapWrapper){
 		this.typeKey = typeKey;
 		this.mapWrapper = mapWrapper;
@@ -62,16 +66,24 @@ public class DecodableRegistry<T>
 	}
 
 	public void RegisterMap(Identifier key, MapCodec<? extends T> mapCodec){
+		AssertUnique(key);
 		this.mapCodecs.put(key, mapWrapper.apply(mapCodec));
 	}
 
 	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
-		this.units.put(key, unit);
+		AssertUnique(key);
 		this.RegisterMap(key, mapCodec);
+		this.units.put(key, unit);
 	}
 
 	public MapDecoder<? extends T> GetDecoder(Identifier type){
 		return this.mapCodecs.get(type);
+	}
+
+	private void AssertUnique(Identifier key){
+		if (this.units.containsKey(key) || this.mapCodecs.containsKey(key)){
+			throw new IllegalStateException("Duplicate registration for entry:"+key.toString());
+		}
 	}
 
 	private class MapDecoderImpl

@@ -12,12 +12,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.BakedModule;
 import fr.estecka.variantscit.IItemModelProvider;
-import fr.estecka.variantscit.ModuleRegistry;
+import fr.estecka.variantscit.UnbakedModule;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.ICitModule;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -49,8 +47,7 @@ public final class ModuleLoader
 		Set<Item> targets,
 		Optional<VariantLibrary> itemLibrary,
 		Optional<VariantLibrary> equipLibrary,
-		ICitModule logic
-		
+		UnbakedModule<?> parameters
 	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
@@ -87,7 +84,6 @@ public final class ModuleLoader
 			if (prototype.definition.modelPrefix().isEmpty())
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
-			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
 			VariantLibrary itemLibrary = null;
 			VariantLibrary equipLibrary = null;
 
@@ -103,7 +99,7 @@ public final class ModuleLoader
 				targets,
 				Optional.ofNullable(itemLibrary),
 				Optional.ofNullable(equipLibrary),
-				moduleLogic
+				prototype.definition.module()
 			);
 
 			modules.add(meta);
@@ -190,8 +186,8 @@ public final class ModuleLoader
 	}
 
 	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
-		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
-		Map<Item, List<BakedModule>> equipModules = new HashMap<>();
+		Map<Item, List<IItemModelProvider>> itemModules  = new HashMap<>();
+		Map<Item, List<IItemModelProvider>> equipModules = new HashMap<>();
 	
 		for (MetaModule meta : modules)
 		{
@@ -203,18 +199,18 @@ public final class ModuleLoader
 		BakeItem(result.equipModules, equipModules);
 	}
 
-	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<IItemModelProvider>> output){
 		if (lib.isEmpty())
 			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", contextName, meta.id());
 		else
 			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
 
 		for (Item itemType : meta.targets()){
-			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(meta.parameters.Bake(lib));
 		}
 	}
 
-	static private void BakeItem(Map<Item, IItemModelProvider> result, Map<Item, List<BakedModule>> moduleListPerItem){
+	static private void BakeItem(Map<Item, IItemModelProvider> result, Map<Item, List<IItemModelProvider>> moduleListPerItem){
 		for (var entry : moduleListPerItem.entrySet()){
 			result.put(
 				entry.getKey(),

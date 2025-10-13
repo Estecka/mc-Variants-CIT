@@ -15,7 +15,7 @@ import fr.estecka.variantscit.modules.*;
 
 public final class VCitRegistries
 {
-	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type");
+	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", c->c.fieldOf("parameters"));
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
 	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
