@@ -12,6 +12,7 @@ import fr.estecka.variantscit.format.properties.*;
 import fr.estecka.variantscit.format.transforms.*;
 import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IModuleBaker;
+import fr.estecka.variantscit.modulebakers.LinearLibrary;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.UnbakedModule;
 
@@ -30,7 +31,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
 		RegisterSimpleModule(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
-		RegisterSimpleModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC);
+		RegisterCustomModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
@@ -82,7 +83,7 @@ public final class VCitRegistries
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text_array"), INbtInput::RichTextArray);
 	}
 
-	static public <T> void RegisterCustomModule(Identifier id, IModuleBaker<T> baker, MapCodec<T> mapcodec){
+	static public <T> void RegisterCustomModule(Identifier id, MapCodec<T> mapcodec, IModuleBaker<T> baker){
 		MODULES.RegisterMap(id, mapcodec.xmap(
 			parameters -> new UnbakedModule<>(baker, parameters),
 			UnbakedModule::parameters
@@ -90,7 +91,7 @@ public final class VCitRegistries
 	}
 
 	static public void RegisterSimpleModule(Identifier id, MapCodec<? extends ICitModule> mapcodec){
-		RegisterCustomModule(id, GenericBakedModule::new, mapcodec);
+		RegisterCustomModule(id, mapcodec, GenericBakedModule::new);
 	}
 
 	static public void RegisterSimpleModule(Identifier id, ICitModule unit){

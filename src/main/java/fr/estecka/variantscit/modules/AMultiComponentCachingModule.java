@@ -30,7 +30,7 @@ implements ICitModule
 
 	protected AMultiComponentCachingModule(boolean debug, Stream<IStringProperty> properties){
 		this.debug = debug;
-		this.cache = new MultiPropertyCache(properties, debug);
+		this.cache = new MultiPropertyCache(debug, properties);
 	}
 
 	// TODO: Ensure child classes can't access unregistered non-cached components.

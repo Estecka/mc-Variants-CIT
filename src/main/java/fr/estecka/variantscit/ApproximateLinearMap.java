@@ -54,27 +54,28 @@ public class ApproximateLinearMap<T>
 	 * @return
 	 */
 	public final T GetClosestValue(int targetMagnitude, boolean greaterThan, Predicate<Entry<T>> isElligible){
-		int iTarget = 0;
+		int midpoint = 0;
 		int iMin = 0;
 		int iMax = this.entries.size();
 
 		while (iMin < iMax){
-			int halfPoint = (iMax - iMin) / 2;
-			Entry<T> entry = entries.get(halfPoint);
+			midpoint = (iMax + iMin) / 2;
+			Entry<T> entry = entries.get(midpoint);
 
 			if (entry.magnitude < targetMagnitude)
-				iMin = halfPoint;
+				iMin = NudgeUp(iMin, midpoint);
 			else if (entry.magnitude > targetMagnitude)
-				iMax = halfPoint;
+				iMax = NudgeDown(iMax, midpoint);
 			else if (greaterThan)
-				iMin = halfPoint;
+				iMin = NudgeUp(iMin, midpoint);
 			else
-				iMax = halfPoint;
+				iMax = NudgeDown(iMax, midpoint);
 
 		}
 
+		//FIXME: Out-of-bound magnitude result in limit being incorrectly selected.
 		int direction = greaterThan ? +1 : -1;
-		for (int i=iTarget; 0<=i && i<entries.size(); i+=direction){
+		for (int i=midpoint; 0<=i && i<entries.size(); i+=direction){
 			Entry<T> result = this.entries.get(i);
 			if (isElligible.test(result))
 				return result.value;
@@ -82,6 +83,9 @@ public class ApproximateLinearMap<T>
 
 		return null;
 	}
+
+	private int NudgeUp  (int min, int midpoint){ return (midpoint > min) ? midpoint : min+1; }
+	private int NudgeDown(int max, int midpoint){ return (midpoint < max) ? midpoint : max-1; }
 
 	public final T GetClosestValue(int targetMagnitude, boolean greaterThan){
 		return GetClosestValue(targetMagnitude, greaterThan, _0->true);

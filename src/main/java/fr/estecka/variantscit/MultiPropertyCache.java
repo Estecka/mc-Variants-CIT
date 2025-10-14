@@ -12,12 +12,12 @@ import net.minecraft.util.Identifier;
 
 public class MultiPropertyCache
 {
-	private final boolean debug;
+	public final boolean debug;
 	private final IStringProperty[] properties;
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
 	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
 
-	public MultiPropertyCache(Stream<IStringProperty> properties, boolean debug){
+	public MultiPropertyCache(boolean debug, Stream<IStringProperty> properties){
 		this.debug = debug;
 		this.properties = properties.distinct().toArray(IStringProperty[]::new);
 	}
