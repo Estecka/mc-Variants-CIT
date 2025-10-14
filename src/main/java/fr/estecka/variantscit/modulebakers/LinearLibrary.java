@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.modulebakers;
 
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.ApproximateLinearMap;
+import fr.estecka.variantscit.LinearSnapMap;
 import fr.estecka.variantscit.VariantLibrary;
 import net.minecraft.util.Identifier;
 
@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 public class LinearLibrary
 {
 	private final Identifier fallback;
-	private final ApproximateLinearMap<Identifier> modelLine = new ApproximateLinearMap<>();
+	private final LinearSnapMap<Identifier> modelLine = new LinearSnapMap<>();
 
 	public LinearLibrary(VariantLibrary variantLibrary, String allowedNamespace){
 		this.fallback = variantLibrary.fallbackModel();
@@ -30,11 +30,11 @@ public class LinearLibrary
 	}
 
 	public Identifier GetLesser(int magnitude){
-		return Fallback(this.modelLine.GetClosestValue(magnitude, false));
+		return Fallback(this.modelLine.GetClosestValue(magnitude, -1));
 	}
 
 	public Identifier GetGreater(int magnitude){
-		return Fallback(this.modelLine.GetClosestValue(magnitude, true));
+		return Fallback(this.modelLine.GetClosestValue(magnitude, +1));
 	}
 
 

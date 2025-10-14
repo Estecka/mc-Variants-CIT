@@ -193,3 +193,6 @@ Since v2.5:
 ## 3.10
 - Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.
+
+## indev
+- Fixed `durability` module never using the fallback model.
