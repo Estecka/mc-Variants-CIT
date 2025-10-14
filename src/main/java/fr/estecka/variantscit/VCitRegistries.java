@@ -10,8 +10,8 @@ import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.properties.*;
 import fr.estecka.variantscit.format.transforms.*;
+import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IModuleBaker;
-import fr.estecka.variantscit.modulebakers.SimpleBakedModule;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.reload.UnbakedModule;
 
@@ -90,7 +90,7 @@ public final class VCitRegistries
 	}
 
 	static public void RegisterSimpleModule(Identifier id, MapCodec<? extends ICitModule> mapcodec){
-		RegisterCustomModule(id, SimpleBakedModule::new, mapcodec);
+		RegisterCustomModule(id, GenericBakedModule::new, mapcodec);
 	}
 
 	static public void RegisterSimpleModule(Identifier id, ICitModule unit){
