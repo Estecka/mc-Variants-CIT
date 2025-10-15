@@ -128,7 +128,7 @@ public class LinearSnapMap<T>
 	}
 
 	/**
-	 * TODO: Behaviour for bias==0 is not implmented. There is currently  no use
+	 * TODO: Behaviour for bias==0 is not implemented. There is currently no use
 	 * case for this in the mod.
 	 */
 	public final T GetClosestValue(int targetMagnitude, int bias, Predicate<T> isElligible){

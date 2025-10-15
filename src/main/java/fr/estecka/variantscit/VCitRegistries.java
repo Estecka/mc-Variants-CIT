@@ -35,7 +35,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
-		RegisterSimpleModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC);
+		RegisterCustomModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());

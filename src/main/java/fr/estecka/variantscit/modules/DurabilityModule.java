@@ -10,13 +10,14 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.format.properties.IntegerComponentProperty;
 import fr.estecka.variantscit.modulebakers.LinearLibrary;
+import fr.estecka.variantscit.modulebakers.LinearLibrary.ILinearCitModule;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
 public class DurabilityModule
-implements LinearLibrary.ILinearCitModule
+implements ILinearCitModule
 {
 	static public final MapCodec<DurabilityModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -61,6 +62,6 @@ implements LinearLibrary.ILinearCitModule
 			durability /= max;
 		}
 
-		return library.GetGreater(durability);
+		return library.GetOrGreater(durability);
 	}
 }

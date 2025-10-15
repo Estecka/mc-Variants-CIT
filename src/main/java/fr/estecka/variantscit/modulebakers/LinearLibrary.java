@@ -29,11 +29,11 @@ public class LinearLibrary
 		return (id != null) ? id : fallback;
 	}
 
-	public Identifier GetLesser(int magnitude){
+	public Identifier GetOrLesser(int magnitude){
 		return Fallback(this.modelLine.GetClosestValue(magnitude, -1));
 	}
 
-	public Identifier GetGreater(int magnitude){
+	public Identifier GetOrGreater(int magnitude){
 		return Fallback(this.modelLine.GetClosestValue(magnitude, +1));
 	}
 

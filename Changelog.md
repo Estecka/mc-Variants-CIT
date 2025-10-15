@@ -195,4 +195,4 @@ Since v2.5:
 - All transforms can now be marked as optional, or take a fallback.
 
 ## indev
-- Fixed `durability` module never using the fallback model.
+- Modules `durability` and `item_count` may now use the fallback model.
