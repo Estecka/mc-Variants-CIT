@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -13,8 +14,7 @@ import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
@@ -25,8 +25,48 @@ import net.minecraft.util.Identifier;
 public class EnchantmentVectorModule
 implements IBakedModule
 {
-	static public record Entry(
-		Object2IntMap<Identifier> vector,
+	static public class EnchantVector
+	extends Int2IntArrayMap
+	{
+		public EnchantVector(){ super(); }
+		public EnchantVector(int size){ super(size); }
+
+		static public EnchantVector FromComponent(ItemEnchantmentsComponent enchants){
+			EnchantVector vector = new EnchantVector(enchants.getSize());
+			for (var entry : enchants.getEnchantmentEntries())
+				vector.put(entry.getKey().getKey().get().getValue().hashCode(), entry.getIntValue());
+			return vector;
+		}
+
+		static public EnchantVector FromMap(Map<Identifier,Integer> enchants){
+			EnchantVector vector = new EnchantVector(enchants.size());
+			for (var entry : enchants.entrySet())
+				vector.put(entry.getKey().hashCode(), (int)entry.getValue());
+			return vector;
+		}
+
+		public int TaxicabMagnitude(){
+			int magnitude = 0;
+			for (int i : this.values())
+				magnitude += i;
+			return magnitude;
+		}
+
+		public boolean IsWithin(EnchantVector box){
+			if (this.size() > box.size())
+				return false;
+
+			for (var entry : this.entries)
+				if (!box.containsKey(entry.getIntKey()) || entry.getIntValue() > box.get(entry.getIntKey()))
+					return false;
+
+			return true;
+		}
+
+	}
+
+	static public record VariantEntry(
+		EnchantVector vector,
 		Identifier modelId
 	) {}
 
@@ -38,7 +78,7 @@ implements IBakedModule
 	private final ComponentType<ItemEnchantmentsComponent> componentType = DataComponentTypes.ENCHANTMENTS;
 	private final MultiPropertyCache cache = new MultiPropertyCache(false, componentType);
 	private final Identifier fallback;
-	private final LinearSnapMap<Entry> modelLine = new LinearSnapMap<>();
+	private final LinearSnapMap<VariantEntry> modelLine = new LinearSnapMap<>();
 
 
 /******************************************************************************/
@@ -50,7 +90,7 @@ implements IBakedModule
 
 		Pattern enchantRegex = BakeRegex(enchantSeparator, levelSeparator);
 
-		Set<Object2IntMap<?>> knownVectors = new HashSet<>();
+		Set<EnchantVector> knownVectors = new HashSet<>();
 		Set<String> duplicateIds = new HashSet<>();
 
 		for (var variant : variantLibrary.variantModels().entrySet())
@@ -63,7 +103,7 @@ implements IBakedModule
 					duplicateIds.add(variant.getKey().getPath());
 				else {
 					knownVectors.add(vector);
-					modelLine.AddEntry(GetMagnitude(vector), new Entry(vector, variant.getValue()));
+					modelLine.AddEntry(vector.TaxicabMagnitude(), new VariantEntry(vector, variant.getValue()));
 				}
 			}
 		}
@@ -78,8 +118,8 @@ implements IBakedModule
 		}
 	}
 
-	static private Optional<Object2IntMap<Identifier>> VariantId2Vector(Pattern regex, Identifier variantId){
-		Object2IntMap<Identifier> vector = new Object2IntOpenHashMap<>();
+	static private Optional<EnchantVector> VariantId2Vector(Pattern regex, Identifier variantId){
+		EnchantVector vector = new EnchantVector();
 		Matcher matches = regex.matcher(variantId.getPath());
 		if (!matches.matches()){
 			VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
@@ -92,12 +132,13 @@ implements IBakedModule
 			int    level     = Optional.ofNullable(matches.group("lvl")).map(Integer::parseInt).orElse(1);
 
 			Identifier enchantId = Identifier.of(namespace, path);
-			if (vector.containsKey(enchantId)){
+			int enchantHash = enchantId.hashCode();
+			if (vector.containsKey(enchantHash)){
 				VariantsCitMod.LOGGER.warn("Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
 				return Optional.empty();
 			}
 
-			vector.put(enchantId, level);
+			vector.put(enchantHash, level);
 		}
 
 		return Optional.of(vector);
@@ -125,14 +166,6 @@ implements IBakedModule
 		return DataResult.success(raw.replace(".", "\\."));
 	}
 
-	static private int GetMagnitude(Object2IntMap<?> item){
-		int magnitude = 0;
-		for (var e : item.object2IntEntrySet())
-			magnitude += e.getIntValue();
-
-		return magnitude;
-	}
-
 
 /******************************************************************************/
 /* # Rendering                                                                */
@@ -148,49 +181,14 @@ implements IBakedModule
 		if (enchants == null || enchants.isEmpty())
 			return null;
 
-		Entry result = modelLine.GetClosestValue(
-			GetMagnitude(enchants),
+		EnchantVector enchantBox = EnchantVector.FromComponent(enchants);
+		VariantEntry result = modelLine.GetClosestValue(
+			enchantBox.TaxicabMagnitude(),
 			-1,
-			model->IsElligible(enchants, model)
+			variant->variant.vector.IsWithin(enchantBox)
 		);
 
 		return (result != null) ? result.modelId : fallback;
 
-	}
-
-	static private int GetMagnitude(ItemEnchantmentsComponent item){
-		int magnitude = 0;
-		for (var e : item.getEnchantmentEntries())
-			magnitude += e.getIntValue();
-
-		return magnitude;
-	}
-
-	static private boolean IsElligible(ItemEnchantmentsComponent item, Entry model){
-		int maxEnchantCount = item.getSize();
-
-		// Fail if the model has enchantments that are not listed on the item.
-		if (model.vector.size() > maxEnchantCount)
-			return false;
-
-		for (var itemEnchant : item.getEnchantmentEntries()) {
-			if (model.vector.size() > maxEnchantCount)
-				return false;
-
-			Identifier enchantId = itemEnchant.getKey().getKey().get().getValue();
-
-			if (!model.vector.containsKey(enchantId)){
-				--maxEnchantCount;
-				// Fail if the model has enchantments that are not listed on the item.
-				if (model.vector.size() > maxEnchantCount)
-						return false;
-			}
-			// Fail if the model has enchantments that are too high level.
-			else if (model.vector.getInt(enchantId) > itemEnchant.getIntValue()){
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
