@@ -7,19 +7,43 @@ import java.util.stream.Stream;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public class MultiPropertyCache
 {
+	static public interface ICachableItemProperty
+	{
+		int GetPropertyHash(ItemStack stack);
+		Object GetReference(ItemStack stack);
+	}
+
 	public final boolean debug;
 	private final IStringProperty[] properties;
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
 	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
 
-	public MultiPropertyCache(boolean debug, Stream<IStringProperty> properties){
+	public MultiPropertyCache(boolean debug, Stream<? extends ICachableItemProperty> properties){
 		this.debug = debug;
 		this.properties = properties.distinct().toArray(IStringProperty[]::new);
+	}
+
+	public MultiPropertyCache(boolean debug, ComponentType<?> component){
+		this(debug, Stream.of(ComponentProperty(component)));
+	}
+
+	static private ICachableItemProperty ComponentProperty(ComponentType<?> type){
+		return new ICachableItemProperty() {
+			@Override
+			public int GetPropertyHash(ItemStack stack) {
+				return stack.get(type).hashCode();
+			}
+			@Override
+			public Object GetReference(ItemStack stack) {
+				return stack.get(type);
+			}
+		};
 	}
 
 	public Identifier ComputeIfAbsent(ItemStack stack, Function<ItemStack,Identifier> computer){

@@ -33,6 +33,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		RegisterCustomModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
+		RegisterCustomModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::new);
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		RegisterCustomModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
