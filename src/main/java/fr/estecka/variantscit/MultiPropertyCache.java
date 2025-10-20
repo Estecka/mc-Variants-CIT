@@ -4,7 +4,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import fr.estecka.variantscit.format.properties.IStringProperty;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.component.ComponentType;
@@ -20,13 +19,13 @@ public class MultiPropertyCache
 	}
 
 	public final boolean debug;
-	private final IStringProperty[] properties;
+	private final ICachableItemProperty[] properties;
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
 	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
 
 	public MultiPropertyCache(boolean debug, Stream<? extends ICachableItemProperty> properties){
 		this.debug = debug;
-		this.properties = properties.distinct().toArray(IStringProperty[]::new);
+		this.properties = properties.distinct().toArray(ICachableItemProperty[]::new);
 	}
 
 	public MultiPropertyCache(boolean debug, ComponentType<?> component){
