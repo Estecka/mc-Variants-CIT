@@ -196,3 +196,4 @@ Since v2.5:
 
 ## indev
 - Modules `durability` and `item_count` may now use the fallback model.
+- Added `enchantment_vector` module.
