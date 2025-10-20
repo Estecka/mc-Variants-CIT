@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 
 /**
- * Sort entries like points on a line. When a position  is requested, it returns
+ * Sort entries as  points on a line. When a position is requested, it looks for
  * the closest entry on a given side of that position.
  */
 public class LinearSnapMap<T>
@@ -53,70 +53,51 @@ public class LinearSnapMap<T>
 	 * 
 	 * @param bias -1, 0, or +1. Defines which range of entries are elligible:
 	 * Those that are greater or equal (+1), lesser or equal (-1) or both (0).
-	 * If multiple entries have the same magnitude:
+	 * @implNote If multiple entries have the same magnitude:
 	 * - For lesser magnitudes, pick the highest index
 	 * - For greater magnitudes, pick the lowest index
 	 * - For equal magnitudes, pick depending on the bias.
-	 * - For equal magnitudes with a bias of 0, immediately returns whichever is
-	 *   found first.
+	 * - For equal magnitudes with a bias of 0, return immediately.
 	 * @return The index  of the  delimiting entry, or -1 if  no elligible entry
 	 * was found.
 	 */
 	private int GetClosestIndex(int targetMagnitude, int bias){
-		if (this.entries.size() < 1)
-			return -1;
+		int iMin = -1;
+		int iMax = this.entries.size();
+		int iBestFit = -1;
 
-		int iMin = 0;
-		int iMax = this.entries.size()-1;
-		int magMin = this.entries.getFirst().magnitude;
-		int magMax = this.entries.getLast ().magnitude;
-		// All entries are outside the elligible range.
-		if ((bias < 0 && magMin > targetMagnitude)
-		||  (bias > 0 && magMax < targetMagnitude)
-		) {
-			return -1;
-		}
-		/**
-		 * Past this point, it is guaranteed that one bound  always points to an
-		 * elligible  entry, and the  other to an inelligible one. (Which one is
-		 * which varies with the bias.)
-		 */
-
-		// Stop when the bounds are adjacent.
-		while (iMin+1 < iMax){
+		// Stop when there are no more entries between the bounds (excluded).
+		while (iMin + 1 < iMax){
 			int midpoint = (iMax + iMin) / 2;
-			Entry<T> midEntry = entries.get(midpoint);
-			if (midEntry.magnitude == targetMagnitude && bias == 0)
+			int midMagnitude = entries.get(midpoint).magnitude;
+
+			if (midMagnitude == targetMagnitude && bias == 0)
 				return midpoint;
 
-			// Would cause an infinite loop.
-			// Should never happen so long as the bounds are not adjacent.
-			assert midpoint != iMin && midpoint != iMax;
+			if (midMagnitude == targetMagnitude
+			|| (midMagnitude < targetMagnitude && bias < 0)
+			|| (midMagnitude > targetMagnitude && bias > 0)
+			){
+				iBestFit = midpoint;
+			}
 
 			boolean nudgeUp;
-			if (midEntry.magnitude < targetMagnitude)
+			if (midMagnitude < targetMagnitude)
 				nudgeUp = true;
-			else if (midEntry.magnitude > targetMagnitude)
+			else if (midMagnitude > targetMagnitude)
 				nudgeUp = false;
 			else 
 				nudgeUp = (bias < 0);
 
 			if (nudgeUp){
-				magMin = midEntry.magnitude;
 				iMin = midpoint;
 			}
 			else {
-				magMax = midEntry.magnitude;
 				iMax = midpoint;
 			}
 		}
 
-		if (bias > 0)
-			return iMax;
-		if (bias < 0)
-			return iMin;
-		// Returns closest
-		return ((magMax+magMin)/2) > targetMagnitude ? iMin : iMax;
+		return iBestFit;
 	}
 
 	public final T GetClosestValue(int targetMagnitude, int bias){
