@@ -59,7 +59,7 @@ implements IBakedModule
 			if (this.size() > box.size())
 				return false;
 
-			for (var entry : this.entries)
+			for (var entry : this.int2IntEntrySet())
 				if (!box.containsKey(entry.getIntKey()) || entry.getIntValue() > box.get(entry.getIntKey()))
 					return false;
 

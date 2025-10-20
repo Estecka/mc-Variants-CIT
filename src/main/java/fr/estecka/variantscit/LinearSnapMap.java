@@ -99,7 +99,7 @@ public class LinearSnapMap<T>
 			else if (midEntry.magnitude > targetMagnitude)
 				nudgeUp = false;
 			else 
-				nudgeUp = (bias > 0);
+				nudgeUp = (bias < 0);
 
 			if (nudgeUp){
 				magMin = midEntry.magnitude;
