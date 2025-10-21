@@ -31,12 +31,12 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
 		RegisterSimpleModule(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
-		RegisterCustomModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
-		RegisterCustomModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::new);
+		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::new);
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
-		RegisterCustomModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
@@ -84,7 +84,7 @@ public final class VCitRegistries
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text_array"), INbtInput::RichTextArray);
 	}
 
-	static public <T> void RegisterCustomModule(Identifier id, MapCodec<T> mapcodec, IModuleBaker<T> baker){
+	static public <T> void RegisterBakedModule(Identifier id, MapCodec<T> mapcodec, IModuleBaker<T> baker){
 		MODULES.RegisterMap(id, mapcodec.xmap(
 			parameters -> new UnbakedModule<>(baker, parameters),
 			UnbakedModule::parameters
@@ -92,7 +92,7 @@ public final class VCitRegistries
 	}
 
 	static public void RegisterSimpleModule(Identifier id, MapCodec<? extends ICitModule> mapcodec){
-		RegisterCustomModule(id, mapcodec, GenericBakedModule::new);
+		RegisterBakedModule(id, mapcodec, GenericBakedModule::new);
 	}
 
 	static public void RegisterSimpleModule(Identifier id, ICitModule unit){

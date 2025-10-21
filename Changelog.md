@@ -193,7 +193,6 @@ Since v2.5:
 ## 3.10
 - Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.
-
-## indev
+## 3.11
 - Modules `durability` and `item_count` may now use the fallback model.
 - Added `enchantment_vector` module.
