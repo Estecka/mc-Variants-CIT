@@ -76,8 +76,10 @@ implements IBakedModule
 	static public record Parameters(
 		boolean bakingDebug,
 		boolean runtimeDebug,
+		boolean optionalLevel,
 		String enchantSeparator,
 		Optional<String> levelSeparator,
+		Map<Identifier,Identifier> aliases,
 		String namespace
 	) {}
 
@@ -85,8 +87,10 @@ implements IBakedModule
 		builder.group(
 			Codec.BOOL.optionalFieldOf("bakingDebug",  false).forGetter(Parameters::bakingDebug),
 			Codec.BOOL.optionalFieldOf("runtimeDebug", false).forGetter(Parameters::runtimeDebug),
-			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
+			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(Parameters::optionalLevel),
+			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
 			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
+			Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(Parameters::namespace)
 		)
 		.apply(builder, Parameters::new)
@@ -106,7 +110,7 @@ implements IBakedModule
 		this.fallback = variantLibrary.fallbackModel();
 		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
 
-		Pattern enchantRegex = BakeRegex(params.enchantSeparator, params.levelSeparator);
+		Pattern enchantRegex = BakeRegex(params);
 
 		Set<Identifier> knownEnchants = new HashSet<>();
 		Set<EnchantVector> knownVectors = new HashSet<>();
@@ -115,7 +119,7 @@ implements IBakedModule
 		for (var variant : variantLibrary.variantModels().entrySet())
 		if  (variant.getKey().getNamespace().equals(params.namespace))
 		{
-			var optMap = VariantId2Map(enchantRegex, variant.getKey());
+			var optMap = VariantId2Map(enchantRegex, variant.getKey(), params.aliases);
 			if (optMap.isPresent()){
 				var vector = EnchantVector.FromMap(optMap.get());
 				if (knownVectors.contains(vector))
@@ -129,14 +133,14 @@ implements IBakedModule
 		}
 
 		if (params.bakingDebug){
-			String msg = "[EnchantmentVector] List of detected enchantments. If this looks wrong, check your filenames:";
+			String msg = "[EnchantVector] These enchantments were detected in the CITs. If this looks wrong, check your filenames and your aliases:";
 			for (Identifier id : knownEnchants)
 				msg += '\n' + id.toString();
 			VariantsCitMod.LOGGER.info(msg);
 		}
 
 		if (!duplicateIds.isEmpty()){
-			String msg = "[EnchantmentVector] The following variant IDs describe duplicate enchantment sets and will be ignored:";
+			String msg = "[EnchantVector] The following variant IDs describe duplicate enchantment sets and will be ignored:";
 			for (String id : duplicateIds) {
 				msg += '\n' + id;
 			}
@@ -145,11 +149,11 @@ implements IBakedModule
 		}
 	}
 
-	static private Optional<Map<Identifier,Integer>> VariantId2Map(Pattern regex, Identifier variantId){
+	static private Optional<Map<Identifier,Integer>> VariantId2Map(Pattern regex, Identifier variantId, Map<Identifier,Identifier> aliases){
 		Map<Identifier,Integer> vector = new HashMap<>();
 		Matcher matches = regex.matcher(variantId.getPath());
 		if (!matches.matches()){
-			VariantsCitMod.LOGGER.warn("[EnchantmentVector] Not a valid enchantment set: {}", variantId.getPath());
+			VariantsCitMod.LOGGER.warn("[EnchantVector] Not a valid enchantment set: {}", variantId.getPath());
 			return Optional.empty();
 		}
 
@@ -160,8 +164,9 @@ implements IBakedModule
 			int    level     = Optional.ofNullable(matches.group("lvl")).map(Integer::parseInt).orElse(1);
 
 			Identifier enchantId = Identifier.of(namespace, path);
+			enchantId = aliases.getOrDefault(enchantId, enchantId);
 			if (vector.containsKey(enchantId)){
-				VariantsCitMod.LOGGER.warn("[EnchantmentVector] Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
+				VariantsCitMod.LOGGER.warn("[EnchantVector] Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
 				return Optional.empty();
 			}
 
@@ -175,13 +180,23 @@ implements IBakedModule
 	 * Example regex
 	 * (?<=^|.__)(?:(?<namespace>[a-z0-9_.-]*?)\.\.)?(?<path>[a-z0-9_.-]+?)(?:\.(?<lvl>[0-9]+))?(?=__.+|$)
 	 */
-	static private Pattern BakeRegex(String enchantSep, Optional<String> lvlSep){
-		String lvlRegex = "";
-		if (lvlSep.isPresent()){
-			lvlRegex = lvlSep.get()+"(?<lvl>[0-9]+)";
-		}
+	static private Pattern BakeRegex(Parameters params){
+		String enchantSep = params.enchantSeparator;
+		String lvlSep     = params.levelSeparator.orElse("");
+
+		String lvlRegex;
+		if (params.levelSeparator.isPresent() || params.optionalLevel)
+			lvlRegex = lvlSep + "(?<lvl>[0-9]+)";
+		else
+			lvlRegex= "(?<lvl>)";
+
+		if (params.optionalLevel)
+			lvlRegex = "(?:"+lvlRegex+")?";
 
 		String regex = "(?<=^|."+enchantSep+")(?:(?<namespace>[a-z0-9_.-]*?)\\.\\.)?(?<path>[a-z0-9_.-]+?)"+lvlRegex+"(?="+enchantSep+".+|$)";
+		if (params.bakingDebug)
+			VariantsCitMod.LOGGER.info("[EnchantVector] Filenames will be parsed using this regex:\n{}", regex);
+
 		return Pattern.compile(regex);
 	}
 
@@ -190,9 +205,7 @@ implements IBakedModule
 	 * @return A regex that matches this string literally.
 	 */
 	static private DataResult<String> ValidateSeparator(String raw){
-		if (raw.isEmpty())
-			return DataResult.error(()->"Separator cannot be empty");
-		if (!raw.matches("^[a-z0-9_.-/]+$"))
+		if (!raw.matches("^[a-z0-9_.-/]*$"))
 			return DataResult.error(()->"Separator contains invalid characters: "+raw);
 
 		return DataResult.success(raw.replace(".", "\\."));
