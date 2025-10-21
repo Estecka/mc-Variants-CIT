@@ -96,7 +96,7 @@ implements IBakedModule
 		.apply(builder, Parameters::new)
 	);
 
-	private final ComponentType<ItemEnchantmentsComponent> componentType = DataComponentTypes.ENCHANTMENTS;
+	private final ComponentType<ItemEnchantmentsComponent> componentType;
 	private final MultiPropertyCache cache;
 	private final Identifier fallback;
 	private final LinearSnapMap<VariantEntry> modelLine = new LinearSnapMap<>();
@@ -106,7 +106,8 @@ implements IBakedModule
 /* # Baking                                                                   */
 /******************************************************************************/
 
-	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params){
+	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, ComponentType<ItemEnchantmentsComponent> component){
+		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
 		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
 
@@ -150,6 +151,13 @@ implements IBakedModule
 		}
 
 		VariantsCitMod.LOGGER.PopLabel();
+	}
+
+	static public EnchantmentVectorModule Bake(VariantLibrary lib, Parameters params) {
+		return new EnchantmentVectorModule(lib, params, DataComponentTypes.ENCHANTMENTS);
+	}
+	static public EnchantmentVectorModule BakeStored(VariantLibrary lib, Parameters params) {
+		return new EnchantmentVectorModule(lib, params, DataComponentTypes.STORED_ENCHANTMENTS);
 	}
 
 	static private Optional<Map<Identifier,Integer>> VariantId2Map(Pattern regex, Identifier variantId, Map<Identifier,Identifier> aliases){

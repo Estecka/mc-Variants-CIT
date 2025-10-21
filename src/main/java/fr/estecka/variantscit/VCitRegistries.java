@@ -33,7 +33,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
 		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
-		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::new);
+		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
@@ -46,6 +46,7 @@ public final class VCitRegistries
 			VariantsCitMod.LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
 			return new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty());
 		}));
+		RegisterBakedModule(Identifier.ofVanilla("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::BakeStored);
 		RegisterSimpleModule(Identifier.ofVanilla("trim"), new TrimModule());
 		RegisterSimpleModule(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
 		RegisterSimpleModule(Identifier.ofVanilla("trim_material"), new TrimPatternModule());

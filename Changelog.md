@@ -195,4 +195,4 @@ Since v2.5:
 - All transforms can now be marked as optional, or take a fallback.
 ## 3.11
 - Modules `durability` and `item_count` may now use the fallback model.
-- Added `enchantment_vector` module.
+- Added modules `enchantment_vector` and `stored_enchantment_vector`.
