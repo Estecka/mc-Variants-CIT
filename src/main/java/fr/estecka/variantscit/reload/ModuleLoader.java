@@ -190,9 +190,11 @@ public final class ModuleLoader
 	
 		for (MetaModule meta : modules)
 		{
+			VariantsCitMod.LOGGER.PushLabel(meta.id);
 			if (meta.itemLibrary() .isPresent()) BakeModuleContext("item_model", meta, meta.itemLibrary ().get(), itemModules );
 			if (meta.equipLibrary().isPresent()) BakeModuleContext("equippable", meta, meta.equipLibrary().get(), equipModules);
-		}
+			VariantsCitMod.LOGGER.PopLabel();
+	}
 
 		BakeItem(result.itemModules,  itemModules );
 		BakeItem(result.equipModules, equipModules);
@@ -200,13 +202,14 @@ public final class ModuleLoader
 
 	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<IBakedModule>> output){
 		if (lib.isEmpty())
-			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", contextName, meta.id());
+			VariantsCitMod.LOGGER.Unlabelled().warn("Empty {} VCIT module {}", contextName, meta.id());
 		else
-			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
+			VariantsCitMod.LOGGER.Unlabelled().info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
 
 		for (Item itemType : meta.targets()){
 			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(meta.parameters.Bake(lib));
 		}
+
 	}
 
 	static private void BakeItem(Map<Item, IBakedModule> result, Map<Item, List<IBakedModule>> moduleListPerItem){

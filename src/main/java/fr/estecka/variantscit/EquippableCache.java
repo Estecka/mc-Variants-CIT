@@ -60,9 +60,15 @@ public class EquippableCache
 		}
 
 		final IBakedModule module = VariantsCitMod.GetEquipmentModule(stack.getItem());
-		Identifier assetId;
+		Identifier assetId = null;
 
-		if (module == null || (assetId=module.GetModelForItem(stack)) == null)
+		if (module != null){
+			VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+			assetId = module.GetModelForItem(stack);
+			VariantsCitMod.LOGGER.PopLabel();
+		}
+
+		if (assetId == null)
 			return original;
 		else
 			return GetWithAssetId(equipable, assetId);

@@ -54,7 +54,7 @@ public class MultiPropertyCache
 			Identifier variant = computer.apply(stack);
 			entry = this.CreateEntry(hash, stack, variant);
 			if (debug)
-				VariantsCitMod.LOGGER.info("[PropertyCache] Size: {}; Latest Model Id: {}", hashToVariant.size(), String.valueOf(entry.variant));
+				VariantsCitMod.LOGGER.info("Cache size: {}; Latest Model Id: {}", hashToVariant.size(), String.valueOf(entry.variant));
 		}
 		return entry.variant;
 	}

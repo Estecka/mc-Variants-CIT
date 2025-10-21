@@ -110,6 +110,7 @@ implements IBakedModule
 		this.fallback = variantLibrary.fallbackModel();
 		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
 
+		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
 		Pattern enchantRegex = BakeRegex(params);
 
 		Set<Identifier> knownEnchants = new HashSet<>();
@@ -133,27 +134,29 @@ implements IBakedModule
 		}
 
 		if (params.bakingDebug){
-			String msg = "[EnchantVector] These enchantments were detected in the CITs. If this looks wrong, check your filenames and your aliases:";
+			String msg = "These enchantments were detected in the CITs. If this looks wrong, check your filenames and your aliases:";
 			for (Identifier id : knownEnchants)
 				msg += '\n' + id.toString();
 			VariantsCitMod.LOGGER.info(msg);
 		}
 
 		if (!duplicateIds.isEmpty()){
-			String msg = "[EnchantVector] The following variant IDs describe duplicate enchantment sets and will be ignored:";
+			String msg = "The following variant IDs describe duplicate enchantment sets and will be ignored:";
 			for (String id : duplicateIds) {
 				msg += '\n' + id;
 			}
 
 			VariantsCitMod.LOGGER.warn(msg);
 		}
+
+		VariantsCitMod.LOGGER.PopLabel();
 	}
 
 	static private Optional<Map<Identifier,Integer>> VariantId2Map(Pattern regex, Identifier variantId, Map<Identifier,Identifier> aliases){
 		Map<Identifier,Integer> vector = new HashMap<>();
 		Matcher matches = regex.matcher(variantId.getPath());
 		if (!matches.matches()){
-			VariantsCitMod.LOGGER.warn("[EnchantVector] Not a valid enchantment set: {}", variantId.getPath());
+			VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
 			return Optional.empty();
 		}
 
@@ -166,7 +169,7 @@ implements IBakedModule
 			Identifier enchantId = Identifier.of(namespace, path);
 			enchantId = aliases.getOrDefault(enchantId, enchantId);
 			if (vector.containsKey(enchantId)){
-				VariantsCitMod.LOGGER.warn("[EnchantVector] Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
+				VariantsCitMod.LOGGER.warn("Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
 				return Optional.empty();
 			}
 
@@ -194,8 +197,8 @@ implements IBakedModule
 			lvlRegex = "(?:"+lvlRegex+")?";
 
 		String regex = "(?<=^|."+enchantSep+")(?:(?<namespace>[a-z0-9_.-]*?)\\.\\.)?(?<path>[a-z0-9_.-]+?)"+lvlRegex+"(?="+enchantSep+".+|$)";
-		if (params.bakingDebug)
-			VariantsCitMod.LOGGER.info("[EnchantVector] Filenames will be parsed using this regex:\n{}", regex);
+		// if (params.bakingDebug)
+		// 	VariantsCitMod.LOGGER.info("Filenames will be parsed using this regex:\n{}", regex);
 
 		return Pattern.compile(regex);
 	}

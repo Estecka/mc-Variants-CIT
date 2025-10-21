@@ -9,8 +9,6 @@ import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.properties.*;
@@ -21,7 +19,7 @@ public class VariantsCitMod
 implements ClientModInitializer
 {
 	static public final String MODID = "variants-cit";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+	public static final LabelledLogger LOGGER = new LabelledLogger();
 
 	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
