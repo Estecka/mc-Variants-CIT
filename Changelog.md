@@ -196,3 +196,4 @@ Since v2.5:
 ## 3.11
 - Modules `durability` and `item_count` may now use the fallback model.
 - Added modules `enchantment_vector` and `stored_enchantment_vector`.
+- Transform `charset_remap` can now replace a single character with a longer string.

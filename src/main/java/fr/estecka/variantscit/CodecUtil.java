@@ -22,6 +22,7 @@ public class CodecUtil
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isPathValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
+	static public final Codec<Character> CHAR = Codec.sizeLimitedString(1).xmap(s->s.charAt(0), c->String.valueOf(c));
 
 	/**
 	 * Functions to be used in `validate()` on deprecated codecs.
