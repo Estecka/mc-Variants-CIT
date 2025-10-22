@@ -3,7 +3,6 @@ package fr.estecka.variantscit;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
@@ -29,16 +28,9 @@ public class DecodableRegistry<T>
 	private final IMapWrapper<T> mapWrapper;
 
 	private final MapDecoder<Identifier> typeCodec;
-	public final Codec<T> unitCodec = Identifier.CODEC.flatXmap(
-		key -> this.units.containsKey(key) ?
-			DataResult.success(units.get(key)) :
-			DataResult.error(()->"Unknown key: "+key),
-		obj -> this.units.containsValue(obj) ?
-			DataResult.success(units.entrySet().stream().filter(e->obj.equals(e.getValue())).map(Entry::getKey).findFirst().get()) :
-			DataResult.error(()->"Unknown unit")
-	);
-	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
-	public final Codec<T> codec = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
+	public final Codec<T>    unitCodec = CodecUtil.Enum(Identifier.CODEC, this.units);
+	public final MapCodec<T> mapCodec  = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
+	public final Codec<T>    codec     = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
 
 	public DecodableRegistry(String typeKey){
 		this(typeKey, null, c->c);

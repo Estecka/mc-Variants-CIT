@@ -1,10 +1,13 @@
 package fr.estecka.variantscit.modules;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.mojang.serialization.Codec;
@@ -55,6 +58,29 @@ implements IBakedModule
 			return magnitude;
 		}
 
+		public int EuclidianSquaredMagnitude(){
+			int magnitude = 0;
+			for (int i : this.values())
+				magnitude += i*i;
+			return magnitude;
+		}
+
+		public int Maximum(){
+			int magnitude = 0;
+			for (int i : this.values())
+				if (i > magnitude)
+					magnitude = i;
+			return magnitude;
+		}
+
+		public int Dimensionality(){
+			int dimensions = 0;
+			for (int i : this.values())
+				if (i != 0)
+					++dimensions;
+			return dimensions;
+		}
+
 		public boolean IsWithin(EnchantVector box){
 			if (this.size() > box.size())
 				return false;
@@ -77,17 +103,28 @@ implements IBakedModule
 		boolean bakingDebug,
 		boolean runtimeDebug,
 		boolean optionalLevel,
+		List<ToIntFunction<EnchantVector>> ordering,
 		String enchantSeparator,
 		Optional<String> levelSeparator,
 		Map<Identifier,Identifier> aliases,
 		String namespace
 	) {}
 
+	static public final Codec<ToIntFunction<EnchantVector>> NORM_CODEC = CodecUtil.Enum(Codec.STRING, Map.of(
+		"taxicab",   EnchantVector::TaxicabMagnitude,
+		"euclidian", EnchantVector::EuclidianSquaredMagnitude,
+		"maximum",   EnchantVector::Maximum,
+		"dimension", EnchantVector::Dimensionality
+	));
+
+	static private final List<ToIntFunction<EnchantVector>> DEFAULT_ORDERING = List.of(EnchantVector::TaxicabMagnitude, EnchantVector::Dimensionality);
+
 	static public final MapCodec<Parameters> PARAM_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			Codec.BOOL.optionalFieldOf("bakingDebug",  false).forGetter(Parameters::bakingDebug),
 			Codec.BOOL.optionalFieldOf("runtimeDebug", false).forGetter(Parameters::runtimeDebug),
 			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(Parameters::optionalLevel),
+			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
 			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
 			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
 			Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
@@ -99,8 +136,8 @@ implements IBakedModule
 	private final ComponentType<ItemEnchantmentsComponent> componentType;
 	private final MultiPropertyCache cache;
 	private final Identifier fallback;
-	private final LinearSnapMap<VariantEntry> modelLine = new LinearSnapMap<>();
-
+	private final LinearSnapMap<VariantEntry> modelLine;
+	private final ToIntFunction<EnchantVector> magnitudeGetter;
 
 /******************************************************************************/
 /* # Baking                                                                   */
@@ -110,6 +147,8 @@ implements IBakedModule
 		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
 		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
+		this.magnitudeGetter = params.ordering.get(0);
+		this.modelLine = OrderedSnapMap(params.ordering);
 
 		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
 		Pattern enchantRegex = BakeRegex(params);
@@ -129,7 +168,7 @@ implements IBakedModule
 				else {
 					knownVectors.add(vector);
 					knownEnchants.addAll(optMap.get().keySet());
-					modelLine.AddEntry(vector.TaxicabMagnitude(), new VariantEntry(vector, variant.getValue()));
+					modelLine.AddEntry(magnitudeGetter.applyAsInt(vector), new VariantEntry(vector, variant.getValue()));
 				}
 			}
 		}
@@ -158,6 +197,25 @@ implements IBakedModule
 	}
 	static public EnchantmentVectorModule BakeStored(VariantLibrary lib, Parameters params) {
 		return new EnchantmentVectorModule(lib, params, DataComponentTypes.STORED_ENCHANTMENTS);
+	}
+
+	static private LinearSnapMap<VariantEntry> OrderedSnapMap(List<ToIntFunction<EnchantVector>> ordering){
+		if (ordering.size() < 2)
+			return new LinearSnapMap<>();
+
+		@SuppressWarnings("unchecked")
+		final Comparator<VariantEntry>[] tiebreaker = new Comparator[ordering.size()-1];
+		for (int i=1; i<ordering.size(); ++i)
+			tiebreaker[i-1] = Comparator.comparing(VariantEntry::vector, Comparator.comparingInt(ordering.get(i)));
+
+		return new LinearSnapMap<>((a,b)->{
+			for (var comp : tiebreaker){
+				int r = comp.compare(a, b);
+				if (r != 0)
+					return r;
+			}
+			return 0;
+		});
 	}
 
 	static private Optional<Map<Identifier,Integer>> VariantId2Map(Pattern regex, Identifier variantId, Map<Identifier,Identifier> aliases){
@@ -239,7 +297,7 @@ implements IBakedModule
 
 		EnchantVector enchantBox = EnchantVector.FromComponent(enchants);
 		VariantEntry result = modelLine.GetClosestValue(
-			enchantBox.TaxicabMagnitude(),
+			magnitudeGetter.applyAsInt(enchantBox),
 			-1,
 			variant->variant.vector.IsWithin(enchantBox)
 		);

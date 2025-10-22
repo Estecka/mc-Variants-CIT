@@ -1,7 +1,9 @@
 package fr.estecka.variantscit;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -32,6 +34,10 @@ public class CodecUtil
 			VariantsCitMod.LOGGER.warn(warning, args);
 			return DataResult.success(o);
 		};
+	}
+
+	static public <T> MapCodec<T> WithWarning(MapCodec<T> codec, String warning, Object... args){
+		return codec.validate(WithWarning(warning, args));
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
@@ -77,6 +83,17 @@ public class CodecUtil
 				codec.fieldOf(primary),
 				codec.fieldOf(alias).validate(WithWarning("VCIT field `{}` is deprecated. Use `context` instead.", alias))
 			);
+	}
+
+	static public <K,V> Codec<V> Enum(Codec<K> keyCodec, Map<K,V> units){
+		return keyCodec.<V>flatXmap(
+			key -> units.containsKey(key) ?
+				DataResult.success(units.get(key)) :
+				DataResult.error(()->"Unknown key: " + key.toString()),
+			obj -> units.containsValue(obj) ?
+				DataResult.success(units.entrySet().stream().filter(entry->obj.equals(entry.getValue())).map(Entry::getKey).findFirst().get()) :
+				DataResult.error(()->"Unknown unit")
+		);
 	}
 
 	static public <T> MapCodec<Optional<T>> OptionalWithAlias(Codec<T> codec, String primary, String alias){

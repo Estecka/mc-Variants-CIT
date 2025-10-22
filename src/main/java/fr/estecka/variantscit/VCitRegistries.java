@@ -42,10 +42,10 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_type"), new PotionTypeModule());
 		RegisterSimpleModule(Identifier.ofVanilla("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.STORED_ENCHANTMENTS));
-		RegisterSimpleModule(Identifier.ofVanilla("stored_enchantments"), MapCodec.unit(() -> {
-			VariantsCitMod.LOGGER.warn("Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead.");
-			return new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty());
-		}));
+		RegisterSimpleModule(Identifier.ofVanilla("stored_enchantments"), CodecUtil.WithWarning(
+			MapCodec.unit(new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
+			"Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead."
+		));
 		RegisterBakedModule(Identifier.ofVanilla("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::BakeStored);
 		RegisterSimpleModule(Identifier.ofVanilla("trim"), new TrimModule());
 		RegisterSimpleModule(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());

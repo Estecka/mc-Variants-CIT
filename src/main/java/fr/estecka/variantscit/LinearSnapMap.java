@@ -51,6 +51,9 @@ public class LinearSnapMap<T>
 	 * magnitude. More specifically, this searches for  the elligible entry that
 	 * separates all elligible entries from the inelligible ones.
 	 * 
+	 * TODO: Behaviour for bias==0 is not correctly implemented and not properly
+	 * defined. There are currently no use cases for this in the mod.
+	 * 
 	 * @param bias -1, 0, or +1. Defines which range of entries are elligible:
 	 * Those that are greater or equal (+1), lesser or equal (-1) or both (0).
 	 * @implNote If multiple entries have the same magnitude:
@@ -65,6 +68,8 @@ public class LinearSnapMap<T>
 		int iMin = -1;
 		int iMax = this.entries.size();
 		int iBestFit = -1;
+
+		assert bias != 0;
 
 		// Stop when there are no more entries between the bounds (excluded).
 		while (iMin + 1 < iMax){
@@ -100,6 +105,10 @@ public class LinearSnapMap<T>
 		return iBestFit;
 	}
 
+	/**
+	 * Finds the entry  with the best fitting magnitude. Assumes all entries are
+	 * elligible, and no ties can occur.
+	 */
 	public final T GetClosestValue(int targetMagnitude, int bias){
 		int i = GetClosestIndex(targetMagnitude, bias);
 		if (i < 0)
@@ -109,8 +118,14 @@ public class LinearSnapMap<T>
 	}
 
 	/**
-	 * TODO: Behaviour for bias==0 is not implemented. There is currently no use
-	 * case for this in the mod.
+	 * Finds the entry  with the best fitting magnitude, and uses the comparator
+	 * given to the constructor is used as tiebreaker.
+	 * 
+	 * @implNote This is more performant than using a custom comparator. Entries
+	 * are sorted ahead of time, so the function  can return the first elligible
+	 * entry it encounters.
+	 * 
+	 * TODO: Behaviour for bias==0 is not implemented.
 	 */
 	public final T GetClosestValue(int targetMagnitude, int bias, Predicate<T> isElligible){
 		int i = GetClosestIndex(targetMagnitude, bias);
@@ -125,6 +140,33 @@ public class LinearSnapMap<T>
 		}
 
 		return null;
+	}
+
+	/**
+	 * Finds  the entry  with  the best  possible magnitude, and uses  the given
+	 * comparator as a tiebreaker.
+	 * 
+	 * TODO: Behaviour for bias==0 is not implemented.
+	 */
+	public final T GetClosestValue(int targetMagnitude, int bias, Predicate<T> isElligible, Comparator<T> comparator){
+		int i = GetClosestIndex(targetMagnitude, bias);
+		if (i < 0)
+			return null;
+
+		Entry<T> bestFit = null;
+
+		int direction = (bias>0) ? +1 : -1;
+		for (; 0<=i && i<entries.size(); i+=direction){
+			Entry<T> result = this.entries.get(i);
+			if (bestFit == null && isElligible.test(result.value))
+				bestFit = result;
+			else if (result.magnitude != bestFit.magnitude)
+				break;
+			else if (isElligible.test(result.value) && comparator.compare(bestFit.value, result.value) < 0)
+				bestFit = result;
+		}
+
+		return bestFit.value;
 	}
 
 }
