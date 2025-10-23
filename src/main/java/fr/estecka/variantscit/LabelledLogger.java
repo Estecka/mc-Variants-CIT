@@ -23,7 +23,7 @@ public class LabelledLogger
 			labels.pop();
 		}
 		catch(EmptyStackException e){
-			logger.error("Logger stack underflow.");
+			logger.error("{}", e);
 		}
 	}
 

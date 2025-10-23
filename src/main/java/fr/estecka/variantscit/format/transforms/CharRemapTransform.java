@@ -40,8 +40,12 @@ implements IStringTransform
 		return result.toString();
 	}
 
-	static private record CharsetParams(String source, String destination, String delete, Map<Character,String> map)
-	{
+	static private record CharsetParams(
+		String source,
+		String destination,
+		String delete,
+		Map<Character,String> map
+	){
 		static public final MapCodec<CharsetParams> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 			builder.group(
 				Codec.STRING.fieldOf("source").forGetter(CharsetParams::source),

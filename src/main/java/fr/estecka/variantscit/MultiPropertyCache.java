@@ -78,9 +78,9 @@ public class MultiPropertyCache
 		WeakReference<?>[] weakRefs = new WeakReference[properties.length];
 
 		for (int i=0; i<properties.length; ++i){
-			Object cmp = properties[i].GetReference(stack);
-			if (cmp != null)
-				weakRefs[i] = new HashedWeakReference(hash, cmp, this.expiredComponents);
+			Object ref = properties[i].GetReference(stack);
+			if (ref != null)
+				weakRefs[i] = new HashedWeakReference(hash, ref, this.expiredComponents);
 		}
 
 		CacheEntry entry = new CacheEntry(variant, weakRefs);

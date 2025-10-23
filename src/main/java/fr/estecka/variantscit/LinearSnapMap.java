@@ -106,7 +106,7 @@ public class LinearSnapMap<T>
 	}
 
 	/**
-	 * Finds the entry  with the best fitting magnitude. Assumes all entries are
+	 * Finds the entry  with the most fitting magnitude. Assumes all entries are
 	 * elligible, and no ties can occur.
 	 */
 	public final T GetClosestValue(int targetMagnitude, int bias){
@@ -114,11 +114,11 @@ public class LinearSnapMap<T>
 		if (i < 0)
 			return null;
 		else
-			return this.entries.get(GetClosestIndex(targetMagnitude, bias)).value;
+			return this.entries.get(i).value;
 	}
 
 	/**
-	 * Finds the entry  with the best fitting magnitude, and uses the comparator
+	 * Finds the elligible entry with the most fitting magnitude. The comparator
 	 * given to the constructor is used as tiebreaker.
 	 * 
 	 * @implNote This is more performant than using a custom comparator. Entries
@@ -143,8 +143,12 @@ public class LinearSnapMap<T>
 	}
 
 	/**
-	 * Finds  the entry  with  the best  possible magnitude, and uses  the given
-	 * comparator as a tiebreaker.
+	 * Finds the elligible  entry with  the most fitting magnitude, and uses the
+	 * given comparator as a tiebreaker.
+	 * 
+	 * @implNote This implementation would have been required by the enchantment
+	 * vector module in order to sort by euclidian distance to the target point,
+	 * but the current implementation of the module ignores it.
 	 * 
 	 * TODO: Behaviour for bias==0 is not implemented.
 	 */
