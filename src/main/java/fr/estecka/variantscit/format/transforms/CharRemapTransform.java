@@ -1,20 +1,23 @@
 package fr.estecka.variantscit.format.transforms;
 
-import org.jetbrains.annotations.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.format.IStringTransform;
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 
 public record CharRemapTransform(
-	Char2ObjectMap<@Nullable Character> map
+	Char2ObjectMap<@NotNull String> map
 )
 implements IStringTransform
 {
-	static public final MapCodec<CharRemapTransform> MAPCODEC = StringCharmap.MAPCODEC
-		.xmap(StringCharmap::ToMap, StringCharmap::FromMap)
+	static public final MapCodec<CharRemapTransform> MAPCODEC = CharsetParams.MAPCODEC
+		.xmap(CharsetParams::ToMap, CharsetParams::FromMap)
 		.xmap(CharRemapTransform::new, CharRemapTransform::map)
 		;
 
@@ -25,65 +28,72 @@ implements IStringTransform
 		for (int i=0; i<original.length(); ++i)
 		{
 			char inChar = original.charAt(i);
-			Character outChar = map.get(inChar);
-			// Replace
-			if (outChar != null)
-				result.append(outChar);
+			String outStr = map.get(inChar);
+			// Replace / Delete
+			if (outStr != null)
+				result.append(outStr);
 			// No-op
-			else if (!map.containsKey(inChar))
+			else
 				result.append(inChar);
-			// else 
-				// delete
 		}
 
 		return result.toString();
 	}
 
-	static private record StringCharmap(String source, String destination)
-	{
-		static public final MapCodec<StringCharmap> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
+	static private record CharsetParams(
+		String source,
+		String destination,
+		String delete,
+		Map<Character,String> map
+	){
+		static public final MapCodec<CharsetParams> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 			builder.group(
-				Codec.STRING.fieldOf("source").forGetter(StringCharmap::source),
-				Codec.STRING.fieldOf("destination").forGetter(StringCharmap::destination)
+				Codec.STRING.fieldOf("source").forGetter(CharsetParams::source),
+				Codec.STRING.fieldOf("destination").forGetter(CharsetParams::destination),
+				Codec.STRING.optionalFieldOf("delete", "").forGetter(CharsetParams::destination),
+				Codec.unboundedMap(CodecUtil.CHAR, Codec.STRING).optionalFieldOf("map", Map.of()).forGetter(CharsetParams::map)
 			)
-			.apply(builder, StringCharmap::new)
+			.apply(builder, CharsetParams::new)
 		);
 
-		static public StringCharmap FromMap(Char2ObjectMap<@Nullable Character> map){
-			StringBuilder src = new StringBuilder();
-			StringBuilder dst = new StringBuilder();
+		static public CharsetParams FromMap(Char2ObjectMap<@NotNull String> fullMap){
+			String src = "", dst = "", del = "";
+			Map<Character, String> paramMap = new HashMap<>();
 
-			for (var entry : map.char2ObjectEntrySet()) {
-				char key = entry.getCharKey();
-				Character value = entry.getValue();
-				if (value != null){
-					src.append(key);
-					dst.append(value);
+			for (var entry : fullMap.char2ObjectEntrySet()) {
+				char   key   = entry.getCharKey();
+				String value = entry.getValue();
+				
+				if (value.isEmpty())
+					del += key;
+				else if (value.length() >= 1)
+					paramMap.put(key, value);
+				else {
+					src += key;
+					dst += value;
 				}
 			}
 
-			// Deletable characters must be at the end.
-			for (var entry : map.char2ObjectEntrySet()) {
-				if (entry.getValue() == null)
-					src.append(entry.getCharKey());
-			}
-
-			return new StringCharmap(src.toString(), dst.toString());
+			return new CharsetParams(src, dst, del, paramMap);
 		}
 
-		public Char2ObjectMap<@Nullable Character> ToMap(){
-			Char2ObjectMap<@Nullable Character> map = new Char2ObjectArrayMap<>();
+		public Char2ObjectMap<@NotNull String> ToMap(){
+			Char2ObjectMap<@NotNull String> fullMap = new Char2ObjectArrayMap<>();
 
-			for (int i=0; i<source.length(); ++i)
-			{
+			for (int i=0; i<source.length(); ++i) {
 				char key = source.charAt(i);
 				if (i < destination.length())
-					map.put(key, (Character)destination.charAt(i));
+					fullMap.put(key, destination.substring(i, i+1));
 				else
-					map.put(key, null);
+					fullMap.put(key, "");
 			}
 
-			return map;
+			for (int i=0; i<delete.length(); ++i)
+				fullMap.put(delete.charAt(i), "");
+
+			fullMap.putAll(this.map);
+
+			return fullMap;
 		}
 	}
 }
