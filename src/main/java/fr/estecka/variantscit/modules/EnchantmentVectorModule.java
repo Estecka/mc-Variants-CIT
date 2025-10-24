@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +21,8 @@ import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
@@ -31,43 +33,81 @@ import net.minecraft.util.Identifier;
 public class EnchantmentVectorModule
 implements IBakedModule
 {
-	static public class EnchantVector
-	extends Int2IntArrayMap
+	static private class VectorSpace
 	{
-		public EnchantVector(){ super(); }
-		public EnchantVector(int size){ super(size); }
+		private final Object2IntMap<Identifier> indices;
+		private final EnchantVector maxLevels;
 
-		static public EnchantVector FromComponent(ItemEnchantmentsComponent enchants){
-			EnchantVector vector = new EnchantVector(enchants.getSize());
-			for (var entry : enchants.getEnchantmentEntries())
-				vector.put(entry.getKey().getKey().get().getValue().hashCode(), entry.getIntValue());
+		public VectorSpace(Map<Identifier,Integer> maxLevels){
+			this.indices = new Object2IntOpenHashMap<>(maxLevels.size());
+			int i = 0;
+			for (var entry : maxLevels.entrySet())
+				this.indices.put(entry.getKey(), i++);
+			this.maxLevels = VectorFromMap(maxLevels);
+		}
+
+		public EnchantVector TruncatedVectorFromComponent(ItemEnchantmentsComponent enchants){
+			EnchantVector vector = new EnchantVector(this.indices.size());
+			for (var entry : enchants.getEnchantmentEntries()){
+				int i = this.indices.getOrDefault(entry.getKey().getKey().get().getValue(), -1);
+				if (i >= 0)
+					vector.values[i] = Math.min(entry.getIntValue(), maxLevels.values[i]);
+			}
+
 			return vector;
 		}
 
-		static public EnchantVector FromMap(Map<Identifier,Integer> enchants){
-			EnchantVector vector = new EnchantVector(enchants.size());
-			for (var entry : enchants.entrySet())
-				vector.put(entry.getKey().hashCode(), (int)entry.getValue());
+		public EnchantVector VectorFromMap(Map<Identifier,Integer> enchants){
+			EnchantVector vector = new EnchantVector(this.indices.size());
+			for (var entry : enchants.entrySet()){
+				int i = this.indices.getOrDefault(entry.getKey(), -1);
+				if (i >= 0)
+					vector.values[i] = entry.getValue();
+			}
+
 			return vector;
+		}
+	}
+
+	static private class EnchantVector
+	{
+		public final int[] values;
+
+		public EnchantVector(int size){
+			this.values = new int[size];
+		}
+
+		@Override
+		public int hashCode(){
+			return Arrays.hashCode(this.values);
+		}
+
+		@Override
+		public boolean equals(Object other){
+			return other instanceof EnchantVector vec && this.equals(vec);
+		}
+
+		public boolean equals(EnchantVector other){
+			return Arrays.equals(this.values, other.values);
 		}
 
 		public int TaxicabMagnitude(){
 			int magnitude = 0;
-			for (int i : this.values())
+			for (int i : this.values)
 				magnitude += i;
 			return magnitude;
 		}
 
 		public int EuclidianSquaredMagnitude(){
 			int magnitude = 0;
-			for (int i : this.values())
+			for (int i : this.values)
 				magnitude += i*i;
 			return magnitude;
 		}
 
 		public int Maximum(){
 			int magnitude = 0;
-			for (int i : this.values())
+			for (int i : this.values)
 				if (i > magnitude)
 					magnitude = i;
 			return magnitude;
@@ -75,18 +115,15 @@ implements IBakedModule
 
 		public int Dimensionality(){
 			int dimensions = 0;
-			for (int i : this.values())
+			for (int i : this.values)
 				if (i != 0)
 					++dimensions;
 			return dimensions;
 		}
 
 		public boolean IsWithin(EnchantVector box){
-			if (this.size() > box.size())
-				return false;
-
-			for (var entry : this.int2IntEntrySet())
-				if (!box.containsKey(entry.getIntKey()) || entry.getIntValue() > box.get(entry.getIntKey()))
+			for (int i=0; i<values.length; ++i)
+				if (this.values[i] > box.values[i])
 					return false;
 
 			return true;
@@ -136,6 +173,7 @@ implements IBakedModule
 	private final ComponentType<ItemEnchantmentsComponent> componentType;
 	private final MultiPropertyCache cache;
 	private final Identifier fallback;
+	private final VectorSpace vectorSpace;
 	private final LinearSnapMap<VariantEntry> modelLine;
 	private final ToIntFunction<EnchantVector> magnitudeGetter;
 
@@ -144,38 +182,39 @@ implements IBakedModule
 /******************************************************************************/
 
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, ComponentType<ItemEnchantmentsComponent> component){
+		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
 		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
 		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
 		this.magnitudeGetter = params.ordering.get(0);
 		this.modelLine = OrderedSnapMap(params.ordering);
 
-		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
 		Pattern enchantRegex = BakeRegex(params);
 
-		Set<Identifier> knownEnchants = new HashSet<>();
-		Set<EnchantVector> knownVectors = new HashSet<>();
+		Map<Identifier,Integer> enchant2MaxLevel = new HashMap<>();
+		Map<Map<Identifier,Integer>, Identifier> vector2Model = new HashMap<>();
 		Set<String> duplicateIds = new HashSet<>();
 
-		for (var variant : variantLibrary.variantModels().entrySet())
-		if  (variant.getKey().getNamespace().equals(params.namespace))
+		for (var model : variantLibrary.variantModels().entrySet())
+		if  (model.getKey().getNamespace().equals(params.namespace))
 		{
-			var optMap = VariantId2Map(enchantRegex, variant.getKey(), params.aliases);
+			var optMap = VariantId2Map(enchantRegex, model.getKey(), params.aliases);
 			if (optMap.isPresent()){
-				var vector = EnchantVector.FromMap(optMap.get());
-				if (knownVectors.contains(vector))
-					duplicateIds.add(variant.getKey().getPath());
+				var enchants = optMap.get();
+				if (vector2Model.containsKey(enchants))
+					duplicateIds.add(model.getKey().getPath());
 				else {
-					knownVectors.add(vector);
-					knownEnchants.addAll(optMap.get().keySet());
-					modelLine.AddEntry(magnitudeGetter.applyAsInt(vector), new VariantEntry(vector, variant.getValue()));
+					vector2Model.put(enchants, model.getValue());
+					for (var e : enchants.entrySet())
+						if (e.getValue() > enchant2MaxLevel.getOrDefault(e.getKey(), 0))
+							enchant2MaxLevel.put(e.getKey(), e.getValue());
 				}
 			}
 		}
 
 		if (params.bakingDebug){
 			String msg = "These enchantments were detected in the CITs. If this looks wrong, check your filenames and your aliases:";
-			for (Identifier id : knownEnchants)
+			for (Identifier id : enchant2MaxLevel.keySet())
 				msg += '\n' + id.toString();
 			VariantsCitMod.LOGGER.info(msg);
 		}
@@ -187,6 +226,13 @@ implements IBakedModule
 			}
 
 			VariantsCitMod.LOGGER.warn(msg);
+			
+		}
+
+		this.vectorSpace = new VectorSpace(enchant2MaxLevel);
+		for (var variant : vector2Model.entrySet()){
+			EnchantVector vector = vectorSpace.VectorFromMap(variant.getKey());
+			modelLine.AddEntry(magnitudeGetter.applyAsInt(vector), new VariantEntry(vector, variant.getValue()));
 		}
 
 		VariantsCitMod.LOGGER.PopLabel();
@@ -238,6 +284,9 @@ implements IBakedModule
 				VariantsCitMod.LOGGER.warn("Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
 				return Optional.empty();
 			}
+
+			if (level == 0)
+				VariantsCitMod.LOGGER.warn("Level 0 enchantments have no effect. {}", variantId.getPath());
 
 			vector.put(enchantId, level);
 		}
@@ -295,7 +344,7 @@ implements IBakedModule
 		if (enchants == null || enchants.isEmpty())
 			return null;
 
-		EnchantVector enchantBox = EnchantVector.FromComponent(enchants);
+		EnchantVector enchantBox = this.vectorSpace.TruncatedVectorFromComponent(enchants);
 		VariantEntry result = modelLine.GetClosestValue(
 			magnitudeGetter.applyAsInt(enchantBox),
 			-1,
