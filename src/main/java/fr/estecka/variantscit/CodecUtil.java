@@ -1,6 +1,10 @@
 package fr.estecka.variantscit;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Map.Entry;
+import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -19,6 +23,22 @@ public class CodecUtil
 
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isPathValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
+	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
+	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
+
+	/**
+	 * Functions to be used in `validate()` on deprecated codecs.
+	 */
+	static public <T> Function<T,DataResult<T>> WithWarning(String warning, Object... args){
+		return o->{
+			VariantsCitMod.LOGGER.warn(warning, args);
+			return DataResult.success(o);
+		};
+	}
+
+	static public <T> MapCodec<T> WithWarning(MapCodec<T> codec, String warning, Object... args){
+		return codec.validate(WithWarning(warning, args));
+	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
 		var listCodec = original.listOf();
@@ -29,7 +49,12 @@ public class CodecUtil
 	}
 
 	static public <T> MapCodec<T> MapWithAlternative(MapCodec<T> primary, MapCodec<? extends T> alternative){
-		return MapCodec.assumeMapUnsafe(Codec.withAlternative(primary.codec(), alternative.codec()));
+		return MapCodec.assumeMapUnsafe(
+			Codec.withAlternative(
+				primary.codec(),
+				alternative.codec()
+			)
+		);
 	}
 
 	@SafeVarargs
@@ -51,6 +76,31 @@ public class CodecUtil
 		for (int i=0; i<mapArray.length; ++i)
 			codecArray[i] = mapArray[i].codec();
 		return MapCodec.assumeMapUnsafe(WithAlternatives(primaryMap.codec(), codecArray));
+	}
+
+	static public <T> MapCodec<T> WithAlias(Codec<T> codec, String primary, String alias){
+		return MapWithAlternative(
+			codec.fieldOf(primary),
+			codec.fieldOf(alias).validate(WithWarning("VCIT field `{}` is deprecated. Use `{}` instead.", alias, primary))
+		);
+	}
+
+	static public <K,V> Codec<V> Enum(Codec<K> keyCodec, Map<K,V> units){
+		return keyCodec.<V>flatXmap(
+			key -> units.containsKey(key) ?
+				DataResult.success(units.get(key)) :
+				DataResult.error(()->"Unknown key: " + key.toString()),
+			obj -> units.containsValue(obj) ?
+				DataResult.success(units.entrySet().stream().filter(entry->obj.equals(entry.getValue())).map(Entry::getKey).findFirst().get()) :
+				DataResult.error(()->"Unknown unit")
+		);
+	}
+
+	static public <T> MapCodec<Optional<T>> OptionalWithAlias(Codec<T> codec, String primary, String alias){
+		return WithAlias(codec, primary, alias)
+			.xmap(Optional::of, Optional::get)
+			.orElse(Optional.empty())
+			;
 	}
 
 	static public <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){
