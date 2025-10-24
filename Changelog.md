@@ -106,6 +106,8 @@
 ## 2.14
 - Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.
+## 2.15
+- Transform `charset_remap` can now replace a single character with a longer string.
 
 # v3
 ## 3.0
