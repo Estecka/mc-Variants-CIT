@@ -51,11 +51,9 @@ public class LinearSnapMap<T>
 	 * magnitude. More specifically, this searches for  the elligible entry that
 	 * separates all elligible entries from the inelligible ones.
 	 * 
-	 * TODO: Behaviour for bias==0 is not correctly implemented and not properly
-	 * defined. There are currently no use cases for this in the mod.
-	 * 
-	 * @param bias -1, 0, or +1. Defines which range of entries are elligible:
-	 * Those that are greater or equal (+1), lesser or equal (-1) or both (0).
+	 * @param bias -1, 0, or +1. Defines w hich range  of entries are elligible:
+	 * Those  that are  greater or equal (+1), lesser or equal (-1)  or strictly
+	 * equal (0).
 	 * @implNote If multiple entries have the same magnitude:
 	 * - For lesser magnitudes, pick the highest index
 	 * - For greater magnitudes, pick the lowest index
@@ -94,12 +92,10 @@ public class LinearSnapMap<T>
 			else 
 				nudgeUp = (bias < 0);
 
-			if (nudgeUp){
+			if (nudgeUp)
 				iMin = midpoint;
-			}
-			else {
+			else
 				iMax = midpoint;
-			}
 		}
 
 		return iBestFit;
@@ -124,8 +120,6 @@ public class LinearSnapMap<T>
 	 * @implNote This is more performant than using a custom comparator. Entries
 	 * are sorted ahead of time, so the function  can return the first elligible
 	 * entry it encounters.
-	 * 
-	 * TODO: Behaviour for bias==0 is not implemented.
 	 */
 	public final T GetClosestValue(int targetMagnitude, int bias, Predicate<T> isElligible){
 		int i = GetClosestIndex(targetMagnitude, bias);
@@ -149,8 +143,6 @@ public class LinearSnapMap<T>
 	 * @implNote This implementation would have been required by the enchantment
 	 * vector module in order to sort by euclidian distance to the target point,
 	 * but the current implementation of the module ignores it.
-	 * 
-	 * TODO: Behaviour for bias==0 is not implemented.
 	 */
 	public final T GetClosestValue(int targetMagnitude, int bias, Predicate<T> isElligible, Comparator<T> comparator){
 		int i = GetClosestIndex(targetMagnitude, bias);
