@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
@@ -30,11 +31,6 @@ public final class ModuleLoader
 		public final ItemVariantAggregator  itemAggregator  = new ItemVariantAggregator ();
 		public final EquipVariantAggregator equipAggregator = new EquipVariantAggregator();
 	}
-
-	static record ProtoModule (
-		ModuleDefinition definition,
-		JsonObject parameters
-	){}
 
 	/**
 	 * Contains all the processed data about a module. Some of that data is only
@@ -63,15 +59,15 @@ public final class ModuleLoader
 		for (var entry : resources.entrySet())
 		try {
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
-			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
+			ModuleDefinition definition = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			List<EModuleContext> contexts = prototype.definition().contexts();
+			List<EModuleContext> contexts = definition.contexts();
 			if (contexts.isEmpty()){
 				VariantsCitMod.LOGGER.warn("Ignored VCIT module with no context: {}", moduleId);
 				continue;
 			}
 
-			Set<Item> targets = prototype.definition.targets()
+			Set<Item> targets = definition.targets()
 				.map(ModuleLoader::ItemsFromTarget)
 				.orElseGet(()->ItemsFromModuleId(moduleId))
 				;
@@ -80,7 +76,7 @@ public final class ModuleLoader
 				continue;
 			}
 
-			if (prototype.definition.modelPrefix().isEmpty())
+			if (definition.modelPrefix().isEmpty())
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			VariantLibrary itemLibrary = null;
@@ -88,17 +84,17 @@ public final class ModuleLoader
 
 			for (EModuleContext c : contexts)
 			switch (c) {
-				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
-				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
+				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(definition, manager); break;
+				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(definition, manager); break;
 			}
 
 			MetaModule meta = new MetaModule(
 				moduleId,
-				prototype.definition.priority(),
+				definition.priority(),
 				targets,
 				Optional.ofNullable(itemLibrary),
 				Optional.ofNullable(equipLibrary),
-				prototype.definition.module()
+				definition.module()
 			);
 
 			modules.add(meta);
@@ -157,7 +153,7 @@ public final class ModuleLoader
 		return Identifier.of(resource.getNamespace(), path);
 	}
 
-	static private DataResult<ProtoModule> DefinitionFromResource(Resource resource){
+	static private DataResult<ModuleDefinition> DefinitionFromResource(Resource resource){
 		JsonObject json;
 		try {
 			json = JsonHelper.deserialize(resource.getReader());
@@ -166,22 +162,7 @@ public final class ModuleLoader
 			return DataResult.error(e::toString);
 		}
 
-		var dataResult = ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json);
-		if (dataResult.isError()){
-			return DataResult.error(dataResult.error().get()::message);
-		}
-
-		try {
-			ModuleDefinition definition = dataResult.getOrThrow().getFirst();
-			JsonObject parameters = json.getAsJsonObject("parameters");
-			if (parameters == null)
-				parameters = new JsonObject();
-
-			return DataResult.success(new ProtoModule(definition, parameters));
-		}
-		catch (IllegalStateException|ClassCastException e){
-			return DataResult.error(e::toString);
-		}
+		return ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
 	}
 
 	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
