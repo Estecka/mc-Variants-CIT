@@ -1,7 +1,9 @@
 package fr.estecka.variantscit;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -21,6 +23,8 @@ public class CodecUtil
 
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isPathValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
+	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
+	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 
 	/**
 	 * Functions to be used in `validate()` on deprecated codecs.
@@ -30,6 +34,10 @@ public class CodecUtil
 			VariantsCitMod.LOGGER.warn(warning, args);
 			return DataResult.success(o);
 		};
+	}
+
+	static public <T> MapCodec<T> WithWarning(MapCodec<T> codec, String warning, Object... args){
+		return codec.validate(WithWarning(warning, args));
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
@@ -72,9 +80,20 @@ public class CodecUtil
 
 	static public <T> MapCodec<T> WithAlias(Codec<T> codec, String primary, String alias){
 		return MapWithAlternative(
-				codec.fieldOf(primary),
-				codec.fieldOf(alias).validate(WithWarning("VCIT field `{}` is deprecated. Use `context` instead.", alias))
-			);
+			codec.fieldOf(primary),
+			codec.fieldOf(alias).validate(WithWarning("VCIT field `{}` is deprecated. Use `{}` instead.", alias, primary))
+		);
+	}
+
+	static public <K,V> Codec<V> Enum(Codec<K> keyCodec, Map<K,V> units){
+		return keyCodec.<V>flatXmap(
+			key -> units.containsKey(key) ?
+				DataResult.success(units.get(key)) :
+				DataResult.error(()->"Unknown key: " + key.toString()),
+			obj -> units.containsValue(obj) ?
+				DataResult.success(units.entrySet().stream().filter(entry->obj.equals(entry.getValue())).map(Entry::getKey).findFirst().get()) :
+				DataResult.error(()->"Unknown unit")
+		);
 	}
 
 	static public <T> MapCodec<Optional<T>> OptionalWithAlias(Codec<T> codec, String primary, String alias){

@@ -106,6 +106,8 @@
 ## 2.14
 - Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.
+## 2.15
+- Transform `charset_remap` can now replace a single character with a longer string.
 
 # v3
 ## 3.0
@@ -193,6 +195,10 @@ Since v2.5:
 ## 3.10
 - Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.
+## 3.11
+- Modules `durability` and `item_count` may now use the fallback model.
+- Added modules `enchantment_vector` and `stored_enchantment_vector`.
+- Transform `charset_remap` can now replace a single character with a longer string.
 
 # v4
 ## 4.0
@@ -241,3 +247,7 @@ Since v3.5:
 ## 4.5
 - Added transforms: `null`, `test`, `successive`, `alternative`, `whitelist`, `blacklist`, `remap`, `charset_remap`.
 - All transforms can now be marked as optional, or take a fallback.
+## 4.6
+- Modules `durability` and `item_count` may now use the fallback model.
+- Added modules `enchantment_vector` and `stored_enchantment_vector`.
+- Transform `charset_remap` can now replace a single character with a longer string.
