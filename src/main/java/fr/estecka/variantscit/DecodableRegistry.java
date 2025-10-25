@@ -3,7 +3,6 @@ package fr.estecka.variantscit;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
@@ -29,16 +28,9 @@ public class DecodableRegistry<T>
 	private final IMapWrapper<T> mapWrapper;
 
 	private final MapDecoder<Identifier> typeCodec;
-	public final Codec<T> unitCodec = Identifier.CODEC.flatXmap(
-		key -> this.units.containsKey(key) ?
-			DataResult.success(units.get(key)) :
-			DataResult.error(()->"Unknown key: "+key),
-		obj -> this.units.containsValue(obj) ?
-			DataResult.success(units.entrySet().stream().filter(e->obj.equals(e.getValue())).map(Entry::getKey).findFirst().get()) :
-			DataResult.error(()->"Unknown unit")
-	);
-	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
-	public final Codec<T> codec = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
+	public final Codec<T>    unitCodec = CodecUtil.Enum(Identifier.CODEC, this.units);
+	public final MapCodec<T> mapCodec  = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
+	public final Codec<T>    codec     = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
 
 	public DecodableRegistry(String typeKey){
 		this(typeKey, null, c->c);
@@ -46,6 +38,10 @@ public class DecodableRegistry<T>
 
 	public DecodableRegistry(String typeKey, Identifier defaultId){
 		this(typeKey, defaultId, c->c);
+	}
+
+	public DecodableRegistry(String typeKey, IMapWrapper<T> mapWrapper){
+		this(typeKey, null, mapWrapper);
 	}
 
 	public DecodableRegistry(String typeKey, @Nullable Identifier defaultId, IMapWrapper<T> mapWrapper){
@@ -62,16 +58,24 @@ public class DecodableRegistry<T>
 	}
 
 	public void RegisterMap(Identifier key, MapCodec<? extends T> mapCodec){
+		AssertUnique(key);
 		this.mapCodecs.put(key, mapWrapper.apply(mapCodec));
 	}
 
 	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
-		this.units.put(key, unit);
+		AssertUnique(key);
 		this.RegisterMap(key, mapCodec);
+		this.units.put(key, unit);
 	}
 
 	public MapDecoder<? extends T> GetDecoder(Identifier type){
 		return this.mapCodecs.get(type);
+	}
+
+	private void AssertUnique(Identifier key){
+		if (this.units.containsKey(key) || this.mapCodecs.containsKey(key)){
+			throw new IllegalStateException("Duplicate registration for entry:"+key.toString());
+		}
 	}
 
 	private class MapDecoderImpl
