@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import fr.estecka.variantscit.modulebakers.IBakedModule;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.EquippableComponent;
@@ -61,10 +62,16 @@ public class EquippableCache
 			return original;
 		}
 
-		final IItemModelProvider module = VariantsCitMod.GetEquipmentModule(stack.getItem());
-		Identifier assetId;
+		final IBakedModule module = VariantsCitMod.GetEquipmentModule(stack.getItem());
+		Identifier assetId = null;
 
-		if (module == null || (assetId=module.GetModelForItem(stack)) == null)
+		if (module != null){
+			VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+			assetId = module.GetModelForItem(stack);
+			VariantsCitMod.LOGGER.PopLabel();
+		}
+
+		if (assetId == null)
 			return original;
 		else
 			return GetWithAssetId(equipable, assetId);

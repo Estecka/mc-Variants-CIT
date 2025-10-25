@@ -10,14 +10,12 @@ import java.util.Optional;
 import java.util.Set;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.BakedModule;
-import fr.estecka.variantscit.IItemModelProvider;
-import fr.estecka.variantscit.ModuleRegistry;
+import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.ICitModule;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -28,16 +26,11 @@ import net.minecraft.util.JsonHelper;
 public final class ModuleLoader
 {
 	static public class Result {
-		public final Map<Item, IItemModelProvider> itemModules  = new HashMap<>();
-		public final Map<Item, IItemModelProvider> equipModules = new HashMap<>();
+		public final Map<Item, IBakedModule> itemModules  = new HashMap<>();
+		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
 		public final ItemVariantAggregator  itemAggregator  = new ItemVariantAggregator ();
 		public final EquipVariantAggregator equipAggregator = new EquipVariantAggregator();
 	}
-
-	static record ProtoModule (
-		ModuleDefinition definition,
-		JsonObject parameters
-	){}
 
 	/**
 	 * Contains all the processed data about a module. Some of that data is only
@@ -49,8 +42,7 @@ public final class ModuleLoader
 		Set<Item> targets,
 		Optional<VariantLibrary> itemLibrary,
 		Optional<VariantLibrary> equipLibrary,
-		ICitModule logic
-		
+		UnbakedModule<?> parameters
 	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
@@ -67,15 +59,15 @@ public final class ModuleLoader
 		for (var entry : resources.entrySet())
 		try {
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
-			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
+			ModuleDefinition definition = DefinitionFromResource(entry.getValue()).getOrThrow();
 
-			List<EModuleContext> contexts = prototype.definition().contexts();
+			List<EModuleContext> contexts = definition.contexts();
 			if (contexts.isEmpty()){
 				VariantsCitMod.LOGGER.warn("Ignored VCIT module with no context: {}", moduleId);
 				continue;
 			}
 
-			Set<Item> targets = prototype.definition.targets()
+			Set<Item> targets = definition.targets()
 				.map(ModuleLoader::ItemsFromTarget)
 				.orElseGet(()->ItemsFromModuleId(moduleId))
 				;
@@ -84,26 +76,25 @@ public final class ModuleLoader
 				continue;
 			}
 
-			if (prototype.definition.modelPrefix().isEmpty())
+			if (definition.modelPrefix().isEmpty())
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
-			ICitModule moduleLogic = ModuleRegistry.CreateModule(prototype.definition.type(), prototype.parameters);
 			VariantLibrary itemLibrary = null;
 			VariantLibrary equipLibrary = null;
 
 			for (EModuleContext c : contexts)
 			switch (c) {
-				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(prototype.definition, manager); break;
-				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(prototype.definition, manager); break;
+				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(definition, manager); break;
+				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(definition, manager); break;
 			}
 
 			MetaModule meta = new MetaModule(
 				moduleId,
-				prototype.definition.priority(),
+				definition.priority(),
 				targets,
 				Optional.ofNullable(itemLibrary),
 				Optional.ofNullable(equipLibrary),
-				moduleLogic
+				definition.module()
 			);
 
 			modules.add(meta);
@@ -162,7 +153,7 @@ public final class ModuleLoader
 		return Identifier.of(resource.getNamespace(), path);
 	}
 
-	static private DataResult<ProtoModule> DefinitionFromResource(Resource resource){
+	static private DataResult<ModuleDefinition> DefinitionFromResource(Resource resource){
 		JsonObject json;
 		try {
 			json = JsonHelper.deserialize(resource.getReader());
@@ -171,54 +162,42 @@ public final class ModuleLoader
 			return DataResult.error(e::toString);
 		}
 
-		var dataResult = ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json);
-		if (dataResult.isError()){
-			return DataResult.error(dataResult.error().get()::message);
-		}
-
-		try {
-			ModuleDefinition definition = dataResult.getOrThrow().getFirst();
-			JsonObject parameters = json.getAsJsonObject("parameters");
-			if (parameters == null)
-				parameters = new JsonObject();
-
-			return DataResult.success(new ProtoModule(definition, parameters));
-		}
-		catch (IllegalStateException|ClassCastException e){
-			return DataResult.error(e::toString);
-		}
+		return ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
 	}
 
 	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
-		Map<Item, List<BakedModule>> itemModules  = new HashMap<>();
-		Map<Item, List<BakedModule>> equipModules = new HashMap<>();
+		Map<Item, List<IBakedModule>> itemModules  = new HashMap<>();
+		Map<Item, List<IBakedModule>> equipModules = new HashMap<>();
 	
 		for (MetaModule meta : modules)
 		{
+			VariantsCitMod.LOGGER.PushLabel(meta.id);
 			if (meta.itemLibrary() .isPresent()) BakeModuleContext("item_model", meta, meta.itemLibrary ().get(), itemModules );
 			if (meta.equipLibrary().isPresent()) BakeModuleContext("equippable", meta, meta.equipLibrary().get(), equipModules);
-		}
+			VariantsCitMod.LOGGER.PopLabel();
+	}
 
 		BakeItem(result.itemModules,  itemModules );
 		BakeItem(result.equipModules, equipModules);
 	}
 
-	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<BakedModule>> output){
+	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<IBakedModule>> output){
 		if (lib.isEmpty())
-			VariantsCitMod.LOGGER.warn("Empty {} VCIT module {}", contextName, meta.id());
+			VariantsCitMod.LOGGER.Unlabelled().warn("Empty {} VCIT module {}", contextName, meta.id());
 		else
-			VariantsCitMod.LOGGER.info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
+			VariantsCitMod.LOGGER.Unlabelled().info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
 
 		for (Item itemType : meta.targets()){
-			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(new BakedModule(lib, meta.logic()));
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(meta.parameters.Bake(lib));
 		}
+
 	}
 
-	static private void BakeItem(Map<Item, IItemModelProvider> result, Map<Item, List<BakedModule>> moduleListPerItem){
+	static private void BakeItem(Map<Item, IBakedModule> result, Map<Item, List<IBakedModule>> moduleListPerItem){
 		for (var entry : moduleListPerItem.entrySet()){
 			result.put(
 				entry.getKey(),
-				IItemModelProvider.OfList( entry.getValue() )
+				IBakedModule.OfList( entry.getValue() )
 			);
 		}
 	}

@@ -1,10 +1,12 @@
 package fr.estecka.variantscit.api;
 
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.modulebakers.IGenericCitModule;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public interface ICitModule
+extends IGenericCitModule<IVariantManager>
 {
 	/**
 	 * The main logic for changing an items model.
