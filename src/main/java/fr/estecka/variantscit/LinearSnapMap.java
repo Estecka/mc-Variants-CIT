@@ -67,8 +67,6 @@ public class LinearSnapMap<T>
 		int iMax = this.entries.size();
 		int iBestFit = -1;
 
-		assert bias != 0;
-
 		// Stop when there are no more entries between the bounds (excluded).
 		while (iMin + 1 < iMax){
 			int midpoint = (iMax + iMin) / 2;
