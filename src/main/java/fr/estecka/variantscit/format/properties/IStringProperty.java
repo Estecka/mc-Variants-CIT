@@ -3,9 +3,11 @@ package fr.estecka.variantscit.format.properties;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.VCitRegistries;
+import fr.estecka.variantscit.MultiPropertyCache;
 import net.minecraft.item.ItemStack;
 
 public interface IStringProperty
+extends MultiPropertyCache.ICachableItemProperty
 {
 	static public MapCodec<IStringProperty> MAP_CODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec;
 	static public Codec<IStringProperty> CODEC = Codec.withAlternative(

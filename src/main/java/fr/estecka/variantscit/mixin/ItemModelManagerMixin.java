@@ -9,8 +9,8 @@ import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import fr.estecka.variantscit.IItemModelProvider;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.modulebakers.IBakedModule;
 
 @Mixin(ItemModelManager.class)
 public class ItemModelManagerMixin
@@ -21,10 +21,16 @@ public class ItemModelManagerMixin
 	)
 	private @Nullable Object GetVariantModel(ItemStack stack, ComponentType<Identifier> type, Operation<Identifier> original)
 	{
-		final IItemModelProvider module = VariantsCitMod.GetItemModule(stack.getItem());
-		Identifier modelId;
+		final IBakedModule module = VariantsCitMod.GetItemModule(stack.getItem());
+		Identifier modelId = null;
 
-		if (module == null || (modelId=module.GetModelForItem(stack)) == null)
+		if (module != null){
+			VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+			modelId = module.GetModelForItem(stack);
+			VariantsCitMod.LOGGER.PopLabel();
+		}
+
+		if (modelId == null)
 			return original.call(stack, type);
 		else
 			return modelId;
