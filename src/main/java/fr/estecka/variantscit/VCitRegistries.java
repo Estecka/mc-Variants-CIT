@@ -1,10 +1,13 @@
 package fr.estecka.variantscit;
 
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.Identifier;
 import java.util.Map;
 import java.util.Optional;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
@@ -16,7 +19,7 @@ import fr.estecka.variantscit.reload.UnbakedModule;
 
 public final class VCitRegistries
 {
-	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", c->c.fieldOf("parameters"));
+	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
 	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", Identifier.ofVanilla("item_component"), TransformableProperty::CodecOf);
 	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", Identifier.ofVanilla("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
@@ -96,5 +99,12 @@ public final class VCitRegistries
 
 	static public void RegisterSimpleModule(Identifier id, ICitModule unit){
 		RegisterSimpleModule(id, MapCodec.unit(unit));
+	}
+
+	static private <T> MapDecoder<T> OptionalParameters(MapDecoder<T> mapcodec){
+		return NbtCompound.CODEC
+			.optionalFieldOf("parameters", new NbtCompound())
+			.flatMap(nbt -> NbtOps.INSTANCE.withParser(mapcodec.decoder()).apply(nbt))
+			;
 	}
 }
