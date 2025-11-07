@@ -202,3 +202,6 @@ Since v2.5:
 - Transform `charset_remap` can now replace a single character with a longer string.
 ### 3.11.1
 - Fixed `parameters` having become mandatory on all modules.
+
+### +indev
+- Workaround for packs taking forever to load when too many modules are present.
