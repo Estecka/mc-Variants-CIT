@@ -56,6 +56,8 @@ public final class ModuleLoader
 		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
 		// resources.putAll(manager.findResources("variants-cit/equipment", id->id.getPath().endsWith(".json")));
 
+		VCitResourceManager vcitManager = VCitResourceManager.GatherAll(manager);
+
 		for (var entry : resources.entrySet())
 		try {
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
@@ -84,8 +86,8 @@ public final class ModuleLoader
 
 			for (EModuleContext c : contexts)
 			switch (c) {
-				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(definition, manager); break;
-				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(definition, manager); break;
+				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(definition, vcitManager); break;
+				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(definition, vcitManager); break;
 			}
 
 			MetaModule meta = new MetaModule(

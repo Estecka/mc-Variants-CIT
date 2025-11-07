@@ -51,7 +51,7 @@ public class BakedModelManagerMixin
 	}
 
 	static private ItemAsset ItemFromModel(Identifier assetId) {
-		var unbaked = new BasicItemModel.Unbaked(assetId.withPrefixedPath("item/"), List.of());
+		var unbaked = new BasicItemModel.Unbaked(assetId, List.of());
 		var properties = new ItemAsset.Properties(true);
 		return new ItemAsset(unbaked, properties);
 	}
@@ -71,7 +71,7 @@ public class BakedModelManagerMixin
 			Map<Identifier,Identifier> models = resultRef.get().modelsToCreate;
 			VariantsCitMod.LOGGER.info("Creating {} models from textures...", models.size());
 			for (var entry : models.entrySet()){
-				Identifier resourceId = entry.getKey().withPrefixedPath("item/");
+				Identifier resourceId = entry.getKey();
 				allModels.put(resourceId, ModelFromTexture(resourceId, entry.getValue()));
 			}
 	

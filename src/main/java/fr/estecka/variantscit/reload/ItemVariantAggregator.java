@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 public class ItemVariantAggregator
@@ -20,7 +19,7 @@ extends AVariantAggregator
 	public final Set<Identifier> itemStatesToCreate = new HashSet<>();
 
 	@Override
-	public VariantLibrary CreateLibrary(ModuleDefinition definition, ResourceManager manager){
+	public VariantLibrary CreateLibrary(ModuleDefinition definition, VCitResourceManager manager){
 		Map<Identifier,Identifier> allVariants = new HashMap<>();
 		Map<String,Identifier> allSpecials = new HashMap<>();
 
@@ -31,8 +30,8 @@ extends AVariantAggregator
 
 		// Variants from items
 		{
-			var varItems  = FindVariants(manager, "items", prefix, ".json");
-			var speItems  = FindSpecials(manager, "items", specials, ".json");
+			var varItems  = FindVariants(manager.items, prefix);
+			var speItems  = FindSpecials(manager.items, specials);
 			allVariants.putAll(varItems);
 			allSpecials.putAll(speItems);
 		}
@@ -40,8 +39,8 @@ extends AVariantAggregator
 		// Variants from models
 		if (definition.itemGen())
 		{
-			var varModels = FindVariants(manager, "models/item", prefix, ".json");
-			var speModels = FindSpecials(manager, "models/item", specials, ".json");
+			var varModels = FindVariants(manager.models, "item/"+prefix);
+			var speModels = FindSpecials(manager.models, specials);
 			allVariants.keySet().forEach(varModels::remove);
 			allSpecials.keySet().forEach(speModels::remove);
 			allVariants.putAll(varModels);
@@ -53,8 +52,8 @@ extends AVariantAggregator
 		// Variants from textures
 		if (modelParent.isPresent())
 		{
-			var varTextures = FindVariants(manager, "textures/item", prefix, ".png");
-			var speTextures = FindSpecials(manager, "textures/item", specials, ".png");
+			var varTextures = FindVariants(manager.textures, "item/"+prefix);
+			var speTextures = FindSpecials(manager.textures, specials);
 			allVariants.keySet().forEach(varTextures::remove);
 			allSpecials.keySet().forEach(speTextures::remove);
 			allVariants.putAll(varTextures);
