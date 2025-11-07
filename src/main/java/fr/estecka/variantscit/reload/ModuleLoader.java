@@ -108,6 +108,16 @@ public final class ModuleLoader
 		// Sort highest priorities first.
 		modules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
 
+		if (!result.itemAggregator.conflictingModelPrefixes.isEmpty()){
+			String message = "Some modules with identical model prefixes have conflicting model parents, "
+			               + "it is undefined which parent will be used. "
+			               + "The folowing prefixes are involved: "
+			               ;
+			for (var prefix : result.itemAggregator.conflictingModelPrefixes)
+				message += '\n' + prefix;
+			VariantsCitMod.LOGGER.error(message);
+		}
+
 		BakeModules(result, modules);
 		return result;
 	}

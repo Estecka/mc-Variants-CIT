@@ -68,11 +68,11 @@ public class BakedModelManagerMixin
 		return original.thenApply( (allModels)->{
 			allModels = new HashMap<Identifier, UnbakedModel>(allModels);
 	
-			Map<Identifier,Identifier> models = resultRef.get().modelsToCreate;
+			Map<Identifier,ItemVariantAggregator.ModelToCreate> models = resultRef.get().modelsToCreate;
 			VariantsCitMod.LOGGER.info("Creating {} models from textures...", models.size());
 			for (var entry : models.entrySet()){
 				Identifier resourceId = entry.getKey();
-				allModels.put(resourceId, ModelFromTexture(resourceId, entry.getValue()));
+				allModels.put(resourceId, ModelFromTexture(resourceId, entry.getValue().parent()));
 			}
 	
 			return allModels;

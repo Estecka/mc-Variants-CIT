@@ -39,6 +39,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
 		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
+		RegisterSimpleModule(Identifier.ofVanilla("noop"), (_0,_1)->null);
 		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_type"), new PotionTypeModule());

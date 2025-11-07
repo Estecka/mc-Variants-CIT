@@ -205,3 +205,4 @@ Since v2.5:
 
 ### +indev
 - Workaround for packs taking forever to load when too many modules are present.
+- Modules with more specific `modelPrefix` will take priority in case of conflicting `modelParent`.

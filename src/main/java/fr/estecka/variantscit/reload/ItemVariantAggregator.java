@@ -6,17 +6,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import fr.estecka.variantscit.VariantLibrary;
-import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.util.Identifier;
 
 public class ItemVariantAggregator
 extends AVariantAggregator
 {
+	static public record ModelToCreate(
+		Identifier parent,
+		int specificity
+	){}
+
 	/**
 	 * Maps each model ID to its parents.
 	 */
-	public final Map<Identifier, Identifier> modelsToCreate = new HashMap<>();
+	public final Map<Identifier, ModelToCreate> modelsToCreate = new HashMap<>();
 	public final Set<Identifier> itemStatesToCreate = new HashSet<>();
+	public final Set<String> conflictingModelPrefixes = new HashSet<>();
 
 	@Override
 	public VariantLibrary CreateLibrary(ModuleDefinition definition, VCitResourceManager manager){
@@ -60,8 +65,8 @@ extends AVariantAggregator
 			allSpecials.putAll(speTextures);
 			this.itemStatesToCreate.addAll(varTextures.values());
 			this.itemStatesToCreate.addAll(speTextures.values());
-			varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
-			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get()));
+			varTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get(), prefix));
+			speTextures.values().forEach(model -> AddModelToCreate(model, modelParent.get(), prefix));
 		}
 
 		allSpecials.remove(null);
@@ -72,11 +77,15 @@ extends AVariantAggregator
 		);
 	}
 
-	private void AddModelToCreate(Identifier model, Identifier parent){
-		if  (!this.modelsToCreate.containsKey(model))
-			modelsToCreate.put(model, parent);
-		else if (!modelsToCreate.get(model).equals(parent))
-			VariantsCitMod.LOGGER.error("Conflicting definitions for model {}", model);
+	private void AddModelToCreate(Identifier modelId, Identifier parent, String modelPrefix){
+		int specificity = modelPrefix.length();
+		var modelData = new ModelToCreate(parent, specificity);
+		var old = this.modelsToCreate.get(modelId);
+
+		if (old == null || old.specificity < modelData.specificity)
+			modelsToCreate.put(modelId, modelData);
+		else if (old.specificity == modelData.specificity)
+			conflictingModelPrefixes.add(modelPrefix);
 	}
 
 }
