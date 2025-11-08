@@ -202,8 +202,7 @@ Since v2.5:
 - Transform `charset_remap` can now replace a single character with a longer string.
 ### 3.11.1
 - Fixed `parameters` having become mandatory on all modules.
-
-### +indev
-- Workaround for zip packs taking forever to load when too many modules are present.
+## 3.12
 - Modules with more specific `modelPrefix` will take priority in case of conflicting `modelParent`s.
 - Reduced log spam in case of conflicting `modelParent`s.
+- Fixed extreme loading times when too many modules crawl through large zip packs..
