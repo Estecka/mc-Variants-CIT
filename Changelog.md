@@ -204,5 +204,6 @@ Since v2.5:
 - Fixed `parameters` having become mandatory on all modules.
 
 ### +indev
-- Workaround for packs taking forever to load when too many modules are present.
-- Modules with more specific `modelPrefix` will take priority in case of conflicting `modelParent`.
+- Workaround for zip packs taking forever to load when too many modules are present.
+- Modules with more specific `modelPrefix` will take priority in case of conflicting `modelParent`s.
+- Reduced log spam in case of conflicting `modelParent`s.

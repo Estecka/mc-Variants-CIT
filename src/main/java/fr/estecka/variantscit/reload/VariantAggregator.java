@@ -1,9 +1,11 @@
 package fr.estecka.variantscit.reload;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import fr.estecka.variantscit.VariantLibrary;
@@ -17,7 +19,6 @@ public class VariantAggregator
 		int priority
 	){}
 
-	public final Map<Identifier, ModuleDefinition> modules;
 	public final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	public final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
 
@@ -28,15 +29,14 @@ public class VariantAggregator
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
 
 
-	public VariantAggregator(Map<Identifier, ModuleDefinition> modules){
-		this.modules = modules;
+	public VariantAggregator(Collection<ModuleDefinition> modules){
 
-		for (ModuleDefinition module : this.modules.values())
+		for (ModuleDefinition module : modules)
 		for (EModuleContext context : module.contexts())
 		{
 			switch (context) {
-				case ITEM_MODEL: this.item_model.put(module, EmptyLibrary(module));
-				case EQUIPPABLE: this.item_model.put(module, EmptyLibrary(module));
+				case ITEM_MODEL: this.item_model.put(module, EmptyLibrary(module)); break;
+				case EQUIPPABLE: this.equippable.put(module, EmptyLibrary(module)); break;
 			}
 		}
 	}
@@ -47,6 +47,14 @@ public class VariantAggregator
 			new HashMap<>(),
 			module.specialModels()
 		);
+	}
+
+	public Optional<VariantLibrary> GetLibrary(EModuleContext context, ModuleDefinition module){
+		return Optional.ofNullable(switch (context) {
+			default -> throw new AssertionError();
+			case ITEM_MODEL -> this.item_model.get(module);
+			case EQUIPPABLE -> this.equippable.get(module);
+		});
 	}
 
 	public void GatherAll(ResourceManager manager){
@@ -135,14 +143,15 @@ public class VariantAggregator
 
 	private void OnAcceptedTexture(ModuleDefinition module, Identifier modelId){
 		int priority = module.modelPrefix().length();
+		Identifier parent = module.modelParent().get();
 		ModelToCreate oldModel = this.modelsToCreate.get(modelId);
 
 		if ((oldModel != null && oldModel.priority < priority)
 		|| (!this.acceptedItemModels.contains(modelId))
 		){
-			this.modelsToCreate.put(modelId, new ModelToCreate(module.modelParent().get(), priority));
+			this.modelsToCreate.put(modelId, new ModelToCreate(parent, priority));
 		}
-		else if (oldModel != null && oldModel.priority == priority){
+		else if (oldModel != null && oldModel.priority == priority && oldModel.parent.equals(parent)){
 			this.conflictingModelPrefixes.add(module.modelPrefix());
 		}
 	}
