@@ -9,9 +9,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.mixin.BakedModelManagerMixin;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+/**
+ * @implNote Texture and Baked model ids usually start with `item/` however here
+ * this prefix is stripped off so that their ids match those of the item states.
+ * These `item/` need to be re-added in {@link BakedModelManagerMixin} for asset
+ * generation.
+ */
 public class VariantAggregator
 {
 	static public record ModelToCreate(
@@ -62,6 +69,10 @@ public class VariantAggregator
 		GatherType(EAssetType.BAKED_MODEL, manager);
 		GatherType(EAssetType.TEXTURE,     manager);
 		GatherType(EAssetType.EQUIPMENT,   manager);
+
+		// Share generated assets accross modules
+		GatherIds(EAssetType.BAKED_MODEL, this.modelsToCreate.keySet().stream());
+		GatherIds(EAssetType.ITEM_STATE,  this.itemStatesToCreate.stream());
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
@@ -74,7 +85,11 @@ public class VariantAggregator
 			))
 		);
 
-		ids.forEach(assetId -> ApplyModelToAll(assetType, assetId));
+		GatherIds(assetType, ids);
+	}
+
+	private void GatherIds(EAssetType assetType, Stream<Identifier> assets){
+		assets.forEach(assetId -> ApplyModelToAll(assetType, assetId));
 	}
 
 	private void ApplyModelToAll(EAssetType assetType, Identifier assetId){
