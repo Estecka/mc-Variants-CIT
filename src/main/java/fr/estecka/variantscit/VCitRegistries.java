@@ -32,14 +32,13 @@ public final class VCitRegistries
 		RegisterSimpleModule(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
 		RegisterSimpleModule(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
-		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
 		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::Bake);
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
-		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
-		RegisterSimpleModule(Identifier.ofVanilla("noop"), (_0,_1)->null);
 		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_type"), new PotionTypeModule());

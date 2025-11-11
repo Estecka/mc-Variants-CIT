@@ -140,12 +140,16 @@ public class VariantAggregator
 			accepted = true;
 
 		if (modelId.getPath().startsWith(module.modelPrefix())){
-			accepted = true;
 			Identifier variantId = Identifier.of(
 				modelId.getNamespace(),
 				modelId.getPath().substring(module.modelPrefix().length())
 			);
-			library.variantModels().put(variantId, modelId);
+
+			if (module.parameters().AcceptsVariant(variantId)){
+				accepted = true;
+				library.variantModels().put(variantId, modelId);
+			}
+
 		}
 
 		return accepted;

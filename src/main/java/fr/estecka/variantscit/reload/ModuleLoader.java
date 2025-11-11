@@ -98,7 +98,7 @@ public final class ModuleLoader
 				targets,
 				result.variantAggregator.GetLibrary(EModuleContext.ITEM_MODEL, definition),
 				result.variantAggregator.GetLibrary(EModuleContext.EQUIPPABLE, definition),
-				definition.module()
+				definition.parameters()
 			));
 		}
 
