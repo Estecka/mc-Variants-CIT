@@ -21,10 +21,10 @@ import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.modulebakers.IModuleBaker;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -139,13 +139,20 @@ implements IBakedModule
 	static public record Parameters(
 		boolean bakingDebug,
 		boolean runtimeDebug,
-		boolean optionalLevel,
 		List<ToIntFunction<EnchantVector>> ordering,
-		String enchantSeparator,
-		Optional<String> levelSeparator,
+		Pattern vectorRegex,
 		Map<Identifier,Identifier> aliases,
 		String namespace
 	) {}
+
+	static private final MapCodec<Pattern> REGEX_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
+		builder.group(
+			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(_0->""),
+			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(_0->Optional.empty()),
+			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(_0->false)
+		)
+		.apply(builder, EnchantmentVectorModule::BakeRegex)
+	);
 
 	static public final Codec<ToIntFunction<EnchantVector>> NORM_CODEC = CodecUtil.Enum(Codec.STRING, Map.of(
 		"taxicab",   EnchantVector::TaxicabMagnitude,
@@ -160,10 +167,8 @@ implements IBakedModule
 		builder.group(
 			Codec.BOOL.optionalFieldOf("bakingDebug",  false).forGetter(Parameters::bakingDebug),
 			Codec.BOOL.optionalFieldOf("runtimeDebug", false).forGetter(Parameters::runtimeDebug),
-			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(Parameters::optionalLevel),
 			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
-			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
-			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
+			REGEX_MAPCODEC.forGetter(Parameters::vectorRegex),
 			Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(Parameters::namespace)
 		)
@@ -181,6 +186,25 @@ implements IBakedModule
 /* # Baking                                                                   */
 /******************************************************************************/
 
+	static public IModuleBaker<Parameters> GetBaker(ComponentType<ItemEnchantmentsComponent> component){
+		return new IModuleBaker<>() {
+			@Override
+			public IBakedModule Bake(VariantLibrary library, Parameters parameters) {
+				return new EnchantmentVectorModule(library, parameters, component);
+			};
+			@Override
+			public boolean AcceptVariant(Identifier variantId, Parameters parameters) {
+				if (!parameters.namespace.equals(variantId.getNamespace()))
+					return false;
+				if (!parameters.vectorRegex.matcher(variantId.getPath()).matches()){
+					VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
+					return false;
+				}
+				return true;
+			};
+		};
+	}
+
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, ComponentType<ItemEnchantmentsComponent> component){
 		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
 		this.componentType = component;
@@ -189,8 +213,6 @@ implements IBakedModule
 		this.magnitudeGetter = params.ordering.get(0);
 		this.modelLine = OrderedSnapMap(params.ordering);
 
-		Pattern enchantRegex = BakeRegex(params);
-
 		Map<Identifier,Integer> enchant2MaxLevel = new HashMap<>();
 		Map<Map<Identifier,Integer>, Identifier> vector2Model = new HashMap<>();
 		Set<String> duplicateIds = new HashSet<>();
@@ -198,7 +220,7 @@ implements IBakedModule
 		for (var model : variantLibrary.variantModels().entrySet())
 		if  (model.getKey().getNamespace().equals(params.namespace))
 		{
-			var optMap = VariantId2Map(enchantRegex, model.getKey(), params.aliases);
+			var optMap = VariantId2Map(params.vectorRegex, model.getKey(), params.aliases);
 			if (optMap.isPresent()){
 				var enchants = optMap.get();
 				if (vector2Model.containsKey(enchants))
@@ -236,13 +258,6 @@ implements IBakedModule
 		}
 
 		VariantsCitMod.LOGGER.PopLabel();
-	}
-
-	static public EnchantmentVectorModule Bake(VariantLibrary lib, Parameters params) {
-		return new EnchantmentVectorModule(lib, params, DataComponentTypes.ENCHANTMENTS);
-	}
-	static public EnchantmentVectorModule BakeStored(VariantLibrary lib, Parameters params) {
-		return new EnchantmentVectorModule(lib, params, DataComponentTypes.STORED_ENCHANTMENTS);
 	}
 
 	static private LinearSnapMap<VariantEntry> OrderedSnapMap(List<ToIntFunction<EnchantVector>> ordering){
@@ -298,21 +313,21 @@ implements IBakedModule
 	 * Example regex
 	 * (?<=^|.__)(?:(?<namespace>[a-z0-9_.-]*?)\.\.)?(?<path>[a-z0-9_.-]+?)(?:\.(?<lvl>[0-9]+))?(?=__.+|$)
 	 */
-	static private Pattern BakeRegex(Parameters params){
-		String enchantSep = params.enchantSeparator;
-		String lvlSep     = params.levelSeparator.orElse("");
+	static private Pattern BakeRegex(String enchantSeparator, Optional<String> levelSeparator, Boolean optionalLevel){
+		String enchantSep = enchantSeparator;
+		String lvlSep     = levelSeparator.orElse("");
 
 		String lvlRegex;
-		if (params.levelSeparator.isPresent() || params.optionalLevel)
+		if (levelSeparator.isPresent() || optionalLevel)
 			lvlRegex = lvlSep + "(?<lvl>[0-9]+)";
 		else
 			lvlRegex= "(?<lvl>)";
 
-		if (params.optionalLevel)
+		if (optionalLevel)
 			lvlRegex = "(?:"+lvlRegex+")?";
 
 		String regex = "(?<=^|."+enchantSep+")(?:(?<namespace>[a-z0-9_.-]*?)\\.\\.)?(?<path>[a-z0-9_.-]+?)"+lvlRegex+"(?="+enchantSep+".+|$)";
-		// if (params.bakingDebug)
+		// if (bakingDebug)
 		// 	VariantsCitMod.LOGGER.info("Filenames will be parsed using this regex:\n{}", regex);
 
 		return Pattern.compile(regex);
