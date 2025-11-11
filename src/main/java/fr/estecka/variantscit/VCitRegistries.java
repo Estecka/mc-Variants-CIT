@@ -25,7 +25,7 @@ public final class VCitRegistries
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static {
-		RegisterSimpleModule(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC);
+		RegisterBakedModule(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
 		RegisterSimpleModule(Identifier.ofVanilla("block_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("bucket_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("component_data"), ComponentDataModule.CODEC);
