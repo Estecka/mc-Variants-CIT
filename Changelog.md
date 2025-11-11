@@ -203,6 +203,7 @@ Since v2.5:
 ### 3.11.1
 - Fixed `parameters` having become mandatory on all modules.
 ## 3.12
-- Modules with more specific `modelPrefix` will take priority in case of conflicting `modelParent`s.
+- Module types may now restrict what variant id they are allowed to collect and generate.
+- Modules with more specific `modelPrefix`es will take priority in case of conflicting `modelParent`s.
 - Reduced log spam in case of conflicting `modelParent`s.
 - Fixed extreme loading times when too many modules crawl through large zip packs..
