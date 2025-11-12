@@ -2,7 +2,6 @@ package fr.estecka.variantscit.reload;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,7 @@ public final class ModuleLoader
 		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
 		public final VariantAggregator variantAggregator;
 
-		private Result(Collection<ModuleDefinition> modules){
+		private Result(Map<Identifier,ModuleDefinition> modules){
 			this.variantAggregator = new VariantAggregator(modules);
 		}
 	}
@@ -83,7 +82,7 @@ public final class ModuleLoader
 			definitions.put(moduleId, definition);
 		}
 
-		result = new Result(definitions.values());
+		result = new Result(definitions);
 		result.variantAggregator.GatherAll(manager);
 
 		for (var entry : definitions.entrySet())

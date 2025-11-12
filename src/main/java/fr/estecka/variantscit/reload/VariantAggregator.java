@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.mixin.BakedModelManagerMixin;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -26,6 +27,7 @@ public class VariantAggregator
 		int priority
 	){}
 
+	private final Map<ModuleDefinition,Identifier> moduleIds = new IdentityHashMap<>();
 	public final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	public final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
 
@@ -36,14 +38,17 @@ public class VariantAggregator
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
 
 
-	public VariantAggregator(Collection<ModuleDefinition> modules){
+	public VariantAggregator(Map<Identifier, ModuleDefinition> modules){
 
-		for (ModuleDefinition module : modules)
-		for (EModuleContext context : module.contexts())
-		{
-			switch (context) {
-				case ITEM_MODEL: this.item_model.put(module, EmptyLibrary(module)); break;
-				case EQUIPPABLE: this.equippable.put(module, EmptyLibrary(module)); break;
+		for (var entry : modules.entrySet()){
+			ModuleDefinition module = entry.getValue();
+			this.moduleIds.put(module, entry.getKey());
+			for (EModuleContext context : module.contexts())
+			{
+				switch (context) {
+					case ITEM_MODEL: this.item_model.put(module, EmptyLibrary(module)); break;
+					case EQUIPPABLE: this.equippable.put(module, EmptyLibrary(module)); break;
+				}
 			}
 		}
 	}
@@ -104,6 +109,7 @@ public class VariantAggregator
 		{
 			ModuleDefinition module = entry.getKey();
 			VariantLibrary library = entry.getValue();
+			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
 
 			boolean accepted = this.ApplyModelToModule(module, library, assetId);
 			if (accepted && assetType.context == EModuleContext.ITEM_MODEL) {
@@ -118,7 +124,8 @@ public class VariantAggregator
 				}
 
 				this.acceptedItemModels.add(assetId);
-			} 
+			}
+			VariantsCitMod.LOGGER.PopLabel();
 		}
 	}
 
