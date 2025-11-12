@@ -170,7 +170,7 @@ public class VariantAggregator
 		){
 			this.modelsToCreate.put(modelId, new ModelToCreate(parent, priority));
 		}
-		else if (oldModel != null && oldModel.priority == priority && oldModel.parent.equals(parent)){
+		else if (oldModel != null && oldModel.priority == priority && !oldModel.parent.equals(parent)){
 			this.conflictingModelPrefixes.add(module.modelPrefix());
 		}
 	}
