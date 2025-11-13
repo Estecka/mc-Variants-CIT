@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.reload;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -15,7 +14,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 /**
- * @implNote Texture and Baked model ids usually start with `item/` however here
+ * @implNote Texture and Baked Model ids usually start with `item/` however here
  * this prefix is stripped off so that their ids match those of the item states.
  * These `item/` need to be re-added in {@link BakedModelManagerMixin} for asset
  * generation.
@@ -27,9 +26,9 @@ public class VariantAggregator
 		int priority
 	){}
 
-	private final Map<ModuleDefinition,Identifier> moduleIds = new IdentityHashMap<>();
-	public final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
-	public final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, Identifier> moduleIds = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
 
 	// item_model assetgen
 	private final Set<Identifier> acceptedItemModels = new HashSet<>();
@@ -39,17 +38,11 @@ public class VariantAggregator
 
 
 	public VariantAggregator(Map<Identifier, ModuleDefinition> modules){
-
 		for (var entry : modules.entrySet()){
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
 			for (EModuleContext context : module.contexts())
-			{
-				switch (context) {
-					case ITEM_MODEL: this.item_model.put(module, EmptyLibrary(module)); break;
-					case EQUIPPABLE: this.equippable.put(module, EmptyLibrary(module)); break;
-				}
-			}
+				GetLibraryMap(context).put(module, EmptyLibrary(module));
 		}
 	}
 
@@ -61,12 +54,16 @@ public class VariantAggregator
 		);
 	}
 
+	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleContext context){
+		return switch (context){
+			default -> throw new AssertionError("Invalid Context");
+			case EQUIPPABLE -> this.equippable;
+			case ITEM_MODEL -> this.item_model;
+		};
+	}
+
 	public Optional<VariantLibrary> GetLibrary(EModuleContext context, ModuleDefinition module){
-		return Optional.ofNullable(switch (context) {
-			default -> throw new AssertionError();
-			case ITEM_MODEL -> this.item_model.get(module);
-			case EQUIPPABLE -> this.equippable.get(module);
-		});
+		return Optional.ofNullable(GetLibraryMap(context).get(module));
 	}
 
 	public void GatherAll(ResourceManager manager){
@@ -98,13 +95,7 @@ public class VariantAggregator
 	}
 
 	private void ApplyModelToAll(EAssetType assetType, Identifier assetId){
-		var module2Lib = switch(assetType.context){
-			default -> throw new AssertionError();
-			case ITEM_MODEL -> this.item_model;
-			case EQUIPPABLE -> this.equippable;
-		};
-
-		for (var entry : module2Lib.entrySet())
+		for (var entry : GetLibraryMap(assetType.context).entrySet())
 		if  (IsTypeAcceptable(assetType, entry.getKey()))
 		{
 			ModuleDefinition module = entry.getKey();
