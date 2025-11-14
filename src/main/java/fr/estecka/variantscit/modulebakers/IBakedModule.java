@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modulebakers;
 
 import java.util.List;
+import fr.estecka.variantscit.commands.CommandLogger;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -23,5 +24,13 @@ public interface IBakedModule
 
 			return null;
 		};
+	}
+
+	default void Dump(CommandLogger logger){
+		logger.Error("This module type does not implement `dump`");
+	}
+
+	default void Walkthrough(CommandLogger logger){
+		logger.Error("This module type does not implement `waktrough`");
 	}
 }
