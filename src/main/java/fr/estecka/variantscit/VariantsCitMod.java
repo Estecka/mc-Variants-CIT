@@ -9,7 +9,10 @@ import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
+import fr.estecka.variantscit.commands.CommandUtil;
 import fr.estecka.variantscit.commands.DumpCommand;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.properties.*;
@@ -51,6 +54,15 @@ implements ClientModInitializer
 		EQUIPABLES.Clear();
 		ITEM_MODULES  = result.itemModules;
 		EQUIP_MODULES = result.equipModules;
+
+		CommandUtil.modules.get(EModuleContext.EQUIPPABLE).clear();
+		CommandUtil.modules.get(EModuleContext.ITEM_MODEL).clear();
+		for (var entry : result.allModules.entrySet()){
+			Identifier id = entry.getKey();
+			MetaModule meta = entry.getValue();
+			if (meta.itemModule ().isPresent()) CommandUtil.modules.get(EModuleContext.ITEM_MODEL).put(id, meta.itemModule ().get());
+			if (meta.equipModule().isPresent()) CommandUtil.modules.get(EModuleContext.EQUIPPABLE).put(id, meta.equipModule().get());
+		}
 	}
 
 }

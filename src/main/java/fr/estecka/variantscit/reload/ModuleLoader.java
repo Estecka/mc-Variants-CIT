@@ -14,7 +14,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
-import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -28,6 +27,7 @@ public final class ModuleLoader
 	static public class Result {
 		public final Map<Item, IBakedModule> itemModules  = new HashMap<>();
 		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
+		public final Map<Identifier, MetaModule> allModules = new HashMap<>();
 		public final VariantAggregator variantAggregator;
 
 		private Result(Map<Identifier,ModuleDefinition> modules){
@@ -35,17 +35,12 @@ public final class ModuleLoader
 		}
 	}
 
-	/**
-	 * Contains all the processed data about a module. Some of that data is only
-	 * relevant to the resource-loading phase, and will be discarded at the end.
-	 */
 	static public record MetaModule (
 		Identifier id,
 		int priority,
 		Set<Item> targets,
-		Optional<VariantLibrary> itemLibrary,
-		Optional<VariantLibrary> equipLibrary,
-		UnbakedModule<?> parameters
+		Optional<IBakedModule> itemModule,
+		Optional<IBakedModule> equipModule
 	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
@@ -90,15 +85,16 @@ public final class ModuleLoader
 			Identifier moduleId = entry.getKey();
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
-
-			metamodules.add(new MetaModule(
+			MetaModule meta = new MetaModule(
 				moduleId,
 				definition.priority(),
 				targets,
-				result.variantAggregator.GetLibrary(EModuleContext.ITEM_MODEL, definition),
-				result.variantAggregator.GetLibrary(EModuleContext.EQUIPPABLE, definition),
-				definition.parameters()
-			));
+				result.variantAggregator.GetLibrary(EModuleContext.ITEM_MODEL, definition).map(definition.parameters()::Bake),
+				result.variantAggregator.GetLibrary(EModuleContext.EQUIPPABLE, definition).map(definition.parameters()::Bake)
+			);
+
+			result.allModules.put(moduleId, meta);
+			metamodules.add(meta);
 		}
 
 		// Sort highest priorities first.
@@ -195,26 +191,18 @@ public final class ModuleLoader
 	
 		for (MetaModule meta : modules)
 		{
-			VariantsCitMod.LOGGER.PushLabel(meta.id);
-			if (meta.itemLibrary() .isPresent()) BakeModuleContext("item_model", meta, meta.itemLibrary ().get(), itemModules );
-			if (meta.equipLibrary().isPresent()) BakeModuleContext("equippable", meta, meta.equipLibrary().get(), equipModules);
-			VariantsCitMod.LOGGER.PopLabel();
-	}
+			if (meta.itemModule .isPresent()) BakeModuleContext(meta, meta.itemModule .get(), itemModules );
+			if (meta.equipModule.isPresent()) BakeModuleContext(meta, meta.equipModule.get(), equipModules);
+		}
 
 		BakeItem(result.itemModules,  itemModules );
 		BakeItem(result.equipModules, equipModules);
 	}
 
-	static private void BakeModuleContext(String contextName, MetaModule meta, VariantLibrary lib, Map<Item, List<IBakedModule>> output){
-		if (lib.isEmpty())
-			VariantsCitMod.LOGGER.Unlabelled().warn("Empty {} VCIT module {}", contextName, meta.id());
-		else
-			VariantsCitMod.LOGGER.Unlabelled().info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
-
+	static private void BakeModuleContext(MetaModule meta, IBakedModule bakedModule, Map<Item, List<IBakedModule>> output){
 		for (Item itemType : meta.targets()){
-			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(meta.parameters.Bake(lib));
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(bakedModule);
 		}
-
 	}
 
 	static private void BakeItem(Map<Item, IBakedModule> result, Map<Item, List<IBakedModule>> moduleListPerItem){

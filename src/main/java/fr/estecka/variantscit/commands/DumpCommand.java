@@ -86,6 +86,11 @@ public class DumpCommand
 		Identifier moduleId = context.getArgument(MODULE_ARG, Identifier.class);
 		IBakedModule module = CommandUtil.modules.get(modContext).get(moduleId);
 
+		if (module == null){
+			context.getSource().sendError(Text.literal("No such module: "+modContext+" "+moduleId));
+			return -1;
+		}
+
 		module.Dump(new CommandLogger(context));
 		return 0;
 	}
