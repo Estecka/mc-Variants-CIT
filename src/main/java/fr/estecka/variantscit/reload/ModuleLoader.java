@@ -28,8 +28,11 @@ public final class ModuleLoader
 	static public class Result {
 		public final Map<Item, IBakedModule> itemModules  = new HashMap<>();
 		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
-		public final ItemVariantAggregator  itemAggregator  = new ItemVariantAggregator ();
-		public final EquipVariantAggregator equipAggregator = new EquipVariantAggregator();
+		public final VariantAggregator variantAggregator;
+
+		private Result(Map<Identifier,ModuleDefinition> modules){
+			this.variantAggregator = new VariantAggregator(modules);
+		}
 	}
 
 	/**
@@ -47,66 +50,71 @@ public final class ModuleLoader
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
-		final ModuleLoader.Result result = new ModuleLoader.Result();
-		final List<MetaModule> modules = new ArrayList<>();
+		final ModuleLoader.Result result;
+		final List<MetaModule> metamodules = new ArrayList<>();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
+		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
 		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
 		ObsoletePathWarning(resources);
 		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
-		// resources.putAll(manager.findResources("variants-cit/equipment", id->id.getPath().endsWith(".json")));
-
 		for (var entry : resources.entrySet())
-		try {
+		{
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
-			ModuleDefinition definition = DefinitionFromResource(entry.getValue()).getOrThrow();
-
-			List<EModuleContext> contexts = definition.contexts();
-			if (contexts.isEmpty()){
-				VariantsCitMod.LOGGER.warn("Ignored VCIT module with no context: {}", moduleId);
+			var optDefinition = DefinitionFromResource(entry.getValue());
+			if (optDefinition.isError()){
+				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
 				continue;
 			}
 
-			Set<Item> targets = definition.targets()
-				.map(ModuleLoader::ItemsFromTarget)
-				.orElseGet(()->ItemsFromModuleId(moduleId))
-				;
-			if (targets.isEmpty()){
+			ModuleDefinition definition = optDefinition.getOrThrow();
+			if (definition.contexts().isEmpty()){
+				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no context: {}", moduleId);
+				continue;
+			}
+			if (ItemsFromModule(moduleId, definition).isEmpty()){
 				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
 				continue;
 			}
-
 			if (definition.modelPrefix().isEmpty())
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
-			VariantLibrary itemLibrary = null;
-			VariantLibrary equipLibrary = null;
+			definitions.put(moduleId, definition);
+		}
 
-			for (EModuleContext c : contexts)
-			switch (c) {
-				case ITEM_MODEL: itemLibrary  = result.itemAggregator .CreateLibrary(definition, manager); break;
-				case EQUIPPABLE: equipLibrary = result.equipAggregator.CreateLibrary(definition, manager); break;
-			}
+		result = new Result(definitions);
+		result.variantAggregator.GatherAll(manager);
 
-			MetaModule meta = new MetaModule(
+		for (var entry : definitions.entrySet())
+		{
+			Identifier moduleId = entry.getKey();
+			ModuleDefinition definition = entry.getValue();
+			Set<Item> targets = ItemsFromModule(moduleId, definition);
+
+			metamodules.add(new MetaModule(
 				moduleId,
 				definition.priority(),
 				targets,
-				Optional.ofNullable(itemLibrary),
-				Optional.ofNullable(equipLibrary),
-				definition.module()
-			);
-
-			modules.add(meta);
-		}
-		catch (IllegalStateException e){
-			VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", entry.getKey(), e);
+				result.variantAggregator.GetLibrary(EModuleContext.ITEM_MODEL, definition),
+				result.variantAggregator.GetLibrary(EModuleContext.EQUIPPABLE, definition),
+				definition.parameters()
+			));
 		}
 
 		// Sort highest priorities first.
-		modules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
+		metamodules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
 
-		BakeModules(result, modules);
+		if (!result.variantAggregator.conflictingModelPrefixes.isEmpty()){
+			String message = "Some modules with identical model prefixes have conflicting model parents, "
+			               + "it is undefined which parent will be used. "
+			               + "The following prefixes are involved: "
+			               ;
+			for (var prefix : result.variantAggregator.conflictingModelPrefixes)
+				message += "\n - " + prefix;
+			VariantsCitMod.LOGGER.error(message);
+		}
+
+		BakeModules(result, metamodules);
 		return result;
 	}
 
@@ -119,6 +127,30 @@ public final class ModuleLoader
 			}
 			VariantsCitMod.LOGGER.warn("Some VCIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
 		}
+	}
+
+	static private DataResult<ModuleDefinition> DefinitionFromResource(Resource resource){
+		JsonObject json;
+		try {
+			json = JsonHelper.deserialize(resource.getReader());
+		}
+		catch (IOException|JsonParseException e){
+			return DataResult.error(e::toString);
+		}
+
+		return ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
+	}
+
+
+/******************************************************************************/
+/* # Target Item Baking                                                       */
+/******************************************************************************/
+
+	static private Set<Item> ItemsFromModule(Identifier moduleId, ModuleDefinition module){
+		return module.targets()
+			.map(ModuleLoader::ItemsFromTarget)
+			.orElseGet(()->ItemsFromModuleId(moduleId))
+			;
 	}
 
 	static private Set<Item> ItemsFromTarget(List<Identifier> targets){
@@ -153,17 +185,9 @@ public final class ModuleLoader
 		return Identifier.of(resource.getNamespace(), path);
 	}
 
-	static private DataResult<ModuleDefinition> DefinitionFromResource(Resource resource){
-		JsonObject json;
-		try {
-			json = JsonHelper.deserialize(resource.getReader());
-		}
-		catch (IOException|JsonParseException e){
-			return DataResult.error(e::toString);
-		}
-
-		return ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
-	}
+/******************************************************************************/
+/* # Module Baking                                                            */
+/******************************************************************************/
 
 	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
 		Map<Item, List<IBakedModule>> itemModules  = new HashMap<>();

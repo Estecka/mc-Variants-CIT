@@ -48,8 +48,32 @@ public class LinearLibrary
 		String GetNamespace();
 	}
 
-	static public GenericBakedModule<LinearLibrary> Bake(VariantLibrary library, ILinearCitModule logic){
-		return new GenericBakedModule<>(new LinearLibrary(library, logic.GetNamespace()), logic);
+	static public final IModuleBaker<ILinearCitModule> BAKER = new IModuleBaker<>()
+	{
+		@Override
+		public GenericBakedModule<LinearLibrary> Bake(VariantLibrary library, ILinearCitModule logic){
+			return new GenericBakedModule<>(new LinearLibrary(library, logic.GetNamespace()), logic);
+		}
+
+		@Override
+		public boolean AcceptVariant(Identifier variantId, ILinearCitModule parameters) {
+			if (!variantId.getNamespace().equals(parameters.GetNamespace()))
+				return false;
+		
+			try {
+					Integer.parseUnsignedInt(variantId.getPath());
+			}
+			catch (NumberFormatException e){
+				return false;
+			}
+		
+			return true;
+		};
+	};
+
+	@SuppressWarnings("unchecked")
+	static public <T extends ILinearCitModule> IModuleBaker<T> GetBaker(){
+		return (IModuleBaker<T>)BAKER;
 	}
 
 }

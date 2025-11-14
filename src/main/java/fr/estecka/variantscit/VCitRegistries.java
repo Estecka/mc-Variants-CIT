@@ -25,19 +25,19 @@ public final class VCitRegistries
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static {
-		RegisterSimpleModule(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC);
+		RegisterBakedModule(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
 		RegisterSimpleModule(Identifier.ofVanilla("block_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("bucket_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("component_data"), ComponentDataModule.CODEC);
 		RegisterSimpleModule(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
 		RegisterSimpleModule(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
-		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
-		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponentTypes.ENCHANTMENTS));
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
-		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary::Bake);
+		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());
@@ -47,7 +47,7 @@ public final class VCitRegistries
 			MapCodec.unit(new EnchantmentModule(DataComponentTypes.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
 			"Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead."
 		));
-		RegisterBakedModule(Identifier.ofVanilla("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule::BakeStored);
+		RegisterBakedModule(Identifier.ofVanilla("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponentTypes.STORED_ENCHANTMENTS));
 		RegisterSimpleModule(Identifier.ofVanilla("trim"), new TrimModule());
 		RegisterSimpleModule(Identifier.ofVanilla("trim_pattern"), new TrimPatternModule());
 		RegisterSimpleModule(Identifier.ofVanilla("trim_material"), new TrimPatternModule());
