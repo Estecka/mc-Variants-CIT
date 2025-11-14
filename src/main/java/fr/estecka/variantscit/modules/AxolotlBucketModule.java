@@ -5,22 +5,46 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.AxolotlVariantProperty;
 import fr.estecka.variantscit.format.properties.EntityAgeMapProperty;
 import fr.estecka.variantscit.format.properties.IStringProperty;
+import fr.estecka.variantscit.modulebakers.GenericBakedModule;
+import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.modulebakers.IModuleBaker;
+import net.minecraft.util.Identifier;
 
 public final class AxolotlBucketModule
 {
+	static private record Params(ICitModule module, String adult, String baby) {}
+
+	static public final IModuleBaker<Params> BAKER = new IModuleBaker<>() {
+		@Override
+		public IBakedModule Bake(VariantLibrary library, Params parameters) {
+			return new GenericBakedModule<>(library, parameters.module);
+		};
+		@Override
+		public boolean AcceptVariant(Identifier variantId, Params parameters) {
+			return variantId.getPath().endsWith(parameters.adult)
+			    || variantId.getPath().endsWith(parameters.baby)
+			    ;
+		};
+	};
+
 	// TODO: Proper getters
-	static public final MapCodec<ICitModule> CODEC = RecordCodecBuilder.mapCodec(builder->
+	static public final MapCodec<Params> CODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->false),
 			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(o->""),
 			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(o->"")
 		)
-		.apply(builder, AxolotlBucketModule::Create)
+		.apply(builder, (debug,adult,baby) -> new Params(
+			AxolotlBucketModule.Create(debug,adult,baby),
+			adult,
+			baby
+		))
 	);
 
 	static private final Substitution agedFormat = Substitution.Parse("${variant}${age}").getOrThrow();
