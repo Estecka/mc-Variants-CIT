@@ -14,7 +14,7 @@ import fr.estecka.variantscit.VCitRegistries;
 
 public record ModuleDefinition(
 	@Deprecated Identifier type,
-	UnbakedModule<?> module,
+	UnbakedModule<?> parameters,
 	List<EModuleContext> contexts,
 	Optional<List<Identifier>> targets,
 	int priority,
@@ -28,7 +28,7 @@ public record ModuleDefinition(
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
-			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::module),
+			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::parameters),
 			CodecUtil.OneOrMany(EModuleContext.CODEC).optionalFieldOf("context", List.of(EModuleContext.ITEM_MODEL)).forGetter(ModuleDefinition::contexts),
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
