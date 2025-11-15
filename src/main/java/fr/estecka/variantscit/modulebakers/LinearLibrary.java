@@ -3,6 +3,9 @@ package fr.estecka.variantscit.modulebakers;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.LinearSnapMap;
 import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.commands.CommandLogger;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 
@@ -48,13 +51,12 @@ public class LinearLibrary
 		String GetNamespace();
 	}
 
-	static public final IModuleBaker<ILinearCitModule> BAKER = new IModuleBaker<>()
-	{
-		@Override
-		public GenericBakedModule<LinearLibrary> Bake(VariantLibrary library, ILinearCitModule logic){
-			return new GenericBakedModule<>(new LinearLibrary(library, logic.GetNamespace()), logic);
-		}
+	static public <T extends ILinearCitModule> IModuleBaker<T> GetBaker(){
+		return (IModuleBaker<T>)BAKER;
+	}
 
+	static public final IModuleBaker<? extends ILinearCitModule> BAKER = new IModuleBaker<>()
+	{
 		@Override
 		public boolean AcceptVariant(Identifier variantId, ILinearCitModule parameters) {
 			if (!variantId.getNamespace().equals(parameters.GetNamespace()))
@@ -69,11 +71,29 @@ public class LinearLibrary
 		
 			return true;
 		};
-	};
 
-	@SuppressWarnings("unchecked")
-	static public <T extends ILinearCitModule> IModuleBaker<T> GetBaker(){
-		return (IModuleBaker<T>)BAKER;
-	}
+		@Override
+		public GenericBakedModule<LinearLibrary> Bake(VariantLibrary library, ILinearCitModule logic){
+			return new GenericBakedModule<>(new LinearLibrary(library, logic.GetNamespace()), logic)
+			{
+				@Override
+				public void Summary(CommandLogger logger) {
+					logger.Info("This module handles {} variants.", this.library.modelLine.Size());
+				};
+				@Override
+				public void Dump(CommandLogger logger) {
+					for (LinearSnapMap.Entry<Identifier> entry : this.library.modelLine){
+						logger.Info(
+							Text.empty()
+							    .append(Text.literal(String.valueOf(entry.magnitude())).formatted(Formatting.AQUA))
+							    .append(" -> ")
+							    .append(Text.literal(entry.value().toString()).formatted(Formatting.YELLOW))
+						);
+
+					}
+				};
+			};
+		}
+	};
 
 }

@@ -10,8 +10,8 @@ import net.minecraft.util.Identifier;
 public class GenericBakedModule<L>
 implements IBakedModule
 {
-	private final L library;
-	private final IGenericCitModule<L> logic;
+	public final L library;
+	public final IGenericCitModule<L> logic;
 
 	public GenericBakedModule(L library, IGenericCitModule<L> logic){
 		this.library = library;

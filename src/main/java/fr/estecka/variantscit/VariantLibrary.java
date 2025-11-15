@@ -7,6 +7,7 @@ import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.modulebakers.IGenericCitModule;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -49,7 +50,7 @@ implements IVariantManager
 	}
 
 	public IBakedModule Bake(ICitModule logic){
-		return new GenericBakedModule<>(this, logic){
+		return new GenericBakedModule<IVariantManager>(this, logic){
 			@Override public void Dump(CommandLogger logger) { VariantLibrary.this.Dump(logger); }
 			@Override public void Summary(CommandLogger logger) { VariantLibrary.this.Summary(logger); }
 			@Override public Identifier Walkthrough(CommandLogger logger, ItemStack stack) { return VariantLibrary.this.Walkthrough(logger, stack, logic); }
@@ -80,7 +81,7 @@ implements IVariantManager
 		}
 	}
 
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack, ICitModule logic){
+	public Identifier Walkthrough(CommandLogger logger, ItemStack stack, IGenericCitModule<IVariantManager> logic){
 		return new SnitchingLibrary(this, logger).Walkthrough(stack, logic);
 	}
 
@@ -98,7 +99,7 @@ implements IVariantManager
 			this.logger = logger;
 		}
 
-		public Identifier Walkthrough(ItemStack stack, ICitModule logic){
+		public Identifier Walkthrough(ItemStack stack, IGenericCitModule<IVariantManager> logic){
 			Identifier r = logic.Walkthrough(stack, this, logger);
 			if (firstVariantId == null)
 				logger.Info("No variant ID could be computed for this item.");
