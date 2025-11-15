@@ -20,6 +20,7 @@ import fr.estecka.variantscit.LinearSnapMap;
 import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.modulebakers.IModuleBaker;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -27,6 +28,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 
@@ -369,4 +372,60 @@ implements IBakedModule
 		return (result != null) ? result.modelId : fallback;
 
 	}
+
+/******************************************************************************/
+/* # Debug Commands                                                           */
+/******************************************************************************/
+
+	private Identifier[] GetEnchantIds(){
+		Identifier[] enchantIds = new Identifier[vectorSpace.indices.size()];
+		for (var dimension : vectorSpace.indices.object2IntEntrySet())
+			enchantIds[dimension.getIntValue()] = dimension.getKey();
+		return enchantIds;
+	}
+
+	private void PrintVector(CommandLogger logger, EnchantVector vector, Identifier[] enchantIds){
+		for (int i=0; i<enchantIds.length; ++i)
+		if  (vector.values[i] != 0)
+		{
+			logger.Info(
+				Text.literal(" - lvl ")
+					.append(Text.literal(String.valueOf(vector.values[i])))
+					.append(" ")
+					.append(Text.literal(enchantIds[i].toString()).formatted(Formatting.AQUA))
+			);
+		}
+	}
+
+	@Override
+	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+		return this.ComputeItemModel(stack);
+	}
+
+	@Override
+	public void Summary(CommandLogger logger) {
+		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.Size(), this.vectorSpace.indices.size());
+		for (Identifier id : this.vectorSpace.indices.keySet())
+			logger.Info(
+				Text.literal(" - ")
+				    .append(Text.literal(id.toString()).formatted(Formatting.AQUA))
+			);
+	}
+
+	@Override
+	public void Dump(CommandLogger logger) {
+		Identifier[] enchantIds = GetEnchantIds();
+
+		for (var entry : this.modelLine)
+		{
+			logger.Info(
+				Text.literal(entry.value().modelId.toString()).formatted(Formatting.YELLOW)
+				    .append(":")
+			);
+
+			EnchantVector vector = entry.value().vector;
+			PrintVector(logger, vector, enchantIds);
+		}
+	}
+
 }

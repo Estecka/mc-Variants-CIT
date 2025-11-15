@@ -3,6 +3,7 @@ package fr.estecka.variantscit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.Predicate;
 
 /**
@@ -10,6 +11,7 @@ import java.util.function.Predicate;
  * the closest entry on a given side of that position.
  */
 public class LinearSnapMap<T>
+implements Iterable<LinearSnapMap.Entry<T>>
 {
 	static public record Entry<T>(int magnitude, T value){}
 
@@ -27,6 +29,14 @@ public class LinearSnapMap<T>
 		this((a,b)->0);
 	}
 
+	public int Size(){
+		return this.entries.size();
+	}
+
+	@Override
+	public Iterator<Entry<T>> iterator() {
+		return entries.iterator();
+	}
 
 	private int CompareEntries(Entry<T> a, Entry<T> b){
 		int r = Integer.compare(a.magnitude, b.magnitude);
