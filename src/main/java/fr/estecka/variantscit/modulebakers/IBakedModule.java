@@ -34,7 +34,8 @@ public interface IBakedModule
 		logger.Error("This module type does not support `dump`. Please report this issue.");
 	}
 
-	default void Walkthrough(CommandLogger logger, ItemStack stack) {
+	default Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
 		logger.Error("This module type does not support `waktrough`. Please report this issue.");
+		return null;
 	}
 }

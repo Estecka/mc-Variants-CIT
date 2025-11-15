@@ -11,7 +11,7 @@ public record CommandLogger(
 	public void Info(String format, Object... args){
 		String result = format;
 		for (Object o : args)
-			result = result.replaceFirst("{}", o.toString());
+			result = result.replaceFirst("\\{\\}", o.toString());
 		this.Info(result);
 	}
 

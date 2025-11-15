@@ -8,6 +8,8 @@ import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public record VariantLibrary(
@@ -50,7 +52,7 @@ implements IVariantManager
 		return new GenericBakedModule<>(this, logic){
 			@Override public void Dump(CommandLogger logger) { VariantLibrary.this.Dump(logger); }
 			@Override public void Summary(CommandLogger logger) { VariantLibrary.this.Summary(logger); }
-			@Override public void Walkthrough(CommandLogger logger, ItemStack stack) { VariantLibrary.this.Walkthrough(logger, stack, logic); }
+			@Override public Identifier Walkthrough(CommandLogger logger, ItemStack stack) { return VariantLibrary.this.Walkthrough(logger, stack, logic); }
 		};
 	}
 
@@ -64,8 +66,17 @@ implements IVariantManager
 	}
 
 	public void Dump(CommandLogger logger){
-		for (var entry : this.variantModels.entrySet()){
-			logger.Info(entry.getKey()+" -> "+entry.getValue());
+		if (this.variantModels.isEmpty())
+			logger.Info("This module does not have any variant.");
+		else for (var entry : this.variantModels.entrySet())
+		{
+			Text variant = Text.literal(entry.getKey().toString()).formatted(Formatting.AQUA);
+			Text model   = Text.literal(entry.getValue().toString()).formatted(Formatting.YELLOW);
+			logger.Info(Text.empty()
+				.append(variant)
+				.append(Text.literal(" -> "))
+				.append(model)
+			);
 		}
 	}
 
@@ -92,7 +103,7 @@ implements IVariantManager
 			if (firstVariantId == null)
 				logger.Info("No variant ID could be computed for this item.");
 			else if (!foundVariantModel){
-				logger.Info("The item has a variant ID ({}), but no associated model exists.");
+				logger.Info("The item has a variant ID, but no associated model exists.");
 				logger.Error("TODO: add tips.");
 			}
 			return r;
@@ -101,9 +112,11 @@ implements IVariantManager
 		@Override
 		public boolean HasVariantModel(Identifier variantId) {
 			boolean r = original.HasVariantModel(variantId);
-			logger.Info("Tested variant ID : {} ({})", variantId, r?"success":"failure");
+			logger.Info(Text.literal("Tested variant ID: ")
+				.append(Text.literal(variantId.toString()).formatted(Formatting.AQUA))
+			);
 			foundVariantModel |= r;
-			if (r && firstVariantId != null)
+			if (firstVariantId == null)
 				firstVariantId = variantId;
 			return r;
 		}

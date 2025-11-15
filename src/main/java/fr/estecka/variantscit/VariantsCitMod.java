@@ -13,7 +13,7 @@ import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
 import fr.estecka.variantscit.commands.CommandUtil;
-import fr.estecka.variantscit.commands.DumpCommand;
+import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.properties.*;
 import fr.estecka.variantscit.selectors.*;
@@ -46,7 +46,7 @@ implements ClientModInitializer
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
 		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
 		
-		DumpCommand.Register();
+		ModuleCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){
