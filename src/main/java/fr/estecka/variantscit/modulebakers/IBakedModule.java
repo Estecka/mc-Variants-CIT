@@ -26,11 +26,15 @@ public interface IBakedModule
 		};
 	}
 
-	default void Dump(CommandLogger logger){
-		logger.Error("This module type does not implement `dump`");
+	default void Summary(CommandLogger logger){
+		logger.Error("This module type does not support `summary`. Please report this issue.");
 	}
 
-	default void Walkthrough(CommandLogger logger){
-		logger.Error("This module type does not implement `waktrough`");
+	default void Dump(CommandLogger logger){
+		logger.Error("This module type does not support `dump`. Please report this issue.");
+	}
+
+	default void Walkthrough(CommandLogger logger, ItemStack stack) {
+		logger.Error("This module type does not support `waktrough`. Please report this issue.");
 	}
 }

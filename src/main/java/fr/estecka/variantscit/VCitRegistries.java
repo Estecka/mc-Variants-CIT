@@ -94,7 +94,7 @@ public final class VCitRegistries
 	}
 
 	static public void RegisterSimpleModule(Identifier id, MapCodec<? extends ICitModule> mapcodec){
-		RegisterBakedModule(id, mapcodec, GenericBakedModule::new);
+		RegisterBakedModule(id, mapcodec, VariantLibrary::Bake);
 	}
 
 	static public void RegisterSimpleModule(Identifier id, ICitModule unit){

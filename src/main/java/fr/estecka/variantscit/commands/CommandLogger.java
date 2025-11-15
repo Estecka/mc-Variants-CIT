@@ -8,6 +8,13 @@ public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext
 )
 {
+	public void Info(String format, Object... args){
+		String result = format;
+		for (Object o : args)
+			result = result.replaceFirst("{}", o.toString());
+		this.Info(result);
+	}
+
 	public void Info(String message){
 		this.Info(Text.literal(message));
 	}
