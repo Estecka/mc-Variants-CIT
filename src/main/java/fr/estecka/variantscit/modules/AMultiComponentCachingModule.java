@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -39,5 +40,10 @@ implements ICitModule
 	@Override
 	public final Identifier GetItemModel(ItemStack stack, IVariantManager library){
 		return this.cache.ComputeIfAbsent(stack, s->this.RecomputeItemModel(s, library));
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+		return this.RecomputeItemModel(stack, library);
 	}
 }

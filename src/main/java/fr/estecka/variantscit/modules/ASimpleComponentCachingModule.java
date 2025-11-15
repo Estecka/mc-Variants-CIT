@@ -3,6 +3,8 @@ package fr.estecka.variantscit.modules;
 import java.util.WeakHashMap;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ISimpleCitModule;
+import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.commands.CommandLogger;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -45,6 +47,14 @@ implements ISimpleCitModule
 			cachedVariants.put(component, GetVariantForComponent(component));
 
 		return cachedVariants.get(component);
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+		T component = stack.get(this.componentType);
+		if (component == null)
+			return null;
+		return GetVariantForComponent(component);
 	}
 
 	public abstract Identifier GetVariantForComponent(T component);

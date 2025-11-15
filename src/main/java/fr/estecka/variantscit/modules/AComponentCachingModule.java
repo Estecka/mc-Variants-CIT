@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.commands.CommandLogger;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -53,6 +54,15 @@ implements ICitModule
 			cachedModels.put(component, GetModelForComponent(component, models));
 
 		return cachedModels.get(component);
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+		T component = stack.get(this.componentType);
+		if (component == null)
+			return null;
+
+		return GetModelForComponent(component, library);
 	}
 
 	public abstract Identifier GetModelForComponent(T component, IVariantManager models);

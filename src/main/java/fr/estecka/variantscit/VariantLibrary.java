@@ -99,7 +99,7 @@ implements IVariantManager
 		}
 
 		public Identifier Walkthrough(ItemStack stack, ICitModule logic){
-			Identifier r = logic.GetItemModel(stack, this);
+			Identifier r = logic.Walkthrough(stack, this, logger);
 			if (firstVariantId == null)
 				logger.Info("No variant ID could be computed for this item.");
 			else if (!foundVariantModel){
