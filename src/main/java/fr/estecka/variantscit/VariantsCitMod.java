@@ -16,7 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.modules.*;
+import fr.estecka.variantscit.modules.IItemModelProvider;
+import fr.estecka.variantscit.modules.impl.*;
+import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.vanilla.*;
 
 
 public class VariantsCitMod

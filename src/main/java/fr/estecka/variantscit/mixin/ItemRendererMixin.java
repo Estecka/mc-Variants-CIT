@@ -14,8 +14,8 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
-import fr.estecka.variantscit.IItemModelProvider;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.modules.IItemModelProvider;
 
 @Mixin(ItemRenderer.class)
 @Environment(EnvType.CLIENT)

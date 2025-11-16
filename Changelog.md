@@ -108,3 +108,5 @@
 - All transforms can now be marked as optional, or take a fallback.
 ## 2.15
 - Transform `charset_remap` can now replace a single character with a longer string.
+## 2.16
+- Added quoting and escaping syntax to nbtPath keynames.

@@ -9,6 +9,7 @@ import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.ModuleRegistrar.ComplexCitModuleFactory;
 import fr.estecka.variantscit.api.ModuleRegistrar.ParameterizedCitModuleFactory;
 import fr.estecka.variantscit.api.ModuleRegistrar.SpecialCitModuleFactory;
+import fr.estecka.variantscit.reload.ModuleDefinition;
 import net.minecraft.util.Identifier;
 
 public final class ModuleRegistry
