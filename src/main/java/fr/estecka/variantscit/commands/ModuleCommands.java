@@ -96,7 +96,7 @@ public class ModuleCommands
 	@FunctionalInterface
 	static private interface IModuleCommand
 	{
-		int Execute(CommandContext<FabricClientCommandSource> context, MetaModule meta, IBakedModule module) throws CommandSyntaxException;
+		int Execute(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module) throws CommandSyntaxException;
 	}
 
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
@@ -110,29 +110,26 @@ public class ModuleCommands
 			return -1;
 		}
 
-		return command.Execute(context, meta, module);
+		CommandLogger logger = new CommandLogger(context, moduleContext, meta);
+		return command.Execute(context, logger, module);
 	}
 
-	static private int Dump(CommandContext<FabricClientCommandSource> context, MetaModule meta, IBakedModule module){
-		module.Dump(new CommandLogger(context));
+	static private int Dump(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module){
+		module.Dump(logger);
 		return 0;
 	}
 
-	static private int Summary(CommandContext<FabricClientCommandSource> context, MetaModule meta, IBakedModule module){
-		module.Summary(new CommandLogger(context));
+	static private int Summary(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module){
+		module.Summary(logger);
 		return 0;
 	}
 
-	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, MetaModule meta, IBakedModule module){
+	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, CommandLogger logger, IBakedModule module){
 		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandStack();
-		CommandLogger logger = new CommandLogger(cmdCtx);
-		EModuleContext modCtx = getModuleContext(cmdCtx, CONTEXT_ARG);
-		Identifier moduleId = cmdCtx.getArgument(MODULE_ARG, Identifier.class);
 
-		logger.Info("Applying {} module {} to item {} ({})", modCtx, moduleId, stack.getName().getString(), stack.getItem());
+		logger.Info("Applying {} module {} to item {} ({})", logger.context(), logger.metamodule().id(), stack.getName().getString(), stack.getItem());
 
-		WalkthroughData debugInfo = new WalkthroughData(logger, modCtx, meta);
-		Identifier modelId = module.Walkthrough(debugInfo, stack);
+		Identifier modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){
 			logger.Info(
 				Text.literal("The module returned the model: ")

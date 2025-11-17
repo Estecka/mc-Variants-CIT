@@ -21,7 +21,6 @@ import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
-import fr.estecka.variantscit.commands.WalkthroughData;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.modulebakers.IModuleBaker;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -399,7 +398,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(WalkthroughData debug, ItemStack stack) {
+	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
 		return this.ComputeItemModel(stack);
 	}
 
