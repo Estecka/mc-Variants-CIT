@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.commands;
 
+import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
@@ -47,38 +48,56 @@ public record CommandLogger(
 /* # Preformatted                                                             */
 /******************************************************************************/
 
-	static public MutableText VariantName(Object variant){
-		return Text.literal(variant.toString()).formatted(Formatting.AQUA);
+	static public MutableText VariantName(@Nullable Object variant){
+		return VariantName(variant, "null");
+	}
+
+	static public MutableText VariantName(@Nullable Object variant, String fallback){
+		if (variant == null)
+			return Text.literal(fallback).formatted(Formatting.RED);
+		else
+			return Text.literal(variant.toString()).formatted(Formatting.AQUA);
 	}
 
 	static public MutableText ResourceName(Object variant){
 		return Text.literal(variant.toString()).formatted(Formatting.YELLOW);
 	}
 
-	static private MutableText AssetFilename(Identifier id, String prefix, String suffix){
-		return ResourceName("/assets/"+id.getNamespace()+"/"+prefix+id.getPath()+suffix);
+	private MutableText AssetFilename(Identifier id, String assetPrefix, String suffix){
+		return Text.literal("/assets/")
+			.append(VariantName(id.getNamespace()))
+			.append("/"+assetPrefix+metamodule.modelPrefix())
+			.append(VariantName(id.getPath()))
+			.append(suffix)
+			.formatted(Formatting.YELLOW)
+			;
 	}
 
 	public void PrintVariantIdTip(Identifier variantId){
 		Info(
-			Text.literal("TIP:").formatted(Formatting.ITALIC)
-				.append(Text.literal("The model prefix is "))
+			Text.literal("TIP:").formatted(Formatting.GRAY)
+				.append(Text.literal("The model prefix is \""))
 				.append(ResourceName(metamodule.modelPrefix()))
-				.append(Text.literal("The variant ID "))
+				.append(Text.literal("\", the variant ID "))
 				.append(VariantName(variantId))
 				.append(" may be supported by providing one of these files:")
 		);
 
-		switch (context()) {
-			default: Error("Error: unknown context");
+		Text bullet = Text.literal("- ").formatted(Formatting.GRAY);
+
+		switch (context())
+		{
+			default:
+				Error("Error: unknown context");
+				break;
 			case EQUIPPABLE:
-				Info(Text.literal("- ").append(AssetFilename(variantId, "items/", ".json")));
-			break;
+				Info(bullet.copy().append(AssetFilename(variantId, "items/", ".json")));
+				break;
 			case ITEM_MODEL:
-				Info(Text.literal("- ").append(AssetFilename(variantId, "items/", ".png")));
-				Info(Text.literal("- ").append(AssetFilename(variantId, "models/item/", ".json")));
-				Info(Text.literal("- ").append(AssetFilename(variantId, "textures/item/", ".json")));
-			break;
+				Info(bullet.copy().append(AssetFilename(variantId, "items/", ".json")));
+				Info(bullet.copy().append(AssetFilename(variantId, "models/item/", ".json")));
+				Info(bullet.copy().append(AssetFilename(variantId, "textures/item/", ".png")));
+				break;
 		}
 	}
 }

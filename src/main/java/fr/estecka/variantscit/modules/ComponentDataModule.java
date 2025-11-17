@@ -8,6 +8,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import fr.estecka.variantscit.format.properties.IStringProperty;
@@ -16,6 +18,7 @@ import fr.estecka.variantscit.format.properties.TransformableProperty;
 import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ComponentDataModule<P extends IStringProperty>
@@ -65,5 +68,16 @@ extends ASimpleMultiComponentCachingModule
 	public @Nullable Identifier RecomputeItemVariant(ItemStack stack) {
 		String result = this.property.GetPropertyString(stack);
 		return (result!=null) ? Identifier.tryParse(result) : null;
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+		String raw = TransformableProperty.GetRaw(this.property).GetPropertyString(stack);
+		String transformed = property.GetPropertyString(stack);
+
+		logger.Info(Text.literal("Raw data: ").append(CommandLogger.VariantName(raw, "Missing or invalid")));
+		logger.Info(Text.literal("Transformed: ").append(CommandLogger.VariantName(transformed)));
+
+		return this.RecomputeItemModel(stack, library);
 	}
 }

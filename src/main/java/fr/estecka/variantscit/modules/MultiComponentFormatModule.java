@@ -2,13 +2,18 @@ package fr.estecka.variantscit.modules;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.IStringProperty;
+import fr.estecka.variantscit.format.properties.TransformableProperty;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
@@ -58,5 +63,30 @@ extends ASimpleMultiComponentCachingModule
 		variables.clear();
 		Identifier id = Identifier.tryParse(rawId);
 		return id;
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+		boolean failure = false;
+		Map<String,String> variables = new HashMap<>();
+
+		for (var entry : varGetters.entrySet()){
+			String raw = TransformableProperty.GetRaw(entry.getValue()).GetPropertyString(stack);
+			String transformed = entry.getValue().GetPropertyString(stack);
+
+			logger.Info(Text.literal("${").append(CommandLogger.ResourceName(entry.getKey())).append("}: "));
+			logger.Info(Text.literal("- Raw data: ").append(CommandLogger.VariantName(raw, "Missing or invalid")));
+			logger.Info(Text.literal("- Transformed: ").append(CommandLogger.VariantName(transformed)));
+
+			failure |= (transformed == null);
+			variables.put(entry.getKey(), transformed);
+		}
+
+		if (failure)
+			logger.Info("Some data could not be processed.");
+		else
+			logger.Info(Text.literal("Formatted variant: ").append(CommandLogger.VariantName(this.format.Substitute(variables))));
+
+		return this.RecomputeItemModel(stack, library);
 	}
 }
