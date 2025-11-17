@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalkthroughData;
 import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.modulebakers.IGenericCitModule;
@@ -53,7 +54,7 @@ implements IVariantManager
 		return new GenericBakedModule<IVariantManager>(this, logic){
 			@Override public void Dump(CommandLogger logger) { VariantLibrary.this.Dump(logger); }
 			@Override public void Summary(CommandLogger logger) { VariantLibrary.this.Summary(logger); }
-			@Override public Identifier Walkthrough(CommandLogger logger, ItemStack stack) { return VariantLibrary.this.Walkthrough(logger, stack, logic); }
+			@Override public Identifier Walkthrough(WalkthroughData debug, ItemStack stack) { return VariantLibrary.this.Walkthrough(debug, stack, logic); }
 		};
 	}
 
@@ -81,8 +82,8 @@ implements IVariantManager
 		}
 	}
 
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack, IGenericCitModule<IVariantManager> logic){
-		return new SnitchingLibrary(this, logger).Walkthrough(stack, logic);
+	public Identifier Walkthrough(WalkthroughData debug, ItemStack stack, IGenericCitModule<IVariantManager> logic){
+		return new SnitchingLibrary(this, debug).Walkthrough(stack, logic);
 	}
 
 	static private class SnitchingLibrary
@@ -90,35 +91,40 @@ implements IVariantManager
 	{
 
 		private final VariantLibrary original;
-		private final CommandLogger logger;
+		private final WalkthroughData debug;
 		private Identifier firstVariantId = null;
 		private boolean foundVariantModel = false;
 
-		SnitchingLibrary (VariantLibrary original, CommandLogger logger){
+		SnitchingLibrary (VariantLibrary original, WalkthroughData debug){
 			this.original = original;
-			this.logger = logger;
+			this.debug = debug;
 		}
 
 		public Identifier Walkthrough(ItemStack stack, IGenericCitModule<IVariantManager> logic){
-			Identifier r = logic.Walkthrough(stack, this, logger);
+			Identifier r = logic.Walkthrough(stack, this, debug.logger());
 			if (firstVariantId == null)
-				logger.Info("No variant ID could be computed for this item.");
-			else if (!foundVariantModel){
-				logger.Info("The item has a variant ID, but no associated model exists.");
-				logger.Error("TODO: add tips.");
+				debug.logger().Info("No variant ID could be computed for this item.");
+			else if (!foundVariantModel)
+			{
+				debug.logger().Info("The item has a valid variant, but no associated model exists.");
+				debug.PrintVariantIdTip(firstVariantId);
 			}
 			return r;
 		}
 
 		@Override
-		public boolean HasVariantModel(Identifier variantId) {
+		public boolean HasVariantModel(@Nullable Identifier variantId) {
 			boolean r = original.HasVariantModel(variantId);
-			logger.Info(Text.literal("Tested variant ID: ")
-				.append(Text.literal(variantId.toString()).formatted(Formatting.AQUA))
-			);
+
+			Text variantName = (variantId == null) ?
+				Text.literal("null").formatted(Formatting.RED):
+				Text.literal(variantId.toString()).formatted(Formatting.AQUA);
+			debug.logger().Info(Text.literal("Tested variant ID: ").append(variantName));
+			
 			foundVariantModel |= r;
 			if (firstVariantId == null)
 				firstVariantId = variantId;
+	
 			return r;
 		}
 
@@ -130,7 +136,7 @@ implements IVariantManager
 
 		@Override
 		public @Nullable Identifier GetSpecialModel(String key) {
-			logger.Info("Tested special model: "+key);
+			debug.logger().Info("Tested special model: "+key);
 			return original.GetSpecialModel(key);
 		}
 	}

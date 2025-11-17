@@ -6,13 +6,11 @@ import net.minecraft.client.render.item.property.numeric.NumericProperties;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
-import fr.estecka.variantscit.commands.CommandUtil;
 import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.properties.*;
@@ -27,14 +25,30 @@ implements ClientModInitializer
 
 	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
-	static private Map<Item, IBakedModule> ITEM_MODULES  = new HashMap<>();
-	static private Map<Item, IBakedModule> EQUIP_MODULES = new HashMap<>();
+	static private Map<Item, IBakedModule> ITEM_MODULES  = Map.of();
+	static private Map<Item, IBakedModule> EQUIP_MODULES = Map.of();
+	static private Map<Identifier, MetaModule> META = Map.of();
 
 	static public @Nullable IBakedModule GetItemModule(Item itemType){
 		return ITEM_MODULES.get(itemType);
 	}
 	static public @Nullable IBakedModule GetEquipmentModule(Item itemType){
 		return EQUIP_MODULES.get(itemType);
+	}
+	static public Map<Identifier,MetaModule> GetMeta(){
+		return Map.copyOf(META);
+	}
+	static public IBakedModule GetModule(EModuleContext context, Identifier id){
+		MetaModule meta = META.get(id);
+		if (meta == null)
+			return null;
+		else {
+			return switch (context) {
+				default -> throw new IllegalArgumentException();
+				case ITEM_MODEL -> meta.itemModule().orElse(null);
+				case EQUIPPABLE -> meta.equipModule().orElse(null);
+			};
+		}
 	}
 
 	@Override
@@ -45,7 +59,7 @@ implements ClientModInitializer
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.ENTITY_DATA));
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
 		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
-		
+
 		ModuleCommands.Register();
 	}
 
@@ -54,15 +68,7 @@ implements ClientModInitializer
 		EQUIPABLES.Clear();
 		ITEM_MODULES  = result.itemModules;
 		EQUIP_MODULES = result.equipModules;
-
-		CommandUtil.modules.get(EModuleContext.EQUIPPABLE).clear();
-		CommandUtil.modules.get(EModuleContext.ITEM_MODEL).clear();
-		for (var entry : result.allModules.entrySet()){
-			Identifier id = entry.getKey();
-			MetaModule meta = entry.getValue();
-			if (meta.itemModule ().isPresent()) CommandUtil.modules.get(EModuleContext.ITEM_MODEL).put(id, meta.itemModule ().get());
-			if (meta.equipModule().isPresent()) CommandUtil.modules.get(EModuleContext.EQUIPPABLE).put(id, meta.equipModule().get());
-		}
+		META = result.allModules;
 	}
 
 }

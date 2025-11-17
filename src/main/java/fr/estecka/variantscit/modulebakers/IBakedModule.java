@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modulebakers;
 
 import java.util.List;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalkthroughData;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -34,8 +35,8 @@ public interface IBakedModule
 		logger.Error("This module type does not support `dump`. Please report this issue.");
 	}
 
-	default Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
-		logger.Error("This module type does not support `walktrough`. Please report this issue.");
+	default Identifier Walkthrough(WalkthroughData debug, ItemStack stack) {
+		debug.logger().Error("This module type does not support `walktrough`. Please report this issue.");
 		return this.GetModelForItem(stack);
 	}
 }

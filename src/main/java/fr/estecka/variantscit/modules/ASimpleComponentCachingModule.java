@@ -54,7 +54,8 @@ implements ISimpleCitModule
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
-		return GetVariantForComponent(component);
+
+		return library.GetVariantModel(GetVariantForComponent(component));
 	}
 
 	public abstract Identifier GetVariantForComponent(T component);

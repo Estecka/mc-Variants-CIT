@@ -39,6 +39,7 @@ public final class ModuleLoader
 		Identifier id,
 		int priority,
 		Set<Item> targets,
+		String modelPrefix,
 		Optional<IBakedModule> itemModule,
 		Optional<IBakedModule> equipModule
 	){}
@@ -89,6 +90,7 @@ public final class ModuleLoader
 				moduleId,
 				definition.priority(),
 				targets,
+				definition.modelPrefix(),
 				result.variantAggregator.GetLibrary(EModuleContext.ITEM_MODEL, definition).map(definition.parameters()::Bake),
 				result.variantAggregator.GetLibrary(EModuleContext.EQUIPPABLE, definition).map(definition.parameters()::Bake)
 			);
