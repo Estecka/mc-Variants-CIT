@@ -211,3 +211,4 @@ Since v2.5:
 
 ## indev
 - Added `/variants-cit` commands: `summary`, `walkthrough` `dump`.
+- Module IDs now longer includes the leading `item/`

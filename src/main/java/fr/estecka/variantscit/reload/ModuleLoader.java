@@ -163,23 +163,20 @@ public final class ModuleLoader
 	}
 
 	static private Set<Item> ItemsFromModuleId(Identifier moduleId){
-		Identifier itemId = ItemIdFromModuleId(moduleId);
-
-		if (Registries.ITEM.containsId(itemId))
-			return Set.of(Registries.ITEM.getEntry(itemId).get().value());
+		if (Registries.ITEM.containsId(moduleId))
+			return Set.of(Registries.ITEM.getEntry(moduleId).get().value());
 		else
 			return Set.of();
 	}
 
-	static private Identifier ItemIdFromModuleId(Identifier resource){
-		String path = resource.getPath();
-		path = path.substring("item/".length());
-		return Identifier.of(resource.getNamespace(), path);
-	}
-
+	/**
+	 * @implNote TODO: Coincidentally, this handles  both the `variants-cit` and
+	 * the `variant-cits` directories. Refactor  will be  required  when modules
+	 * are moved to `variants-cit/module/`.
+	 */
 	static private Identifier ModuleIdFromResourceId(Identifier resource){
 		String path = resource.getPath();
-		path = path.substring("variant-cits/".length(), path.length()-".json".length());
+		path = path.substring("variants-cit/item/".length(), path.length()-".json".length());
 		return Identifier.of(resource.getNamespace(), path);
 	}
 

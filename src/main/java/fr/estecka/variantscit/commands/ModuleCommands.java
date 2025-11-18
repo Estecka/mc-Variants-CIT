@@ -12,11 +12,14 @@ import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
@@ -73,17 +76,19 @@ public class ModuleCommands
 
 	static private CompletableFuture<Suggestions> ModuleAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
-		for (var entry : VariantsCitMod.GetMeta().entrySet()){
-			MetaModule meta = entry.getValue();
-			boolean exist = switch (moduleContext){
-				default -> false;
-				case ITEM_MODEL -> meta.itemModule().isPresent();
-				case EQUIPPABLE -> meta.equipModule().isPresent();
-			};
+		Stream<Identifier> modules = VariantsCitMod.GetMeta().entrySet().stream()
+			.filter(entry -> {
+				MetaModule meta = entry.getValue();
+				return switch (moduleContext){
+					default -> false;
+					case ITEM_MODEL -> meta.itemModule().isPresent();
+					case EQUIPPABLE -> meta.equipModule().isPresent();
+				};
+			})
+			.map(Map.Entry::getKey)
+			;
 
-			if (exist)
-				builder.suggest(entry.getKey().toString());
-		}
+		CommandSource.suggestIdentifiers(modules, builder);
 
 		return builder.buildFuture();
 	}
