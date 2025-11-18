@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 
 public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
-	EModuleContext context,
+	EModuleContext moduleContext,
 	MetaModule metamodule
 )
 {
@@ -21,11 +21,24 @@ public record CommandLogger(
 /* # Generic logging                                                          */
 /******************************************************************************/
 
-	public void Info(String format, Object... args){
+	public void InfoFormat(String format, Object... args){
 		String result = format;
 		for (Object o : args)
 			result = result.replaceFirst("\\{\\}", o.toString());
 		this.Info(result);
+	}
+
+	public void Info(Object... texts){
+		this.Info(Formatting.RESET, (Object[])texts);
+	}
+
+	public void Info(Formatting formatting, Object... args){
+		MutableText message = Text.empty().formatted(formatting);
+
+		for (Object obj : args)
+			message.append(TextOf(obj));
+
+		this.Info(message);
 	}
 
 	public void Info(String message){
@@ -48,26 +61,33 @@ public record CommandLogger(
 /* # Preformatted                                                             */
 /******************************************************************************/
 
-	static public MutableText VariantName(@Nullable Object variant){
-		return VariantName(variant, "null");
+	static public MutableText TextOf(Object obj){
+		if (obj instanceof Text t)
+			return t.copy();
+		else
+			return Text.literal(String.valueOf(obj));
 	}
 
-	static public MutableText VariantName(@Nullable Object variant, String fallback){
+	static public MutableText ItemData(@Nullable Object variant){
+		return ItemData(variant, "null");
+	}
+
+	static public MutableText ItemData(@Nullable Object variant, String fallback){
 		if (variant == null)
 			return Text.literal(fallback).formatted(Formatting.RED);
 		else
-			return Text.literal(variant.toString()).formatted(Formatting.AQUA);
+			return TextOf(variant).formatted(Formatting.AQUA);
 	}
 
-	static public MutableText ResourceName(Object variant){
-		return Text.literal(variant.toString()).formatted(Formatting.YELLOW);
+	static public MutableText PackData(Object variant){
+		return TextOf(variant).formatted(Formatting.YELLOW);
 	}
 
 	private MutableText AssetFilename(Identifier id, String assetPrefix, String suffix){
 		return Text.literal("/assets/")
-			.append(VariantName(id.getNamespace()))
+			.append(ItemData(id.getNamespace()))
 			.append("/"+assetPrefix+metamodule.modelPrefix())
-			.append(VariantName(id.getPath()))
+			.append(ItemData(id.getPath()))
 			.append(suffix)
 			.formatted(Formatting.YELLOW)
 			;
@@ -75,17 +95,18 @@ public record CommandLogger(
 
 	public void PrintVariantIdTip(Identifier variantId){
 		Info(
-			Text.literal("TIP:").formatted(Formatting.GRAY)
-				.append(Text.literal("The model prefix is \""))
-				.append(ResourceName(metamodule.modelPrefix()))
-				.append(Text.literal("\", the variant ID "))
-				.append(VariantName(variantId))
+			Text.empty().formatted(Formatting.GRAY)
+				.append("[TIP] ")
+				.append("The model prefix is \"")
+				.append(PackData(metamodule.modelPrefix()))
+				.append("\", the variant ID ")
+				.append(ItemData(variantId))
 				.append(" may be supported by providing one of these files:")
 		);
 
 		Text bullet = Text.literal("- ").formatted(Formatting.GRAY);
 
-		switch (context())
+		switch (moduleContext())
 		{
 			default:
 				Error("Error: unknown context");

@@ -132,7 +132,17 @@ public class ModuleCommands
 	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, CommandLogger logger, IBakedModule module){
 		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandStack();
 
-		logger.Info("Applying {} module {} to item {} ({})", logger.context(), logger.metamodule().id(), stack.getName().getString(), stack.getItem());
+		logger.Info("--------");
+		logger.Info(
+			"Applying ",
+			CommandLogger.PackData(logger.moduleContext()),
+			" module ",
+			CommandLogger.PackData(logger.metamodule().id()).formatted(Formatting.UNDERLINE),
+			" to item ",
+			CommandLogger.ItemData(stack.getName()).formatted(Formatting.UNDERLINE),
+			" (", CommandLogger.ItemData(stack.getItem()), ")"
+		);
+		logger.Info("----");
 
 		Identifier modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){

@@ -404,7 +404,7 @@ implements IBakedModule
 
 	@Override
 	public void Summary(CommandLogger logger) {
-		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.Size(), this.vectorSpace.indices.size());
+		logger.InfoFormat("This module has {} variants, spread across {} enchantments:", this.modelLine.Size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
 			logger.Info(
 				Text.literal(" - ")

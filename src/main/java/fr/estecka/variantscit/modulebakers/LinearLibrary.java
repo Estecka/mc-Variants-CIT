@@ -84,7 +84,7 @@ public class LinearLibrary
 			{
 				@Override
 				public void Summary(CommandLogger logger) {
-					logger.Info("This module handles {} variants.", this.library.modelLine.Size());
+					logger.InfoFormat("This module handles {} variants.", this.library.modelLine.Size());
 				};
 				@Override
 				public void Dump(CommandLogger logger) {
@@ -141,7 +141,7 @@ public class LinearLibrary
 		private void LogGet(int magnitude, int bias, String textBias, String namespace){
 			logger.Info(
 				Text.literal("Getting model ")
-				    .append(CommandLogger.VariantName(magnitude))
+				    .append(CommandLogger.ItemData(magnitude))
 				    .append(" or "+textBias)
 			);
 			Identifier model = super.modelLine.GetClosestValue(magnitude, bias);
