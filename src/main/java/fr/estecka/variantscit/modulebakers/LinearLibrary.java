@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.LinearSnapMap;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -11,11 +12,16 @@ import net.minecraft.util.Identifier;
 
 public class LinearLibrary
 {
-	private final Identifier fallback;
-	private final LinearSnapMap<Identifier> modelLine = new LinearSnapMap<>();
+	protected final Identifier fallback;
+	protected final LinearSnapMap<Identifier> modelLine;
+
+	protected LinearLibrary(Identifier fallback, LinearSnapMap<Identifier> modelLine){
+		this.fallback = fallback;
+		this.modelLine = modelLine;
+	}
 
 	public LinearLibrary(VariantLibrary variantLibrary, String allowedNamespace){
-		this.fallback = variantLibrary.fallbackModel();
+		this(variantLibrary.fallbackModel(), new LinearSnapMap<>());
 
 		for (var variant : variantLibrary.variantModels().entrySet())
 		if  (variant.getKey().getNamespace().equals(allowedNamespace))
@@ -73,8 +79,8 @@ public class LinearLibrary
 		};
 
 		@Override
-		public GenericBakedModule<LinearLibrary> Bake(VariantLibrary library, ILinearCitModule logic){
-			return new GenericBakedModule<>(new LinearLibrary(library, logic.GetNamespace()), logic)
+		public GenericBakedModule<LinearLibrary> Bake(VariantLibrary library, ILinearCitModule linearModule){
+			return new GenericBakedModule<>(new LinearLibrary(library, linearModule.GetNamespace()), linearModule)
 			{
 				@Override
 				public void Summary(CommandLogger logger) {
@@ -92,8 +98,59 @@ public class LinearLibrary
 
 					}
 				};
+				@Override
+				public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+					return library.Walkthrough(logger, linearModule, stack);
+				};
 			};
 		}
 	};
+
+
+/******************************************************************************/
+/* # DebugCommands                                                            */
+/******************************************************************************/
+	public Identifier Walkthrough(CommandLogger logger, ILinearCitModule module, ItemStack stack){
+		return module.GetItemModel(stack, new SnitchingLinearLibrary(logger, this, module.GetNamespace()));
+	}
+
+	private class SnitchingLinearLibrary
+	extends LinearLibrary
+	{
+		private final CommandLogger logger;
+		private final String namespace;
+
+		public SnitchingLinearLibrary(CommandLogger logger, LinearLibrary original, String namespace){
+			super(original.fallback, original.modelLine);
+			this.logger = logger;
+			this.namespace = namespace;
+		}
+
+		@Override
+		public Identifier GetOrGreater(int magnitude) {
+			LogGet(magnitude, +1, "greater", namespace);
+			return super.GetOrGreater(magnitude);
+		}
+
+		@Override
+		public Identifier GetOrLesser(int magnitude) {
+			LogGet(magnitude, -1, "lesser", namespace);
+			return super.GetOrLesser(magnitude);
+		}
+
+		private void LogGet(int magnitude, int bias, String textBias, String namespace){
+			logger.Info(
+				Text.literal("Getting model ")
+				    .append(CommandLogger.VariantName(magnitude))
+				    .append(" or "+textBias)
+			);
+			Identifier model = super.modelLine.GetClosestValue(magnitude, bias);
+
+			if (model == null){
+				logger.Info("No such model exists.");
+				this.logger.PrintVariantIdTip(Identifier.of(namespace, String.valueOf(magnitude)));
+			}
+		}
+	}
 
 }
