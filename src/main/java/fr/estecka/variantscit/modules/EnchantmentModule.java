@@ -7,11 +7,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.commands.CommandLogger;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
@@ -130,5 +132,26 @@ extends AComponentCachingModule<ItemEnchantmentsComponent>
 
 	private boolean HasVariantModel(Entry<RegistryEntry<Enchantment>> enchant, IVariantManager library){
 		return null != GetEnchantModel(enchant, library);
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+		ItemEnchantmentsComponent enchants = stack.get(this.componentType);
+		if (enchants == null || enchants.isEmpty()){
+			logger.Info("The item does not have any enchantment.");
+			return null;
+		}
+
+		if (!this.MatchesPrecondition(enchants)){
+			logger.Info("The item is missing some of the required enchantments.");
+			return null;
+		}
+
+		if (enchants.getSize() <= precondition.size()){
+			logger.Info("The item does not have any enchantment besides the required ones.");
+			return null;
+		}
+
+		return super.Walkthrough(stack, library, logger);
 	}
 }
