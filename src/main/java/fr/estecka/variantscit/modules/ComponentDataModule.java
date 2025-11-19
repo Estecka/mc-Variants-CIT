@@ -75,8 +75,8 @@ extends ASimpleMultiComponentCachingModule
 		String raw = TransformableProperty.GetRaw(this.property).GetPropertyString(stack);
 		String transformed = property.GetPropertyString(stack);
 
-		logger.Info(Text.literal("Raw data: ").append(CommandLogger.ItemData(raw, "Missing or invalid")));
-		logger.Info(Text.literal("Transformed: ").append(CommandLogger.ItemData(transformed)));
+		logger.Info("Raw data: {}",    CommandLogger.ItemData(raw, "Missing or invalid"));
+		logger.Info("Transformed: {}", CommandLogger.ItemData(transformed));
 
 		return this.RecomputeItemModel(stack, library);
 	}

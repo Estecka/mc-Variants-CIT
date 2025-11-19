@@ -84,18 +84,15 @@ public class LinearLibrary
 			{
 				@Override
 				public void Summary(CommandLogger logger) {
-					logger.InfoFormat("This module handles {} variants.", this.library.modelLine.Size());
+					logger.Info("This module handles {} variants.", this.library.modelLine.Size());
 				};
 				@Override
 				public void Dump(CommandLogger logger) {
 					for (LinearSnapMap.Entry<Identifier> entry : this.library.modelLine){
-						logger.Info(
-							Text.empty()
-							    .append(Text.literal(String.valueOf(entry.magnitude())).formatted(Formatting.AQUA))
-							    .append(" -> ")
-							    .append(Text.literal(entry.value().toString()).formatted(Formatting.YELLOW))
+						logger.Info("{} -> {}",
+							CommandLogger.ItemData(entry.magnitude()),
+							CommandLogger.PackData(entry.value())
 						);
-
 					}
 				};
 				@Override
@@ -139,11 +136,7 @@ public class LinearLibrary
 		}
 
 		private void LogGet(int magnitude, int bias, String textBias, String namespace){
-			logger.Info(
-				Text.literal("Getting model ")
-				    .append(CommandLogger.ItemData(magnitude))
-				    .append(" or "+textBias)
-			);
+			logger.Info("Getting model {} or {}", CommandLogger.ItemData(magnitude), textBias);
 			Identifier model = super.modelLine.GetClosestValue(magnitude, bias);
 
 			if (model == null){

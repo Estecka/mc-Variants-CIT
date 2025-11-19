@@ -21,24 +21,43 @@ public record CommandLogger(
 /* # Generic logging                                                          */
 /******************************************************************************/
 
-	public void InfoFormat(String format, Object... args){
-		String result = format;
-		for (Object o : args)
-			result = result.replaceFirst("\\{\\}", o.toString());
-		this.Info(result);
+	static public MutableText TextOf(Object obj){
+		if (obj instanceof Text text)
+			return text.copy();
+		else
+			return Text.literal(String.valueOf(obj));
 	}
 
-	public void Info(Object... texts){
-		this.Info(Formatting.RESET, (Object[])texts);
+	static public MutableText TextFormat(Formatting style, String format, Object... args){
+		MutableText result = Text.empty().formatted(style);
+
+		String remainder = format;
+		int i = 0;
+		int argPos;
+		while (i < args.length && 0 <= (argPos=remainder.indexOf("{}"))){
+			result.append(remainder.substring(0, argPos));
+			result.append(TextOf(args[i]));
+
+			++i;
+			remainder = remainder.substring(argPos + 2);
+		}
+
+		if (!remainder.isEmpty())
+			result.append(remainder);
+
+		return result;
 	}
 
-	public void Info(Formatting formatting, Object... args){
-		MutableText message = Text.empty().formatted(formatting);
+	public MutableText TextFormat(String format, Object... args){
+		return TextFormat(Formatting.RESET, format, args);
+	}
 
-		for (Object obj : args)
-			message.append(TextOf(obj));
+	public void Info(Formatting formatting, String format, Object... args){
+		this.Info(TextFormat(formatting, format, args));
+	}
 
-		this.Info(message);
+	public void Info(String format, Object... args){
+		this.Info(TextFormat(Formatting.RESET, format, args));
 	}
 
 	public void Info(String message){
@@ -61,13 +80,6 @@ public record CommandLogger(
 /* # Preformatted                                                             */
 /******************************************************************************/
 
-	static public MutableText TextOf(Object obj){
-		if (obj instanceof Text t)
-			return t.copy();
-		else
-			return Text.literal(String.valueOf(obj));
-	}
-
 	static public MutableText ItemData(@Nullable Object variant){
 		return ItemData(variant, "null");
 	}
@@ -83,41 +95,35 @@ public record CommandLogger(
 		return TextOf(variant).formatted(Formatting.YELLOW);
 	}
 
-	private MutableText AssetFilename(Identifier id, String assetPrefix, String suffix){
-		return Text.literal("/assets/")
-			.append(ItemData(id.getNamespace()))
-			.append("/"+assetPrefix+metamodule.modelPrefix())
-			.append(ItemData(id.getPath()))
-			.append(suffix)
-			.formatted(Formatting.YELLOW)
-			;
+	private MutableText AssetFilename(Identifier variantId, String assetDir, String extension){
+		return TextFormat(Formatting.YELLOW, "/assets/{}/{}/{}{}.{}",
+			ItemData(variantId.getNamespace()),
+			assetDir,
+			metamodule.modelPrefix(),
+			ItemData(variantId.getPath()),
+			extension
+		);
 	}
 
 	public void PrintVariantIdTip(Identifier variantId){
-		Info(
-			Text.empty().formatted(Formatting.GRAY)
-				.append("[TIP] ")
-				.append("The model prefix is \"")
-				.append(PackData(metamodule.modelPrefix()))
-				.append("\", the variant ID ")
-				.append(ItemData(variantId))
-				.append(" may be supported by providing one of these files:")
+		Info(Formatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
+			PackData(metamodule.modelPrefix()),
+			ItemData(variantId)
 		);
 
 		Text bullet = Text.literal("- ").formatted(Formatting.GRAY);
-
 		switch (moduleContext())
 		{
 			default:
 				Error("Error: unknown context");
 				break;
 			case EQUIPPABLE:
-				Info(bullet.copy().append(AssetFilename(variantId, "items/", ".json")));
+				Info(bullet.copy().append(AssetFilename(variantId, "items", "json")));
 				break;
 			case ITEM_MODEL:
-				Info(bullet.copy().append(AssetFilename(variantId, "items/", ".json")));
-				Info(bullet.copy().append(AssetFilename(variantId, "models/item/", ".json")));
-				Info(bullet.copy().append(AssetFilename(variantId, "textures/item/", ".png")));
+				Info(bullet.copy().append(AssetFilename(variantId, "items", "json")));
+				Info(bullet.copy().append(AssetFilename(variantId, "models/item", "json")));
+				Info(bullet.copy().append(AssetFilename(variantId, "textures/item", "png")));
 				break;
 		}
 	}

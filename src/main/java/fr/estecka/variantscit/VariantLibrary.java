@@ -9,8 +9,6 @@ import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.modulebakers.IGenericCitModule;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public record VariantLibrary(
@@ -63,7 +61,7 @@ implements IVariantManager
 /******************************************************************************/
 
 	public void Summary(CommandLogger logger){
-		logger.Info("This module handles "+this.variantModels.size()+" variants.");
+		logger.Info("This module handles {} variants.", this.variantModels.size());
 	}
 
 	public void Dump(CommandLogger logger){
@@ -71,12 +69,9 @@ implements IVariantManager
 			logger.Info("This module does not have any variant.");
 		else for (var entry : this.variantModels.entrySet())
 		{
-			Text variant = Text.literal(entry.getKey().toString()).formatted(Formatting.AQUA);
-			Text model   = Text.literal(entry.getValue().toString()).formatted(Formatting.YELLOW);
-			logger.Info(Text.empty()
-				.append(variant)
-				.append(Text.literal(" -> "))
-				.append(model)
+			logger.Info("{} -> {} ",
+				CommandLogger.ItemData(entry.getKey()),
+				CommandLogger.PackData(entry.getValue())
 			);
 		}
 	}
@@ -115,11 +110,8 @@ implements IVariantManager
 		public boolean HasVariantModel(@Nullable Identifier variantId) {
 			boolean r = original.HasVariantModel(variantId);
 
-			Text variantName = (variantId == null) ?
-				Text.literal("null").formatted(Formatting.RED):
-				Text.literal(variantId.toString()).formatted(Formatting.AQUA);
-			logger.Info(Text.literal("Tested variant ID: ").append(variantName));
-			
+			logger.Info("Tested variant ID: {}", CommandLogger.ItemData(variantId));
+
 			foundVariantModel |= r;
 			if (firstVariantId == null)
 				firstVariantId = variantId;
@@ -135,7 +127,7 @@ implements IVariantManager
 
 		@Override
 		public @Nullable Identifier GetSpecialModel(String key) {
-			logger.Info("Tested special model: "+key);
+			logger.Info("Tested special model: {}", key);
 			return original.GetSpecialModel(key);
 		}
 	}

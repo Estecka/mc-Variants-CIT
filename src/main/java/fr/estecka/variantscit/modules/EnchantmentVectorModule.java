@@ -388,12 +388,7 @@ implements IBakedModule
 		for (int i=0; i<enchantIds.length; ++i)
 		if  (vector.values[i] != 0)
 		{
-			logger.Info(
-				Text.literal(" - lvl ")
-					.append(Text.literal(String.valueOf(vector.values[i])))
-					.append(" ")
-					.append(Text.literal(enchantIds[i].toString()).formatted(Formatting.AQUA))
-			);
+			logger.Info("- lvl {} {}", vector.values[i], CommandLogger.ItemData(enchantIds[i]));
 		}
 	}
 
@@ -404,12 +399,9 @@ implements IBakedModule
 
 	@Override
 	public void Summary(CommandLogger logger) {
-		logger.InfoFormat("This module has {} variants, spread across {} enchantments:", this.modelLine.Size(), this.vectorSpace.indices.size());
+		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.Size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
-			logger.Info(
-				Text.literal(" - ")
-				    .append(Text.literal(id.toString()).formatted(Formatting.AQUA))
-			);
+			logger.Info(" - {}", CommandLogger.ItemData(id));
 	}
 
 	@Override
@@ -418,10 +410,7 @@ implements IBakedModule
 
 		for (var entry : this.modelLine)
 		{
-			logger.Info(
-				Text.literal(entry.value().modelId.toString()).formatted(Formatting.YELLOW)
-				    .append(":")
-			);
+			logger.Info("{}:", CommandLogger.PackData(entry.value().modelId));
 
 			EnchantVector vector = entry.value().vector;
 			PrintVector(logger, vector, enchantIds);

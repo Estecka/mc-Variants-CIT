@@ -133,22 +133,18 @@ public class ModuleCommands
 		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandStack();
 
 		logger.Info("--------");
-		logger.Info(
-			"Applying ",
+		logger.Info("Applying {} module {} to item {} ({})",
 			CommandLogger.PackData(logger.moduleContext()),
-			" module ",
 			CommandLogger.PackData(logger.metamodule().id()).formatted(Formatting.UNDERLINE),
-			" to item ",
 			CommandLogger.ItemData(stack.getName()).formatted(Formatting.UNDERLINE),
-			" (", CommandLogger.ItemData(stack.getItem()), ")"
+			CommandLogger.ItemData(stack.getItem())
 		);
 		logger.Info("----");
 
 		Identifier modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){
-			logger.Info(
-				Text.literal("The module returned the model: ")
-				    .append(Text.literal(modelId.toString()).formatted(Formatting.YELLOW))
+			logger.Info("The module returned the model: {}",
+				CommandLogger.PackData(modelId)
 			);
 		}
 		else

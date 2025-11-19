@@ -74,9 +74,9 @@ extends ASimpleMultiComponentCachingModule
 			String raw = TransformableProperty.GetRaw(entry.getValue()).GetPropertyString(stack);
 			String transformed = entry.getValue().GetPropertyString(stack);
 
-			logger.Info(Text.literal("${").append(CommandLogger.PackData(entry.getKey())).append("}: "));
-			logger.Info(Text.literal("- Raw data: ").append(CommandLogger.ItemData(raw, "Missing or invalid")));
-			logger.Info(Text.literal("- Transformed: ").append(CommandLogger.ItemData(transformed)));
+			logger.Info("${{}}:", CommandLogger.PackData(entry.getKey()));
+			logger.Info("- Raw data: {}", CommandLogger.ItemData(raw, "Missing or invalid"));
+			logger.Info("- Transformed: {}", CommandLogger.ItemData(transformed));
 
 			failure |= (transformed == null);
 			variables.put(entry.getKey(), transformed);
@@ -85,7 +85,7 @@ extends ASimpleMultiComponentCachingModule
 		if (failure)
 			logger.Info("Some data could not be processed.");
 		else
-			logger.Info(Text.literal("Formatted variant: ").append(CommandLogger.ItemData(this.format.Substitute(variables))));
+			logger.Info("Formatted variant: {}", CommandLogger.ItemData(this.format.Substitute(variables)));
 
 		return this.RecomputeItemModel(stack, library);
 	}
