@@ -28,7 +28,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -38,7 +37,7 @@ implements IBakedModule
 {
 	static private class VectorSpace
 	{
-		private final Object2IntMap<Identifier> indices;
+		public final Object2IntMap<Identifier> indices;
 		private final EnchantVector maxLevels;
 
 		public VectorSpace(Map<Identifier,Integer> maxLevels){
@@ -142,20 +141,13 @@ implements IBakedModule
 	static public record Parameters(
 		boolean bakingDebug,
 		boolean runtimeDebug,
+		boolean optionalLevel,
 		List<ToIntFunction<EnchantVector>> ordering,
-		Pattern vectorRegex,
+		String enchantSeparator,
+		Optional<String> levelSeparator,
 		Map<Identifier,Identifier> aliases,
 		String namespace
 	) {}
-
-	static private final MapCodec<Pattern> REGEX_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
-		builder.group(
-			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(_0->""),
-			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(_0->Optional.empty()),
-			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(_0->false)
-		)
-		.apply(builder, EnchantmentVectorModule::BakeRegex)
-	);
 
 	static public final Codec<ToIntFunction<EnchantVector>> NORM_CODEC = CodecUtil.Enum(Codec.STRING, Map.of(
 		"taxicab",   EnchantVector::TaxicabMagnitude,
@@ -170,8 +162,10 @@ implements IBakedModule
 		builder.group(
 			Codec.BOOL.optionalFieldOf("bakingDebug",  false).forGetter(Parameters::bakingDebug),
 			Codec.BOOL.optionalFieldOf("runtimeDebug", false).forGetter(Parameters::runtimeDebug),
+			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(Parameters::optionalLevel),
 			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
-			REGEX_MAPCODEC.forGetter(Parameters::vectorRegex),
+			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
+			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
 			Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(Parameters::namespace)
 		)
@@ -184,6 +178,8 @@ implements IBakedModule
 	private final VectorSpace vectorSpace;
 	private final LinearSnapMap<VariantEntry> modelLine;
 	private final ToIntFunction<EnchantVector> magnitudeGetter;
+
+	private final Parameters params;
 
 /******************************************************************************/
 /* # Baking                                                                   */
@@ -199,7 +195,9 @@ implements IBakedModule
 			public boolean AcceptVariant(Identifier variantId, Parameters parameters) {
 				if (!parameters.namespace.equals(variantId.getNamespace()))
 					return false;
-				if (!parameters.vectorRegex.matcher(variantId.getPath()).matches()){
+
+				Pattern vectorRegex = BakeRegex(parameters);
+				if (!vectorRegex.matcher(variantId.getPath()).matches()){
 					VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
 					return false;
 				}
@@ -210,11 +208,14 @@ implements IBakedModule
 
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, ComponentType<ItemEnchantmentsComponent> component){
 		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
+		this.params = params;
 		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
 		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
 		this.magnitudeGetter = params.ordering.get(0);
 		this.modelLine = OrderedSnapMap(params.ordering);
+
+		Pattern enchantRegex = BakeRegex(params);
 
 		Map<Identifier,Integer> enchant2MaxLevel = new HashMap<>();
 		Map<Map<Identifier,Integer>, Identifier> vector2Model = new HashMap<>();
@@ -223,7 +224,7 @@ implements IBakedModule
 		for (var model : variantLibrary.variantModels().entrySet())
 		if  (model.getKey().getNamespace().equals(params.namespace))
 		{
-			var optMap = VariantId2Map(params.vectorRegex, model.getKey(), params.aliases);
+			var optMap = VariantId2Map(enchantRegex, model.getKey(), params.aliases);
 			if (optMap.isPresent()){
 				var enchants = optMap.get();
 				if (vector2Model.containsKey(enchants))
@@ -316,21 +317,21 @@ implements IBakedModule
 	 * Example regex
 	 * (?<=^|.__)(?:(?<namespace>[a-z0-9_.-]*?)\.\.)?(?<path>[a-z0-9_.-]+?)(?:\.(?<lvl>[0-9]+))?(?=__.+|$)
 	 */
-	static private Pattern BakeRegex(String enchantSeparator, Optional<String> levelSeparator, Boolean optionalLevel){
-		String enchantSep = enchantSeparator;
-		String lvlSep     = levelSeparator.orElse("");
+	static private Pattern BakeRegex(Parameters params){
+		String enchantSep = params.enchantSeparator;
+		String lvlSep     = params.levelSeparator.orElse("");
 
 		String lvlRegex;
-		if (levelSeparator.isPresent() || optionalLevel)
+		if (params.levelSeparator.isPresent() || params.optionalLevel)
 			lvlRegex = lvlSep + "(?<lvl>[0-9]+)";
 		else
 			lvlRegex= "(?<lvl>)";
 
-		if (optionalLevel)
+		if (params.optionalLevel)
 			lvlRegex = "(?:"+lvlRegex+")?";
 
 		String regex = "(?<=^|."+enchantSep+")(?:(?<namespace>[a-z0-9_.-]*?)\\.\\.)?(?<path>[a-z0-9_.-]+?)"+lvlRegex+"(?="+enchantSep+".+|$)";
-		// if (bakingDebug)
+		// if (params.bakingDebug)
 		// 	VariantsCitMod.LOGGER.info("Filenames will be parsed using this regex:\n{}", regex);
 
 		return Pattern.compile(regex);
@@ -362,6 +363,11 @@ implements IBakedModule
 		if (enchants == null || enchants.isEmpty())
 			return null;
 
+		VariantEntry result = FindEntry(enchants);
+		return (result != null) ? result.modelId : fallback;
+	}
+
+	public VariantEntry FindEntry(ItemEnchantmentsComponent enchants) {
 		EnchantVector enchantBox = this.vectorSpace.TruncatedVectorFromComponent(enchants);
 		VariantEntry result = modelLine.GetClosestValue(
 			magnitudeGetter.applyAsInt(enchantBox),
@@ -369,7 +375,7 @@ implements IBakedModule
 			variant->variant.vector.IsWithin(enchantBox)
 		);
 
-		return (result != null) ? result.modelId : fallback;
+		return result;
 
 	}
 
@@ -384,17 +390,55 @@ implements IBakedModule
 		return enchantIds;
 	}
 
-	private void PrintVector(CommandLogger logger, EnchantVector vector, Identifier[] enchantIds){
+	private void PrintVector(CommandLogger logger, EnchantVector vector, Identifier[] enchantIds, boolean itemSided){
 		for (int i=0; i<enchantIds.length; ++i)
 		if  (vector.values[i] != 0)
 		{
-			logger.Info("- lvl {} {}", vector.values[i], CommandLogger.ItemData(enchantIds[i]));
+			logger.Info("- lvl {} {}", 
+				vector.values[i], 
+				itemSided ? CommandLogger.ItemData(enchantIds[i]) : CommandLogger.PackData(enchantIds[i])
+			);
 		}
 	}
 
-	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
-		return this.ComputeItemModel(stack);
+	private boolean IsPerfectMatch(EnchantVector model, ItemEnchantmentsComponent item){
+		boolean checkLevels = params.optionalLevel || params.levelSeparator.isPresent();
+
+		for (var entry : item.getEnchantmentEntries()){
+			Identifier enchantId = entry.getKey().getKey().get().getValue();
+			if (!vectorSpace.indices.containsKey(enchantId))
+				return false;
+			int index = vectorSpace.indices.getInt(enchantId);
+			int itemLevel = (checkLevels) ? entry.getIntValue() : 1;
+			if (model.values[index] != itemLevel)
+				return false;
+		}
+
+		return true;
+	}
+
+	private String GetPerfectVariantId(ItemEnchantmentsComponent item){
+		String result = "";
+		boolean first = true;
+		String enchantSep = params.enchantSeparator.replace("\\", "");
+		String levelSep = params.levelSeparator.orElse(params.optionalLevel ? "" : null);
+		if (levelSep != null)
+			levelSep = levelSep.replace("\\", "");
+
+		for (var entry : item.getEnchantmentEntries()){
+			if (!first)
+				result += enchantSep;
+			first = false;
+			Identifier id = entry.getKey().getKey().get().getValue();
+			if (!id.getNamespace().equals("minecraft"))
+				result += id.getNamespace()+"..";
+			result += id.getPath();
+
+			if (entry.getIntValue() > 1 && levelSep != null)
+				result += levelSep + String.valueOf(entry.getIntValue());
+		}
+
+		return result;
 	}
 
 	@Override
@@ -413,8 +457,37 @@ implements IBakedModule
 			logger.Info("{}:", CommandLogger.PackData(entry.value().modelId));
 
 			EnchantVector vector = entry.value().vector;
-			PrintVector(logger, vector, enchantIds);
+			PrintVector(logger, vector, enchantIds, true);
 		}
+	}
+
+	@Override
+	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+		var enchants = stack.get(componentType);
+		if (enchants == null || enchants.isEmpty()){
+			logger.Info("The item has no enchantment.");
+			return null;
+		}
+
+		VariantEntry result = FindEntry(enchants);
+		if (result == null)
+			logger.Info("The item has enchantments, but no associated models exist.");
+		else {
+			logger.Info("Best matching model: ");
+			PrintVector(logger, result.vector, GetEnchantIds(), false);
+		}
+
+
+		if (result == null || !IsPerfectMatch(result.vector, enchants)){
+			String perfectVariant = GetPerfectVariantId(enchants);
+			logger.Info(Formatting.GRAY, "[TIP] An optimal variant ID for this item could be: {}", CommandLogger.ItemData(perfectVariant));
+			logger.Info(Formatting.GRAY, "This estimation does not take into account aliases or syntax issues arising from oddly named enchantments.");
+			logger.PrintVariantIdTip(Identifier.of(this.params.namespace, perfectVariant));
+		}
+		else
+			logger.Info("This is a perfect match.");
+
+		return this.ComputeItemModel(stack);
 	}
 
 }

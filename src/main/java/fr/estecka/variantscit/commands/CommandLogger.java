@@ -111,7 +111,7 @@ public record CommandLogger(
 			ItemData(variantId)
 		);
 
-		Text bullet = Text.literal("- ").formatted(Formatting.GRAY);
+		Text bullet = Text.literal("-").formatted(Formatting.GRAY);
 		switch (moduleContext())
 		{
 			default:
