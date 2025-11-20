@@ -443,7 +443,7 @@ implements IBakedModule
 
 	@Override
 	public void Summary(CommandLogger logger) {
-		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.Size(), this.vectorSpace.indices.size());
+		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
 			logger.Info(" - {}", CommandLogger.ItemData(id));
 	}
@@ -452,7 +452,9 @@ implements IBakedModule
 	public void Dump(CommandLogger logger) {
 		Identifier[] enchantIds = GetEnchantIds();
 
-		for (var entry : this.modelLine)
+		if (this.modelLine.size() <= 0)
+			logger.Info("This module does not have any variant.");
+		else for (var entry : this.modelLine)
 		{
 			logger.Info("{}:", CommandLogger.PackData(entry.value().modelId));
 

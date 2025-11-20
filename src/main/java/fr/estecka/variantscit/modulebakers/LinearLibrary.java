@@ -5,8 +5,6 @@ import fr.estecka.variantscit.LinearSnapMap;
 import fr.estecka.variantscit.VariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 
@@ -84,11 +82,13 @@ public class LinearLibrary
 			{
 				@Override
 				public void Summary(CommandLogger logger) {
-					logger.Info("This module handles {} variants.", this.library.modelLine.Size());
+					logger.Info("This module handles {} variants.", this.library.modelLine.size());
 				};
 				@Override
 				public void Dump(CommandLogger logger) {
-					for (LinearSnapMap.Entry<Identifier> entry : this.library.modelLine){
+					if (this.library.modelLine.size() <= 0)
+						logger.Info("This module does not have any variant.");
+					else for (LinearSnapMap.Entry<Identifier> entry : this.library.modelLine){
 						logger.Info("{} -> {}",
 							CommandLogger.ItemData(entry.magnitude()),
 							CommandLogger.PackData(entry.value())
@@ -108,7 +108,7 @@ public class LinearLibrary
 /* # DebugCommands                                                            */
 /******************************************************************************/
 	public Identifier Walkthrough(CommandLogger logger, ILinearCitModule module, ItemStack stack){
-		return module.GetItemModel(stack, new SnitchingLinearLibrary(logger, this, module.GetNamespace()));
+		return new SnitchingLinearLibrary(logger, this, module.GetNamespace()).Walkthrough(logger, module, stack);
 	}
 
 	private class SnitchingLinearLibrary
@@ -116,6 +116,8 @@ public class LinearLibrary
 	{
 		private final CommandLogger logger;
 		private final String namespace;
+		private Integer firstVariant = null;
+		private boolean foundModel = false;
 
 		public SnitchingLinearLibrary(CommandLogger logger, LinearLibrary original, String namespace){
 			super(original.fallback, original.modelLine);
@@ -136,13 +138,25 @@ public class LinearLibrary
 		}
 
 		private void LogGet(int magnitude, int bias, String textBias, String namespace){
+			if (this.firstVariant == null)
+				this.firstVariant = magnitude;
 			logger.Info("Getting model {} or {}", CommandLogger.ItemData(magnitude), textBias);
 			Identifier model = super.modelLine.GetClosestValue(magnitude, bias);
 
-			if (model == null){
-				logger.Info("No such model exists.");
-				this.logger.PrintVariantIdTip(Identifier.of(namespace, String.valueOf(magnitude)));
+			if (model != null)
+				this.foundModel = true;
+		}
+
+		@Override
+		public Identifier Walkthrough(CommandLogger logger, ILinearCitModule module, ItemStack stack) {
+			Identifier result = module.Walkthrough(stack, this, logger);
+
+			if (firstVariant != null && !foundModel){
+				logger.Info("The item has a valid variant, but no associated model exists.");
+				this.logger.PrintVariantIdTip(Identifier.of(namespace, String.valueOf(firstVariant)));
 			}
+			
+			return result;
 		}
 	}
 

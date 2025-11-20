@@ -2,6 +2,7 @@ package fr.estecka.variantscit.commands;
 
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
+import fr.estecka.variantscit.reload.EAssetType;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -95,13 +96,13 @@ public record CommandLogger(
 		return TextOf(variant).formatted(Formatting.YELLOW);
 	}
 
-	private MutableText AssetFilename(Identifier variantId, String assetDir, String extension){
-		return TextFormat(Formatting.YELLOW, "/assets/{}/{}/{}{}.{}",
+	private MutableText AssetFilename(Identifier variantId, EAssetType assetType){
+		return TextFormat(Formatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
-			assetDir,
+			assetType.directory,
 			metamodule.modelPrefix(),
 			ItemData(variantId.getPath()),
-			extension
+			assetType.suffix
 		);
 	}
 
@@ -118,12 +119,12 @@ public record CommandLogger(
 				Error("Error: unknown context");
 				break;
 			case EQUIPPABLE:
-				Info(bullet.copy().append(AssetFilename(variantId, "items", "json")));
+				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));
 				break;
 			case ITEM_MODEL:
-				Info(bullet.copy().append(AssetFilename(variantId, "items", "json")));
-				Info(bullet.copy().append(AssetFilename(variantId, "models/item", "json")));
-				Info(bullet.copy().append(AssetFilename(variantId, "textures/item", "png")));
+				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));
+				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.BAKED_MODEL)));
+				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.TEXTURE)));
 				break;
 		}
 	}

@@ -29,7 +29,7 @@ implements Iterable<LinearSnapMap.Entry<T>>
 		this((a,b)->0);
 	}
 
-	public int Size(){
+	public int size(){
 		return this.entries.size();
 	}
 

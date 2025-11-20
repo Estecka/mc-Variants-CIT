@@ -8,6 +8,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.MultiPropertyCache;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.properties.IntegerComponentProperty;
 import fr.estecka.variantscit.modulebakers.LinearLibrary;
 import fr.estecka.variantscit.modulebakers.LinearLibrary.ILinearCitModule;
@@ -63,5 +64,10 @@ implements ILinearCitModule
 		}
 
 		return library.GetOrGreater(durability);
+	}
+
+	@Override
+	public @Nullable Identifier Walkthrough(ItemStack stack, LinearLibrary library, CommandLogger logger) {
+		return this.RecomputeItemModel(stack, library);
 	}
 }
