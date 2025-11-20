@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modulebakers;
 
+import fr.estecka.variantscit.commands.CommandLogger;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -11,15 +12,33 @@ public class GenericBakedModule<L>
 implements IBakedModule
 {
 	public final L library;
+	private final IDebuggableLibrary<L> debug;
 	public final IGenericCitModule<L> logic;
 
-	public GenericBakedModule(L library, IGenericCitModule<L> logic){
-		this.library = library;
+	public GenericBakedModule(IDebuggableLibrary<L> library, IGenericCitModule<L> logic){
+		this.library = (L)library;
+		this.debug = library;
 		this.logic = logic;
 	}
 
 	@Override
 	public Identifier GetModelForItem(ItemStack stack) {
 		return logic.GetItemModel(stack, library);
+	}
+
+	@Override
+	public void Summary(CommandLogger logger) {
+		debug.Summary(logger);
+	}
+
+	@Override
+	public void Dump(CommandLogger logger) {
+		debug.Dump(logger);
+	}
+
+	@Override
+	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+		L snitch = this.debug.GetSnitch(logger);
+		return this.logic.Walkthrough(stack, snitch, logger);
 	}
 }

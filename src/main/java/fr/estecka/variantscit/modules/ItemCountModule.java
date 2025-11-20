@@ -2,10 +2,8 @@ package fr.estecka.variantscit.modules;
 
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.modulebakers.LinearLibrary;
+import fr.estecka.variantscit.modulebakers.ILinearLibrary;
 import fr.estecka.variantscit.modulebakers.LinearLibrary.ILinearCitModule;
-// import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-// import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -23,7 +21,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public Identifier GetItemModel(ItemStack stack, LinearLibrary library){
+	public Identifier GetItemModel(ItemStack stack, ILinearLibrary library){
 		return library.GetOrLesser(stack.getCount());
 	}
 }

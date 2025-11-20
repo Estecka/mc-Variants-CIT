@@ -7,8 +7,7 @@ import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
-import fr.estecka.variantscit.modulebakers.IGenericCitModule;
-import net.minecraft.item.ItemStack;
+import fr.estecka.variantscit.modulebakers.IDebuggableLibrary;
 import net.minecraft.util.Identifier;
 
 public record VariantLibrary(
@@ -16,7 +15,7 @@ public record VariantLibrary(
 	Map<Identifier, Identifier> variantModels,
 	Map<String, Identifier> specialModels
 )
-implements IVariantManager
+implements IVariantManager, IDebuggableLibrary<IVariantManager>
 {
 	@Override
 	public boolean HasVariantModel(Identifier variant){
@@ -48,11 +47,7 @@ implements IVariantManager
 	}
 
 	public IBakedModule Bake(ICitModule logic){
-		return new GenericBakedModule<IVariantManager>(this, logic){
-			@Override public void Dump(CommandLogger logger) { VariantLibrary.this.Dump(logger); }
-			@Override public void Summary(CommandLogger logger) { VariantLibrary.this.Summary(logger); }
-			@Override public Identifier Walkthrough(CommandLogger logger, ItemStack stack) { return VariantLibrary.this.Walkthrough(logger, stack, logic); }
-		};
+		return new GenericBakedModule<>(this, logic);
 	}
 
 
@@ -60,10 +55,12 @@ implements IVariantManager
 /* # Debug Commands                                                           */
 /******************************************************************************/
 
+	@Override
 	public void Summary(CommandLogger logger){
 		logger.Info("This module handles {} variants.", this.variantModels.size());
 	}
 
+	@Override
 	public void Dump(CommandLogger logger){
 		if (this.variantModels.isEmpty())
 			logger.Info("This module does not have any variant.");
@@ -76,59 +73,37 @@ implements IVariantManager
 		}
 	}
 
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack, IGenericCitModule<IVariantManager> logic){
-		return new SnitchingLibrary(this, logger).Walkthrough(stack, logic);
+	@Override
+	public IVariantManager GetSnitch(CommandLogger logger) {
+		return new SnitchingLibrary(logger);
 	}
 
-	static private class SnitchingLibrary
+	private class SnitchingLibrary
+	extends IDebuggableLibrary.Snitch
 	implements IVariantManager
 	{
-
-		private final VariantLibrary original;
-		private final CommandLogger logger;
-		private Identifier firstVariantId = null;
-		private boolean foundVariantModel = false;
-
-		SnitchingLibrary (VariantLibrary original, CommandLogger logger){
-			this.original = original;
-			this.logger = logger;
-		}
-
-		public Identifier Walkthrough(ItemStack stack, IGenericCitModule<IVariantManager> logic){
-			Identifier r = logic.Walkthrough(stack, this, logger);
-			if (firstVariantId == null)
-				logger.Info("No variant ID could be computed for this item.");
-			else if (!foundVariantModel)
-			{
-				logger.Info("The item has a valid variant, but no associated model exists.");
-				logger.PrintVariantIdTip(firstVariantId);
-			}
-			return r;
+		SnitchingLibrary (CommandLogger logger){
+			super(logger);
 		}
 
 		@Override
 		public boolean HasVariantModel(@Nullable Identifier variantId) {
-			boolean r = original.HasVariantModel(variantId);
-
-			logger.Info("Tested variant ID: {}", CommandLogger.ItemData(variantId));
-
-			foundVariantModel |= r;
-			if (firstVariantId == null)
-				firstVariantId = variantId;
-	
+			boolean r = VariantLibrary.this.HasVariantModel(variantId);
+			this.OnTriedVariant(variantId, r);
 			return r;
 		}
 
 		@Override
 		public @Nullable Identifier GetVariantModel(Identifier variantId) {
-			this.HasVariantModel(variantId);
-			return original.GetVariantModel(variantId);
+			this.OnTriedVariant(variantId, this.HasVariantModel(variantId));
+			return VariantLibrary.this.GetVariantModel(variantId);
 		}
 
 		@Override
 		public @Nullable Identifier GetSpecialModel(String key) {
-			logger.Info("Tested special model: {}", key);
-			return original.GetSpecialModel(key);
+			Identifier r = VariantLibrary.this.GetSpecialModel(key);
+			this.OnTriedSpecial(key, r != null);
+			return r;
 		}
 	}
 

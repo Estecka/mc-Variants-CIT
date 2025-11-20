@@ -10,7 +10,7 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.MultiPropertyCache;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.properties.IntegerComponentProperty;
-import fr.estecka.variantscit.modulebakers.LinearLibrary;
+import fr.estecka.variantscit.modulebakers.ILinearLibrary;
 import fr.estecka.variantscit.modulebakers.LinearLibrary.ILinearCitModule;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -45,11 +45,11 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable Identifier GetItemModel(ItemStack stack, LinearLibrary library) {
+	public @Nullable Identifier GetItemModel(ItemStack stack, ILinearLibrary library) {
 		return this.cache.ComputeIfAbsent(stack, __->RecomputeItemModel(stack, library));
 	}
 
-	public @Nullable Identifier RecomputeItemModel(ItemStack stack, LinearLibrary library) {
+	public @Nullable Identifier RecomputeItemModel(ItemStack stack, ILinearLibrary library) {
 		Integer max = stack.get(DataComponentTypes.MAX_DAMAGE);
 		if (max == null)
 			return null;
@@ -67,7 +67,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, LinearLibrary library, CommandLogger logger) {
+	public @Nullable Identifier Walkthrough(ItemStack stack, ILinearLibrary library, CommandLogger logger) {
 		return this.RecomputeItemModel(stack, library);
 	}
 }
