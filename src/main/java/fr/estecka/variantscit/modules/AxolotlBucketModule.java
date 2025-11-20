@@ -11,7 +11,6 @@ import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.AxolotlVariantProperty;
 import fr.estecka.variantscit.format.properties.EntityAgeMapProperty;
 import fr.estecka.variantscit.format.properties.IStringProperty;
-import fr.estecka.variantscit.modulebakers.GenericBakedModule;
 import fr.estecka.variantscit.modulebakers.IBakedModule;
 import fr.estecka.variantscit.modulebakers.IModuleBaker;
 import net.minecraft.util.Identifier;
@@ -23,7 +22,7 @@ public final class AxolotlBucketModule
 	static public final IModuleBaker<Params> BAKER = new IModuleBaker<>() {
 		@Override
 		public IBakedModule Bake(VariantLibrary library, Params parameters) {
-			return new GenericBakedModule<>(library, parameters.module);
+			return library.Bake(parameters.module);
 		};
 		@Override
 		public boolean AcceptVariant(Identifier variantId, Params parameters) {

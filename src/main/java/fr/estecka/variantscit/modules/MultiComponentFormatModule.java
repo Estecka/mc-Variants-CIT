@@ -70,6 +70,7 @@ extends ASimpleMultiComponentCachingModule
 		boolean failure = false;
 		Map<String,String> variables = new HashMap<>();
 
+		logger.Info("Format: \"{}\"", CommandLogger.PackData(this.format));
 		for (var entry : varGetters.entrySet()){
 			String raw = TransformableProperty.GetRaw(entry.getValue()).GetPropertyString(stack);
 			String transformed = entry.getValue().GetPropertyString(stack);
