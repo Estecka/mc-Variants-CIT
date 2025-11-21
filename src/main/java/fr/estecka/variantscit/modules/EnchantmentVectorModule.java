@@ -404,7 +404,7 @@ implements IBakedModule
 	private boolean IsPerfectMatch(EnchantVector model, ItemEnchantmentsComponent item){
 		boolean checkLevels = params.optionalLevel || params.levelSeparator.isPresent();
 
-		if (item.getEnchantmentEntries().size() != model.values.length)
+		if (item.getEnchantmentEntries().size() != model.Dimensionality())
 			return false;
 
 		for (var entry : item.getEnchantmentEntries()){
