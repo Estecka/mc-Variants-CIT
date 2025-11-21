@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -133,13 +134,16 @@ public class ModuleCommands
 		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandStack();
 
 		logger.Info("--------");
-		logger.Info("Applying {} module {} to item {} ({})",
+		logger.Info("Testing {} module {} on main-hand item: {} ({})",
 			CommandLogger.PackData(logger.moduleContext()),
 			CommandLogger.PackData(logger.metamodule().id()).formatted(Formatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getName()).formatted(Formatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getItem())
 		);
 		logger.Info("----");
+
+		if (!logger.metamodule().targets().contains(stack.getItem()))
+			logger.Info(Formatting.GOLD, "[WARN] This module would normally not be applied to items of type {}", stack.getItem());
 
 		Identifier modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){
