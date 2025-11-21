@@ -110,12 +110,12 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 	}
 
 	@Override
-	public ILinearLibrary GetSnitch(CommandLogger logger) {
+	public Snitch<ILinearLibrary> CreateSnitch(CommandLogger logger) {
 		return new SnitchingLinearLibrary(logger);
 	}
 
 	private class SnitchingLinearLibrary
-	extends IDebuggableLibrary.Snitch
+	extends IDebuggableLibrary.Snitch<ILinearLibrary>
 	implements ILinearLibrary
 	{
 

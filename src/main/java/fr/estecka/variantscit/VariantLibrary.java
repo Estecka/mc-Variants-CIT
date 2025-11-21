@@ -74,12 +74,12 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 	}
 
 	@Override
-	public IVariantManager GetSnitch(CommandLogger logger) {
+	public Snitch<IVariantManager> CreateSnitch(CommandLogger logger) {
 		return new SnitchingLibrary(logger);
 	}
 
 	private class SnitchingLibrary
-	extends IDebuggableLibrary.Snitch
+	extends IDebuggableLibrary.Snitch<IVariantManager>
 	implements IVariantManager
 	{
 		SnitchingLibrary (CommandLogger logger){

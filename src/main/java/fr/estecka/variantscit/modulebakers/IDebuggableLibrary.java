@@ -11,15 +11,26 @@ public interface IDebuggableLibrary<LIB>
 {
 	public void Summary(CommandLogger logger);
 	public void Dump(CommandLogger logger);
-	public LIB GetSnitch(CommandLogger logger);
+	public Snitch<LIB> CreateSnitch(CommandLogger logger);
 
-	public abstract class Snitch {
+	public default LIB GetLibrary(){
+		return (LIB)this;
+	}
+
+	/**
+	 * Implementations MUST be of type LIB.
+	 */
+	public abstract class Snitch<LIB> {
 		protected final CommandLogger logger;
 		private @Nullable Identifier mainVariant = null;
 		private boolean foundModel = false;
 
 		protected Snitch(CommandLogger logger){
 			this.logger = logger;
+		}
+
+		public LIB GetLibrary(){
+			return (LIB)this;
 		}
 
 		protected void OnTriedVariant(Identifier variant, boolean exists){
@@ -33,7 +44,7 @@ public interface IDebuggableLibrary<LIB>
 			logger.Info("Tested special Model: {}", CommandLogger.ItemData(special));
 		}
 
-		protected void Conclude(){
+		public void PrintConclusion(){
 			if (foundModel)
 				; // No-op
 			else if (mainVariant == null)
