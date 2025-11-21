@@ -95,7 +95,7 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 
 		@Override
 		public @Nullable Identifier GetVariantModel(Identifier variantId) {
-			this.OnTriedVariant(variantId, this.HasVariantModel(variantId));
+			this.HasVariantModel(variantId);
 			return VariantLibrary.this.GetVariantModel(variantId);
 		}
 
@@ -104,6 +104,12 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 			Identifier r = VariantLibrary.this.GetSpecialModel(key);
 			this.OnTriedSpecial(key, r != null);
 			return r;
+		}
+
+		@Override
+		protected void OnTriedVariant(Identifier variantId, boolean exists) {
+			logger.Info("Tested variant ID: {}", CommandLogger.ItemData(variantId));
+			super.OnTriedVariant(variantId, exists);
 		}
 	}
 
