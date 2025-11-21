@@ -5,10 +5,6 @@ import fr.estecka.variantscit.modulebakers.IDebuggableLibrary.Snitch;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
-/**
- * TODO: Although not abstract yet, this class should not be used directly, so
- * that debug commands get implemented in child classes.
- */
 public class GenericBakedModule<L>
 implements IBakedModule
 {

@@ -82,7 +82,7 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 	extends IDebuggableLibrary.Snitch<IVariantManager>
 	implements IVariantManager
 	{
-		SnitchingLibrary (CommandLogger logger){
+		public SnitchingLibrary (CommandLogger logger){
 			super(logger);
 		}
 

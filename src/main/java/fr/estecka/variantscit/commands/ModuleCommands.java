@@ -34,7 +34,7 @@ import static fr.estecka.variantscit.commands.ModuleContextArgumentType.getModul
 
 public class ModuleCommands
 {
-	static public final Identifier ID = Identifier.of(VariantsCitMod.MODID, "dump");
+	static public final Identifier ID = Identifier.of(VariantsCitMod.MODID, "modules");
 
 	static public final String CONTEXT_ARG = "context";
 	static public final String MODULE_ARG  = "module id";
@@ -143,9 +143,7 @@ public class ModuleCommands
 
 		Identifier modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){
-			logger.Info("The module returned the model: {}",
-				CommandLogger.PackData(modelId)
-			);
+			logger.Info("The module returned the model: {}", CommandLogger.PackData(modelId));
 		}
 		else
 			logger.Info("The module failed to apply to the item.");

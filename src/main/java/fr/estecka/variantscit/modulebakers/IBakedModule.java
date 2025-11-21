@@ -35,7 +35,7 @@ public interface IBakedModule
 	}
 
 	default Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
-		logger.Error("This module type does not support `walktrough`. Please report this issue.");
+		logger.Error("This module type does not support `walkthrough`. Please report this issue.");
 		return this.GetModelForItem(stack);
 	}
 }

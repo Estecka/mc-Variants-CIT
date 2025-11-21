@@ -12,16 +12,11 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 {
 	protected final String namespace;
 	protected final Identifier fallback;
-	protected final LinearSnapMap<Identifier> modelLine;
-
-	protected LinearLibrary(String namespace, Identifier fallback, LinearSnapMap<Identifier> modelLine){
-		this.namespace = namespace;
-		this.fallback = fallback;
-		this.modelLine = modelLine;
-	}
+	protected final LinearSnapMap<Identifier> modelLine = new LinearSnapMap<>();
 
 	public LinearLibrary(VariantLibrary variantLibrary, String allowedNamespace){
-		this(allowedNamespace, variantLibrary.fallbackModel(), new LinearSnapMap<>());
+		this.fallback = variantLibrary.fallbackModel();
+		this.namespace = allowedNamespace;
 
 		for (var variant : variantLibrary.variantModels().entrySet())
 		if  (variant.getKey().getNamespace().equals(allowedNamespace))
@@ -57,35 +52,32 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 		String GetNamespace();
 	}
 
-	static public <T extends ILinearCitModule> IModuleBaker<T> GetBaker(){
-		return (IModuleBaker<T>)BAKER;
-	}
+	static public <M extends ILinearCitModule> IModuleBaker<M> GetBaker(){
+		return new IModuleBaker<>() {
+			@Override
+			public boolean AcceptVariant(Identifier variantId, M parameters) {
+				if (!variantId.getNamespace().equals(parameters.GetNamespace()))
+					return false;
 
-	static public final IModuleBaker<? extends ILinearCitModule> BAKER = new IModuleBaker<>()
-	{
-		@Override
-		public boolean AcceptVariant(Identifier variantId, ILinearCitModule parameters) {
-			if (!variantId.getNamespace().equals(parameters.GetNamespace()))
-				return false;
-		
-			try {
+				try {
 					Integer.parseUnsignedInt(variantId.getPath());
-			}
-			catch (NumberFormatException e){
-				return false;
-			}
-		
-			return true;
-		};
+				}
+				catch (NumberFormatException e){
+					return false;
+				}
 
-		@Override
-		public GenericBakedModule<ILinearLibrary> Bake(VariantLibrary library, ILinearCitModule linearModule){
-			return new GenericBakedModule<ILinearLibrary>(
-				new LinearLibrary(library, linearModule.GetNamespace()),
-				linearModule
-			);
-		}
-	};
+				return true;
+			};
+
+			@Override
+			public GenericBakedModule<ILinearLibrary> Bake(VariantLibrary library, M linearModule){
+				return new GenericBakedModule<ILinearLibrary>(
+					new LinearLibrary(library, linearModule.GetNamespace()),
+					linearModule
+				);
+			};
+		};
+	}
 
 
 /******************************************************************************/
