@@ -10,7 +10,7 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.modules.IBakedModule;
 
 @Mixin(ItemModelManager.class)
 public class ItemModelManagerMixin

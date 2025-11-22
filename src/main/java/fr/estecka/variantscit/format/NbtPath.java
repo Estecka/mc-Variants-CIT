@@ -70,9 +70,13 @@ public final class NbtPath
 		return DataResult.success(new NbtPath(tokens));
 	}
 
+	/**
+	 * @implNote Parser functions will return NULL instead of a DataResult to
+	 * signify that another parser should be used.
+	 */
 	static public DataResult<NbtPath> Parse(final String input){
 		@SuppressWarnings("unchecked")
-		final Function<String,Parsed>[] parsers = new Function[3];
+		final Function<String,DataResult<Parsed>>[] parsers = new Function[3];
 		parsers[0] = MapKey::Next;
 		parsers[1] = ArrayIndex::Next;
 		parsers[2] = MapIndex::Next;
@@ -81,15 +85,24 @@ public final class NbtPath
 		String remainder = input;
 
 		while (!remainder.isEmpty()){
-			Parsed result = null;
+			DataResult<Parsed> result = null;
 			for (int i=0; i<parsers.length && result == null; ++i)
 				result = parsers[i].apply(remainder);
 
-			if (result == null)
-				return DataResult.error(()->"Invalid token in path: "+input, new NbtPath(tokens));
+			if (result == null){
+				final String rem = remainder;
+				result = DataResult.error(()->"Invalid character here -> "+rem);
+			}
+
+			if (result.isError()){
+				return result.map(_0->new NbtPath(tokens))
+				             .mapError(err->"Invalid token in path: "+input+'\n'+err)
+				             ;
+			}
 			else {
-				tokens.add(result.token);
-				remainder = result.remainder;
+				Parsed parsed = result.getOrThrow();
+				tokens.add(parsed.token);
+				remainder = parsed.remainder;
 			}
 		}
 
@@ -117,6 +130,9 @@ public final class NbtPath
 	static private record MapKey(String name)
 	implements Token
 	{
+		static private final char QUOTE  = '\'';
+		static private final char ESCAPE = '\\';
+
 		@Override
 		public NbtElement Resolve(NbtElement nbt){
 			if (nbt instanceof NbtCompound compound)
@@ -127,25 +143,64 @@ public final class NbtPath
 
 		@Override
 		public String toString(){
-			return "."+name;
+			return ".'"+name+"'";
 		}
 
-		static private Parsed Next(String input){
+		static private DataResult<Parsed> Next(String input){
 			if (input.length() < 2 || input.charAt(0) != '.')
 				return null;
 
-			int end;
-			for (end=1; end<input.length(); ++end){
+			String result = "";
+			boolean openQuotes = false;
+			boolean isEscaping = false;
+
+			int end=1;
+			if (input.charAt(1) == QUOTE){
+				openQuotes = true;
+				++end;
+			}
+			for (  ; end<input.length(); ++end)
+			{
 				char c = input.charAt(end);
-				if (c < 'A' || 'Z' < c)
-					if (!Identifier.isCharValid(c) || c == '.')
-						break;
+				if (isEscaping){
+					result += c;
+					isEscaping = false;
+				}
+				else if (c == ESCAPE)
+					isEscaping = true;
+				else if (openQuotes && c == QUOTE){
+					openQuotes = false;
+					++end;
+					break;
+				}
+				else if (openQuotes || IsCharValid(c))
+					result += c;
+				else
+					break;
 			}
 
-			return new Parsed(
-				new MapKey(input.substring(1, end)),
+			// Disallow points followed by nothing, but allow empty quotes.
+			if (end <= 1){
+				return DataResult.error(()->"Missing keyname after dot -> " + input
+				                           + "\nIf the key is intentionally empty, quote it. ( Write .'' )"
+				                       );
+			}
+
+			if (openQuotes)
+				return DataResult.error(()->"Unclosed quote in keyname -> "+input);
+			if (isEscaping)
+				return DataResult.error(()->"Escape character at the end of input -> "+input);
+
+			return DataResult.success(new Parsed(
+				new MapKey(result),
 				input.substring(end)
-			);
+			));
+		}
+
+		static private boolean IsCharValid(char c){
+			return ('A' <= c && c <= 'Z')
+			    || (Identifier.isCharValid(c) && c != '.')
+			    ;
 		}
 	}
 
@@ -172,26 +227,26 @@ public final class NbtPath
 			return "["+index+"]";
 		}
 
-		static private Parsed Next(String input){
+		static private DataResult<Parsed> Next(String input){
 			if (input.length() < 3 || input.charAt(0) != '[')
 				return null;
 
 			int end = input.indexOf(']');
 			if (end < 0)
-				return null;
+				return DataResult.error(()->"Empty array index here -> "+input);
 
 			
 			int index;
 			try {
 				index = Integer.parseUnsignedInt(input.substring(1, end));
 			} catch (NumberFormatException e){
-				return null;
+				return DataResult.error(()->"Array indx is not a number -> "+input);
 			}
 
-			return new Parsed(
+			return DataResult.success(new Parsed(
 				new ArrayIndex(index),
 				input.substring(end+1)
-			);
+			));
 		}
 	}
 
@@ -226,26 +281,26 @@ public final class NbtPath
 			return result;
 		}
 
-		static private Parsed Next(String input){
+		static private DataResult<Parsed> Next(String input){
 			if (input.length() < 3 || input.charAt(0) != '{')
 				return null;
 
 			int end = input.indexOf('}');
 			if (end < 0)
-				return null;
+				return DataResult.error(()->"Empty map index here -> "+input);
 
 			
 			int index;
 			try {
 				index = Integer.parseUnsignedInt(input.substring(1, end));
 			} catch (NumberFormatException e){
-				return null;
+				return DataResult.error(()->"Map index is not a number -> "+input);
 			}
 
-			return new Parsed(
+			return DataResult.success(new Parsed(
 				new MapIndex(index),
 				input.substring(end+1)
-			);
+			));
 		}
 
 		@Override
