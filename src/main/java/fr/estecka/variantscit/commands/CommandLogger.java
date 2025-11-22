@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.reload.EAssetType;
 import fr.estecka.variantscit.reload.EModuleContext;
-import fr.estecka.variantscit.reload.ModuleLoader.MetaModule;
+import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;

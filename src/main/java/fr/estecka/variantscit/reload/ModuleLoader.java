@@ -13,7 +13,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -34,15 +34,6 @@ public final class ModuleLoader
 			this.variantAggregator = new VariantAggregator(modules);
 		}
 	}
-
-	static public record MetaModule (
-		Identifier id,
-		int priority,
-		Set<Item> targets,
-		String modelPrefix,
-		Optional<IBakedModule> itemModule,
-		Optional<IBakedModule> equipModule
-	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
@@ -190,8 +181,8 @@ public final class ModuleLoader
 	
 		for (MetaModule meta : modules)
 		{
-			if (meta.itemModule .isPresent()) BakeModuleContext(meta, meta.itemModule .get(), itemModules );
-			if (meta.equipModule.isPresent()) BakeModuleContext(meta, meta.equipModule.get(), equipModules);
+			if (meta.itemModule ().isPresent()) BakeModuleContext(meta, meta.itemModule ().get(), itemModules );
+			if (meta.equipModule().isPresent()) BakeModuleContext(meta, meta.equipModule().get(), equipModules);
 		}
 
 		BakeItem(result.itemModules,  itemModules );

@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.api;
 
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.modulebakers.IGenericCitModule;
+import fr.estecka.variantscit.modules.libraries.IGenericCitModule;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 

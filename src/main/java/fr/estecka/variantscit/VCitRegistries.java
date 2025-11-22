@@ -13,8 +13,9 @@ import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.properties.*;
 import fr.estecka.variantscit.format.transforms.*;
-import fr.estecka.variantscit.modulebakers.*;
 import fr.estecka.variantscit.modules.*;
+import fr.estecka.variantscit.modules.impl.*;
+import fr.estecka.variantscit.modules.libraries.*;
 import fr.estecka.variantscit.reload.UnbakedModule;
 
 public final class VCitRegistries
