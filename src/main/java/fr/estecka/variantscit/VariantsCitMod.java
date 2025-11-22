@@ -10,9 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
-import fr.estecka.variantscit.properties.*;
-import fr.estecka.variantscit.selectors.*;
+import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.vanilla.*;
 
 
 public class VariantsCitMod

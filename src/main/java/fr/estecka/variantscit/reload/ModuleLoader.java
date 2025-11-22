@@ -13,8 +13,8 @@ import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
-import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -34,19 +34,6 @@ public final class ModuleLoader
 			this.variantAggregator = new VariantAggregator(modules);
 		}
 	}
-
-	/**
-	 * Contains all the processed data about a module. Some of that data is only
-	 * relevant to the resource-loading phase, and will be discarded at the end.
-	 */
-	static public record MetaModule (
-		Identifier id,
-		int priority,
-		Set<Item> targets,
-		Optional<VariantLibrary> itemLibrary,
-		Optional<VariantLibrary> equipLibrary,
-		UnbakedModule<?> parameters
-	){}
 
 	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
 	{
@@ -195,7 +182,7 @@ public final class ModuleLoader
 	
 		for (MetaModule meta : modules)
 		{
-			VariantsCitMod.LOGGER.PushLabel(meta.id);
+			VariantsCitMod.LOGGER.PushLabel(meta.id());
 			if (meta.itemLibrary() .isPresent()) BakeModuleContext("item_model", meta, meta.itemLibrary ().get(), itemModules );
 			if (meta.equipLibrary().isPresent()) BakeModuleContext("equippable", meta, meta.equipLibrary().get(), equipModules);
 			VariantsCitMod.LOGGER.PopLabel();
@@ -212,7 +199,7 @@ public final class ModuleLoader
 			VariantsCitMod.LOGGER.Unlabelled().info("Found {} {} variants for VCIT module {}", lib.GetVariantCount(), contextName, meta.id());
 
 		for (Item itemType : meta.targets()){
-			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(meta.parameters.Bake(lib));
+			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(meta.parameters().Bake(lib));
 		}
 
 	}
