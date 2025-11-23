@@ -1,8 +1,8 @@
 package fr.estecka.variantscit.reload;
 
-import fr.estecka.variantscit.VariantLibrary;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
-import fr.estecka.variantscit.modulebakers.IModuleBaker;
+import fr.estecka.variantscit.modules.libraries.VariantLibrary;
+import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.IModuleBaker;
 import net.minecraft.util.Identifier;
 
 public record UnbakedModule<T>(

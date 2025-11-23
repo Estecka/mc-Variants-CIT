@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.modules.IBakedModule;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.EquippableComponent;
