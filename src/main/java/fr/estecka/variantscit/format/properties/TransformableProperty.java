@@ -43,4 +43,10 @@ implements IStringProperty
 
 		return result;
 	}
+
+	static public IStringProperty GetRaw(IStringProperty property){
+		while (property instanceof TransformableProperty<?> transformable)
+			property = transformable.inner;
+		return property;
+	}
 }
