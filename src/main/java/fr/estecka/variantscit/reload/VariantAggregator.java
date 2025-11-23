@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import fr.estecka.variantscit.VariantLibrary;
+import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.mixin.BakedModelManagerMixin;
 import net.minecraft.resource.ResourceManager;

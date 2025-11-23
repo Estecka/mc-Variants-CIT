@@ -4,11 +4,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import fr.estecka.variantscit.modulebakers.IBakedModule;
+import fr.estecka.variantscit.reload.MetaModule;
+import fr.estecka.variantscit.commands.ModuleCommands;
+import fr.estecka.variantscit.modules.IBakedModule;
 
 
 public class VariantsCitMod
@@ -19,8 +21,9 @@ implements ClientModInitializer
 
 	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
-	static private Map<Item, IBakedModule> ITEM_MODULES  = new HashMap<>();
-	static private Map<Item, IBakedModule> EQUIP_MODULES = new HashMap<>();
+	static private Map<Item, IBakedModule> ITEM_MODULES  = Map.of();
+	static private Map<Item, IBakedModule> EQUIP_MODULES = Map.of();
+	static private Map<Identifier, MetaModule> META = Map.of();
 
 	static public @Nullable IBakedModule GetItemModule(Item itemType){
 		return ITEM_MODULES.get(itemType);
@@ -28,9 +31,25 @@ implements ClientModInitializer
 	static public @Nullable IBakedModule GetEquipmentModule(Item itemType){
 		return EQUIP_MODULES.get(itemType);
 	}
+	static public Map<Identifier,MetaModule> GetMeta(){
+		return Map.copyOf(META);
+	}
+	static public IBakedModule GetModule(EModuleContext context, Identifier id){
+		MetaModule meta = META.get(id);
+		if (meta == null)
+			return null;
+		else {
+			return switch (context) {
+				default -> throw new IllegalArgumentException();
+				case ITEM_MODEL -> meta.itemModule().orElse(null);
+				case EQUIPPABLE -> meta.equipModule().orElse(null);
+			};
+		}
+	}
 
 	@Override
 	public void onInitializeClient(){
+		ModuleCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){
@@ -38,6 +57,7 @@ implements ClientModInitializer
 		EQUIPABLES.Clear();
 		ITEM_MODULES  = result.itemModules;
 		EQUIP_MODULES = result.equipModules;
+		META = result.allModules;
 	}
 
 }
