@@ -162,7 +162,7 @@ implements IBakedModule
 		builder.group(
 			Codec.BOOL.optionalFieldOf("bakingDebug",  false).forGetter(Parameters::bakingDebug),
 			Codec.BOOL.optionalFieldOf("runtimeDebug", false).forGetter(Parameters::runtimeDebug),
-			Codec.BOOL.optionalFieldOf("optionalLevel", false).forGetter(Parameters::optionalLevel),
+			Codec.BOOL.optionalFieldOf("optionalLevel", true).forGetter(Parameters::optionalLevel),
 			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
 			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
 			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
@@ -295,7 +295,7 @@ implements IBakedModule
 		while(matches.find()){
 			String path      = matches.group("path");
 			String namespace = Optional.ofNullable(matches.group("namespace")).orElse("minecraft");
-			int    level     = Optional.ofNullable(matches.group("lvl")).map(Integer::parseInt).orElse(1);
+			int    level     = Optional.ofNullable(matches.group("lvl")).flatMap(i->SafeParseInt(regex, variantId, i)).orElse(1);
 
 			Identifier enchantId = Identifier.of(namespace, path);
 			enchantId = aliases.getOrDefault(enchantId, enchantId);
@@ -313,6 +313,24 @@ implements IBakedModule
 		return Optional.of(vector);
 	}
 
+	static private Optional<Integer> SafeParseInt(Pattern regex, Identifier variantId, String input){
+		try {
+			return Optional.of(Integer.parseInt(input));
+		}
+		catch (NumberFormatException e){
+			VariantsCitMod.LOGGER.error(
+				"Critical error parsing enchantment level. Please report this issue!"
+				+ "\nRegex: {}"
+				+ "\nVariant ID: {}"
+				+ "\nRaw level: \"{}\"",
+				regex.pattern(),
+				variantId,
+				input
+			);
+			return Optional.empty();
+		}
+	}
+
 	/**
 	 * Example regex
 	 * (?<=^|.__)(?:(?<namespace>[a-z0-9_.-]*?)\.\.)?(?<path>[a-z0-9_.-]+?)(?:\.(?<lvl>[0-9]+))?(?=__.+|$)
@@ -321,14 +339,14 @@ implements IBakedModule
 		String enchantSep = params.enchantSeparator;
 		String lvlSep     = params.levelSeparator.orElse("");
 
-		String lvlRegex;
-		if (params.levelSeparator.isPresent() || params.optionalLevel)
-			lvlRegex = lvlSep + "(?<lvl>[0-9]+)";
-		else
-			lvlRegex= "(?<lvl>)";
+		String lvlRegex = "(?<lvl>[0-9]+)";
+		if (params.levelSeparator.isPresent())
+			lvlRegex = lvlSep + lvlRegex;
 
 		if (params.optionalLevel)
 			lvlRegex = "(?:"+lvlRegex+")?";
+		else if (!params.levelSeparator.isPresent())
+			lvlRegex = "(?:"+lvlRegex+"){0}"; // Causes the group to be accessible, but evaluate to null.
 
 		String regex = "(?<=^|."+enchantSep+")(?:(?<namespace>[a-z0-9_.-]*?)\\.\\.)?(?<path>[a-z0-9_.-]+?)"+lvlRegex+"(?="+enchantSep+".+|$)";
 		// if (params.bakingDebug)
@@ -446,6 +464,9 @@ implements IBakedModule
 
 	@Override
 	public void Summary(CommandLogger logger) {
+		logger.Info("The model IDs were parsed using this regex:");
+		logger.Info("{}", CommandLogger.PackData(BakeRegex(this.params).pattern()));
+
 		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
 			logger.Info(" - {}", CommandLogger.ItemData(id));
