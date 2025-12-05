@@ -13,7 +13,8 @@
 		"ItemModelTypesMixin",
 		"ItemModelManagerMixin",
 		"ReferencedModelsCollectorMixin",
-		"ReferencedModelsCollectorMixin$ResolverImplMixin"
+		"ReferencedModelsCollectorMixin$ResolverImplMixin",
+		"MinecraftClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
