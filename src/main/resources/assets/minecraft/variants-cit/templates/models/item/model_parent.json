@@ -1,0 +1,6 @@
+{
+	"parent": "${MODEL_PARENT}",
+	"textures": {
+		"layer0": "${BAKED_MODEL_ID}"
+	}
+}

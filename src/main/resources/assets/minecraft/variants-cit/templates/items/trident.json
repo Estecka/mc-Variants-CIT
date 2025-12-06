@@ -1,0 +1,27 @@
+{
+	"model": {
+		"type": "select",
+		"property": "display_context",
+		"cases": 
+		[{
+			"when": [ "gui", "ground", "fixed" ],
+			"model": { "type":"model", "model":"${BAKED_MODEL_ID}" }
+		}],
+		"fallback":
+		{
+			"type": "condition",
+			"property": "using_item",
+			"on_false":
+			{
+				"type": "special",
+				"base": "item/${BAKED_MODEL_ID}_in_hand",
+				"model": { "type": "trident" }
+			},
+			"on_true": {
+				"type": "special",
+				"base": "item/${BAKED_MODEL_ID}_throwing",
+				"model": { "type": "trident" }
+			}
+		}
+	}
+}
