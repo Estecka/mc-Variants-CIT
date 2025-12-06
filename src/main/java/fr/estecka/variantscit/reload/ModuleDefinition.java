@@ -21,6 +21,7 @@ public record ModuleDefinition(
 	String modelPrefix,
 	boolean itemGen,
 	Optional<Identifier> modelParent,
+	List<Identifier> assetGen,
 	Optional<Identifier> fallbackModel,
 	Map<String,Identifier> specialModels
 )
@@ -35,6 +36,7 @@ public record ModuleDefinition(
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
+			Identifier.CODEC.listOf().optionalFieldOf("assetGen", List.of()).forGetter(ModuleDefinition::assetGen),
 			Identifier.CODEC.validate(ModuleDefinition::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(ModuleDefinition::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
 		)

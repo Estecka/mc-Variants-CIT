@@ -3,7 +3,9 @@ package fr.estecka.variantscit.assetgen;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +35,7 @@ import net.minecraft.util.Identifier;
 public class GeneratedResourcePack
 implements ResourcePack
 {
-	static private final GeneratedResourcePack INSTANCE = new GeneratedResourcePack();
+	static public final GeneratedResourcePack INSTANCE = new GeneratedResourcePack();
 
 	static private final ResourcePackInfo PACK_INFO = new ResourcePackInfo("variants-cit:assetgen", Text.literal("Variants-CIT Mod"), ResourcePackSource.BUILTIN, Optional.empty());
 	static private final ResourcePackPosition POSITION = new ResourcePackPosition(true, InsertionPosition.BOTTOM, true);
@@ -52,16 +54,14 @@ implements ResourcePack
 
 	static public final ResourcePackProfile PROFILE = new ResourcePackProfile(PACK_INFO, FACTORY, METADATA, POSITION);
 
-	private PackGenerator generator = new PackGenerator();
+	private Map<Identifier, InputSupplier<InputStream>> resources;
 	{
 		this.Reset();
 	}
 
-	public PackGenerator Reset(){
-		this.generator = new PackGenerator();
-		this.generator.AddFile(Identifier.ofVanilla("models/item/axolotl_bucket/blue_baby.json"));
-		this.generator.AddFile(Identifier.ofVanilla("models/item/axolotl_bucket/cyan_baby.json"));
-		return generator;
+	public Map<Identifier, InputSupplier<InputStream>> Reset(){
+		this.resources = new IdentityHashMap<>();
+		return this.resources;
 	}
 
 	@Override
@@ -96,10 +96,7 @@ implements ResourcePack
 		if (type != ResourceType.CLIENT_RESOURCES)
 			return null;
 
-		if (generator.resources.contains(resourceId))
-			return () -> this.generator.GetStream(resourceId);
-		else
-			return null;
+		return this.resources.get(resourceId);
 	}
 
 	@Override
@@ -107,16 +104,20 @@ implements ResourcePack
 		if (type != ResourceType.CLIENT_RESOURCES)
 			return;
 
-		for (Identifier id : this.generator.resources)
-		if  (id.getNamespace().equals(namespace) && id.getPath().startsWith(prefix)){
-			consumer.accept(id, () -> generator.GetStream(id));
+		for (var entry : this.resources.entrySet()){
+			Identifier id = entry.getKey();
+			InputSupplier<InputStream> supplier = entry.getValue();
+
+			if (id.getNamespace().equals(namespace) && id.getPath().startsWith(prefix)){
+				consumer.accept(id, supplier);
+			}
 		}
 	}
 
 	@Override
 	public Set<String> getNamespaces(ResourceType type) {
 		var result = new HashSet<String>();
-		for (Identifier id : this.generator.resources)
+		for (Identifier id : this.resources.keySet())
 			result.add(id.getNamespace());
 		return result;
 	}

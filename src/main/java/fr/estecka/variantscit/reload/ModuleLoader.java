@@ -15,6 +15,8 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
+import fr.estecka.variantscit.assetgen.PackGenerator;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -67,6 +69,15 @@ public final class ModuleLoader
 				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			definitions.put(moduleId, definition);
+		}
+
+		var generators = GeneratedResourcePack.INSTANCE.Reset();
+		VariantsCitMod.LOGGER.warn("AssetGen reset !");
+		for (ModuleDefinition module : definitions.values())
+		for (Identifier resourceId : module.assetGen())
+		{
+			VariantsCitMod.LOGGER.warn("AssetGen: {}", resourceId);
+			generators.put(resourceId, PackGenerator.GetSupplier());
 		}
 
 		result = new Result(definitions);
