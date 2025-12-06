@@ -2,9 +2,12 @@ package fr.estecka.variantscit.assetgen;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 // import net.fabricmc.fabric.impl.resource.loader.PlaceholderResourcePack;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -49,6 +52,18 @@ implements ResourcePack
 
 	static public final ResourcePackProfile PROFILE = new ResourcePackProfile(PACK_INFO, FACTORY, METADATA, POSITION);
 
+	private PackGenerator generator = new PackGenerator();
+	{
+		this.Reset();
+	}
+
+	public PackGenerator Reset(){
+		this.generator = new PackGenerator();
+		this.generator.AddFile(Identifier.ofVanilla("models/item/axolotl_bucket/blue_baby.json"));
+		this.generator.AddFile(Identifier.ofVanilla("models/item/axolotl_bucket/cyan_baby.json"));
+		return generator;
+	}
+
 	@Override
 	public ResourcePackInfo getInfo() {
 		return PACK_INFO;
@@ -77,23 +92,33 @@ implements ResourcePack
 	}
 
 	@Override
-	public InputSupplier<InputStream> open(ResourceType type, Identifier var2) {
+	public @Nullable InputSupplier<@NotNull InputStream> open(ResourceType type, Identifier resourceId) {
 		if (type != ResourceType.CLIENT_RESOURCES)
 			return null;
 
-		// TODO Auto-generated method stub
-		return null;
+		if (generator.resources.contains(resourceId))
+			return () -> this.generator.GetStream(resourceId);
+		else
+			return null;
 	}
 
 	@Override
-	public void findResources(ResourceType type, String namepsace, String prefix, ResultConsumer consumer) {
-		// TODO Auto-generated method stub
+	public void findResources(ResourceType type, String namespace, String prefix, ResultConsumer consumer) {
+		if (type != ResourceType.CLIENT_RESOURCES)
+			return;
+
+		for (Identifier id : this.generator.resources)
+		if  (id.getNamespace().equals(namespace) && id.getPath().startsWith(prefix)){
+			consumer.accept(id, () -> generator.GetStream(id));
+		}
 	}
 
 	@Override
 	public Set<String> getNamespaces(ResourceType type) {
-		// TODO Auto-generated method stub
-		return Set.of();
+		var result = new HashSet<String>();
+		for (Identifier id : this.generator.resources)
+			result.add(id.getNamespace());
+		return result;
 	}
 
 	@Override
