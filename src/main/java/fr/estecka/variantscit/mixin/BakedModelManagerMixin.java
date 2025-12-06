@@ -18,6 +18,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.reload.VariantAggregator;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.TemplateRepository;
 import net.minecraft.client.item.ItemAsset;
 import net.minecraft.client.item.ItemAssetsLoader;
 import net.minecraft.client.render.item.model.BasicItemModel;
@@ -58,6 +59,7 @@ public class BakedModelManagerMixin
 
 	@Inject( method="reload", at=@At("HEAD") )
 	private void reload(CallbackInfoReturnable<?> ci, @Local(argsOnly=true) ResourceManager manager, @Share("result") LocalRef<VariantAggregator> resultRef){
+		TemplateRepository.ReloadPatterns(manager);
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(manager);
 		resultRef.set(result.variantAggregator);
 		VariantsCitMod.OnResourceReload(result);
