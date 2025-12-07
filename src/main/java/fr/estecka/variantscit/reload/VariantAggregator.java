@@ -13,18 +13,12 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import fr.estecka.variantscit.assetgen.GeneratorsRegistry;
+import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
-import fr.estecka.variantscit.mixin.BakedModelManagerMixin;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
-/**
- * @implNote Texture and Baked Model ids usually start with `item/` however here
- * this prefix is stripped off so that their ids match those of the item states.
- * These `item/` need to be re-added in {@link BakedModelManagerMixin} for asset
- * generation.
- */
 public class VariantAggregator
 {
 	static public record GeneratedAsset(
@@ -72,18 +66,18 @@ public class VariantAggregator
 		return Optional.ofNullable(GetLibraryMap(context).get(module));
 	}
 
-	public void GatherAll(ResourceManager manager){
+	public void GatherAll(HotswappableResourceManager manager){
 		var genPack = GeneratedResourcePack.INSTANCE.Reset();
 
 		// Asset generation passes
-		GatherType(EAssetType.TEXTURE,     manager);
-		UpdateGeneratedPack(genPack);
-		GatherType(EAssetType.BAKED_MODEL, manager);
-		UpdateGeneratedPack(genPack);
+		GatherType(EAssetType.TEXTURE,     manager.Get());
+		UpdateGeneratedPack(genPack, manager);
+		GatherType(EAssetType.BAKED_MODEL, manager.Get());
+		UpdateGeneratedPack(genPack, manager);
 
 		// Populate variant libraries
-		GatherType(EAssetType.ITEM_STATE,  manager);
-		GatherType(EAssetType.EQUIPMENT,   manager);
+		GatherType(EAssetType.ITEM_STATE,  manager.Get());
+		GatherType(EAssetType.EQUIPMENT,   manager.Get());
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
@@ -158,9 +152,11 @@ public class VariantAggregator
 		return accepted;
 	}
 
-	private void UpdateGeneratedPack(Map<Identifier, InputSupplier<InputStream>> pack){
+	private void UpdateGeneratedPack(Map<Identifier, InputSupplier<InputStream>> pack, HotswappableResourceManager manager){
 		for (var entry : this.generatedAssets.entrySet())
 			pack.put(entry.getKey(), entry.getValue().resource);
+
+		manager.Refresh();
 	}
 
 	private void OnGeneratedResource(Identifier resourceId, String modelPrefix, InputSupplier<InputStream> resource){
@@ -168,7 +164,10 @@ public class VariantAggregator
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)
+		{
 			this.generatedAssets.put(resourceId, new GeneratedAsset(resource, priority));
+			// VariantsCitMod.LOGGER.warn("Generated asset: {}", resourceId);
+		}
 		else if (oldAsset != null && oldAsset.priority == priority && !oldAsset.resource.equals(resource))
 			this.conflictingModelPrefixes.add(modelPrefix);
 	}

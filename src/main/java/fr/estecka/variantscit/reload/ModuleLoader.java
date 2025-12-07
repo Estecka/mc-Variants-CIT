@@ -15,8 +15,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
-import fr.estecka.variantscit.assetgen.PackGenerator;
+import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -37,16 +36,16 @@ public final class ModuleLoader
 		}
 	}
 
-	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
+	static public ModuleLoader.Result ReloadModules(HotswappableResourceManager manager)
 	{
 		final ModuleLoader.Result result;
 		final List<MetaModule> metamodules = new ArrayList<>();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
-		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(manager.Get().findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
 		ObsoletePathWarning(resources);
-		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(manager.Get().findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
 		for (var entry : resources.entrySet())
 		{
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());

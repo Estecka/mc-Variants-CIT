@@ -3,7 +3,6 @@
 	"package": "fr.estecka.variantscit.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"BakedModelManagerMixin",
 		"FeatureRendererMixin$Armor",
 		"FeatureRendererMixin$Cape",
 		"FeatureRendererMixin$Elytra",
@@ -14,6 +13,7 @@
 		"ItemModelManagerMixin",
 		"ReferencedModelsCollectorMixin",
 		"ReferencedModelsCollectorMixin$ResolverImplMixin",
+		"ReloadableResourceManagerImplMixin",
 		"MinecraftClientMixin"
 	],
 	"injectors": {

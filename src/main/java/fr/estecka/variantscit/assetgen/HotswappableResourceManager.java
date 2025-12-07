@@ -1,0 +1,23 @@
+package fr.estecka.variantscit.assetgen;
+
+import java.util.function.Supplier;
+import net.minecraft.resource.ResourceManager;
+
+public class HotswappableResourceManager
+{
+	private ResourceManager resourceManager;
+	private final Supplier<ResourceManager> refresher;
+
+	public HotswappableResourceManager(ResourceManager initial, Supplier<ResourceManager> refresher){
+		this.resourceManager = initial;
+		this.refresher = refresher;
+	}
+
+	public ResourceManager Get(){
+		return this.resourceManager;
+	}
+
+	public ResourceManager Refresh(){
+		return (this.resourceManager = refresher.get());
+	}
+}
