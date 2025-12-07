@@ -11,17 +11,8 @@
 		{
 			"type": "condition",
 			"property": "using_item",
-			"on_false":
-			{
-				"type": "special",
-				"base": "${BAKED_MODEL_ID}_in_hand",
-				"model": { "type": "trident" }
-			},
-			"on_true": {
-				"type": "special",
-				"base": "${BAKED_MODEL_ID}_throwing",
-				"model": { "type": "trident" }
-			}
+			"on_false":{ "type":"model", "model":"${BAKED_MODEL_ID}_in_hand"  },
+			"on_true": { "type":"model", "model":"${BAKED_MODEL_ID}_throwing" }
 		}
 	}
 }

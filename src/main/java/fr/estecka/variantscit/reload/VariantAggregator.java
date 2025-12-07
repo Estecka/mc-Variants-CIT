@@ -12,7 +12,7 @@ import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
-import fr.estecka.variantscit.assetgen.GeneratorsRegistry;
+import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
 import net.minecraft.resource.InputSupplier;
@@ -42,7 +42,7 @@ public class VariantAggregator
 			for (EModuleContext context : module.contexts())
 				GetLibraryMap(context).put(module, EmptyLibrary(module));
 
-			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorsRegistry.LegacyGenerator(module)));
+			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
 		}
 	}
 

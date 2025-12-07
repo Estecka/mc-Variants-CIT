@@ -1,12 +1,9 @@
 package fr.estecka.variantscit.assetgen;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.CodecUtil;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.util.Identifier;
@@ -17,7 +14,7 @@ public interface IAssetGenerator
 
 	static public final IAssetGenerator NOOP = (_0,_1)->null;
 	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(Codec.withAlternative(
-		GeneratorsRegistry.PRESET_CODEC,
+		GeneratorPresets.PRESET_CODEC,
 		TemplatedAssetGenerator.MAPCODEC.codec()
 	)).xmap(IAssetGenerator::OfList, _0->null);
 
@@ -34,32 +31,5 @@ public interface IAssetGenerator
 			}
 			return null;
 		};
-	}
-
-	static public interface Builder
-	extends Supplier<DataResult<IAssetGenerator>>
-	{}
-
-	static public record ListBuilder(Builder[] builders)
-	implements Builder
-	{
-		@SafeVarargs
-		static public ListBuilder Of(Builder... builders){
-			return new ListBuilder(builders);
-		}
-	
-		@Override
-		public DataResult<IAssetGenerator> get() {
-			List<IAssetGenerator> generators = new ArrayList<>(builders.length);
-			for (var b : builders){
-				DataResult<IAssetGenerator> r = b.get();
-				if (r.isError())
-					return r;
-				else
-					generators.add(r.getOrThrow());
-			}
-
-			return DataResult.success(OfList(generators));
-		}
 	}
 }
