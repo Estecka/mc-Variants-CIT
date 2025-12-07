@@ -42,7 +42,7 @@ public class VariantAggregator
 			for (EModuleContext context : module.contexts())
 				GetLibraryMap(context).put(module, EmptyLibrary(module));
 
-			this.assetGenerators.put(module, GeneratorsRegistry.LegacyGenerator(module));
+			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorsRegistry.LegacyGenerator(module)));
 		}
 	}
 

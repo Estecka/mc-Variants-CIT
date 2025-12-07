@@ -3,7 +3,10 @@ package fr.estecka.variantscit.assetgen;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import com.mojang.serialization.Codec;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.IAssetGenerator.ListBuilder;
 import fr.estecka.variantscit.assetgen.TemplatedAssetGenerator.Builder;
 import fr.estecka.variantscit.reload.ModuleDefinition;
 import net.minecraft.util.Identifier;
@@ -21,8 +24,20 @@ public class GeneratorsRegistry
 	static private final Builder ITEMS_TRIDENT          = new Builder(EAssetGenPass.ITEM_STATES, Identifier.ofVanilla("items/trident"), ExcludeRegex(TRIDENT_SUBVARIANTS), Map.of());
 	static private final Builder ITEMS_BOW              = new Builder(EAssetGenPass.ITEM_STATES, Identifier.ofVanilla("items/bow"), ExcludeRegex(BOW_SUBVARIANTS), Map.of());
 
+	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(Codec.STRING, Map.of(
+		"item/generated",        ListBuilder.Of(ITEMS_STATELESS, MODELS_GENERATED),
+		"item/handheld",         ListBuilder.Of(ITEMS_STATELESS, MODELS_HANDHELD),
+		"item/bow",              ListBuilder.Of(ITEMS_BOW, ModelParent("item/bow")),
+		"item/trident",          ListBuilder.Of(ITEMS_TRIDENT, MODELS_HANDHELD),
+		"item/trident_gui_only", ListBuilder.Of(ITEMS_TRIDENT_GUI_ONLY, MODELS_GENERATED)
+	)).flatXmap(IAssetGenerator.Builder::get, _0->null);
+
+	static private Builder ModelParent(String parent){
+		return new Builder(EAssetGenPass.BAKED_MODELS, Identifier.ofVanilla("models/model_parent"), id->true, Map.of("MODEL_PARENT", parent));
+	}
+
 	static private Builder ModelParent(Identifier parent){
-		return new Builder(EAssetGenPass.BAKED_MODELS, Identifier.ofVanilla("models/model_parent"), id->true, Map.of("MODEL_PARENT", parent.toString()));
+		return ModelParent(parent.toString());
 	}
 
 	static public Predicate<Identifier> ExcludeRegex(Pattern regex){
