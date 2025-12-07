@@ -24,9 +24,13 @@ implements InputSupplier<InputStream>
 		return variables;
 	}
 
+	public String getString(){
+		return this.template.Substitute(variables);
+	}
+
 	@Override
 	public InputStream get() throws IOException {
-		String fullAsset = this.template.Substitute(variables);
+		String fullAsset = this.getString();
 		return new ByteArrayInputStream(fullAsset.getBytes());
 	}
 }

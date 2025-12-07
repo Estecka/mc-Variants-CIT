@@ -64,6 +64,10 @@ implements ResourcePack
 		return this.resources;
 	}
 
+	public Map<Identifier, InputSupplier<InputStream>> Get(){
+		return Map.copyOf(this.resources);
+	}
+
 	@Override
 	public ResourcePackInfo getInfo() {
 		return PACK_INFO;

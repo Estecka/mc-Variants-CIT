@@ -55,7 +55,7 @@ public class TemplateRepository
 		String raw = "";
 		Iterator<String> lines = reader.lines().iterator();
 		while (lines.hasNext()){
-			raw += lines.next();
+			raw += lines.next() + "\n";
 		}
 
 		return Substitution.Parse(raw);

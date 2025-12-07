@@ -220,3 +220,5 @@ Since v2.5:
 - Fixed `optionalLevel` defaulting to false instead of true.
 ### 3.14-indev
 - Generated assets are now provided via a built-in virtual resource pack.
+- Added module option `assetGen`.
+- Added command `/variants-cit assetgen`.
