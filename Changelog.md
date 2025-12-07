@@ -218,3 +218,5 @@ Since v2.5:
 ### 3.13.1
 - Fixed crash on `enchantment_vector` when set to ignore enchantment levels.
 - Fixed `optionalLevel` defaulting to false instead of true.
+### 3.14-indev
+- Generated assets are now provided via a built-in virtual resource pack.
