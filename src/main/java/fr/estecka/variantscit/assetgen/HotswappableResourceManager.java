@@ -1,8 +1,12 @@
 package fr.estecka.variantscit.assetgen;
 
 import java.util.function.Supplier;
+import fr.estecka.variantscit.mixin.ReloadableResourceManagerImplMixin;
 import net.minecraft.resource.ResourceManager;
 
+/**
+ * See {@linkplain ReloadableResourceManagerImplMixin}
+ */
 public class HotswappableResourceManager
 {
 	private ResourceManager resourceManager;

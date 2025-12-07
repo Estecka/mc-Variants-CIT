@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 import net.minecraft.resource.Resource;
@@ -14,7 +16,10 @@ import net.minecraft.util.Identifier;
 
 public class TemplateRepository
 {
-	static private Map<Identifier, Substitution> TEMPLATES = Map.of();
+	static private final String DIRECTORY = "variants-cit/templates";
+	static private final String EXTENSION = ".json";
+	static private final Map<Identifier, Substitution> TEMPLATES = new HashMap<>();
+	static public final Codec<Substitution> CODEC = CodecUtil.Enum(Identifier.CODEC, TEMPLATES);
 
 	static public Substitution Get(Identifier id){
 		return TEMPLATES.get(id);
@@ -22,13 +27,13 @@ public class TemplateRepository
 
 	static public void ReloadPatterns(ResourceManager manager)
 	{
-		TEMPLATES = new HashMap<>();
-		Map<Identifier, Resource> resources = manager.findResources("variants-cit/templates", id->id.getPath().endsWith(".json"));
+		TEMPLATES.clear();
+		Map<Identifier, Resource> resources = manager.findResources(DIRECTORY, id->id.getPath().endsWith(EXTENSION));
 
 		for (var entry : resources.entrySet())
 		{
 			Resource resource = entry.getValue();
-			Identifier id = entry.getKey().withPath(path -> path.substring("variants-cit/templates/".length(), path.length()-".json".length()));
+			Identifier id = entry.getKey().withPath(path -> path.substring(DIRECTORY.length()+1, path.length()-EXTENSION.length()));
 
 			var result = CreateTemplate(resource);
 			if (result.isError())

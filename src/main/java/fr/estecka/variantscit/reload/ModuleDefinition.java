@@ -11,7 +11,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
-import fr.estecka.variantscit.assetgen.GeneratorsRegistry;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
 
 public record ModuleDefinition(
@@ -38,7 +37,7 @@ public record ModuleDefinition(
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
-			GeneratorsRegistry.PRESET_CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen),
+			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen),
 			Identifier.CODEC.validate(ModuleDefinition::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
 			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(ModuleDefinition::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
 		)
