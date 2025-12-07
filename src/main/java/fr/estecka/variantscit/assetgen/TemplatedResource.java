@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.util.Identifier;
@@ -24,16 +22,6 @@ implements InputSupplier<InputStream>
 		variables.put("ASSET_NAMESPACE", assetId.getNamespace());
 		variables.put("BAKED_MODEL_ID", assetId.getNamespace() + ":item/" + assetId.getPath());
 		return variables;
-	}
-
-	static public @Nullable TemplatedResource Of(Identifier templateId, Map<String,String> variables){
-		Substitution template = TemplateRepository.Get(templateId);
-		if (template != null)
-			return new TemplatedResource(template, variables);
-		else {
-			VariantsCitMod.LOGGER.error("No such template: {}", templateId);
-			return null;
-		}
 	}
 
 	@Override

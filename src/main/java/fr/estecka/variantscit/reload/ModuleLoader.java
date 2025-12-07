@@ -71,15 +71,6 @@ public final class ModuleLoader
 			definitions.put(moduleId, definition);
 		}
 
-		var generators = GeneratedResourcePack.INSTANCE.Reset();
-		VariantsCitMod.LOGGER.warn("AssetGen reset !");
-		for (ModuleDefinition module : definitions.values())
-		for (Identifier resourceId : module.assetGen())
-		{
-			VariantsCitMod.LOGGER.warn("AssetGen: {}", resourceId);
-			generators.put(resourceId, PackGenerator.GetSupplier());
-		}
-
 		result = new Result(definitions);
 		result.variantAggregator.GatherAll(manager);
 

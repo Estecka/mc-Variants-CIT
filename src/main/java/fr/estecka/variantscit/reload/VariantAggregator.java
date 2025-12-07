@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.reload;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -9,7 +10,12 @@ import java.util.Set;
 import java.util.stream.Stream;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.EAssetGenPass;
+import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
+import fr.estecka.variantscit.assetgen.GeneratorsRegistry;
+import fr.estecka.variantscit.assetgen.IAssetGenerator;
 import fr.estecka.variantscit.mixin.BakedModelManagerMixin;
+import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
@@ -21,19 +27,17 @@ import net.minecraft.util.Identifier;
  */
 public class VariantAggregator
 {
-	static public record ModelToCreate(
-		Identifier parent,
+	static public record GeneratedAsset(
+		InputSupplier<InputStream> resource,
 		int priority
 	){}
 
 	private final Map<ModuleDefinition, Identifier> moduleIds = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
 
-	// item_model assetgen
-	private final Set<Identifier> acceptedItemModels = new HashSet<>();
-	public final Map<Identifier, ModelToCreate> modelsToCreate = new HashMap<>();
-	public final Set<Identifier> itemStatesToCreate = new HashSet<>();
+	public final Map<Identifier, GeneratedAsset> generatedAssets = new HashMap<>();
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
 
 
@@ -43,6 +47,8 @@ public class VariantAggregator
 			this.moduleIds.put(module, entry.getKey());
 			for (EModuleContext context : module.contexts())
 				GetLibraryMap(context).put(module, EmptyLibrary(module));
+
+			this.assetGenerators.put(module, GeneratorsRegistry.LegacyGenerator(module));
 		}
 	}
 
@@ -67,14 +73,17 @@ public class VariantAggregator
 	}
 
 	public void GatherAll(ResourceManager manager){
-		GatherType(EAssetType.ITEM_STATE,  manager);
-		GatherType(EAssetType.BAKED_MODEL, manager);
-		GatherType(EAssetType.TEXTURE,     manager);
-		GatherType(EAssetType.EQUIPMENT,   manager);
+		var genPack = GeneratedResourcePack.INSTANCE.Reset();
 
-		// Share generated assets accross modules
-		GatherIds(EAssetType.BAKED_MODEL, this.modelsToCreate.keySet().stream());
-		GatherIds(EAssetType.ITEM_STATE,  this.itemStatesToCreate.stream());
+		// Asset generation passes
+		GatherType(EAssetType.TEXTURE,     manager);
+		UpdateGeneratedPack(genPack);
+		GatherType(EAssetType.BAKED_MODEL, manager);
+		UpdateGeneratedPack(genPack);
+
+		// Populate variant libraries
+		GatherType(EAssetType.ITEM_STATE,  manager);
+		GatherType(EAssetType.EQUIPMENT,   manager);
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
@@ -95,57 +104,53 @@ public class VariantAggregator
 	}
 
 	private void ApplyModelToAll(EAssetType assetType, Identifier assetId){
+		EAssetGenPass generatorPass = switch (assetType){
+			default -> null;
+			case EAssetType.TEXTURE     -> EAssetGenPass.BAKED_MODELS;
+			case EAssetType.BAKED_MODEL -> EAssetGenPass.ITEM_STATES;
+		};
+
 		for (var entry : GetLibraryMap(assetType.context).entrySet())
-		if  (IsTypeAcceptable(assetType, entry.getKey()))
 		{
 			ModuleDefinition module = entry.getKey();
 			VariantLibrary library = entry.getValue();
 			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
 
-			boolean accepted = this.ApplyModelToModule(module, library, assetId);
-			if (accepted && assetType.context == EModuleContext.ITEM_MODEL) {
-				switch (assetType) {
-					default: /* no-op */;
-					break;
+			// TODO: EnchantmentVector and AxolotlVariant will refuse stuff like "_pulling_1" for bows
+			boolean accepted = this.ApplyModelToModule(assetType.isFundamental, module, library, assetId);
 
-					// Fallthrough
-					case TEXTURE:     OnAcceptedTexture   (module, assetId);
-					case BAKED_MODEL: OnAcceptedBakedModel(module, assetId);
-					break;
-				}
+			if (accepted && generatorPass != null){
+				Identifier resourceId = generatorPass.GetOutputResourceId(assetId);
+				IAssetGenerator generator = this.assetGenerators.get(module);
+				InputSupplier<InputStream> resource = generator.AcceptAsset(generatorPass, assetId);
 
-				this.acceptedItemModels.add(assetId);
+				if (resource != null)
+					this.OnGeneratedResource(resourceId, module.modelPrefix(), resource);
 			}
+
 			VariantsCitMod.LOGGER.PopLabel();
 		}
 	}
 
-	static private boolean IsTypeAcceptable(EAssetType type, ModuleDefinition module){
-		switch (type) {
-			default:          return true;
-			case BAKED_MODEL: return module.itemGen();
-			case TEXTURE:     return module.itemGen() && module.modelParent().isPresent();
-		}
-	}
-
-	private boolean ApplyModelToModule(ModuleDefinition module, VariantLibrary library, Identifier modelId){
+	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, Identifier assetId){
 		boolean accepted = false;
 
-		if (modelId.equals(library.fallbackModel()))
+		if (assetId.equals(library.fallbackModel()))
 			accepted = true;
 
-		if (library.specialModels().containsValue(modelId))
+		if (library.specialModels().containsValue(assetId))
 			accepted = true;
 
-		if (modelId.getPath().startsWith(module.modelPrefix())){
+		if (assetId.getPath().startsWith(module.modelPrefix())){
 			Identifier variantId = Identifier.of(
-				modelId.getNamespace(),
-				modelId.getPath().substring(module.modelPrefix().length())
+				assetId.getNamespace(),
+				assetId.getPath().substring(module.modelPrefix().length())
 			);
 
 			if (module.parameters().AcceptsVariant(variantId)){
 				accepted = true;
-				library.variantModels().put(variantId, modelId);
+				if (isFundamental)
+					library.variantModels().put(variantId, assetId);
 			}
 
 		}
@@ -153,23 +158,18 @@ public class VariantAggregator
 		return accepted;
 	}
 
-	private void OnAcceptedBakedModel(ModuleDefinition module, Identifier modelId){
-		if (!this.acceptedItemModels.contains(modelId))
-			this.itemStatesToCreate.add(modelId);
+	private void UpdateGeneratedPack(Map<Identifier, InputSupplier<InputStream>> pack){
+		for (var entry : this.generatedAssets.entrySet())
+			pack.put(entry.getKey(), entry.getValue().resource);
 	}
 
-	private void OnAcceptedTexture(ModuleDefinition module, Identifier modelId){
-		int priority = module.modelPrefix().length();
-		Identifier parent = module.modelParent().get();
-		ModelToCreate oldModel = this.modelsToCreate.get(modelId);
+	private void OnGeneratedResource(Identifier resourceId, String modelPrefix, InputSupplier<InputStream> resource){
+		int priority = modelPrefix.length();
+		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
-		if ((oldModel != null && oldModel.priority < priority)
-		|| (!this.acceptedItemModels.contains(modelId))
-		){
-			this.modelsToCreate.put(modelId, new ModelToCreate(parent, priority));
-		}
-		else if (oldModel != null && oldModel.priority == priority && !oldModel.parent.equals(parent)){
-			this.conflictingModelPrefixes.add(module.modelPrefix());
-		}
+		if (oldAsset == null || oldAsset.priority < priority)
+			this.generatedAssets.put(resourceId, new GeneratedAsset(resource, priority));
+		else if (oldAsset != null && oldAsset.priority == priority && !oldAsset.resource.equals(resource))
+			this.conflictingModelPrefixes.add(modelPrefix);
 	}
 }
