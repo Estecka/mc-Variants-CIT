@@ -1,0 +1,13 @@
+{
+	"parent": "variants-cit:item/trident_in_hand",
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 90, -180],
+			"translation": [0.5, 10, 1]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 60, 0],
+			"translation": [0.5, -10, 1]
+		}
+	}
+}
