@@ -114,12 +114,13 @@ public class VariantAggregator
 			boolean accepted = this.ApplyModelToModule(assetType.isFundamental, module, library, assetId);
 
 			if (accepted && generatorPass != null){
-				Identifier resourceId = generatorPass.GetOutputResourceId(assetId);
 				IAssetGenerator generator = this.assetGenerators.get(module);
-				InputSupplier<InputStream> resource = generator.AcceptAsset(generatorPass, assetId);
+				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, assetId);
 
-				if (resource != null)
-					this.OnGeneratedResource(resourceId, module.modelPrefix(), resource);
+				for (var r : generatedResources.entrySet()){
+					Identifier resourceId = generatorPass.GetOutputResourceId(r.getKey());
+					this.OnGeneratedResource(resourceId, module.modelPrefix(), r.getValue());
+				}
 			}
 
 			VariantsCitMod.LOGGER.PopLabel();

@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -25,6 +27,7 @@ public class CodecUtil
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
+	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 
 	/**
 	 * Functions to be used in `validate()` on deprecated codecs.
@@ -135,5 +138,14 @@ public class CodecUtil
 			o->DataResult.success((SUPER)o),
 			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
 		);
+	}
+
+	static public DataResult<Pattern> ParseRegex(String regex){
+		try {
+			return DataResult.success(Pattern.compile(regex));
+		}
+		catch (PatternSyntaxException e){
+			return DataResult.error(e::toString);
+		}
 	}
 }

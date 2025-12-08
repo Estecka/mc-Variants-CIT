@@ -6,8 +6,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.FilledTemplate;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
-import fr.estecka.variantscit.assetgen.TemplatedResource;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.MetaModule;
@@ -136,7 +136,7 @@ public class ModuleCommands
 
 	static private int AssetDump(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
 		Identifier id = context.getArgument(ASSET_ARG, Identifier.class);
-		TemplatedResource resource = (TemplatedResource)GeneratedResourcePack.INSTANCE.Get().get(id);
+		FilledTemplate resource = (FilledTemplate)GeneratedResourcePack.INSTANCE.Get().get(id);
 
 		VariantsCitMod.LOGGER.info("{}:\n{}", id, resource.getString());
 

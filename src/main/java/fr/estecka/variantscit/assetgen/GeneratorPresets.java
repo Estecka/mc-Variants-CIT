@@ -17,12 +17,15 @@ import net.minecraft.util.Identifier;
 
 public class GeneratorPresets
 {
-	static private final Pattern BOW_SUBVARIANTS      = Pattern.compile(".+_pulling_[0-9]+");
-	static private final Pattern CROSSBOW_SUBVARIANTS = Pattern.compile(".+(_arrow|_firework|_pulling_[0-9]+)");
-	static private final Pattern HORN_SUBVARIANTS     = Pattern.compile("tooting_.+");
-	static private final Pattern ROD_SUBVARIANTS      = Pattern.compile(".+_cast");
-	static private final Pattern SHIELD_SUBVARIANTS   = Pattern.compile(".+_blocking");
-	static private final Pattern TRIDENT_SUBVARIANTS  = Pattern.compile(".+(_in_hand|_throwing)");
+	static private final Pattern REGEX_RADICAL_BOW      = Pattern.compile("(?!.*_pulling_[0-9]+).*");
+	static private final Pattern REGEX_RADICAL_CROSSBOW = Pattern.compile("(?!.*(_arrow|_firework|_pulling_[0-9]+)).*");
+	static private final Pattern REGEX_RADICAL_HORN     = Pattern.compile("(?!tooting_.*).*");
+	static private final Pattern REGEX_RADICAL_ROD      = Pattern.compile("(?!.*_cast).*");
+	static private final Pattern REGEX_RADICAL_SHIELD   = Pattern.compile("(?!.*_blocking).*");
+	static private final Pattern REGEX_RADICAL_TRIDENT  = Pattern.compile("(?!.*(_in_hand|_throwing)).*");
+	static private final Pattern REGEX_SUBVARIANT_TOOTING  = Pattern.compile("tooting_.*");
+	static private final Pattern REGEX_SUBVARIANT_IN_HAND  = Pattern.compile(".*_in_hand");
+	static private final Pattern REGEX_SUBVARIANT_THROWING = Pattern.compile(".*_throwing");
 
 	static private final IBuilder MODELS_GENERATED        = TemplateBuilder.ModelParent("item/item_generated");
 	static private final IBuilder MODELS_HANDHELD         = TemplateBuilder.ModelParent("item/handheld");
@@ -30,18 +33,18 @@ public class GeneratorPresets
 	static private final IBuilder MODELS_BOW              = TemplateBuilder.ModelParent("item/bow");
 	static private final IBuilder MODELS_CROSSBOW         = TemplateBuilder.ModelParent("item/crossbow");
 	static private final IBuilder MODELS_HORN_STANDBY     = TemplateBuilder.ModelParent("item/goat_horn");
-	static private final IBuilder MODELS_HORN_TOOTING     = TemplateBuilder.ModelParent("item/tooting_goat_horn");
-	static private final IBuilder MODELS_TRIDENT_GUI_ONLY = TemplateBuilder.ModelParent("item/generated").ExcludeRegex(TRIDENT_SUBVARIANTS);
-	static private final IBuilder MODELS_TRIDENT_IN_HAND  = TemplateBuilder.ModelParent("variants-cit:item/trident_in_hand" ).IncludeSuffix("_in_hand" );
-	static private final IBuilder MODELS_TRIDENT_THROWING = TemplateBuilder.ModelParent("variants-cit:item/trident_throwing").IncludeSuffix("_throwing");
+	static private final IBuilder MODELS_HORN_TOOTING     = TemplateBuilder.ModelParent("item/tooting_goat_horn").MatchRegex(REGEX_SUBVARIANT_TOOTING);
+	static private final IBuilder MODELS_TRIDENT_GUI_ONLY = TemplateBuilder.ModelParent("item/generated").MatchRegex(REGEX_RADICAL_TRIDENT);
+	static private final IBuilder MODELS_TRIDENT_IN_HAND  = TemplateBuilder.ModelParent("variants-cit:item/trident_in_hand" ).MatchRegex(REGEX_SUBVARIANT_IN_HAND);
+	static private final IBuilder MODELS_TRIDENT_THROWING = TemplateBuilder.ModelParent("variants-cit:item/trident_throwing").MatchRegex(REGEX_SUBVARIANT_THROWING);
 
 	static private final IBuilder ITEMS_STATELESS        = TemplateBuilder.ItemStates("items/stateless");
-	static private final IBuilder ITEMS_BOW              = TemplateBuilder.ItemStates("items/bow").ExcludeRegex(BOW_SUBVARIANTS);
-	static private final IBuilder ITEMS_CROSSBOW         = TemplateBuilder.ItemStates("items/crossbow").ExcludeRegex(CROSSBOW_SUBVARIANTS);
-	static private final IBuilder ITEMS_FISHING_ROD      = TemplateBuilder.ItemStates("items/fishing_rod").ExcludeRegex(ROD_SUBVARIANTS);
-	static private final IBuilder ITEMS_SHIELD           = TemplateBuilder.ItemStates("items/shield").ExcludeRegex(SHIELD_SUBVARIANTS);
-	static private final IBuilder ITEMS_GOAT_HORN        = TemplateBuilder.ItemStates("items/goat_horn").ExcludeRegex(HORN_SUBVARIANTS);
-	static private final IBuilder ITEMS_TRIDENT          = TemplateBuilder.ItemStates("items/trident").ExcludeRegex(TRIDENT_SUBVARIANTS);
+	static private final IBuilder ITEMS_BOW              = TemplateBuilder.ItemStates("items/bow").MatchRegex(REGEX_RADICAL_BOW);
+	static private final IBuilder ITEMS_CROSSBOW         = TemplateBuilder.ItemStates("items/crossbow").MatchRegex(REGEX_RADICAL_CROSSBOW);
+	static private final IBuilder ITEMS_FISHING_ROD      = TemplateBuilder.ItemStates("items/fishing_rod").MatchRegex(REGEX_RADICAL_ROD);
+	static private final IBuilder ITEMS_SHIELD           = TemplateBuilder.ItemStates("items/shield").MatchRegex(REGEX_RADICAL_SHIELD);
+	static private final IBuilder ITEMS_GOAT_HORN        = TemplateBuilder.ItemStates("items/goat_horn").MatchRegex(REGEX_RADICAL_HORN);
+	static private final IBuilder ITEMS_TRIDENT          = TemplateBuilder.ItemStates("items/trident").MatchRegex(REGEX_RADICAL_TRIDENT);
 	static private final IBuilder ITEMS_TRIDENT_GUI_ONLY = TemplateBuilder.ItemStates("items/trident_gui_only");
 
 	static private final Map<String, IBuilder> PRESETS = new HashMap<>();
@@ -52,7 +55,9 @@ public class GeneratorPresets
 		PRESETS.put("item_model/handheld",         ListBuilder.Of(ITEMS_STATELESS, MODELS_HANDHELD));
 		PRESETS.put("item_model/bow",              ListBuilder.Of(ITEMS_BOW, MODELS_BOW));
 		PRESETS.put("item_model/crossbow",         ListBuilder.Of(ITEMS_CROSSBOW, MODELS_CROSSBOW));
-		PRESETS.put("item_model/trident",          ListBuilder.Of(ITEMS_TRIDENT, MODELS_TRIDENT_GUI_ONLY, MODELS_TRIDENT_IN_HAND, MODELS_TRIDENT_THROWING));
+		PRESETS.put("item_model/fishing_rod",      ListBuilder.Of(ITEMS_FISHING_ROD, MODELS_ROD));
+		PRESETS.put("item_model/goat_horn",        ListBuilder.Of(ITEMS_GOAT_HORN, MODELS_HORN_TOOTING, MODELS_HORN_STANDBY));
+		PRESETS.put("item_model/trident",          ListBuilder.Of(ITEMS_TRIDENT, MODELS_TRIDENT_IN_HAND, MODELS_TRIDENT_THROWING, MODELS_GENERATED)); // FIXME
 		PRESETS.put("item_model/trident_gui_only", ListBuilder.Of(ITEMS_TRIDENT_GUI_ONLY, MODELS_GENERATED));
 
 		// Baked model generators
@@ -145,7 +150,7 @@ public class GeneratorPresets
 	{
 		private EAssetGenPass pass;
 		private Identifier templateId;
-		private Predicate<Identifier> acceptedVariants = id->true;
+		private Pattern inputRegex = Pattern.compile(".*");
 		private Map<String,String> variableOverrides = new HashMap<>();
 
 		public TemplateBuilder(EAssetGenPass pass, Identifier templateId){
@@ -159,7 +164,7 @@ public class GeneratorPresets
 			if (template == null)
 				return DataResult.error(()->"Missing template: " + templateId);
 			else
-				return DataResult.success(new TemplatedAssetGenerator(pass, template, acceptedVariants, variableOverrides));
+				return DataResult.success(new TemplatedAssetGenerator(pass, inputRegex, new FilledTemplate(template, variableOverrides)));
 		}
 
 		static public TemplateBuilder ItemStates(String templatePath){
@@ -180,13 +185,8 @@ public class GeneratorPresets
 			return this;
 		}
 
-		public TemplateBuilder ExcludeRegex(Pattern regex){
-			this.acceptedVariants = id->!regex.matcher(id.getPath()).matches();
-			return this;
-		}
-
-		public TemplateBuilder IncludeSuffix(String suffix){
-			this.acceptedVariants = id->id.getPath().endsWith(suffix);
+		public TemplateBuilder MatchRegex(Pattern regex){
+			this.inputRegex = regex;
 			return this;
 		}
 	}

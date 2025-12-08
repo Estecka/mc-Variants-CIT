@@ -1,8 +1,8 @@
 package fr.estecka.variantscit.assetgen;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
-import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.CodecUtil;
 import net.minecraft.resource.InputSupplier;
@@ -10,9 +10,13 @@ import net.minecraft.util.Identifier;
 
 public interface IAssetGenerator
 {
-	@Nullable InputSupplier<InputStream> AcceptAsset(EAssetGenPass pass, Identifier assetId);
+	Result AcceptAsset(EAssetGenPass pass, Identifier assetId);
 
-	static public final IAssetGenerator NOOP = (_0,_1)->null;
+	// public default Identifier GetRadical(Identifier assetId){
+	// 	return assetId;
+	// }
+
+	static public final IAssetGenerator NOOP = (_0,_1)->new Result();
 	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(Codec.withAlternative(
 		GeneratorPresets.PRESET_CODEC,
 		TemplatedAssetGenerator.MAPCODEC.codec()
@@ -24,12 +28,19 @@ public interface IAssetGenerator
 
 	static public IAssetGenerator OfList(final List<IAssetGenerator> generators){
 		return (pass, assetId)->{
-			for (IAssetGenerator generator : generators){
-				InputSupplier<InputStream> result = generator.AcceptAsset(pass, assetId);
-				if (result != null)
-					return result;
-			}
-			return null;
+			Result result = new Result();
+			for (IAssetGenerator generator : generators)
+				result.PutAllIfAbsent(generator.AcceptAsset(pass, assetId));
+			return result;
 		};
+	}
+
+	static public class Result
+	extends HashMap<Identifier,InputSupplier<InputStream>>
+	{
+		public void PutAllIfAbsent(Result behind){
+			for (var entry : behind.entrySet())
+				this.putIfAbsent(entry.getKey(), entry.getValue());
+		}
 	}
 }

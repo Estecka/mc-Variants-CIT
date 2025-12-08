@@ -1,48 +1,89 @@
 package fr.estecka.variantscit.assetgen;
 
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Predicate;
-import org.jetbrains.annotations.Nullable;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.format.IStringTransform;
-import fr.estecka.variantscit.format.Substitution;
-import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
-import net.minecraft.resource.InputSupplier;
+import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.util.Identifier;
 
 public record TemplatedAssetGenerator(
 	EAssetGenPass pass,
-	Substitution template,
-	Predicate<Identifier> acceptedVariants,
-	Map<String,String> variableOverrides
+	Pattern inputRegex,
+	// String radicalSubst,
+	Map<String,FilledTemplate> outputs
 )
 implements IAssetGenerator
 {
 	static public final MapCodec<TemplatedAssetGenerator> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			EAssetGenPass.CODEC.fieldOf("pass").forGetter(TemplatedAssetGenerator::pass),
-			TemplateRepository.CODEC.fieldOf("template").forGetter(TemplatedAssetGenerator::template),
-			SuccessiveTransform.CODEC.optionalFieldOf("acceptedAssets", IStringTransform.NOOP).xmap(TemplatedAssetGenerator::TransformAsPredicate, _0->null).forGetter(TemplatedAssetGenerator::acceptedVariants),
-			Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("variables", Map.of()).forGetter(TemplatedAssetGenerator::variableOverrides)
+			CodecUtil.REGEX.optionalFieldOf("input", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
+			Codec.unboundedMap(Codec.STRING, FilledTemplate.MAPCODEC.codec()).optionalFieldOf("output", Map.of()).forGetter(TemplatedAssetGenerator::outputs)
 		)
 		.apply(builder, TemplatedAssetGenerator::new)
 	);
 
-	static public Predicate<Identifier> TransformAsPredicate(IStringTransform transform){
-		return (id)->{ return transform.apply(id.toString()) != null; };
+	public TemplatedAssetGenerator(
+		EAssetGenPass pass,
+		Pattern inputRegex,
+		FilledTemplate template
+	){
+		this(pass, inputRegex, Map.of("$0", template));
 	}
 
 	@Override
-	public @Nullable InputSupplier<InputStream> AcceptAsset(EAssetGenPass pass, Identifier assetId) {
-		if (pass != this.pass || !acceptedVariants.test(assetId))
-			return null;
+	public IAssetGenerator.Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
+		IAssetGenerator.Result result = new Result();
+		Matcher inputMatcher = inputRegex.matcher(assetId.toString());
+		if (pass != this.pass || !inputMatcher.matches())
+			return result;
 
-		HashMap<String,String> variables = TemplatedResource.DefaultVariables(assetId);
-		variables.putAll(variableOverrides);
-		return new TemplatedResource(this.template, variables);
+		// inputMatcher.replaceAll(radicalSubst);
+
+		// Identifier radicalId = Substitute(inputMatcher, radicalSubst).orElse(assetId);
+
+		Map<String,String> commonVariables = FilledTemplate.DefaultVariables(assetId);
+		for (var entry : this.outputs.entrySet()){
+			var optId = Substitute(inputMatcher, entry.getKey());
+			if (optId.isPresent())
+				result.putIfAbsent(optId.get(), entry.getValue().Backfilled(commonVariables));
+		}
+
+		return result;
+	}
+
+	static private Optional<Identifier> Substitute(Matcher matcher, String substitution){
+		String stringResult;
+		try {
+			stringResult = matcher.replaceAll(substitution);
+		}
+		catch(IndexOutOfBoundsException|IllegalArgumentException e){
+			VariantsCitMod.LOGGER.error(
+				"Error in regex substitution:\n- Regex: {}\n- Substitution: {}\n{}",
+				matcher.pattern().pattern(),
+				substitution,
+				ExceptionUtils.getStackTrace(e)
+			);
+			return Optional.empty();
+		}
+
+		Identifier result = Identifier.of(stringResult);
+		if (result == null){
+			VariantsCitMod.LOGGER.error(
+				"Invalid identifier: {}\n- Regex: {}\n- Substitution: {}",
+				stringResult,
+				matcher.pattern().pattern(),
+				substitution
+			);
+			return Optional.empty();
+		}
+
+		return Optional.of(result);
 	}
 }
