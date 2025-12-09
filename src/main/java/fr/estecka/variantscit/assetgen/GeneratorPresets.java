@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import com.mojang.serialization.Codec;
@@ -23,11 +22,11 @@ public class GeneratorPresets
 	static private final Pattern REGEX_RADICAL_ROD      = Pattern.compile("(?!.*_cast).*");
 	static private final Pattern REGEX_RADICAL_SHIELD   = Pattern.compile("(?!.*_blocking).*");
 	static private final Pattern REGEX_RADICAL_TRIDENT  = Pattern.compile("(?!.*(_in_hand|_throwing)).*");
-	static private final Pattern REGEX_SUBVARIANT_TOOTING  = Pattern.compile("tooting_.*");
-	static private final Pattern REGEX_SUBVARIANT_IN_HAND  = Pattern.compile(".*_in_hand");
-	static private final Pattern REGEX_SUBVARIANT_THROWING = Pattern.compile(".*_throwing");
+	static private final Pattern REGEX_SUBVARIANT_TOOTING  = Pattern.compile("tooting_(.*)");
+	static private final Pattern REGEX_SUBVARIANT_IN_HAND  = Pattern.compile("(.*)_in_hand");
+	static private final Pattern REGEX_SUBVARIANT_THROWING = Pattern.compile("(.*)_throwing");
 
-	static private final IBuilder MODELS_GENERATED        = TemplateBuilder.ModelParent("item/item_generated");
+	static private final IBuilder MODELS_GENERATED        = TemplateBuilder.ModelParent("item/generated");
 	static private final IBuilder MODELS_HANDHELD         = TemplateBuilder.ModelParent("item/handheld");
 	static private final IBuilder MODELS_ROD              = TemplateBuilder.ModelParent("item/handheld_rod");
 	static private final IBuilder MODELS_BOW              = TemplateBuilder.ModelParent("item/bow");
@@ -35,8 +34,7 @@ public class GeneratorPresets
 	static private final IBuilder MODELS_HORN_STANDBY     = TemplateBuilder.ModelParent("item/goat_horn");
 	static private final IBuilder MODELS_HORN_TOOTING     = TemplateBuilder.ModelParent("item/tooting_goat_horn").MatchRegex(REGEX_SUBVARIANT_TOOTING);
 	static private final IBuilder MODELS_TRIDENT_GUI_ONLY = TemplateBuilder.ModelParent("item/generated").MatchRegex(REGEX_RADICAL_TRIDENT);
-	static private final IBuilder MODELS_TRIDENT_IN_HAND  = TemplateBuilder.ModelParent("variants-cit:item/trident_in_hand" ).MatchRegex(REGEX_SUBVARIANT_IN_HAND);
-	static private final IBuilder MODELS_TRIDENT_THROWING = TemplateBuilder.ModelParent("variants-cit:item/trident_throwing").MatchRegex(REGEX_SUBVARIANT_THROWING);
+	static private final IBuilder MODELS_TRIDENT_IN_HAND  = GeneratorPresets::TridentInHand;
 
 	static private final IBuilder ITEMS_STATELESS        = TemplateBuilder.ItemStates("items/stateless");
 	static private final IBuilder ITEMS_BOW              = TemplateBuilder.ItemStates("items/bow").MatchRegex(REGEX_RADICAL_BOW);
@@ -57,13 +55,12 @@ public class GeneratorPresets
 		PRESETS.put("item_model/crossbow",         ListBuilder.Of(ITEMS_CROSSBOW, MODELS_CROSSBOW));
 		PRESETS.put("item_model/fishing_rod",      ListBuilder.Of(ITEMS_FISHING_ROD, MODELS_ROD));
 		PRESETS.put("item_model/goat_horn",        ListBuilder.Of(ITEMS_GOAT_HORN, MODELS_HORN_TOOTING, MODELS_HORN_STANDBY));
-		PRESETS.put("item_model/trident",          ListBuilder.Of(ITEMS_TRIDENT, MODELS_TRIDENT_IN_HAND, MODELS_TRIDENT_THROWING, MODELS_GENERATED)); // FIXME
+		PRESETS.put("item_model/trident",          ListBuilder.Of(ITEMS_TRIDENT, MODELS_TRIDENT_IN_HAND, MODELS_GENERATED));
 		PRESETS.put("item_model/trident_gui_only", ListBuilder.Of(ITEMS_TRIDENT_GUI_ONLY, MODELS_GENERATED));
 
 		// Baked model generators
 		PRESETS.put("models/trident_gui_only", MODELS_TRIDENT_GUI_ONLY);
 		PRESETS.put("models/trident_in_hand",  MODELS_TRIDENT_IN_HAND );
-		PRESETS.put("models/trident_throwing", MODELS_TRIDENT_THROWING);
 
 		// Item-state generators
 		PRESETS.put("items/bow",         ITEMS_BOW);
@@ -74,12 +71,21 @@ public class GeneratorPresets
 		PRESETS.put("items/trident",     ITEMS_TRIDENT);
 	}
 
-	static public Predicate<Identifier> ExcludeRegex(Pattern regex){
-		return (Identifier id) -> !regex.matcher(id.getPath()).matches();
-	}
 
-	static public Predicate<Identifier> IncludeRegex(Pattern regex){
-		return (Identifier id) -> regex.matcher(id.getPath()).matches();
+/******************************************************************************/
+/* # Builder impl                                                             */
+/******************************************************************************/
+
+	static private DataResult<IAssetGenerator> TridentInHand(){
+		return FilledTemplate.ModelParent("variants-cit:item/trident_in_hand").flatMap(
+			_in_hand -> FilledTemplate.ModelParent("variants-cit:item/trident_throwing").map(
+				_throwing -> new TemplatedAssetGenerator(
+					EAssetGenPass.BAKED_MODELS,
+					REGEX_SUBVARIANT_IN_HAND,
+					Map.of("$1_in_hand", _in_hand, "$1_throwing", _throwing)
+				)
+			)
+		);
 	}
 
 	static public IAssetGenerator LegacyGenerator(ModuleDefinition module){
@@ -112,7 +118,7 @@ public class GeneratorPresets
 
 
 /******************************************************************************/
-/* # Builders                                                                 */
+/* # Builder class                                                            */
 /******************************************************************************/
 	/**
 	 * Generators depend on templates, which are not available at compile time.

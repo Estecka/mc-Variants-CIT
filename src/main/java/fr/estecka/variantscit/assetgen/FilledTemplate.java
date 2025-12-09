@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.format.Substitution;
@@ -33,6 +34,44 @@ implements InputSupplier<InputStream>
 
 	static public final Codec<FilledTemplate> CODEC = Codec.withAlternative(STRING_CODEC, MAPCODEC.codec());
 
+
+/******************************************************************************/
+/* # Supplier                                                                 */
+/******************************************************************************/
+
+	public String getString(){
+		return this.rawTemplate.Substitute(this.variables);
+	}
+
+	@Override
+	public InputStream get() throws IOException {
+		String fullAsset = this.getString();
+		return new ByteArrayInputStream(fullAsset.getBytes());
+	}
+
+
+/******************************************************************************/
+/* # Builder Utils                                                            */
+/******************************************************************************/
+
+	static public DataResult<FilledTemplate> ModelParent(String parent){
+		return TemplateRepository.FlatGet(Identifier.ofVanilla("models/model_parent"))
+			.map(template -> new FilledTemplate(template, Map.of("modelParent", parent))
+		);
+	}
+
+	static public HashMap<String,String> IdVariables(String varname, Identifier identifier){
+		HashMap<String,String> variables = new HashMap<>();
+
+		variables.put(varname+"_ID", identifier.toString());
+		variables.put(varname+"_PATH", identifier.getPath());
+		variables.put(varname+"_NAMESPACE", identifier.getNamespace());
+		variables.put("ITEM_"+varname+"_ID", identifier.getNamespace() + ":item/" + identifier.getPath());
+
+		return variables;
+	}
+
+	@Deprecated
 	static public HashMap<String,String> DefaultVariables(Identifier assetId){
 		HashMap<String,String> variables = new HashMap<>();
 
@@ -61,15 +100,5 @@ implements InputSupplier<InputStream>
 		allVariables.putAll(this.variables);
 		allVariables.putAll(frontVariables);
 		return new FilledTemplate(this.rawTemplate, allVariables);
-	}
-
-	public String getString(){
-		return this.rawTemplate.Substitute(this.variables);
-	}
-
-	@Override
-	public InputStream get() throws IOException {
-		String fullAsset = this.getString();
-		return new ByteArrayInputStream(fullAsset.getBytes());
 	}
 }

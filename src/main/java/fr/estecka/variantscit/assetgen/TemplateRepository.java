@@ -21,8 +21,16 @@ public class TemplateRepository
 	static private final Map<Identifier, Substitution> TEMPLATES = new HashMap<>();
 	static public final Codec<Substitution> CODEC = CodecUtil.Enum(Identifier.CODEC, TEMPLATES);
 
+	@Deprecated
 	static public Substitution Get(Identifier id){
 		return TEMPLATES.get(id);
+	}
+
+	static public DataResult<Substitution> FlatGet(Identifier id){
+		Substitution result = TEMPLATES.get(id);
+		return (result != null) ?
+			DataResult.success(result) :
+			DataResult.error(()->"No such template: "+id.toString());
 	}
 
 	static public void ReloadPatterns(ResourceManager manager)
