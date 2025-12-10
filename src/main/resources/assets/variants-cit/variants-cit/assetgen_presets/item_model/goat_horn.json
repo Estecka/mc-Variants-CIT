@@ -1,0 +1,19 @@
+[
+	{
+		"pass": "models",
+		"input": "(.*)_tooting",
+		"template": "models/model_parent",
+		"variables": { "modelParent": "item/tooting_goat_horn" }
+	},
+	{
+		"pass": "models",
+		"input": "(?!.*_tooting).*",
+		"template": "models/model_parent",
+		"variables": { "modelParent": "item/goat_horn" }
+	},
+	{
+		"pass": "items",
+		"input": "(?!.*_tooting).*",
+		"template":"items/bow"
+	}
+]

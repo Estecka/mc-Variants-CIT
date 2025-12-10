@@ -1,0 +1,10 @@
+[
+	{
+		"pass": "models",
+		"template":"models/item/generated"
+	},
+	{
+		"pass": "items",
+		"template":"items/stateless"
+	}
+]

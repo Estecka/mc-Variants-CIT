@@ -9,10 +9,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.util.Identifier;
 
+/**
+ * Binds some variables to a template. The template is never guaranteed to be
+ * fully filled.
+ */
 public record FilledTemplate(
 	Substitution rawTemplate,
 	Map<String,String> variables
@@ -51,14 +56,25 @@ implements InputSupplier<InputStream>
 
 
 /******************************************************************************/
-/* # Builder Utils                                                            */
+/* # Builder Util                                                             */
 /******************************************************************************/
 
 	static public DataResult<FilledTemplate> ModelParent(String parent){
-		return TemplateRepository.FlatGet(Identifier.ofVanilla("models/model_parent"))
+		return TemplateRepository.FlatGet(VariantsCitMod.Identifier("models/model_parent"))
 			.map(template -> new FilledTemplate(template, Map.of("modelParent", parent))
 		);
 	}
+
+	static public DataResult<FilledTemplate> Stateless(){
+		return TemplateRepository.FlatGet(VariantsCitMod.Identifier("items/stateless"))
+			.map(template -> new FilledTemplate(template, Map.of())
+		);
+	}
+
+
+/******************************************************************************/
+/* # Variables Util                                                           */
+/******************************************************************************/
 
 	static public HashMap<String,String> IdVariables(String varname, Identifier identifier){
 		HashMap<String,String> variables = new HashMap<>();

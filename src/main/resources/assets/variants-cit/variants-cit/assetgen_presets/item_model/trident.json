@@ -16,7 +16,7 @@
 	{
 		"pass": "models",
 		"input": "(?!.*(_in_hand|_throwing)).*",
-		"template": "models/item/generated"
+		"template": "models/item/handheld"
 	},
 	{
 		"pass": "items",

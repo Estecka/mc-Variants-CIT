@@ -2,11 +2,11 @@
 	{
 		"pass": "models",
 		"template":"models/model_parent",
-		"variables": { "modelParent": "item/bow" }
+		"variables": { "modelParent": "item/handheld_row" }
 	},
 	{
 		"pass": "items",
-		"input": "(?!.*_pulling_[0-9]+).*",
+		"input": "(?!.*_cast).*",
 		"template":"items/bow"
 	}
 ]

@@ -2,11 +2,11 @@
 	{
 		"pass": "models",
 		"template":"models/model_parent",
-		"variables": { "modelParent": "item/bow" }
+		"variables": { "modelParent": "item/crossbow" }
 	},
 	{
 		"pass": "items",
-		"input": "(?!.*_pulling_[0-9]+).*",
+		"input": "(?!.*(_arrow|_firework|_pulling_[0-9]+)).*",
 		"template":"items/bow"
 	}
 ]

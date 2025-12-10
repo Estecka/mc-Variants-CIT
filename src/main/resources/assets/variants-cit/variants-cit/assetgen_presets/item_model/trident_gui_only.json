@@ -1,0 +1,10 @@
+[
+	{
+		"pass": "models",
+		"template":"models/item/handheld"
+	},
+	{
+		"pass": "items",
+		"template":"items/trident_gui_only"
+	}
+]
