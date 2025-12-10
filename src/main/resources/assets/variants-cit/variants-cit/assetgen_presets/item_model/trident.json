@@ -1,0 +1,26 @@
+[
+	{
+		"pass": "models",
+		"input": "(.*)_in_hand",
+		"output": {
+			"$1_in_hand": {
+				"template": "models/model_parent",
+				"variables": { "modelParent": "variants-cit:item/trident_in_hand" }
+			},
+			"$1_throwing": {
+				"template": "models/model_parent",
+				"variables": { "modelParent": "variants-cit:item/trident_throwing" }
+			}
+		}
+	},
+	{
+		"pass": "models",
+		"input": "(?!.*(_in_hand|_throwing)).*",
+		"output": { "$0": { "template": "models/item/generated" } }
+	},
+	{
+		"pass": "items",
+		"input": "(?!.*(_in_hand|_throwing)).*",
+		"output": { "$0": { "template": "items/trident" } }
+	}
+]

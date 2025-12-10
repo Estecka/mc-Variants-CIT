@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import com.llamalad7.mixinextras.sugar.Local;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.TemplateRepository;
 import net.minecraft.resource.LifecycledResourceManagerImpl;
@@ -57,6 +58,7 @@ public class ReloadableResourceManagerImplMixin
 		var hotswap = new HotswappableResourceManager(original, ()->new LifecycledResourceManagerImpl(this.type, packs));
 
 		TemplateRepository.ReloadPatterns(original);
+		GeneratorPresets.ReloadPresets(original);
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(hotswap);
 		VariantsCitMod.OnResourceReload(result);
 

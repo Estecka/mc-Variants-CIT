@@ -20,19 +20,38 @@ public interface IAssetGenerator
 	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(Codec.withAlternative(
 		GeneratorPresets.PRESET_CODEC,
 		TemplatedAssetGenerator.MAPCODEC.codec()
-	)).xmap(IAssetGenerator::OfList, _0->null);
+	)).xmap(ListGenerator::Wrap, ListGenerator::Unwrap);
 
-	static public IAssetGenerator OfList(final IAssetGenerator... generators){
-		return OfList(List.of(generators));
-	}
-
-	static public IAssetGenerator OfList(final List<IAssetGenerator> generators){
-		return (pass, assetId)->{
+	static public record ListGenerator(IAssetGenerator[] subGenerators)
+	implements IAssetGenerator
+	{
+		@Override
+		public Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
 			Result result = new Result();
-			for (IAssetGenerator generator : generators)
+			for (IAssetGenerator generator : subGenerators)
 				result.PutAllIfAbsent(generator.AcceptAsset(pass, assetId));
 			return result;
-		};
+		}
+
+		static public ListGenerator Of(IAssetGenerator... subGenerators){
+			return new ListGenerator(subGenerators);
+		}
+
+		static public <T extends IAssetGenerator> IAssetGenerator Wrap(List<T> list){
+			if (list.size() == 0)
+				return IAssetGenerator.NOOP;
+			if (list.size() == 1)
+				return list.get(0);
+			else
+				return new ListGenerator(list.toArray(IAssetGenerator[]::new));
+		}
+
+		static public List<IAssetGenerator> Unwrap(IAssetGenerator generator){
+			if (generator instanceof ListGenerator list)
+				return List.of(list.subGenerators);
+			else
+				return List.of(generator);
+		}
 	}
 
 	static public class Result

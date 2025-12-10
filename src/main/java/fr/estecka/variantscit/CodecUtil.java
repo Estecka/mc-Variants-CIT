@@ -1,5 +1,7 @@
 package fr.estecka.variantscit;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,21 +10,29 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.jetbrains.annotations.Nullable;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
-public class CodecUtil
+public final class CodecUtil
 {
 	static private final MinecraftClient client = MinecraftClient.getInstance();
 
+	static public final Codec<Identifier> VCIT_IDENTIFIER = Codec.STRING.comapFlatMap(CodecUtil::VCitIdenfitier, Identifier::toString);
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isPathValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isNamespaceValid(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
@@ -41,6 +51,12 @@ public class CodecUtil
 
 	static public <T> MapCodec<T> WithWarning(MapCodec<T> codec, String warning, Object... args){
 		return codec.validate(WithWarning(warning, args));
+	}
+
+	static public DataResult<Identifier> VCitIdenfitier(String input){
+		if (!input.contains(":"))
+			input = VariantsCitMod.MODID + ":" + input;
+		return Identifier.validate(input);
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
@@ -147,5 +163,48 @@ public class CodecUtil
 		catch (PatternSyntaxException e){
 			return DataResult.error(e::toString);
 		}
+	}
+
+	static public Identifier AssetIdFromResourceId(Identifier id, String directory, String suffix){
+		return id.withPath(path->path.substring(
+			directory.length() + 1,
+			path.length() - suffix.length()
+		));
+	}
+
+	static public <T>  DataResult<T> ParseResource(Resource resource, MapCodec<T> codec){
+		return ParseResource(resource, codec.codec());
+	}
+
+	static public <T>  DataResult<T> ParseResource(Resource resource, Codec<T> codec){
+		JsonElement json;
+		try {
+			json = JsonParser.parseReader(resource.getReader());
+		}
+		catch (IOException|JsonParseException e){
+			return DataResult.error(e::toString);
+		}
+
+		return codec.decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
+	}
+
+	static public <T> Map<Identifier, T> ReloadResources(ResourceManager manager, Codec<T> codec, String directory, String extension){
+		Map<Identifier, T> results = new HashMap<>();
+
+		Map<Identifier, Resource> resources = manager.findResources(directory, id->id.getPath().endsWith(extension));
+		for (var entry : resources.entrySet()){
+			Identifier id = CodecUtil.AssetIdFromResourceId(entry.getKey(), directory, extension);
+			DataResult<T> result = ParseResource(entry.getValue(), codec);
+			if (result.isSuccess())
+				results.put(id, result.getOrThrow());
+			else {
+				VariantsCitMod.LOGGER.error("Error loading resource {}:\n{}",
+					entry.getKey(),
+					result.error().get().message()
+				);
+			}
+		}
+
+		return results;
 	}
 }

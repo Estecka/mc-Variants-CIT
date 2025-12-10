@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.reload;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,12 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import net.minecraft.item.Item;
@@ -21,7 +16,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
 public final class ModuleLoader
 {
@@ -49,7 +43,7 @@ public final class ModuleLoader
 		for (var entry : resources.entrySet())
 		{
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
-			var optDefinition = DefinitionFromResource(entry.getValue());
+			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
 				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
 				continue;
@@ -117,18 +111,6 @@ public final class ModuleLoader
 			}
 			VariantsCitMod.LOGGER.warn("Some VCIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
 		}
-	}
-
-	static private DataResult<ModuleDefinition> DefinitionFromResource(Resource resource){
-		JsonObject json;
-		try {
-			json = JsonHelper.deserialize(resource.getReader());
-		}
-		catch (IOException|JsonParseException e){
-			return DataResult.error(e::toString);
-		}
-
-		return ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
 	}
 
 

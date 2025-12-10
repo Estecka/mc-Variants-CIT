@@ -12,6 +12,7 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.reload.ModuleDefinition;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 public class GeneratorPresets
@@ -45,8 +46,18 @@ public class GeneratorPresets
 	static private final IBuilder ITEMS_TRIDENT          = TemplateBuilder.ItemStates("items/trident").MatchRegex(REGEX_RADICAL_TRIDENT);
 	static private final IBuilder ITEMS_TRIDENT_GUI_ONLY = TemplateBuilder.ItemStates("items/trident_gui_only");
 
+	static private final Map<Identifier, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
+	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, BAKED_PRESETS);
+
+	static public void ReloadPresets(ResourceManager manager){
+		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), "variants-cit/assetgen_presets", ".json");
+		BAKED_PRESETS.clear();
+		for (var entry : result.entrySet())
+			BAKED_PRESETS.put(entry.getKey(), IAssetGenerator.ListGenerator.Wrap(entry.getValue()));
+	}
+
+	@Deprecated
 	static private final Map<String, IBuilder> PRESETS = new HashMap<>();
-	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(Codec.STRING, PRESETS).flatXmap(IBuilder::get, _0->null);
 	static {
 		// Fullstack generators
 		PRESETS.put("item_model/generated",        ListBuilder.Of(ITEMS_STATELESS, MODELS_GENERATED));
@@ -71,11 +82,11 @@ public class GeneratorPresets
 		PRESETS.put("items/trident",     ITEMS_TRIDENT);
 	}
 
-
 /******************************************************************************/
 /* # Builder impl                                                             */
 /******************************************************************************/
 
+	@Deprecated
 	static private DataResult<IAssetGenerator> TridentInHand(){
 		return FilledTemplate.ModelParent("variants-cit:item/trident_in_hand").flatMap(
 			_in_hand -> FilledTemplate.ModelParent("variants-cit:item/trident_throwing").map(
@@ -113,7 +124,7 @@ public class GeneratorPresets
 
 		models = optModels.getOrThrow();
 
-		return IAssetGenerator.OfList(items, models);
+		return IAssetGenerator.ListGenerator.Of(items, models);
 	}
 
 
@@ -124,10 +135,12 @@ public class GeneratorPresets
 	 * Generators depend on templates, which are not available at compile time.
 	 * The builders will recreate the generators based on available templates.
 	 */
+	@Deprecated
 	static public interface IBuilder
 	extends Supplier<DataResult<IAssetGenerator>>
 	{}
 
+	@Deprecated
 	static public record ListBuilder(IBuilder[] builders)
 	implements IBuilder
 	{
@@ -147,10 +160,11 @@ public class GeneratorPresets
 					generators.add(r.getOrThrow());
 			}
 
-			return DataResult.success(IAssetGenerator.OfList(generators));
+			return DataResult.success(IAssetGenerator.ListGenerator.Wrap(generators));
 		}
 	}
 
+	@Deprecated
 	static public class TemplateBuilder
 	implements IBuilder
 	{
