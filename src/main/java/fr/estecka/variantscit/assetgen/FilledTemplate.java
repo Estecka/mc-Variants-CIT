@@ -60,7 +60,7 @@ implements InputSupplier<InputStream>
 /******************************************************************************/
 
 	static public DataResult<FilledTemplate> ModelParent(String parent){
-		return TemplateRepository.FlatGet(VariantsCitMod.Identifier("models/model_parent"))
+		return TemplateRepository.FlatGet(VariantsCitMod.Identifier("models/parent"))
 			.map(template -> new FilledTemplate(template, Map.of("modelParent", parent))
 		);
 	}

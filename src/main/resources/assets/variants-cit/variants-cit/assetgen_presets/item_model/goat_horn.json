@@ -2,13 +2,13 @@
 	{
 		"pass": "models",
 		"input": "(.*)_tooting",
-		"template": "models/model_parent",
+		"template": "models/parent",
 		"variables": { "modelParent": "item/tooting_goat_horn" }
 	},
 	{
 		"pass": "models",
 		"input": "(?!.*_tooting).*",
-		"template": "models/model_parent",
+		"template": "models/parent",
 		"variables": { "modelParent": "item/goat_horn" }
 	},
 	{

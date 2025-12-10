@@ -1,7 +1,7 @@
 [
 	{
 		"pass": "models",
-		"template":"models/model_parent",
+		"template":"models/parent",
 		"variables": { "modelParent": "item/bow" }
 	},
 	{

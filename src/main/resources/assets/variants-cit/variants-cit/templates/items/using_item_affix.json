@@ -1,8 +1,0 @@
-{
-	"model": {
-		"type": "condition",
-		"property": "using_item",
-		"on_false": { "type":"model", "model":"${ASSET_NAMESPACE}:item/${ASSET_PATH}" },
-		"on_true":  { "type":"model", "model":"${ASSET_NAMESPACE}:item/${usingPrefix}${ASSET_PATH}${usingSuffix}" }
-	}
-}
