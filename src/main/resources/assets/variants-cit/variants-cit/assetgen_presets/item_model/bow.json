@@ -1,20 +1,12 @@
 [
 	{
 		"pass": "models",
-		"output": {
-			"$0": {
-				"template":"models/model_parent",
-				"variables": { "modelParent": "item/bow" }
-			}
-		}
+		"template":"models/model_parent",
+		"variables": { "modelParent": "item/bow" }
 	},
 	{
 		"pass": "items",
 		"input": "(?!.*_pulling_[0-2]).*",
-		"output": {
-			"$0": {
-				"template":"items/bow"
-			}
-		}
+		"template":"items/bow"
 	}
 ]

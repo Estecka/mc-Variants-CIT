@@ -20,11 +20,16 @@ public record TemplatedAssetGenerator(
 )
 implements IAssetGenerator
 {
+	static public final MapCodec<Map<String,FilledTemplate>> OUTPUT_MAPCODEC = CodecUtil.MapWithAlternative(
+		Codec.unboundedMap(Codec.STRING, FilledTemplate.MAPCODEC.codec()).fieldOf("output"),
+		FilledTemplate.MAPCODEC.xmap(template -> Map.of("$0", template), _0->null)
+	);
+
 	static public final MapCodec<TemplatedAssetGenerator> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			EAssetGenPass.CODEC.fieldOf("pass").forGetter(TemplatedAssetGenerator::pass),
 			CodecUtil.REGEX.optionalFieldOf("input", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
-			Codec.unboundedMap(Codec.STRING, FilledTemplate.MAPCODEC.codec()).optionalFieldOf("output", Map.of()).forGetter(TemplatedAssetGenerator::outputs)
+			OUTPUT_MAPCODEC.forGetter(TemplatedAssetGenerator::outputs)
 		)
 		.apply(builder, TemplatedAssetGenerator::new)
 	);
@@ -76,7 +81,7 @@ implements IAssetGenerator
 		Identifier result = Identifier.of(stringResult);
 		if (result == null){
 			VariantsCitMod.LOGGER.error(
-				"Invalid identifier: {}\n- Regex: {}\n- Substitution: {}",
+				"Asset Generator resulted in invalid identifier: {}\n- Regex: {}\n- Substitution: {}",
 				stringResult,
 				matcher.pattern().pattern(),
 				substitution

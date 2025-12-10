@@ -16,11 +16,11 @@
 	{
 		"pass": "models",
 		"input": "(?!.*(_in_hand|_throwing)).*",
-		"output": { "$0": { "template": "models/item/generated" } }
+		"template": "models/item/generated"
 	},
 	{
 		"pass": "items",
 		"input": "(?!.*(_in_hand|_throwing)).*",
-		"output": { "$0": { "template": "items/trident" } }
+		"template": "items/trident"
 	}
 ]
