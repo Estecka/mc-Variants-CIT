@@ -19,7 +19,7 @@ public class TemplateRepository
 	static private final String DIRECTORY = "variants-cit/templates";
 	static private final String EXTENSION = ".json";
 	static private final Map<Identifier, Substitution> TEMPLATES = new HashMap<>();
-	static public final Codec<Substitution> CODEC = CodecUtil.Enum(Identifier.CODEC, TEMPLATES);
+	static public final Codec<Substitution> CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, TEMPLATES);
 
 	@Deprecated
 	static public Substitution Get(Identifier id){

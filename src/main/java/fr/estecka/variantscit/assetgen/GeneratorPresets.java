@@ -188,14 +188,14 @@ public class GeneratorPresets
 		}
 
 		static public TemplateBuilder ItemStates(String templatePath){
-			return new TemplateBuilder(EAssetGenPass.ITEM_STATES, Identifier.ofVanilla(templatePath));
+			return new TemplateBuilder(EAssetGenPass.ITEM_STATES, VariantsCitMod.Identifier(templatePath));
 		}
 
 		static public TemplateBuilder ModelParent(Identifier parent){
 			return ModelParent(parent.toString());
 		}
 		static public TemplateBuilder ModelParent(String parent){
-			return new TemplateBuilder(EAssetGenPass.BAKED_MODELS, Identifier.ofVanilla("models/model_parent"))
+			return new TemplateBuilder(EAssetGenPass.BAKED_MODELS, VariantsCitMod.Identifier("models/model_parent"))
 				.AddVariables(Map.of("modelParent", parent))
 				;
 		}
