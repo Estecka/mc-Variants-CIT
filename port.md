@@ -27,3 +27,7 @@ Initial Release
 - The signature of `BakedModelManager::reload` has changed. The `ResourceManager` passed as argument is now wrapped into another data type.
 ### Possible workaround:
 - `NbtComponent::getNbt` was removed. use `copyNbt`, or create an accessor.
+
+## 1.21.11
+### Backward compatible:
+- `ItemAsset.Properties::new` takes another parameter. Use the statically available `DEFAULT` instead.

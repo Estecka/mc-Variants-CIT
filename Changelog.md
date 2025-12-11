@@ -291,3 +291,5 @@ Since v3.5:
 ### 4.8.1
 - Fixed crash on `enchantment_vector` when set to ignore enchantment levels.
 - Fixed `optionalLevel` defaulting to false instead of true.
+### 4.8.2
+- Updated for MC 1.21.11
