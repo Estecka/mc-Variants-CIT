@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.assetgen;
 
+import java.util.Optional;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.reload.EAssetType;
 import net.minecraft.util.Identifier;
@@ -8,21 +9,30 @@ import net.minecraft.util.StringIdentifiable;
 public enum EAssetGenPass
 implements StringIdentifiable
 {
-	BAKED_MODELS(1, "models", EAssetType.TEXTURE,     EAssetType.BAKED_MODEL),
-	ITEM_STATES (2, "items" , EAssetType.BAKED_MODEL, EAssetType.ITEM_STATE ),
+	EQUIPMENTS  ("equipments_from_textures" , EAssetType.EQUIP_TEXTURE, EAssetType.EQUIPMENT  ),
+	BAKED_MODELS("models_from_textures",      EAssetType.ITEM_TEXTURE,  EAssetType.BAKED_MODEL),
+	ITEM_STATES ("items_from_models" ,        EAssetType.BAKED_MODEL,   EAssetType.ITEM_STATE ),
 	;
 
 	static public final Codec<EAssetGenPass> CODEC = StringIdentifiable.createCodec(EAssetGenPass::values);
 
-	public final int order;
 	public final String name;
 	public final EAssetType input, output;
 
-	private EAssetGenPass(int order, String name, EAssetType input, EAssetType output){
-		this.order = order;
+	private EAssetGenPass(String name, EAssetType input, EAssetType output){
 		this.name = name;
 		this.input = input;
 		this.output = output;
+	}
+
+	public Optional<Identifier> GetInputAssetId(Identifier resourceId){
+		String path = resourceId.getPath();
+		if (!path.startsWith(input.directory+"/") || !path.endsWith(input.suffix))
+			return Optional.empty();
+
+		return Optional.of(resourceId.withPath(
+			p->p.substring(0, 0)
+		));
 	}
 
 	public Identifier GetOutputResourceId(Identifier assetId){

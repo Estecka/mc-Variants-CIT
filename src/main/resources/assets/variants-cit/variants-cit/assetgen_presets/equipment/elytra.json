@@ -1,0 +1,8 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"input": "wings/(.*)",
+		"output": "$1",
+		"template": "equipment/elytra"
+	}
+]

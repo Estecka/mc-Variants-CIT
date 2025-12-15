@@ -1,0 +1,8 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"input": "humanoid(?:_leggings)?/(.*)",
+		"output": "$1",
+		"template": "equipment/humanoid"
+	}
+]

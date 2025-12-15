@@ -124,7 +124,7 @@ public record CommandLogger(
 			case ITEM_MODEL:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.BAKED_MODEL)));
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_TEXTURE)));
 				break;
 		}
 	}

@@ -1,11 +1,11 @@
 [
 	{
-		"pass": "models",
+		"pass": "models_from_textures",
 		"template":"models/parent",
 		"variables": { "modelParent": "item/bow" }
 	},
 	{
-		"pass": "items",
+		"pass": "items_from_models",
 		"input": "(?!.*_pulling_[0-9]+).*",
 		"template":"items/bow"
 	}

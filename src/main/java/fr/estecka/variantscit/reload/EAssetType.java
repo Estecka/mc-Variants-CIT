@@ -2,10 +2,12 @@ package fr.estecka.variantscit.reload;
 
 public enum EAssetType
 {
-	TEXTURE     (EModuleContext.ITEM_MODEL, false, "textures/item", ".png" ),
-	BAKED_MODEL (EModuleContext.ITEM_MODEL, false, "models/item"  , ".json"),
-	ITEM_STATE  (EModuleContext.ITEM_MODEL, true , "items"        , ".json"),
-	EQUIPMENT   (EModuleContext.EQUIPPABLE, true , "equipment"    , ".json"),
+	ITEM_TEXTURE  (EModuleContext.ITEM_MODEL, false, "textures/item", ".png"),
+	BAKED_MODEL   (EModuleContext.ITEM_MODEL, false, "models/item"  , ".json"),
+	ITEM_STATE    (EModuleContext.ITEM_MODEL, true , "items"        , ".json"),
+
+	EQUIP_TEXTURE (EModuleContext.EQUIPPABLE, false, "textures/entity/equipment", ".png"),
+	EQUIPMENT     (EModuleContext.EQUIPPABLE, true , "equipment"                , ".json"),
 	;
 
 	public final EModuleContext context;

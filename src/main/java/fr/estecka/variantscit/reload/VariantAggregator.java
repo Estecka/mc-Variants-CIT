@@ -70,14 +70,15 @@ public class VariantAggregator
 		var genPack = GeneratedResourcePack.INSTANCE.Reset();
 
 		// Asset generation passes
-		GatherType(EAssetType.TEXTURE,     manager.Get());
+		GatherType(EAssetType.EQUIP_TEXTURE, manager.Get());
+		GatherType(EAssetType.ITEM_TEXTURE,  manager.Get());
 		UpdateGeneratedPack(genPack, manager);
-		GatherType(EAssetType.BAKED_MODEL, manager.Get());
+		GatherType(EAssetType.BAKED_MODEL,   manager.Get());
 		UpdateGeneratedPack(genPack, manager);
 
 		// Populate variant libraries
-		GatherType(EAssetType.ITEM_STATE,  manager.Get());
-		GatherType(EAssetType.EQUIPMENT,   manager.Get());
+		GatherType(EAssetType.ITEM_STATE,    manager.Get());
+		GatherType(EAssetType.EQUIPMENT,     manager.Get());
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
@@ -100,8 +101,9 @@ public class VariantAggregator
 	private void ApplyModelToAll(EAssetType assetType, Identifier assetId){
 		EAssetGenPass generatorPass = switch (assetType){
 			default -> null;
-			case EAssetType.TEXTURE     -> EAssetGenPass.BAKED_MODELS;
-			case EAssetType.BAKED_MODEL -> EAssetGenPass.ITEM_STATES;
+			case EAssetType.EQUIP_TEXTURE -> EAssetGenPass.EQUIPMENTS;
+			case EAssetType.ITEM_TEXTURE  -> EAssetGenPass.BAKED_MODELS;
+			case EAssetType.BAKED_MODEL   -> EAssetGenPass.ITEM_STATES;
 		};
 
 		for (var entry : GetLibraryMap(assetType.context).entrySet())
