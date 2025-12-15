@@ -117,7 +117,7 @@ public class VariantAggregator
 
 			if (accepted && generatorPass != null){
 				IAssetGenerator generator = this.assetGenerators.get(module);
-				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, assetId);
+				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, generatorPass.input.GetVanillaId(assetId));
 
 				for (var r : generatedResources.entrySet()){
 					Identifier resourceId = generatorPass.GetOutputResourceId(r.getKey());

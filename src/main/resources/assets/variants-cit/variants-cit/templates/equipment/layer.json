@@ -2,7 +2,7 @@
 	"layers": {
 		"${layerName}": [
 			{
-				"texture": "${ASSET_ID}"
+				"texture": "${OUTPUT_ID}"
 			}
 		]
 	}

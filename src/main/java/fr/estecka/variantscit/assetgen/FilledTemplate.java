@@ -82,7 +82,6 @@ implements InputSupplier<InputStream>
 		variables.put(varname+"_ID", identifier.toString());
 		variables.put(varname+"_PATH", identifier.getPath());
 		variables.put(varname+"_NAMESPACE", identifier.getNamespace());
-		variables.put("ITEM_"+varname+"_ID", identifier.getNamespace() + ":item/" + identifier.getPath());
 
 		return variables;
 	}

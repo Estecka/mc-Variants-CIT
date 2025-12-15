@@ -2,7 +2,7 @@
 	"layers": {
 		"wings": [
 			{
-				"texture": "${ASSET_ID}",
+				"texture": "${OUTPUT_ID}",
 				"use_player_texture": true
 			}
 		]

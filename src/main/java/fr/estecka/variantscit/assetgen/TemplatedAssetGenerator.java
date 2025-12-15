@@ -40,9 +40,9 @@ implements IAssetGenerator
 	}
 
 	@Override
-	public IAssetGenerator.Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
+	public IAssetGenerator.Result AcceptAsset(EAssetGenPass pass, Identifier inputId) {
 		IAssetGenerator.Result result = new Result();
-		Matcher inputMatcher = inputRegex.matcher(assetId.toString());
+		Matcher inputMatcher = inputRegex.matcher(inputId.getPath());
 		if (pass != this.pass || !inputMatcher.matches())
 			return result;
 
@@ -50,15 +50,22 @@ implements IAssetGenerator
 
 		// Identifier radicalId = Substitute(inputMatcher, radicalSubst).orElse(assetId);
 
-		Map<String,String> commonVariables = FilledTemplate.DefaultVariables(assetId);
-		var optId = Substitute(inputMatcher, outputSubst);
-		if (optId.isPresent())
-			result.putIfAbsent(optId.get(), template.Backfilled(commonVariables));
+		Optional<String> outPath = SubstitutePath(inputMatcher, outputSubst);
+		if (outPath.isPresent()){
+			Identifier outputId = inputId.withPath(outPath.get());
+			result.putIfAbsent(
+				outputId,
+				template.Backfilled(Map.of("NAMESPACE", inputId.getNamespace()))
+				        .Backfilled(FilledTemplate.IdVariables("INPUT",  inputId ))
+				        .Backfilled(FilledTemplate.IdVariables("OUTPUT", outputId))
+				        .Backfilled(FilledTemplate.DefaultVariables(inputId))
+			);
+		}
 
 		return result;
 	}
 
-	static private Optional<Identifier> Substitute(Matcher matcher, String substitution){
+	static private Optional<String> SubstitutePath(Matcher matcher, String substitution){
 		String stringResult;
 		try {
 			stringResult = matcher.replaceAll(substitution);
@@ -72,11 +79,9 @@ implements IAssetGenerator
 			);
 			return Optional.empty();
 		}
-
-		Identifier result = Identifier.of(stringResult);
-		if (result == null){
+		if (!Identifier.isPathValid(stringResult)){
 			VariantsCitMod.LOGGER.error(
-				"Asset Generator resulted in invalid identifier: {}\n- Regex: {}\n- Substitution: {}",
+				"Asset Generator resulted in invalid identifier path: {}:{}\n- Regex: {}\n- Substitution: {}",
 				stringResult,
 				matcher.pattern().pattern(),
 				substitution
@@ -84,6 +89,6 @@ implements IAssetGenerator
 			return Optional.empty();
 		}
 
-		return Optional.of(result);
+		return Optional.of(stringResult);
 	}
 }
