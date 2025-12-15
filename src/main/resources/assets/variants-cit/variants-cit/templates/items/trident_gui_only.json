@@ -11,8 +11,7 @@
 		{
 			"type": "condition",
 			"property": "using_item",
-			"on_false":
-			{
+			"on_false": {
 				"type": "special",
 				"base": "item/trident_in_hand",
 				"model": { "type": "trident" }

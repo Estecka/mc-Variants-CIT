@@ -6,7 +6,7 @@
 	},
 	{
 		"pass": "items_from_models",
-		"input": "(?!.*(_arrow|_firework|_pulling_[0-9]+)).*",
-		"template":"items/bow"
+		"input": "(?!.*(_pulling_[0-9]+|_arrow|_firework)).*",
+		"template":"items/crossbow"
 	}
 ]

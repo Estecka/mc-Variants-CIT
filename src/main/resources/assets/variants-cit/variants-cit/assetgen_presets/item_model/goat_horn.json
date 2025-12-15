@@ -2,13 +2,13 @@
 	{
 		"pass": "models_from_textures",
 		"template": "models/parent",
-		"variables": { "modelParent": "item/tooting_goat_horn" }
+		"variables": { "modelParent": "item/goat_horn" }
 	},
 	{
 		"pass": "models_from_textures",
 		"output": "$0_tooting",
 		"template": "models/parent",
-		"variables": { "modelParent": "item/goat_horn" }
+		"variables": { "modelParent": "item/tooting_goat_horn" }
 	},
 	{
 		"pass": "items_from_models",
