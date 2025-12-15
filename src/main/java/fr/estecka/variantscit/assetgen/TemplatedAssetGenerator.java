@@ -56,9 +56,8 @@ implements IAssetGenerator
 			result.putIfAbsent(
 				outputId,
 				template.Backfilled(Map.of("NAMESPACE", inputId.getNamespace()))
-				        .Backfilled(FilledTemplate.IdVariables("INPUT",  inputId ))
-				        .Backfilled(FilledTemplate.IdVariables("OUTPUT", outputId))
-				        .Backfilled(FilledTemplate.DefaultVariables(inputId))
+				        .Backfilled(FilledTemplate.IdVariables("INPUT",  pass.input .GetVanillaId(inputId )))
+				        .Backfilled(FilledTemplate.IdVariables("OUTPUT", pass.output.GetVanillaId(outputId)))
 			);
 		}
 

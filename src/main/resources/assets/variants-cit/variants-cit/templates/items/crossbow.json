@@ -5,30 +5,30 @@
 		"cases": [
 			{
 				"when": "arrow",
-				"model": { "type":"model", "model":"${BAKED_MODEL_ID}_arrow" }
+				"model": { "type":"model", "model":"${INPUT_ID}_arrow" }
 			},
 			{
 				"when": "rocket",
-				"model": { "type":"model", "model":"${BAKED_MODEL_ID}_firework" }
+				"model": { "type":"model", "model":"${INPUT_ID}_firework" }
 			}
 		],
 		"fallback": {
 			"type": "condition",
 			"property": "using_item",
-			"on_false": { "type":"model", "model":"${BAKED_MODEL_ID}" },
+			"on_false": { "type":"model", "model":"${INPUT_ID}" },
 			"on_true":
 			{
 				"type": "range_dispatch",
 				"property": "crossbow/pull",
-				"fallback": { "type":"model", "model":"${BAKED_MODEL_ID}_pulling_0" },
+				"fallback": { "type":"model", "model":"${INPUT_ID}_pulling_0" },
 				"entries": [
 					{
 						"threshold": 0.58,
-						"model": { "type":"model", "model":"${BAKED_MODEL_ID}_pulling_1" }
+						"model": { "type":"model", "model":"${INPUT_ID}_pulling_1" }
 					},
 					{
 						"threshold": 1.0,
-						"model": { "type":"model", "model":"${BAKED_MODEL_ID}_pulling_2" }
+						"model": { "type":"model", "model":"${INPUT_ID}_pulling_2" }
 					}
 				]
 			}

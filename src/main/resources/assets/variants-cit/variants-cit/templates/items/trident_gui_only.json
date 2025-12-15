@@ -5,7 +5,7 @@
 		"cases": 
 		[{
 			"when": [ "gui", "ground", "fixed" ],
-			"model": { "type":"model", "model":"${BAKED_MODEL_ID}" }
+			"model": { "type":"model", "model":"${INPUT_ID}" }
 		}],
 		"fallback":
 		{

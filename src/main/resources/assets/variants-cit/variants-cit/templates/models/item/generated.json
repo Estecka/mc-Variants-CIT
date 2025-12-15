@@ -1,6 +1,6 @@
 {
 	"parent": "item/generated",
 	"textures": {
-		"layer0": "${BAKED_MODEL_ID}"
+		"layer0": "${INPUT_ID}"
 	}
 }

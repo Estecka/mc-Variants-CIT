@@ -2,7 +2,7 @@
 	"model": {
 		"type": "condition",
 		"property": "fishing_rod/cast",
-		"on_false": { "type":"model", "model":"${BAKED_MODEL_ID}" },
-		"on_true":  { "type":"model", "model":"${BAKED_MODEL_ID}_cast" }
+		"on_false": { "type":"model", "model":"${INPUT_ID}" },
+		"on_true":  { "type":"model", "model":"${INPUT_ID}_cast" }
 	}
 }

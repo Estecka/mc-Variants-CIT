@@ -1,5 +1,7 @@
 package fr.estecka.variantscit.reload;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.util.Identifier;
 
 public enum EAssetType
@@ -20,7 +22,7 @@ public enum EAssetType
 	 * an equivalent fundamental asset somewhere down the line.
 	 */
 	public final boolean isFundamental;
-	public final String vanillaPrefix;
+	public final @Nullable String vanillaPrefix;
 	public final String directory;
 	public final String suffix;
 
@@ -34,10 +36,13 @@ public enum EAssetType
 		if(subDir >= 0)
 			this.vanillaPrefix = directory.substring(subDir + 1);
 		else
-			this.vanillaPrefix = directory;
+			this.vanillaPrefix = null;
 	}
 
-	public Identifier GetVanillaId(Identifier assetId){
-		return assetId.withPath(path -> vanillaPrefix+"/"+path);
+	public Identifier GetVanillaId(Identifier simplifiedId){
+		if (vanillaPrefix == null)
+			return simplifiedId;
+		else
+			return simplifiedId.withPath(path -> vanillaPrefix+"/"+path);
 	}
 }
