@@ -1,0 +1,44 @@
+{
+	"layers": {
+		"camel_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"donkey_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"horse_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"mule_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"pig_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"skeleton_horse_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"strider_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"zombie_horse_saddle": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		]
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"layers": {
+		"wings": [
+			{
+				"texture": "${ASSET_ID}",
+				"use_player_texture": true
+			}
+		]
+	}
+}

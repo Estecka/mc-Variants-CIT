@@ -16,20 +16,17 @@ public record TemplatedAssetGenerator(
 	EAssetGenPass pass,
 	Pattern inputRegex,
 	// String radicalSubst,
-	Map<String,FilledTemplate> outputs
+	String outputSubst,
+	FilledTemplate template
 )
 implements IAssetGenerator
 {
-	static public final MapCodec<Map<String,FilledTemplate>> OUTPUT_MAPCODEC = CodecUtil.MapWithAlternative(
-		Codec.unboundedMap(Codec.STRING, FilledTemplate.MAPCODEC.codec()).fieldOf("output"),
-		FilledTemplate.MAPCODEC.xmap(template -> Map.of("$0", template), _0->null)
-	);
-
 	static public final MapCodec<TemplatedAssetGenerator> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			EAssetGenPass.CODEC.fieldOf("pass").forGetter(TemplatedAssetGenerator::pass),
 			CodecUtil.REGEX.optionalFieldOf("input", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
-			OUTPUT_MAPCODEC.forGetter(TemplatedAssetGenerator::outputs)
+			Codec.STRING.optionalFieldOf("output", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
+			FilledTemplate.MAPCODEC.forGetter(TemplatedAssetGenerator::template)
 		)
 		.apply(builder, TemplatedAssetGenerator::new)
 	);
@@ -39,7 +36,7 @@ implements IAssetGenerator
 		Pattern inputRegex,
 		FilledTemplate template
 	){
-		this(pass, inputRegex, Map.of("$0", template));
+		this(pass, inputRegex, "$0", template);
 	}
 
 	@Override
@@ -54,11 +51,9 @@ implements IAssetGenerator
 		// Identifier radicalId = Substitute(inputMatcher, radicalSubst).orElse(assetId);
 
 		Map<String,String> commonVariables = FilledTemplate.DefaultVariables(assetId);
-		for (var entry : this.outputs.entrySet()){
-			var optId = Substitute(inputMatcher, entry.getKey());
-			if (optId.isPresent())
-				result.putIfAbsent(optId.get(), entry.getValue().Backfilled(commonVariables));
-		}
+		var optId = Substitute(inputMatcher, outputSubst);
+		if (optId.isPresent())
+			result.putIfAbsent(optId.get(), template.Backfilled(commonVariables));
 
 		return result;
 	}

@@ -1,0 +1,14 @@
+{
+	"layers": {
+		"humanoid": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		],
+		"humanoid_leggings": [
+			{
+				"texture": "${ASSET_ID}"
+			}
+		]
+	}
+}
