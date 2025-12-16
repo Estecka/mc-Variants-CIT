@@ -1,12 +1,12 @@
 [
 	{
 		"pass": "models_from_textures",
-		"template":"models/parent",
+		"template": "models/parent",
 		"variables": { "modelParent": "item/crossbow" }
 	},
 	{
 		"pass": "items_from_models",
-		"input": "(?!.*(_pulling_[0-9]+|_arrow|_firework)).*",
-		"template":"items/crossbow"
+		"inputPath": "(?!.*(_pulling_[0-9]+|_arrow|_firework)).*",
+		"template": "items/crossbow"
 	}
 ]

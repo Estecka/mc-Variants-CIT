@@ -24,8 +24,8 @@ implements IAssetGenerator
 	static public final MapCodec<TemplatedAssetGenerator> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			EAssetGenPass.CODEC.fieldOf("pass").forGetter(TemplatedAssetGenerator::pass),
-			CodecUtil.REGEX.optionalFieldOf("input", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
-			Codec.STRING.optionalFieldOf("output", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
+			CodecUtil.REGEX.optionalFieldOf("inputPath", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
+			Codec.STRING.optionalFieldOf("outputPath", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
 			FilledTemplate.MAPCODEC.forGetter(TemplatedAssetGenerator::template)
 		)
 		.apply(builder, TemplatedAssetGenerator::new)
