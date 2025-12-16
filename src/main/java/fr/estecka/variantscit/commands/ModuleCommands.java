@@ -79,7 +79,7 @@ public class ModuleCommands
 /******************************************************************************/
 
 	static private CompletableFuture<Suggestions> AssetAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
-		CommandSource.suggestIdentifiers(GeneratedResourcePack.INSTANCE.Get().keySet(), builder);
+		CommandSource.suggestIdentifiers(GeneratedResourcePack.INSTANCE.GetAll().keySet(), builder);
 		return builder.buildFuture();
 	}
 
@@ -136,7 +136,7 @@ public class ModuleCommands
 
 	static private int AssetDump(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
 		Identifier id = context.getArgument(ASSET_ARG, Identifier.class);
-		FilledTemplate resource = (FilledTemplate)GeneratedResourcePack.INSTANCE.Get().get(id);
+		FilledTemplate resource = (FilledTemplate)GeneratedResourcePack.INSTANCE.GetAll().get(id);
 
 		VariantsCitMod.LOGGER.info("{}:\n{}", id, resource.getString());
 

@@ -37,16 +37,16 @@ public class ReloadableResourceManagerImplMixin
 	@Shadow private @Final ResourceType type;
 
 	@ModifyArg(
-		method="reload",
+		method = "reload",
 		index = 0,
-		at=@At(
+		at = @At(
 			value = "INVOKE",
 			target = "net/minecraft/resource/SimpleResourceReload.start(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/resource/ResourceReload;"
 		)
 	)
 	private ResourceManager reload(ResourceManager original, @Local(argsOnly=true) List<ResourcePack> packs){
 		if (this.type != ResourceType.CLIENT_RESOURCES){
-			VariantsCitMod.LOGGER.warn(
+			VariantsCitMod.LOGGER.error(
 				"Something fundamental has changed in the way Minecraft reloads "
 				+ "resources, and Variants-CIT ended up hooked to the wrong "
 				+ "place: \"{}\".",

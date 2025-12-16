@@ -37,9 +37,9 @@ public final class ModuleLoader
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
-		resources.putAll(manager.Get().findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(CodecUtil.GetResources(manager.Get(), "variant-cits/item", ".json"));
 		ObsoletePathWarning(resources);
-		resources.putAll(manager.Get().findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/item", ".json"));
 		for (var entry : resources.entrySet())
 		{
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());

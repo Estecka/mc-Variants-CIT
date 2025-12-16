@@ -10,13 +10,16 @@ import fr.estecka.variantscit.reload.ModuleDefinition;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
-public class GeneratorPresets
+public final class GeneratorPresets
 {
+	static private final String DIRECTORY = "variants-cit/assetgen_presets";
+	static private final String EXTENSION = ".json";
+
 	static private final Map<Identifier, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
 	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, BAKED_PRESETS);
 
 	static public void ReloadPresets(ResourceManager manager){
-		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), "variants-cit/assetgen_presets", ".json");
+		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), DIRECTORY, EXTENSION);
 		BAKED_PRESETS.clear();
 		for (var entry : result.entrySet())
 			BAKED_PRESETS.put(entry.getKey(), IAssetGenerator.ListGenerator.Wrap(entry.getValue()));

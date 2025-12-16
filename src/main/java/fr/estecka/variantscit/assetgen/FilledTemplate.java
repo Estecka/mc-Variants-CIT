@@ -60,13 +60,13 @@ implements InputSupplier<InputStream>
 /******************************************************************************/
 
 	static public DataResult<FilledTemplate> ModelParent(String parent){
-		return TemplateRepository.FlatGet(VariantsCitMod.Identifier("models/parent"))
+		return TemplateRepository.Get(VariantsCitMod.Identifier("models/parent"))
 			.map(template -> new FilledTemplate(template, Map.of("modelParent", parent))
 		);
 	}
 
 	static public DataResult<FilledTemplate> Stateless(){
-		return TemplateRepository.FlatGet(VariantsCitMod.Identifier("items/stateless"))
+		return TemplateRepository.Get(VariantsCitMod.Identifier("items/stateless"))
 			.map(template -> new FilledTemplate(template, Map.of())
 		);
 	}
@@ -82,23 +82,6 @@ implements InputSupplier<InputStream>
 		variables.put(varname+"_ID", identifier.toString());
 		variables.put(varname+"_PATH", identifier.getPath());
 		variables.put(varname+"_NAMESPACE", identifier.getNamespace());
-
-		return variables;
-	}
-
-	@Deprecated
-	static public HashMap<String,String> DefaultVariables(Identifier assetId){
-		HashMap<String,String> variables = new HashMap<>();
-
-		variables.put("ASSET_ID", assetId.toString());
-		variables.put("ASSET_PATH", assetId.getPath());
-		variables.put("ASSET_NAMESPACE", assetId.getNamespace());
-		variables.put("BAKED_MODEL_ID", assetId.getNamespace() + ":item/" + assetId.getPath());
-
-		// variables.put("MASTER_ID", masterId.toString());
-		// variables.put("MASTER_PATH", masterId.getPath());
-		// variables.put("MASTER_NAMESPACE", masterId.getNamespace());
-		// variables.put("MASTER_BAKED_MODEL_ID", masterId.getNamespace() + ":item/" + masterId.getPath());
 
 		return variables;
 	}

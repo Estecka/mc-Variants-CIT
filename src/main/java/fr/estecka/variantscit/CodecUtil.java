@@ -165,6 +165,14 @@ public final class CodecUtil
 		}
 	}
 
+	/**
+	 * @param directory The base directory, *without* the trailing `/`
+	 * @param suffix The file extension, including the deparating dot.
+	 */
+	static public Map<Identifier,Resource> GetResources(ResourceManager manager, String directory, String suffix){
+		return manager.findResources(directory, id->id.getPath().endsWith(suffix));
+	}
+
 	static public Identifier AssetIdFromResourceId(Identifier id, String directory, String suffix){
 		return id.withPath(path->path.substring(
 			directory.length() + 1,
@@ -188,12 +196,12 @@ public final class CodecUtil
 		return codec.decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
 	}
 
-	static public <T> Map<Identifier, T> ReloadResources(ResourceManager manager, Codec<T> codec, String directory, String extension){
+	static public <T> Map<Identifier, T> ReloadResources(ResourceManager manager, Codec<T> codec, String directory, String suffix){
 		Map<Identifier, T> results = new HashMap<>();
 
-		Map<Identifier, Resource> resources = manager.findResources(directory, id->id.getPath().endsWith(extension));
+		Map<Identifier, Resource> resources = GetResources(manager, directory, suffix);
 		for (var entry : resources.entrySet()){
-			Identifier id = CodecUtil.AssetIdFromResourceId(entry.getKey(), directory, extension);
+			Identifier id = CodecUtil.AssetIdFromResourceId(entry.getKey(), directory, suffix);
 			DataResult<T> result = ParseResource(entry.getValue(), codec);
 			if (result.isSuccess())
 				results.put(id, result.getOrThrow());

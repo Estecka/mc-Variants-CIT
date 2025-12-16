@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.reload;
 
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.util.Identifier;
 
 public enum EAssetType
@@ -33,16 +33,27 @@ public enum EAssetType
 		this.suffix = suffix;
 
 		int subDir = directory.indexOf("/");
-		if(subDir >= 0)
+		if (subDir >= 0)
 			this.vanillaPrefix = directory.substring(subDir + 1);
 		else
 			this.vanillaPrefix = null;
 	}
 
-	public Identifier GetVanillaId(Identifier simplifiedId){
-		if (vanillaPrefix == null)
-			return simplifiedId;
+	public Optional<Identifier> GetShortId(Identifier resourceId){
+		String path = resourceId.getPath();
+		if (!path.startsWith(directory+"/") || !path.endsWith(suffix))
+			return Optional.empty();
 		else
-			return simplifiedId.withPath(path -> vanillaPrefix+"/"+path);
+			return Optional.of(resourceId.withPath(path.substring(
+				directory.length() + 1,
+				path.length() - suffix.length()
+			)));
+	}
+
+	public Identifier GetVanillaId(Identifier shortId){
+		if (vanillaPrefix == null)
+			return shortId;
+		else
+			return shortId.withPath(path -> vanillaPrefix+"/"+path);
 	}
 }

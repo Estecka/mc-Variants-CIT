@@ -21,12 +21,7 @@ public class TemplateRepository
 	static private final Map<Identifier, Substitution> TEMPLATES = new HashMap<>();
 	static public final Codec<Substitution> CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, TEMPLATES);
 
-	@Deprecated
-	static public Substitution Get(Identifier id){
-		return TEMPLATES.get(id);
-	}
-
-	static public DataResult<Substitution> FlatGet(Identifier id){
+	static public DataResult<Substitution> Get(Identifier id){
 		Substitution result = TEMPLATES.get(id);
 		return (result != null) ?
 			DataResult.success(result) :

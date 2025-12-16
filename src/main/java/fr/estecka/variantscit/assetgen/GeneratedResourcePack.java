@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-// import net.fabricmc.fabric.impl.resource.loader.PlaceholderResourcePack;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.SharedConstants;
@@ -37,16 +36,18 @@ implements ResourcePack
 {
 	static public final GeneratedResourcePack INSTANCE = new GeneratedResourcePack();
 
-	static private final ResourcePackInfo PACK_INFO = new ResourcePackInfo("variants-cit:assetgen", Text.literal("Variants-CIT Mod"), ResourcePackSource.BUILTIN, Optional.empty());
+	static public final Text PACK_TITLE = Text.literal("Variants-CIT Mod");
+	static public final Text PACK_DESC  = Text.literal("Runtime-generated assets");
+
+	static private final ResourcePackInfo PACK_INFO = new ResourcePackInfo("variants-cit:assetgen", PACK_TITLE, ResourcePackSource.BUILTIN, Optional.empty());
 	static private final ResourcePackPosition POSITION = new ResourcePackPosition(true, InsertionPosition.BOTTOM, true);
-	static private final Metadata METADATA = new Metadata(Text.literal("Runtime-generated assets"), ResourcePackCompatibility.COMPATIBLE, FeatureSet.empty(), List.of());
+	static private final Metadata METADATA = new Metadata(PACK_DESC, ResourcePackCompatibility.COMPATIBLE, FeatureSet.empty(), List.of());
 	static private final PackResourceMetadata PACK_METADATA = new PackResourceMetadata(
-		Text.literal("PackMetadata"),
+		Text.literal("PackMetadata"), // TODO: Figure out what this does.
 		SharedConstants.getGameVersion().getResourceVersion(ResourceType.CLIENT_RESOURCES),
 		Optional.empty()
 	);
 
-	// static private final PlaceholderResourcePack PLACEHOLDER = new PlaceholderResourcePack(ResourceType.CLIENT_RESOURCES, PACK_INFO);
 	static private final PackFactory FACTORY = new PackFactory() {
 		public ResourcePack open(ResourcePackInfo var1) { return INSTANCE; };
 		public ResourcePack openWithOverlays(ResourcePackInfo var1, Metadata var2) { return INSTANCE; };
@@ -59,12 +60,19 @@ implements ResourcePack
 		this.Reset();
 	}
 
+	/**
+	 * Clears the pack  and returns a mutable pack  that can be used  to add new
+	 * assets to the pack.
+	 */
 	public Map<Identifier, InputSupplier<InputStream>> Reset(){
 		this.resources = new IdentityHashMap<>();
 		return this.resources;
 	}
 
-	public Map<Identifier, InputSupplier<InputStream>> Get(){
+	/**
+	 * @return An immutable copy of the pack's content.
+	 */
+	public Map<Identifier, InputSupplier<InputStream>> GetAll(){
 		return Map.copyOf(this.resources);
 	}
 
@@ -87,7 +95,7 @@ implements ResourcePack
 	}
 
 	@Override
-	public InputSupplier<InputStream> openRoot(String... segments) {
+	public @Nullable InputSupplier<@NotNull InputStream> openRoot(String... segments) {
 		String path = String.join("/", segments);
 		switch (path) {
 			default: return null;

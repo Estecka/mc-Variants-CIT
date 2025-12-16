@@ -84,21 +84,15 @@ public class VariantAggregator
 	private void GatherType(EAssetType assetType, ResourceManager manager){
 		Set<Identifier> resources = manager.findResources(assetType.directory, id->id.getPath().endsWith(assetType.suffix)).keySet();
 
-		Stream<Identifier> ids = resources.stream().map(
-			id->id.withPath(path->path.substring(
-				assetType.directory.length() + 1,
-				path.length() - assetType.suffix.length()
-			))
-		);
-
-		GatherIds(assetType, ids);
+		Stream<Identifier> shortIds = resources.stream().map(id->assetType.GetShortId(id).get());
+		GatherIds(assetType, shortIds);
 	}
 
 	private void GatherIds(EAssetType assetType, Stream<Identifier> assets){
-		assets.forEach(assetId -> ApplyModelToAll(assetType, assetId));
+		assets.forEach(shortId -> ApplyModelToAll(assetType, shortId));
 	}
 
-	private void ApplyModelToAll(EAssetType assetType, Identifier assetId){
+	private void ApplyModelToAll(EAssetType assetType, Identifier shortId){
 		EAssetGenPass generatorPass = switch (assetType){
 			default -> null;
 			case EAssetType.EQUIP_TEXTURE -> EAssetGenPass.EQUIPMENTS;
@@ -113,11 +107,11 @@ public class VariantAggregator
 			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
 
 			// TODO: EnchantmentVector and AxolotlVariant will refuse stuff like "_pulling_1" for bows
-			boolean accepted = this.ApplyModelToModule(assetType.isFundamental, module, library, assetId);
+			boolean accepted = this.ApplyModelToModule(assetType.isFundamental, module, library, shortId);
 
 			if (accepted && generatorPass != null){
 				IAssetGenerator generator = this.assetGenerators.get(module);
-				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, assetId);
+				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, shortId);
 
 				for (var r : generatedResources.entrySet()){
 					Identifier resourceId = generatorPass.GetOutputResourceId(r.getKey());
@@ -129,25 +123,25 @@ public class VariantAggregator
 		}
 	}
 
-	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, Identifier assetId){
+	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, Identifier shortId){
 		boolean accepted = false;
 
-		if (assetId.equals(library.fallbackModel()))
+		if (shortId.equals(library.fallbackModel()))
 			accepted = true;
 
-		if (library.specialModels().containsValue(assetId))
+		if (library.specialModels().containsValue(shortId))
 			accepted = true;
 
-		if (assetId.getPath().startsWith(module.modelPrefix())){
+		if (shortId.getPath().startsWith(module.modelPrefix())){
 			Identifier variantId = Identifier.of(
-				assetId.getNamespace(),
-				assetId.getPath().substring(module.modelPrefix().length())
+				shortId.getNamespace(),
+				shortId.getPath().substring(module.modelPrefix().length())
 			);
 
 			if (module.parameters().AcceptsVariant(variantId)){
 				accepted = true;
 				if (isFundamental)
-					library.variantModels().put(variantId, assetId);
+					library.variantModels().put(variantId, shortId);
 			}
 
 		}
@@ -171,7 +165,8 @@ public class VariantAggregator
 			this.generatedAssets.put(resourceId, new GeneratedAsset(resource, priority));
 			// VariantsCitMod.LOGGER.warn("Generated asset: {}", resourceId);
 		}
-		else if (oldAsset != null && oldAsset.priority == priority && !oldAsset.resource.equals(resource))
-			this.conflictingModelPrefixes.add(modelPrefix);
+		// // TODO: Fix false positives
+		// else if (oldAsset != null && oldAsset.priority == priority && !oldAsset.resource.equals(resource))
+		// 	this.conflictingModelPrefixes.add(modelPrefix);
 	}
 }

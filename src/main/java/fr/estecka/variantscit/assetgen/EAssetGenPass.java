@@ -9,9 +9,9 @@ import net.minecraft.util.StringIdentifiable;
 public enum EAssetGenPass
 implements StringIdentifiable
 {
-	EQUIPMENTS  ("equipments_from_textures" , EAssetType.EQUIP_TEXTURE, EAssetType.EQUIPMENT  ),
-	BAKED_MODELS("models_from_textures",      EAssetType.ITEM_TEXTURE,  EAssetType.BAKED_MODEL),
-	ITEM_STATES ("items_from_models" ,        EAssetType.BAKED_MODEL,   EAssetType.ITEM_STATE ),
+	EQUIPMENTS  ("equipments_from_textures", EAssetType.EQUIP_TEXTURE, EAssetType.EQUIPMENT  ),
+	BAKED_MODELS("models_from_textures",     EAssetType.ITEM_TEXTURE,  EAssetType.BAKED_MODEL),
+	ITEM_STATES ("items_from_models",        EAssetType.BAKED_MODEL,   EAssetType.ITEM_STATE ),
 	;
 
 	static public final Codec<EAssetGenPass> CODEC = StringIdentifiable.createCodec(EAssetGenPass::values);
@@ -25,7 +25,7 @@ implements StringIdentifiable
 		this.output = output;
 	}
 
-	public Optional<Identifier> GetInputAssetId(Identifier resourceId){
+	public Optional<Identifier> GetShortInputId(Identifier resourceId){
 		String path = resourceId.getPath();
 		if (!path.startsWith(input.directory+"/") || !path.endsWith(input.suffix))
 			return Optional.empty();
@@ -35,8 +35,8 @@ implements StringIdentifiable
 		));
 	}
 
-	public Identifier GetOutputResourceId(Identifier assetId){
-		return assetId.withPath(path -> output.directory+"/"+path+output.suffix);
+	public Identifier GetOutputResourceId(Identifier shortAssetId){
+		return shortAssetId.withPath(path -> output.directory+"/"+path+output.suffix);
 	}
 
 	@Override

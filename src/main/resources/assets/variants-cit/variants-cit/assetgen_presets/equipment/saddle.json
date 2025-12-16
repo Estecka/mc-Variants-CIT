@@ -1,7 +1,7 @@
 [
 	{
 		"pass": "equipments_from_textures",
-		"input": ".+_saddle/(.*)",
+		"input": "[^/]+_saddle/(.*)",
 		"output": "$1",
 		"template": "equipment/saddle"
 	}
