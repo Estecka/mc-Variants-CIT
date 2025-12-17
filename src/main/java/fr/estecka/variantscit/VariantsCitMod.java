@@ -25,6 +25,10 @@ implements ClientModInitializer
 	static private Map<Item, IBakedModule> EQUIP_MODULES = Map.of();
 	static private Map<Identifier, MetaModule> META = Map.of();
 
+	static public Identifier Identifier(String path){
+		return Identifier.of(MODID, path);
+	}
+
 	static public @Nullable IBakedModule GetItemModule(Item itemType){
 		return ITEM_MODULES.get(itemType);
 	}

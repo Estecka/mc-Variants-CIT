@@ -1,0 +1,276 @@
+{
+	"meta": {
+		"format_version": "5.0",
+		"model_format": "java_block",
+		"box_uv": true
+	},
+	"name": "trident_in_hand",
+	"parent": "",
+	"java_block_version": "1.9.0",
+	"ambientocclusion": true,
+	"front_gui_light": false,
+	"visible_box": [1, 1, 0],
+	"variable_placeholders": "",
+	"variable_placeholder_buttons": [],
+	"unhandled_root_fields": {},
+	"resolution": {
+		"width": 32,
+		"height": 32
+	},
+	"elements": [
+		{
+			"name": "Pole",
+			"box_uv": true,
+			"render_order": "default",
+			"rescale": false,
+			"locked": false,
+			"shade": true,
+			"light_emission": 0,
+			"allow_mirror_modeling": true,
+			"from": [7.5, 0, 7.5],
+			"to": [8.5, 31, 8.5],
+			"autouv": 0,
+			"color": 5,
+			"origin": [8, 21.75, 8],
+			"faces": {
+				"north": {
+					"uv": [1, 1, 2, 32],
+					"texture": 0
+				},
+				"east": {
+					"uv": [0, 1, 1, 32],
+					"texture": 0
+				},
+				"south": {
+					"uv": [3, 1, 4, 32],
+					"texture": 0
+				},
+				"west": {
+					"uv": [2, 1, 3, 32],
+					"texture": 0
+				},
+				"up": {
+					"uv": [2, 1, 1, 0],
+					"texture": 0
+				},
+				"down": {
+					"uv": [3, 0, 2, 1],
+					"texture": 0
+				}
+			},
+			"type": "cube",
+			"uuid": "154921cc-e79c-e6bf-2980-03f866c85cac"
+		},
+		{
+			"name": "Joint",
+			"box_uv": true,
+			"render_order": "default",
+			"rescale": false,
+			"locked": false,
+			"shade": true,
+			"light_emission": 0,
+			"allow_mirror_modeling": true,
+			"from": [6.5, 25, 7.5],
+			"to": [9.5, 27, 8.5],
+			"autouv": 0,
+			"color": 0,
+			"origin": [8, 21.75, 8],
+			"uv_offset": [4, 0],
+			"faces": {
+				"north": {
+					"uv": [5, 1, 8, 3],
+					"texture": 0
+				},
+				"east": {
+					"uv": [4, 1, 5, 3],
+					"texture": 0
+				},
+				"south": {
+					"uv": [9, 1, 12, 3],
+					"texture": 0
+				},
+				"west": {
+					"uv": [8, 1, 9, 3],
+					"texture": 0
+				},
+				"up": {
+					"uv": [8, 1, 5, 0],
+					"texture": 0
+				},
+				"down": {
+					"uv": [11, 0, 8, 1],
+					"texture": 0
+				}
+			},
+			"type": "cube",
+			"uuid": "cdebc596-7461-412b-dc93-da0f01621df9"
+		},
+		{
+			"name": "Left Tooth",
+			"box_uv": true,
+			"render_order": "default",
+			"rescale": false,
+			"locked": false,
+			"shade": true,
+			"light_emission": 0,
+			"allow_mirror_modeling": true,
+			"from": [5.5, 26, 7.5],
+			"to": [6.5, 30, 8.5],
+			"autouv": 0,
+			"color": 6,
+			"origin": [8, 21.75, 8],
+			"uv_offset": [4, 3],
+			"faces": {
+				"north": {
+					"uv": [5, 4, 6, 8],
+					"texture": 0
+				},
+				"east": {
+					"uv": [4, 4, 5, 8],
+					"texture": 0
+				},
+				"south": {
+					"uv": [7, 4, 8, 8],
+					"texture": 0
+				},
+				"west": {
+					"uv": [6, 4, 7, 8],
+					"texture": 0
+				},
+				"up": {
+					"uv": [6, 4, 5, 3],
+					"texture": 0
+				},
+				"down": {
+					"uv": [7, 3, 6, 4],
+					"texture": 0
+				}
+			},
+			"type": "cube",
+			"uuid": "d2c4d0a9-5de7-0052-d5d3-e2a7cff05408"
+		},
+		{
+			"name": "Right Tooth",
+			"box_uv": true,
+			"render_order": "default",
+			"rescale": false,
+			"locked": false,
+			"shade": true,
+			"light_emission": 0,
+			"allow_mirror_modeling": true,
+			"from": [9.5, 26, 7.5],
+			"to": [10.5, 30, 8.5],
+			"autouv": 0,
+			"color": 1,
+			"origin": [8, 21.75, 8],
+			"uv_offset": [4, 3],
+			"faces": {
+				"north": {
+					"uv": [5, 4, 6, 8],
+					"texture": 0
+				},
+				"east": {
+					"uv": [4, 4, 5, 8],
+					"texture": 0
+				},
+				"south": {
+					"uv": [7, 4, 8, 8],
+					"texture": 0
+				},
+				"west": {
+					"uv": [6, 4, 7, 8],
+					"texture": 0
+				},
+				"up": {
+					"uv": [6, 4, 5, 3],
+					"texture": 0
+				},
+				"down": {
+					"uv": [7, 3, 6, 4],
+					"texture": 0
+				}
+			},
+			"type": "cube",
+			"uuid": "91252138-d36c-9261-8576-7e00072bf147"
+		}
+	],
+	"groups": [
+		{
+			"uuid": "f85d523f-d6db-aefc-c9cb-c9a52c10961e",
+			"export": true,
+			"locked": false,
+			"origin": [8, 8, 8],
+			"rotation": [0, 0, 0],
+			"color": 0,
+			"name": "Trident",
+			"children": [],
+			"reset": false,
+			"shade": true,
+			"mirror_uv": false,
+			"selected": false,
+			"visibility": true,
+			"autouv": 0,
+			"isOpen": true,
+			"primary_selected": false
+		}
+	],
+	"outliner": [
+		{
+			"uuid": "f85d523f-d6db-aefc-c9cb-c9a52c10961e",
+			"isOpen": true,
+			"children": [
+				"154921cc-e79c-e6bf-2980-03f866c85cac",
+				"cdebc596-7461-412b-dc93-da0f01621df9",
+				"d2c4d0a9-5de7-0052-d5d3-e2a7cff05408",
+				"91252138-d36c-9261-8576-7e00072bf147"
+			]
+		}
+	],
+	"textures": [
+		{
+			"name": "trident.png",
+			"relative_path": ".minecraft/assets/minecraft/textures/entity/trident.png",
+			"folder": "entity",
+			"namespace": "minecraft",
+			"id": "layer0",
+			"group": "",
+			"width": 32,
+			"height": 32,
+			"uv_width": 32,
+			"uv_height": 32,
+			"particle": true,
+			"use_as_default": false,
+			"layers_enabled": false,
+			"sync_to_project": "",
+			"render_mode": "default",
+			"render_sides": "auto",
+			"pbr_channel": "color",
+			"frame_time": 1,
+			"frame_order_type": "loop",
+			"frame_order": "",
+			"frame_interpolate": false,
+			"visible": true,
+			"internal": false,
+			"saved": true,
+			"uuid": "337cfa9d-a8d3-4a69-71ab-721d6cfc5709"
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 60, 0],
+			"translation": [0.5, -10, 1]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 60, 0],
+			"translation": [0.5, -10, 1]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -90, 25],
+			"translation": [1, -10, 8]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -90, 25],
+			"translation": [1, -10, 8]
+		}
+	}
+}
