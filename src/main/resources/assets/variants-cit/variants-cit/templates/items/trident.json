@@ -1,0 +1,18 @@
+{
+	"model": {
+		"type": "select",
+		"property": "display_context",
+		"cases": 
+		[{
+			"when": [ "gui", "ground", "fixed" ],
+			"model": { "type":"model", "model":"${INPUT_ID}" }
+		}],
+		"fallback":
+		{
+			"type": "condition",
+			"property": "using_item",
+			"on_false":{ "type":"model", "model":"${INPUT_ID}_in_hand"  },
+			"on_true": { "type":"model", "model":"${INPUT_ID}_throwing" }
+		}
+	}
+}

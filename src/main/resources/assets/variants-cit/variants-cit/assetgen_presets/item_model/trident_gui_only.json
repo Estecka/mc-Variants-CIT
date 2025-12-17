@@ -1,0 +1,10 @@
+[
+	{
+		"pass": "models_from_textures",
+		"template": "models/item/handheld"
+	},
+	{
+		"pass": "items_from_models",
+		"template": "items/trident_gui_only"
+	}
+]

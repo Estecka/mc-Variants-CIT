@@ -1,0 +1,6 @@
+{
+	"parent": "${modelParent}",
+	"textures": {
+		"layer0": "${INPUT_ID}"
+	}
+}
