@@ -218,6 +218,11 @@ Since v2.5:
 ### 3.13.1
 - Fixed crash on `enchantment_vector` when set to ignore enchantment levels.
 - Fixed `optionalLevel` defaulting to false instead of true.
+## 3.14
+- Generated assets are now provided via a built-in virtual resource pack.
+- Added VCIT asset types: `templates` and `assetgen_presets`.
+- Added module option `assetGen`.
+- Added command `/variants-cit assetgen`.
 
 # v4
 ## 4.0
@@ -291,3 +296,8 @@ Since v3.5:
 ### 4.8.1
 - Fixed crash on `enchantment_vector` when set to ignore enchantment levels.
 - Fixed `optionalLevel` defaulting to false instead of true.
+## 4.9
+- Generated assets are now provided via a built-in virtual resource pack.
+- Added VCIT asset types: `templates` and `assetgen_presets`.
+- Added module option `assetGen`.
+- Added command `/variants-cit assetgen`.

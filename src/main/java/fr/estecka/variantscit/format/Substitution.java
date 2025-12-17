@@ -88,10 +88,11 @@ public class Substitution
 	static private record Parsed<T extends Token>(T token, String remainder)
 	{}
 
-	static public DataResult<Substitution> Parse(String remainder)
+	static public DataResult<Substitution> Parse(String input)
 	{
 		List<Token> result = new ArrayList<>();
 
+		String remainder = input;
 		while (!remainder.isEmpty()) {
 			Parsed<?> parsed;
 			try {
@@ -120,11 +121,12 @@ public class Substitution
 
 		String literal = input.substring(0, end);
 
-		if (Identifier.tryParse(literal) != null)
+		// // TODO: was relevant to component_format, but can't be used in templates.
+		// if (Identifier.tryParse(literal) != null)
 			return new Parsed<>( new Literal(literal), input.substring(end) );
-		else {
-			throw new IllegalArgumentException("Invalid character in path: "+literal);
-		}
+		// else {
+		// 	throw new IllegalArgumentException("Invalid character in path: "+literal);
+		// }
 	}
 
 	static private Parsed<Variable> NextVariable(String input)
