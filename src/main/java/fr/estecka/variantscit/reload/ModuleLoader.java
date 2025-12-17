@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.reload;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,19 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
 public final class ModuleLoader
 {
@@ -35,20 +30,20 @@ public final class ModuleLoader
 		}
 	}
 
-	static public ModuleLoader.Result ReloadModules(ResourceManager manager)
+	static public ModuleLoader.Result ReloadModules(HotswappableResourceManager manager)
 	{
 		final ModuleLoader.Result result;
 		final List<MetaModule> metamodules = new ArrayList<>();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
-		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(CodecUtil.GetResources(manager.Get(), "variant-cits/item", ".json"));
 		ObsoletePathWarning(resources);
-		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/item", ".json"));
 		for (var entry : resources.entrySet())
 		{
 			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
-			var optDefinition = DefinitionFromResource(entry.getValue());
+			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
 				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
 				continue;
@@ -116,18 +111,6 @@ public final class ModuleLoader
 			}
 			VariantsCitMod.LOGGER.warn("Some VCIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
 		}
-	}
-
-	static private DataResult<ModuleDefinition> DefinitionFromResource(Resource resource){
-		JsonObject json;
-		try {
-			json = JsonHelper.deserialize(resource.getReader());
-		}
-		catch (IOException|JsonParseException e){
-			return DataResult.error(e::toString);
-		}
-
-		return ModuleDefinition.CODEC.decoder().decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
 	}
 
 

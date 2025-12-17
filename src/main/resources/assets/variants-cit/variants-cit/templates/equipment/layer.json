@@ -1,0 +1,9 @@
+{
+	"layers": {
+		"${layerName}": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		]
+	}
+}

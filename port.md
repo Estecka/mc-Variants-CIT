@@ -25,6 +25,7 @@ Initial Release
 ## 1.21.9
 ### No workaround:
 - The signature of `BakedModelManager::reload` has changed. The `ResourceManager` passed as argument is now wrapped into another data type.
+- `PackResourceMetadata::new` takes a different set of parameters for the range.
 ### Possible workaround:
 - `NbtComponent::getNbt` was removed. use `copyNbt`, or create an accessor.
 

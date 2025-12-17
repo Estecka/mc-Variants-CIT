@@ -1,0 +1,8 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"inputPath": "[^/]+_saddle/(.*)",
+		"outputPath": "$1",
+		"template": "equipment/saddle"
+	}
+]

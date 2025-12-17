@@ -1,0 +1,18 @@
+[
+	{
+		"pass": "models_from_textures",
+		"template": "models/parent",
+		"variables": { "modelParent": "item/goat_horn" }
+	},
+	{
+		"pass": "models_from_textures",
+		"outputPath": "$0_tooting",
+		"template": "models/parent",
+		"variables": { "modelParent": "item/tooting_goat_horn" }
+	},
+	{
+		"pass": "items_from_models",
+		"inputPath": "(?!.*_tooting).*",
+		"template": "items/goat_horn"
+	}
+]
