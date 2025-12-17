@@ -13,6 +13,6 @@
 	{
 		"pass": "items_from_models",
 		"inputPath": "(?!.*_tooting).*",
-		"template": "items/bow"
+		"template": "items/goat_horn"
 	}
 ]

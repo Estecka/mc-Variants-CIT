@@ -39,6 +39,42 @@ public final class CodecUtil
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 
+
+/******************************************************************************/
+/* # Base Types                                                               */
+/******************************************************************************/
+
+	static public DataResult<Identifier> VCitIdenfitier(String input){
+		if (!input.contains(":"))
+			input = VariantsCitMod.MODID + ":" + input;
+		return Identifier.validate(input);
+	}
+
+	static public DataResult<Pattern> ParseRegex(String regex){
+		try {
+			return DataResult.success(Pattern.compile(regex));
+		}
+		catch (PatternSyntaxException e){
+			return DataResult.error(e::toString);
+		}
+	}
+
+	static public <K,V> Codec<V> Enum(Codec<K> keyCodec, Map<K,V> units){
+		return keyCodec.<V>flatXmap(
+			key -> units.containsKey(key) ?
+				DataResult.success(units.get(key)) :
+				DataResult.error(()->"Unknown key: " + key.toString()),
+			obj -> units.containsValue(obj) ?
+				DataResult.success(units.entrySet().stream().filter(entry->obj.equals(entry.getValue())).map(Entry::getKey).findFirst().get()) :
+				DataResult.error(()->"Unknown unit")
+		);
+	}
+
+
+/******************************************************************************/
+/* # Codec Modifiers                                                          */
+/******************************************************************************/
+
 	/**
 	 * Functions to be used in `validate()` on deprecated codecs.
 	 */
@@ -51,12 +87,6 @@ public final class CodecUtil
 
 	static public <T> MapCodec<T> WithWarning(MapCodec<T> codec, String warning, Object... args){
 		return codec.validate(WithWarning(warning, args));
-	}
-
-	static public DataResult<Identifier> VCitIdenfitier(String input){
-		if (!input.contains(":"))
-			input = VariantsCitMod.MODID + ":" + input;
-		return Identifier.validate(input);
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
@@ -104,23 +134,28 @@ public final class CodecUtil
 		);
 	}
 
-	static public <K,V> Codec<V> Enum(Codec<K> keyCodec, Map<K,V> units){
-		return keyCodec.<V>flatXmap(
-			key -> units.containsKey(key) ?
-				DataResult.success(units.get(key)) :
-				DataResult.error(()->"Unknown key: " + key.toString()),
-			obj -> units.containsValue(obj) ?
-				DataResult.success(units.entrySet().stream().filter(entry->obj.equals(entry.getValue())).map(Entry::getKey).findFirst().get()) :
-				DataResult.error(()->"Unknown unit")
-		);
-	}
-
 	static public <T> MapCodec<Optional<T>> OptionalWithAlias(Codec<T> codec, String primary, String alias){
 		return WithAlias(codec, primary, alias)
 			.xmap(Optional::of, Optional::get)
 			.orElse(Optional.empty())
 			;
 	}
+
+	/**
+	 * Downcast the decoder's result to a superclass. This strips the codec of
+	 * its encoding abilities.
+	 */
+	static public <SUPER, SUB extends SUPER> MapCodec<SUPER> Anonymize(MapCodec<SUB> original){
+		return original.flatXmap(
+			o->DataResult.success((SUPER)o),
+			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
+		);
+	}
+
+
+/******************************************************************************/
+/* # Component Serialization                                                  */
+/******************************************************************************/
 
 	static public <T> @Nullable NbtElement GetComponentNbt(ItemStack stack, ComponentType<T> type){
 		T component = stack.get(type);
@@ -145,29 +180,14 @@ public final class CodecUtil
 		}
 	}
 
-	/**
-	 * Downcast the decoder's result to a superclass. This strips the codec of
-	 * its encoding abilities.
-	 */
-	static public <SUPER, SUB extends SUPER> MapCodec<SUPER> Anonymize(MapCodec<SUB> original){
-		return original.flatXmap(
-			o->DataResult.success((SUPER)o),
-			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
-		);
-	}
 
-	static public DataResult<Pattern> ParseRegex(String regex){
-		try {
-			return DataResult.success(Pattern.compile(regex));
-		}
-		catch (PatternSyntaxException e){
-			return DataResult.error(e::toString);
-		}
-	}
+/******************************************************************************/
+/* # Resource Reload                                                          */
+/******************************************************************************/
 
 	/**
-	 * @param directory The base directory, *without* the trailing `/`
-	 * @param suffix The file extension, including the deparating dot.
+	 * @param directory	The base directory, *without* the trailing `/`
+	 * @param suffix	The file extension, including the separating dot.
 	 */
 	static public Map<Identifier,Resource> GetResources(ResourceManager manager, String directory, String suffix){
 		return manager.findResources(directory, id->id.getPath().endsWith(suffix));

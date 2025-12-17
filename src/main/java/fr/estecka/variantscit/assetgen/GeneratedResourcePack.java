@@ -61,7 +61,7 @@ implements ResourcePack
 	}
 
 	/**
-	 * Clears the pack  and returns a mutable pack  that can be used  to add new
+	 * Clears the pack  and returns  a mutable map  that can be used  to add new
 	 * assets to the pack.
 	 */
 	public Map<Identifier, InputSupplier<InputStream>> Reset(){
