@@ -3,6 +3,7 @@
 		"pass": "models_from_textures",
 		"inputPath": "(.*)_in_hand",
 		"outputPath": "$1_in_hand",
+		"radicalPath": "$1",
 		"template": "models/parent",
 		"variables": { "modelParent": "variants-cit:item/trident_in_hand" }
 	},
@@ -10,6 +11,7 @@
 		"pass": "models_from_textures",
 		"inputPath": "(.*)_in_hand",
 		"outputPath": "$1_throwing",
+		"radicalPath": "$1",
 		"template": "models/parent",
 		"variables": { "modelParent": "variants-cit:item/trident_throwing" }
 	},

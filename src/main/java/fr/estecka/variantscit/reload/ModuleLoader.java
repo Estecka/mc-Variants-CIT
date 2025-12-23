@@ -17,6 +17,7 @@ import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+
 public final class ModuleLoader
 {
 	static public class Result {
@@ -40,9 +41,10 @@ public final class ModuleLoader
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variant-cits/item", ".json"));
 		ObsoletePathWarning(resources);
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/item", ".json"));
+		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/modules", ".json"));
 		for (var entry : resources.entrySet())
 		{
-			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
+			Identifier moduleId = entry.getKey();
 			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
 				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
@@ -107,7 +109,7 @@ public final class ModuleLoader
 			String names = "";
 			for (Identifier id : resources.keySet()) {
 				names += ' ';
-				names += ModuleIdFromResourceId(id).toString();
+				names += id.toString();
 			}
 			VariantsCitMod.LOGGER.warn("Some VCIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
 		}
@@ -143,16 +145,6 @@ public final class ModuleLoader
 			return Set.of();
 	}
 
-	/**
-	 * @implNote TODO: Coincidentally, this handles  both the `variants-cit` and
-	 * the `variant-cits` directories. Refactor  will be  required  when modules
-	 * are moved to `variants-cit/module/`.
-	 */
-	static private Identifier ModuleIdFromResourceId(Identifier resource){
-		String path = resource.getPath();
-		path = path.substring("variants-cit/item/".length(), path.length()-".json".length());
-		return Identifier.of(resource.getNamespace(), path);
-	}
 
 /******************************************************************************/
 /* # Module Baking                                                            */

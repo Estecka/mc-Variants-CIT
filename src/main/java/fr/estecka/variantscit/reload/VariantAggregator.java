@@ -106,16 +106,17 @@ public class VariantAggregator
 			VariantLibrary library = entry.getValue();
 			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
 
-			// TODO: EnchantmentVector and AxolotlVariant will refuse stuff like "_pulling_1" for bows
-			boolean accepted = this.ApplyModelToModule(assetType.isFundamental, module, library, shortId);
+			this.ApplyModelToModule(assetType.isFundamental, module, library, shortId);
 
-			if (accepted && generatorPass != null){
+			if (generatorPass != null){
 				IAssetGenerator generator = this.assetGenerators.get(module);
 				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, shortId);
 
-				for (var r : generatedResources.entrySet()){
-					Identifier resourceId = generatorPass.GetOutputResourceId(r.getKey());
-					this.OnGeneratedResource(resourceId, module.modelPrefix(), r.getValue());
+				for (var e : generatedResources.entrySet())
+				if  (this.ApplyModelToModule(false, module, library, e.getValue().radical()))
+				{
+					Identifier resourceId = generatorPass.GetOutputResourceId(e.getKey());
+					this.OnGeneratedResource(resourceId, module.modelPrefix(), e.getValue().resource());
 				}
 			}
 
@@ -123,6 +124,10 @@ public class VariantAggregator
 		}
 	}
 
+	/**
+	 * @return Whether the provided ID asset can be added to this library.
+	 * @param isFundamental If true, add the asset to the library on success.
+	 */
 	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, Identifier shortId){
 		boolean accepted = false;
 

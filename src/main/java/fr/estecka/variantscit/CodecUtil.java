@@ -188,9 +188,16 @@ public final class CodecUtil
 	/**
 	 * @param directory	The base directory, *without* the trailing `/`
 	 * @param suffix	The file extension, including the separating dot.
+	 * @return The matching  resources, keyed using  an ID that includes neither
+	 * the directory nor the suffix.
 	 */
 	static public Map<Identifier,Resource> GetResources(ResourceManager manager, String directory, String suffix){
-		return manager.findResources(directory, id->id.getPath().endsWith(suffix));
+		Map<Identifier, Resource> result = new HashMap<>();
+		var resources = manager.findResources(directory, id->id.getPath().endsWith(suffix));
+		for (var e : resources.entrySet())
+			result.put(AssetIdFromResourceId(e.getKey(), directory, suffix), e.getValue());
+
+		return result;
 	}
 
 	static public Identifier AssetIdFromResourceId(Identifier id, String directory, String suffix){
@@ -221,7 +228,7 @@ public final class CodecUtil
 
 		Map<Identifier, Resource> resources = GetResources(manager, directory, suffix);
 		for (var entry : resources.entrySet()){
-			Identifier id = CodecUtil.AssetIdFromResourceId(entry.getKey(), directory, suffix);
+			Identifier id = entry.getKey();
 			DataResult<T> result = ParseResource(entry.getValue(), codec);
 			if (result.isSuccess())
 				results.put(id, result.getOrThrow());
