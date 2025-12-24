@@ -54,8 +54,13 @@ public interface IAssetGenerator
 		}
 	}
 
+	static public record ParentedResource(
+		Identifier radical,
+		InputSupplier<InputStream> resource
+	) {}
+
 	static public class Result
-	extends HashMap<Identifier,InputSupplier<InputStream>>
+	extends HashMap<Identifier,ParentedResource>
 	{
 		public void PutAllIfAbsent(Result behind){
 			for (var entry : behind.entrySet())

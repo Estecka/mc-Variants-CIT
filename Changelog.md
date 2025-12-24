@@ -223,6 +223,10 @@ Since v2.5:
 - Added VCIT asset types: `templates` and `assetgen_presets`.
 - Added module option `assetGen`.
 - Added command `/variants-cit assetgen`.
+## 3.15
+- Added the `radicalPath` option to asset generators.
+- Added the `RADICAL` variables to template.
+- Modules will now be looked for in `modules/` in addition to the old directories.
 
 # v4
 ## 4.0
@@ -303,3 +307,7 @@ Since v3.5:
 - Added VCIT asset types: `templates` and `assetgen_presets`.
 - Added module option `assetGen`.
 - Added command `/variants-cit assetgen`.
+## 4.10
+- Added the `radicalPath` option to asset generators.
+- Added the `RADICAL` variables to template.
+- Modules will now be looked for in `modules/` in addition to the old directories.

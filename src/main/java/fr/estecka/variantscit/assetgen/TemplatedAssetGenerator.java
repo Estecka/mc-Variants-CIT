@@ -15,8 +15,8 @@ import net.minecraft.util.Identifier;
 public record TemplatedAssetGenerator(
 	EAssetGenPass pass,
 	Pattern inputRegex,
-	// String radicalSubst,
 	String outputSubst,
+	String radicalSubst,
 	FilledTemplate template
 )
 implements IAssetGenerator
@@ -26,6 +26,7 @@ implements IAssetGenerator
 			EAssetGenPass.CODEC.fieldOf("pass").forGetter(TemplatedAssetGenerator::pass),
 			CodecUtil.REGEX.optionalFieldOf("inputPath", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
 			Codec.STRING.optionalFieldOf("outputPath", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
+			Codec.STRING.optionalFieldOf("radicalPath", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
 			FilledTemplate.MAPCODEC.forGetter(TemplatedAssetGenerator::template)
 		)
 		.apply(builder, TemplatedAssetGenerator::new)
@@ -36,7 +37,7 @@ implements IAssetGenerator
 		Pattern inputRegex,
 		FilledTemplate template
 	){
-		this(pass, inputRegex, "$0", template);
+		this(pass, inputRegex, "$0", "$0", template);
 	}
 
 	@Override
@@ -46,18 +47,23 @@ implements IAssetGenerator
 		if (pass != this.pass || !inputMatcher.matches())
 			return result;
 
-		// inputMatcher.replaceAll(radicalSubst);
-
-		// Identifier radicalId = Substitute(inputMatcher, radicalSubst).orElse(assetId);
+		Identifier radicalId = SubstitutePath(inputMatcher, radicalSubst)
+			.map(inputId::withPath)
+			.orElse(inputId)
+			;
 
 		Optional<String> outPath = SubstitutePath(inputMatcher, outputSubst);
 		if (outPath.isPresent()){
 			Identifier outputId = inputId.withPath(outPath.get());
 			result.putIfAbsent(
 				outputId,
-				template.Backfilled(Map.of("NAMESPACE", inputId.getNamespace()))
-				        .Backfilled(FilledTemplate.IdVariables("INPUT",  pass.input .GetVanillaId(inputId )))
-				        .Backfilled(FilledTemplate.IdVariables("OUTPUT", pass.output.GetVanillaId(outputId)))
+				new ParentedResource(
+					radicalId,
+					template.Backfilled(Map.of("NAMESPACE", inputId.getNamespace()))
+					        .Backfilled(FilledTemplate.IdVariables("INPUT",   pass.input .GetVanillaId(inputId )))
+					        .Backfilled(FilledTemplate.IdVariables("OUTPUT",  pass.output.GetVanillaId(outputId)))
+					        .Backfilled(FilledTemplate.IdVariables("RADICAL", pass.output.GetVanillaId(outputId)))
+				)
 			);
 		}
 
