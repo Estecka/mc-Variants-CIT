@@ -2,6 +2,8 @@
 	{
 		"pass": "models_from_textures",
 		"template": "models/parent",
+		"inputPath": "(.*?)(_cast)?",
+		"radicalPath": "$1",
 		"variables": { "modelParent": "item/handheld_row" }
 	},
 	{

@@ -2,6 +2,8 @@
 	{
 		"pass": "models_from_textures",
 		"template": "models/parent",
+		"inputPath": "(.*?)(_pulling_[0-9]+)?",
+		"radicalPath": "$1",
 		"variables": { "modelParent": "item/bow" }
 	},
 	{
