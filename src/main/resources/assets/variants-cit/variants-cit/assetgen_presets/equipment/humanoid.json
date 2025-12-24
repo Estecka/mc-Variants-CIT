@@ -3,6 +3,7 @@
 		"pass": "equipments_from_textures",
 		"inputPath": "humanoid(_leggings)?/(.*)",
 		"outputPath": "$2",
+		"radicalPath": "$2",
 		"template": "equipment/humanoid"
 	}
 ]
