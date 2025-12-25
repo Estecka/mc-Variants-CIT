@@ -110,3 +110,5 @@
 - Transform `charset_remap` can now replace a single character with a longer string.
 ## 2.16
 - Added quoting and escaping syntax to nbtPath keynames.
+## 2.17
+- Modules can now be loaded from `variants-cit/modules/`.

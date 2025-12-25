@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.ModuleRegistry;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
@@ -63,9 +64,10 @@ implements DataLoader<ModuleLoader.Result>
 		ModuleLoader.Result result = new ModuleLoader.Result();
 
 		Map<Identifier, Resource> resources = new HashMap<>();
-		resources.putAll(manager.findResources("variant-cits/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(CodecUtil.GetResources(manager, "variant-cits/item", ".json"));
 		Warn(resources);
-		resources.putAll(manager.findResources("variants-cit/item", id->id.getPath().endsWith(".json")));
+		resources.putAll(CodecUtil.GetResources(manager, "variants-cit/item", ".json"));
+		resources.putAll(CodecUtil.GetResources(manager, "variants-cit/modules", ".json"));
 
 		for (var entry : resources.entrySet())
 		try {
