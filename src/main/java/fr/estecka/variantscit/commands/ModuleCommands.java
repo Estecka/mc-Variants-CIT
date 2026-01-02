@@ -6,8 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.assetgen.FilledTemplate;
-import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.MetaModule;
@@ -38,7 +36,6 @@ public class ModuleCommands
 {
 	static public final Identifier ID = Identifier.of(VariantsCitMod.MODID, "modules");
 
-	static public final String ASSET_ARG   = "asset id";
 	static public final String CONTEXT_ARG = "context";
 	static public final String MODULE_ARG  = "module id";
 	
@@ -54,20 +51,14 @@ public class ModuleCommands
 			.then(literal("walkthrough").executes(c->Execute(c, ModuleCommands::Walkthrough)))
 			;
 
-		var context = argument(CONTEXT_ARG, moduleContext())
-			.suggests(ModuleCommands::ContextAutofill)
-			.then(module)
-			;
-
-		var assetgen = literal("assetgen")
-			.then(argument(ASSET_ARG, identifier())
-				.suggests(ModuleCommands::AssetAutofill)
-				.executes(ModuleCommands::AssetDump)
+		var context = literal("module")
+			.then(argument(CONTEXT_ARG, moduleContext())
+				.suggests(ModuleCommands::ContextAutofill)
+				.then(module)	
 			);
 
 		var root = literal(VariantsCitMod.MODID)
 			.then(context)
-			.then(assetgen)
 			;
 
 		dispatcher.register(root);
@@ -77,11 +68,6 @@ public class ModuleCommands
 /******************************************************************************/
 /* # Autofill                                                                 */
 /******************************************************************************/
-
-	static private CompletableFuture<Suggestions> AssetAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
-		CommandSource.suggestIdentifiers(GeneratedResourcePack.INSTANCE.GetAll().keySet(), builder);
-		return builder.buildFuture();
-	}
 
 	static private CompletableFuture<Suggestions> ContextAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
 		for (EModuleContext moduleContext : EModuleContext.values())
@@ -132,16 +118,6 @@ public class ModuleCommands
 
 		CommandLogger logger = new CommandLogger(context, moduleContext, meta);
 		return command.Execute(context, logger, module);
-	}
-
-	static private int AssetDump(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
-		Identifier id = context.getArgument(ASSET_ARG, Identifier.class);
-		FilledTemplate resource = (FilledTemplate)GeneratedResourcePack.INSTANCE.GetAll().get(id);
-
-		VariantsCitMod.LOGGER.info("{}:\n{}", id, resource.getString());
-
-		context.getSource().sendFeedback(Text.literal("Asset content was printed into the game's log."));
-		return 0;
 	}
 
 	static private int Dump(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module){

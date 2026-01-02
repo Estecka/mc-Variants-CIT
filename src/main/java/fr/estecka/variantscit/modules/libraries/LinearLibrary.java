@@ -32,12 +32,16 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 		return (id != null) ? id : fallback;
 	}
 
+	public Identifier GetWithBias(int magnitude, int bias){
+		return Fallback(this.modelLine.GetClosestValue(magnitude, bias));
+	}
+
 	public Identifier GetOrLesser(int magnitude){
-		return Fallback(this.modelLine.GetClosestValue(magnitude, -1));
+		return GetWithBias(magnitude, -1);
 	}
 
 	public Identifier GetOrGreater(int magnitude){
-		return Fallback(this.modelLine.GetClosestValue(magnitude, +1));
+		return GetWithBias(magnitude, +1);
 	}
 
 
@@ -112,6 +116,18 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 
 		public SnitchingLinearLibrary(CommandLogger logger){
 			super(logger);
+		}
+
+		@Override
+		public Identifier GetWithBias(int magnitude, int bias) {
+			if (bias < 0)
+				return GetOrLesser(magnitude);
+			if (bias > 0)
+				return GetOrGreater(magnitude);
+
+			Identifier r = LinearLibrary.this.GetWithBias(magnitude, 0);
+			LogGet(magnitude, r != null, "strictly equal", namespace);
+			return r;
 		}
 
 		@Override

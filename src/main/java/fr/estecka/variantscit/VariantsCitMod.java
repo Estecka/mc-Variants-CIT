@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.reload.MetaModule;
+import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modules.IBakedModule;
 
@@ -54,6 +55,7 @@ implements ClientModInitializer
 	@Override
 	public void onInitializeClient(){
 		ModuleCommands.Register();
+		AssetGenCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){

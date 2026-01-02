@@ -10,7 +10,7 @@ The format revolves around item variants being automatically associated to model
 Instead of defining a condition for every CIT, you define a single rule that governs all CITs in a collection, (so-called **modules**). This module defines what item is affected, how to figure out its variants, and where their models are located.
 
 For example, here's a simple module that would change the texture of enchanted books :
-```json
+```jsonc
 {
 	"type": "stored_enchantment", // How to compute the item's "variant ID"
 	"items": "minecraft:enchanted_book", // The affected item type(s)
@@ -26,7 +26,7 @@ This single module will work for every possible enchantment, vanilla or modded, 
 
 The module type above has a purpose-made logic for enchanted books. If no module type exists for a specific component, you can still use more generic modules to get a variant from any component:
 
-```json
+```jsonc
 {
 	"type": "component_data",
 	"items": "minecraft:suspicious_stew",
@@ -39,7 +39,7 @@ The module type above has a purpose-made logic for enchanted books. If no module
 ```
 
 At a higher level, you can create variants by combining multiple pieces of data from multiple components:
-```json
+```jsonc
 {
 	"type": "component_format",
 	"items": "minecraft:diamond_sword",
