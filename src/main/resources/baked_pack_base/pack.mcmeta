@@ -1,0 +1,11 @@
+{
+	"pack": {
+		"pack_format": 34,
+		"supported_formats": [34, 999],
+		"min_format": 34,
+		"max_format": 999,
+		"description": [
+			"Baked runtime-generated assets"
+		]
+	}
+}

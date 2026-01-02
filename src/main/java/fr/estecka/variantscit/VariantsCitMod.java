@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.reload.MetaModule;
+import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.vanilla.*;
@@ -64,6 +65,7 @@ implements ClientModInitializer
 		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
 
 		ModuleCommands.Register();
+		AssetGenCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){
