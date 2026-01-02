@@ -26,19 +26,20 @@ public final class VCitRegistries
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static {
-		RegisterBakedModule(Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
+		RegisterBakedModule (Identifier.ofVanilla("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
 		RegisterSimpleModule(Identifier.ofVanilla("block_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("bucket_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("component_data"), ComponentDataModule.CODEC);
 		RegisterSimpleModule(Identifier.ofVanilla("component_format"), MultiComponentFormatModule.CODEC);
+		RegisterBakedModule (Identifier.ofVanilla("component_threshold"), ComponentThresholdModule.MAPCODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.CUSTOM_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("custom_name"), CustomNameModule.CODEC);
-		RegisterBakedModule(Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary.GetBaker());
+		RegisterBakedModule (Identifier.ofVanilla("durability"), DurabilityModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("enchantment"), EnchantmentModule.CreateCodec(DataComponentTypes.ENCHANTMENTS));
-		RegisterBakedModule(Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponentTypes.ENCHANTMENTS));
+		RegisterBakedModule (Identifier.ofVanilla("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponentTypes.ENCHANTMENTS));
 		RegisterSimpleModule(Identifier.ofVanilla("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponentTypes.ENTITY_DATA));
 		RegisterSimpleModule(Identifier.ofVanilla("instrument"), new GoatHornModule());
-		RegisterBakedModule(Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
+		RegisterBakedModule (Identifier.ofVanilla("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(Identifier.ofVanilla("jukebox_playable"), new MusicDiscModule());
 		RegisterSimpleModule(Identifier.ofVanilla("painting_variant"), new PaintingVariantModule());
 		RegisterSimpleModule(Identifier.ofVanilla("potion_effect"), new PotionEffectModule());

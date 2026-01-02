@@ -2,6 +2,7 @@ package fr.estecka.variantscit;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -36,7 +37,7 @@ public class MultiPropertyCache
 		return new ICachableItemProperty() {
 			@Override
 			public int GetPropertyHash(ItemStack stack) {
-				return stack.get(type).hashCode();
+				return Objects.hashCode(stack.get(type));
 			}
 			@Override
 			public Object GetReference(ItemStack stack) {

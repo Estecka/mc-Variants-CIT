@@ -3,7 +3,6 @@
 		"pass": "equipments_from_textures",
 		"inputPath": "wings/(.*)",
 		"outputPath": "$1",
-		"radicalPath": "$1",
 		"template": "equipment/elytra"
 	}
 ]
