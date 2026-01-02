@@ -16,7 +16,7 @@ public record TemplatedAssetGenerator(
 	EAssetGenPass pass,
 	Pattern inputRegex,
 	String outputSubst,
-	String radicalSubst,
+	Optional<String> radicalSubst,
 	FilledTemplate template
 )
 implements IAssetGenerator
@@ -26,7 +26,7 @@ implements IAssetGenerator
 			EAssetGenPass.CODEC.fieldOf("pass").forGetter(TemplatedAssetGenerator::pass),
 			CodecUtil.REGEX.optionalFieldOf("inputPath", Pattern.compile(".*")).forGetter(TemplatedAssetGenerator::inputRegex),
 			Codec.STRING.optionalFieldOf("outputPath", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
-			Codec.STRING.optionalFieldOf("radicalPath", "$0").forGetter(TemplatedAssetGenerator::outputSubst),
+			Codec.STRING.optionalFieldOf("radicalPath").forGetter(TemplatedAssetGenerator::radicalSubst),
 			FilledTemplate.MAPCODEC.forGetter(TemplatedAssetGenerator::template)
 		)
 		.apply(builder, TemplatedAssetGenerator::new)
@@ -37,7 +37,7 @@ implements IAssetGenerator
 		Pattern inputRegex,
 		FilledTemplate template
 	){
-		this(pass, inputRegex, "$0", "$0", template);
+		this(pass, inputRegex, "$0", Optional.of("$0"), template);
 	}
 
 	@Override
@@ -47,14 +47,12 @@ implements IAssetGenerator
 		if (pass != this.pass || !inputMatcher.matches())
 			return result;
 
-		Identifier radicalId = SubstitutePath(inputMatcher, radicalSubst)
-			.map(inputId::withPath)
-			.orElse(inputId)
-			;
-
 		Optional<String> outPath = SubstitutePath(inputMatcher, outputSubst);
-		if (outPath.isPresent()){
-			Identifier outputId = inputId.withPath(outPath.get());
+		Optional<String> radPath = SubstitutePath(inputMatcher, radicalSubst.orElse(outputSubst));
+		if (outPath.isPresent() && radPath.isPresent()){
+			Identifier outputId  = inputId.withPath(outPath.get());
+			Identifier radicalId = inputId.withPath(radPath.get());
+
 			result.putIfAbsent(
 				outputId,
 				new ParentedResource(
@@ -62,7 +60,7 @@ implements IAssetGenerator
 					template.Backfilled(Map.of("NAMESPACE", inputId.getNamespace()))
 					        .Backfilled(FilledTemplate.IdVariables("INPUT",   pass.input .GetVanillaId(inputId )))
 					        .Backfilled(FilledTemplate.IdVariables("OUTPUT",  pass.output.GetVanillaId(outputId)))
-					        .Backfilled(FilledTemplate.IdVariables("RADICAL", pass.output.GetVanillaId(outputId)))
+					        .Backfilled(FilledTemplate.IdVariables("RADICAL", pass.output.GetVanillaId(radicalId)))
 				)
 			);
 		}

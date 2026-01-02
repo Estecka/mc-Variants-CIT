@@ -227,6 +227,13 @@ Since v2.5:
 - Added the `radicalPath` option to asset generators.
 - Added the `RADICAL` variables to template.
 - Modules will now be looked for in `modules/` in addition to the old directories.
+## 3.16
+- Added command: `/variants-cit assetgen createPack`
+- Renamed existing commands.
+- Changed the radical so it defaults to the output rather than the input.
+- Fixed the `RADICAL` template variables using an incorrect value.
+- Fixed a crash when certain modules try to access null components.
+- Added module `component_threshold`
 
 # v4
 ## 4.0
@@ -309,3 +316,10 @@ Since v3.5:
 - Added the `radicalPath` option to asset generators.
 - Added the `RADICAL` variables to template.
 - Modules will now be looked for in `modules/` in addition to the old directories.
+## 4.11
+- Added command: `/variants-cit assetgen createPack`
+- Renamed existing commands.
+- Changed the radical so it defaults to the output rather than the input.
+- Fixed the `RADICAL` template variables using an incorrect value.
+- Fixed a crash when certain modules try to access null components.
+- Added module `component_threshold`

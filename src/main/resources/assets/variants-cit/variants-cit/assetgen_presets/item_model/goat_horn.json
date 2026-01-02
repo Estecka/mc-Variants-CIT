@@ -7,6 +7,7 @@
 	{
 		"pass": "models_from_textures",
 		"outputPath": "$0_tooting",
+		"radicalPath": "$0",
 		"template": "models/parent",
 		"variables": { "modelParent": "item/tooting_goat_horn" }
 	},
