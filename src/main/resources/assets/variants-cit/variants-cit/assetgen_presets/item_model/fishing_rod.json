@@ -1,14 +1,14 @@
 [
 	{
 		"pass": "models_from_textures",
-		"template": "models/parent",
 		"inputPath": "(.*?)(_cast)?",
 		"radicalPath": "$1",
-		"variables": { "modelParent": "item/handheld_row" }
+		"template": "models/parent",
+		"variables": { "modelParent": "item/handheld_rod" }
 	},
 	{
 		"pass": "items_from_models",
 		"inputPath": "(?!.*_cast).*",
-		"template": "items/bow"
+		"template": "items/fishing_rod"
 	}
 ]
