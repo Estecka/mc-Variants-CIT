@@ -228,12 +228,15 @@ Since v2.5:
 - Added the `RADICAL` variables to template.
 - Modules will now be looked for in `modules/` in addition to the old directories.
 ## 3.16
+### 3.16.0
 - Added command: `/variants-cit assetgen createPack`
 - Renamed existing commands.
 - Changed the radical so it defaults to the output rather than the input.
 - Fixed the `RADICAL` template variables using an incorrect value.
 - Fixed a crash when certain modules try to access null components.
 - Added module `component_threshold`
+### 3.16.1
+- Fixed the `fishing_rod` assetGen preset.
 
 # v4
 ## 4.0
@@ -319,9 +322,12 @@ Since v3.5:
 - Added the `RADICAL` variables to template.
 - Modules will now be looked for in `modules/` in addition to the old directories.
 ## 4.11
+### 4.11.0
 - Added command: `/variants-cit assetgen createPack`
 - Renamed existing commands.
 - Changed the radical so it defaults to the output rather than the input.
 - Fixed the `RADICAL` template variables using an incorrect value.
 - Fixed a crash when certain modules try to access null components.
 - Added module `component_threshold`
+### 4.11.1
+- Fixed the `fishing_rod` assetGen preset.
