@@ -65,13 +65,13 @@ implements DataLoader<ModuleLoader.Result>
 
 		Map<Identifier, Resource> resources = new HashMap<>();
 		resources.putAll(CodecUtil.GetResources(manager, "variant-cits/item", ".json"));
-		Warn(resources);
+		ObsoletePathWarning(resources);
 		resources.putAll(CodecUtil.GetResources(manager, "variants-cit/item", ".json"));
 		resources.putAll(CodecUtil.GetResources(manager, "variants-cit/modules", ".json"));
 
 		for (var entry : resources.entrySet())
 		try {
-			Identifier moduleId = ModuleIdFromResourceId(entry.getKey());
+			Identifier moduleId = entry.getKey();
 			ProtoModule prototype = DefinitionFromResource(entry.getValue()).getOrThrow();
 
 			Set<RegistryEntry<Item>> targets = prototype.definition.targets()
@@ -111,12 +111,12 @@ implements DataLoader<ModuleLoader.Result>
 		return result;
 	}
 
-	static private void Warn(Map<Identifier, Resource> resources){
+	static private void ObsoletePathWarning(Map<Identifier, Resource> resources){
 		if (!resources.isEmpty()){
 			String names = "";
 			for (Identifier id : resources.keySet()) {
 				names += ' ';
-				names += ModuleIdFromResourceId(id).toString();
+				names += id.toString();
 			}
 			VariantsCitMod.LOGGER.warn("Some VCIT modules are using the old mispelled directory `variant-cits`, those should be moved to `variants-cit` instead:{}", names);
 		}
@@ -133,24 +133,10 @@ implements DataLoader<ModuleLoader.Result>
 	}
 
 	static private Set<RegistryEntry<Item>> ItemsFromModuleId(Identifier moduleId){
-		Identifier itemId = ItemIdFromModuleId(moduleId);
-
-		if (Registries.ITEM.containsId(itemId))
-			return Set.of(Registries.ITEM.getEntry(itemId).get());
+		if (Registries.ITEM.containsId(moduleId))
+			return Set.of(Registries.ITEM.getEntry(moduleId).get());
 		else
 			return Set.of();
-	}
-
-	static private Identifier ItemIdFromModuleId(Identifier resource){
-		String path = resource.getPath();
-		path = path.substring("item/".length());
-		return Identifier.of(resource.getNamespace(), path);
-	}
-
-	static private Identifier ModuleIdFromResourceId(Identifier resource){
-		String path = resource.getPath();
-		path = path.substring("variant-cits/".length(), path.length()-".json".length());
-		return Identifier.of(resource.getNamespace(), path);
 	}
 
 	static private DataResult<ProtoModule> DefinitionFromResource(Resource resource){

@@ -111,4 +111,7 @@
 ## 2.16
 - Added quoting and escaping syntax to nbtPath keynames.
 ## 2.17
+### 2.17.0
 - Modules can now be loaded from `variants-cit/modules/`.
+### 2.17.1
+- Fixed resource reload crash when using some modules.
