@@ -5,11 +5,11 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 public class MultiPropertyCache
 {
@@ -29,11 +29,11 @@ public class MultiPropertyCache
 		this.properties = properties.distinct().toArray(ICachableItemProperty[]::new);
 	}
 
-	public MultiPropertyCache(boolean debug, ComponentType<?> component){
+	public MultiPropertyCache(boolean debug, DataComponentType<?> component){
 		this(debug, Stream.of(ComponentProperty(component)));
 	}
 
-	static private ICachableItemProperty ComponentProperty(ComponentType<?> type){
+	static private ICachableItemProperty ComponentProperty(DataComponentType<?> type){
 		return new ICachableItemProperty() {
 			@Override
 			public int GetPropertyHash(ItemStack stack) {
@@ -46,13 +46,13 @@ public class MultiPropertyCache
 		};
 	}
 
-	public Identifier ComputeIfAbsent(ItemStack stack, Function<ItemStack,Identifier> computer){
+	public ResourceLocation ComputeIfAbsent(ItemStack stack, Function<ItemStack,ResourceLocation> computer){
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
 		CacheEntry entry = this.hashToVariant.get(hash);
 		if (entry == null) {
-			Identifier variant = computer.apply(stack);
+			ResourceLocation variant = computer.apply(stack);
 			entry = this.CreateEntry(hash, stack, variant);
 			if (debug)
 				VariantsCitMod.LOGGER.info("Cache size: {}; Latest Model Id: {}", hashToVariant.size(), String.valueOf(entry.variant));
@@ -75,7 +75,7 @@ public class MultiPropertyCache
 	 * TODO: As-is, an entry where all registered components are null will never
 	 * expire. This is limited to one entry per cache, so it is negligible.
 	 */
-	private CacheEntry CreateEntry(int hash, ItemStack stack, Identifier variant){
+	private CacheEntry CreateEntry(int hash, ItemStack stack, ResourceLocation variant){
 		WeakReference<?>[] weakRefs = new WeakReference[properties.length];
 
 		for (int i=0; i<properties.length; ++i){
@@ -116,6 +116,6 @@ public class MultiPropertyCache
 	 * get garbage collected  before its referee. Otherwise, references will not
 	 * get enqueued, and the cache will never be cleared.
 	 */
-	static private record CacheEntry(Identifier variant, WeakReference<?>[] components)
+	static private record CacheEntry(ResourceLocation variant, WeakReference<?>[] components)
 	{}
 }

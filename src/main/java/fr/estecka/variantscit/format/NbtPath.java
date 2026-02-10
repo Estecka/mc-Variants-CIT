@@ -3,14 +3,14 @@ package fr.estecka.variantscit.format;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import net.minecraft.nbt.CollectionTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.nbt.AbstractNbtList;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.Identifier;
 
 public final class NbtPath
 {
@@ -38,7 +38,7 @@ public final class NbtPath
 		this.tokens = tokens.toArray(Token[]::new);
 	}
 
-	public @Nullable NbtElement Resolve(NbtElement nbt){
+	public @Nullable Tag Resolve(Tag nbt){
 		for (Token tk : this.tokens){
 			nbt = tk.Resolve(nbt);
 			if (nbt == null) return null;
@@ -124,7 +124,7 @@ public final class NbtPath
 /******************************************************************************/
 
 	static private interface Token {
-		@Nullable NbtElement Resolve(NbtElement nbt);
+		@Nullable Tag Resolve(Tag nbt);
 	}
 
 	static private record MapKey(String name)
@@ -134,8 +134,8 @@ public final class NbtPath
 		static private final char ESCAPE = '\\';
 
 		@Override
-		public NbtElement Resolve(NbtElement nbt){
-			if (nbt instanceof NbtCompound compound)
+		public Tag Resolve(Tag nbt){
+			if (nbt instanceof CompoundTag compound)
 				return compound.get(name);
 			else
 				return null;
@@ -199,7 +199,7 @@ public final class NbtPath
 
 		static private boolean IsCharValid(char c){
 			return ('A' <= c && c <= 'Z')
-			    || (Identifier.isCharValid(c) && c != '.')
+			    || (ResourceLocation.isAllowedInResourceLocation(c) && c != '.')
 			    ;
 		}
 	}
@@ -208,8 +208,8 @@ public final class NbtPath
 	implements Token
 	{
 		@Override
-		public NbtElement Resolve(NbtElement nbt){
-			if (!(nbt instanceof AbstractNbtList<?> list))
+		public Tag Resolve(Tag nbt){
+			if (!(nbt instanceof CollectionTag<?> list))
 				return null;
 
 			int size = list.size();
@@ -254,11 +254,11 @@ public final class NbtPath
 	implements Token
 	{
 		@Override
-		public NbtElement Resolve(NbtElement nbt){
-			if (!(nbt instanceof NbtCompound compound))
+		public Tag Resolve(Tag nbt){
+			if (!(nbt instanceof CompoundTag compound))
 				return null;
 
-			int size = compound.getSize();
+			int size = compound.size();
 			if (index < -size || size <= index)
 				return null;
 
@@ -266,7 +266,7 @@ public final class NbtPath
 			if (i < 0) i += size;
 
 			String key = null;
-			for (String k : compound.getKeys())
+			for (String k : compound.getAllKeys())
 			if (i-- <= 0){
 				key = k;
 				break;
@@ -275,7 +275,7 @@ public final class NbtPath
 			if (key == null)
 				return null;
 
-			NbtCompound result = new NbtCompound();
+			CompoundTag result = new CompoundTag();
 			result.putString("key", key);
 			result.put("value", compound.get(key));
 			return result;

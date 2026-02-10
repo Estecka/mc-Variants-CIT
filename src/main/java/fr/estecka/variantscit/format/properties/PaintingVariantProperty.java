@@ -1,26 +1,26 @@
 package fr.estecka.variantscit.format.properties;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.component.CustomData;
 
 public class PaintingVariantProperty
-extends AMonoComponentProperty<NbtComponent>
+extends AMonoComponentProperty<CustomData>
 {
 	static public final PaintingVariantProperty UNIT = new PaintingVariantProperty();
 
 	private PaintingVariantProperty(){
-		super(DataComponentTypes.ENTITY_DATA);
+		super(DataComponents.ENTITY_DATA);
 	}
 
 	@Override
-	public String GetPropertyString(NbtComponent component) {
-		return component.getNbt().getString("variant");
+	public String GetPropertyString(CustomData component) {
+		return component.getUnsafe().getString("variant");
 	}
 
-	public Identifier GetPropertyId(NbtComponent component){
+	public ResourceLocation GetPropertyId(CustomData component){
 		String rawVariant = GetPropertyString(component);
-		return (rawVariant!=null) ?  Identifier.tryParse(rawVariant) : null;
+		return (rawVariant!=null) ?  ResourceLocation.tryParse(rawVariant) : null;
 	}
 	
 }

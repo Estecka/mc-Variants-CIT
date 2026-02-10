@@ -11,12 +11,12 @@ import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.CommandSource;
-import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.repository.PackRepository;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -38,11 +38,11 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.command.argument.IdentifierArgumentType.identifier;
+import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
 
 public class AssetGenCommands
 {
-	static public final Identifier ID = Identifier.of(VariantsCitMod.MODID, "assetgen");
+	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "assetgen");
 	static public final String BAKED_PACK_DIR = "VCIT Baked AssetGen";
 	static public final String ASSET_ARG = "asset id";
 
@@ -50,13 +50,13 @@ public class AssetGenCommands
 		ClientCommandRegistrationCallback.EVENT.register(ID, AssetGenCommands::RegisterWith);
 	}
 
-	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess){
+	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess){
 		var pack = literal("createPack")
 			.executes(AssetGenCommands::CreatePack)
 			;
 
 		var peek = literal("peek")
-			.then(argument(ASSET_ARG, identifier())
+			.then(argument(ASSET_ARG, id())
 				.suggests(AssetGenCommands::AssetAutofill)
 				.executes(AssetGenCommands::AssetPeek)
 			);
@@ -76,7 +76,7 @@ public class AssetGenCommands
 /******************************************************************************/
 
 	static private CompletableFuture<Suggestions> AssetAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
-		CommandSource.suggestIdentifiers(GeneratedResourcePack.INSTANCE.GetAll().keySet(), builder);
+		SharedSuggestionProvider.suggestResource(GeneratedResourcePack.INSTANCE.GetAll().keySet(), builder);
 		return builder.buildFuture();
 	}
 
@@ -86,12 +86,12 @@ public class AssetGenCommands
 /******************************************************************************/
 
 	static private int Error(CommandContext<FabricClientCommandSource> context, String message){
-		context.getSource().sendError(Text.literal(message));
+		context.getSource().sendError(Component.literal(message));
 		return -1;
 	}
 
 	static private int AssetPeek(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
-		Identifier id = context.getArgument(ASSET_ARG, Identifier.class);
+		ResourceLocation id = context.getArgument(ASSET_ARG, ResourceLocation.class);
 		FilledTemplate resource = (FilledTemplate)GeneratedResourcePack.INSTANCE.GetAll().get(id);
 
 		if (resource == null)
@@ -99,7 +99,7 @@ public class AssetGenCommands
 
 		VariantsCitMod.LOGGER.info("{}:\n{}", id, resource.getString());
 
-		context.getSource().sendFeedback(Text.literal("Asset content was printed into the game's log."));
+		context.getSource().sendFeedback(Component.literal("Asset content was printed into the game's log."));
 		return 0;
 	}
 
@@ -143,9 +143,9 @@ public class AssetGenCommands
 		}
 
 		// Assets
-		context.getSource().sendFeedback(Text.literal("Writing assets..."));
+		context.getSource().sendFeedback(Component.literal("Writing assets..."));
 		for (var entry : GeneratedResourcePack.INSTANCE.GetAll().entrySet()){
-			Identifier id = entry.getKey();
+			ResourceLocation id = entry.getKey();
 			String assetPath = "assets/"+id.getNamespace()+"/"+id.getPath();
 			Path assetDst = dst.resolve(assetPath);
 			filesToKeep.add(assetDst);
@@ -164,7 +164,7 @@ public class AssetGenCommands
 			Error(context, "Error while writing some assets. See log for details.");
 
 		// Clean-up
-		context.getSource().sendFeedback(Text.literal("Cleaning-up obsolete assets..."));
+		context.getSource().sendFeedback(Component.literal("Cleaning-up obsolete assets..."));
 		try {
 			Files.walkFileTree(dst, new SimpleFileVisitor<Path>() {
 				@Override
@@ -190,16 +190,16 @@ public class AssetGenCommands
 		else
 			context.getSource().sendFeedback(Text.literal("Done !"));
 
-		ResourcePackManager packManager = MinecraftClient.getInstance().getResourcePackManager();
+		PackRepository packManager = Minecraft.getInstance().getResourcePackRepository();
 		String packId = "file/"+BAKED_PACK_DIR;
-		List<String> enabled = new ArrayList<>(packManager.getEnabledIds());
-		if (!packManager.getEnabledIds().contains(packId)){
+		List<String> enabled = new ArrayList<>(packManager.getSelectedIds());
+		if (!packManager.getSelectedIds().contains(packId)){
 			enabled.addFirst(packId);
-			packManager.scanPacks();
-			packManager.setEnabledProfiles(enabled);
+			packManager.reload(); // Scan for available packs. NOT a resource reload.
+			packManager.setSelected(enabled);
 		}
 
-		MinecraftClient.getInstance().reloadResources();
+		Minecraft.getInstance().reloadResourcePacks(); // THIS is a resource reload.
 		return 1;
 	}
 

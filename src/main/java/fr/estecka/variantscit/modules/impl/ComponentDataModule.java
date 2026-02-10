@@ -2,6 +2,9 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
 import java.util.stream.Stream;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -16,10 +19,6 @@ import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.format.properties.ItemComponentProperty;
 import fr.estecka.variantscit.format.properties.TransformableProperty;
 import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public class ComponentDataModule<P extends IStringProperty>
 extends ASimpleMultiComponentCachingModule
@@ -33,7 +32,7 @@ extends ASimpleMultiComponentCachingModule
 	);
 
 	@Deprecated
-	static public final <T> MapCodec<ComponentDataModule<TransformableProperty<ItemComponentProperty>>> CreateLegacyCodec(ComponentType<T> componentType){
+	static public final <T> MapCodec<ComponentDataModule<TransformableProperty<ItemComponentProperty>>> CreateLegacyCodec(DataComponentType<T> componentType){
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				LegacyPropertyCodec(componentType).forGetter(o->o.property),
@@ -47,7 +46,7 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Deprecated
-	static public final <T> MapCodec<TransformableProperty<ItemComponentProperty>> LegacyPropertyCodec(ComponentType<T> componentType){
+	static public final <T> MapCodec<TransformableProperty<ItemComponentProperty>> LegacyPropertyCodec(DataComponentType<T> componentType){
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter()),
@@ -65,13 +64,13 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Override
-	public @Nullable Identifier RecomputeItemVariant(ItemStack stack) {
+	public @Nullable ResourceLocation RecomputeItemVariant(ItemStack stack) {
 		String result = this.property.GetPropertyString(stack);
-		return (result!=null) ? Identifier.tryParse(result) : null;
+		return (result!=null) ? ResourceLocation.tryParse(result) : null;
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
 		String raw = TransformableProperty.GetRaw(this.property).GetPropertyString(stack);
 		String transformed = property.GetPropertyString(stack);
 

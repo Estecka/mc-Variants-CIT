@@ -11,12 +11,12 @@ import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.CommandSource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -28,13 +28,13 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.command.argument.IdentifierArgumentType.identifier;
+import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
 import static fr.estecka.variantscit.commands.ModuleContextArgumentType.moduleContext;
 import static fr.estecka.variantscit.commands.ModuleContextArgumentType.getModuleContext;
 
 public class ModuleCommands
 {
-	static public final Identifier ID = Identifier.of(VariantsCitMod.MODID, "modules");
+	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "modules");
 
 	static public final String CONTEXT_ARG = "context";
 	static public final String MODULE_ARG  = "module id";
@@ -43,8 +43,8 @@ public class ModuleCommands
 		ClientCommandRegistrationCallback.EVENT.register(ID, ModuleCommands::RegisterWith);
 	}
 
-	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess){
-		var module = argument(MODULE_ARG, identifier())
+	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess){
+		var module = argument(MODULE_ARG, id())
 			.suggests(ModuleCommands::ModuleAutofill)
 			.then(literal("dump").executes(c->Execute(c, ModuleCommands::Dump)))
 			.then(literal("summary").executes(c->Execute(c, ModuleCommands::Summary)))
@@ -77,7 +77,7 @@ public class ModuleCommands
 
 	static private CompletableFuture<Suggestions> ModuleAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
-		Stream<Identifier> modules = VariantsCitMod.GetMeta().entrySet().stream()
+		Stream<ResourceLocation> modules = VariantsCitMod.GetMeta().entrySet().stream()
 			.filter(entry -> {
 				MetaModule meta = entry.getValue();
 				return switch (moduleContext){
@@ -89,7 +89,7 @@ public class ModuleCommands
 			.map(Map.Entry::getKey)
 			;
 
-		CommandSource.suggestIdentifiers(modules, builder);
+		SharedSuggestionProvider.suggestResource(modules, builder);
 
 		return builder.buildFuture();
 	}
@@ -107,12 +107,12 @@ public class ModuleCommands
 
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
-		Identifier moduleId = context.getArgument(MODULE_ARG, Identifier.class);
+		ResourceLocation moduleId = context.getArgument(MODULE_ARG, ResourceLocation.class);
 		MetaModule meta = VariantsCitMod.GetMeta().get(moduleId);
 		IBakedModule module = VariantsCitMod.GetModule(moduleContext, moduleId);
 
 		if (module == null){
-			context.getSource().sendError(Text.literal("No such module: "+moduleContext+" "+moduleId));
+			context.getSource().sendError(Component.literal("No such module: "+moduleContext+" "+moduleId));
 			return -1;
 		}
 
@@ -131,21 +131,21 @@ public class ModuleCommands
 	}
 
 	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, CommandLogger logger, IBakedModule module){
-		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandStack();
+		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandItem();
 
 		logger.Info("--------");
 		logger.Info("Testing {} module {} on main-hand item: {} ({})",
 			CommandLogger.PackData(logger.moduleContext()),
-			CommandLogger.PackData(logger.metamodule().id()).formatted(Formatting.UNDERLINE),
-			CommandLogger.ItemData(stack.getName()).formatted(Formatting.UNDERLINE),
+			CommandLogger.PackData(logger.metamodule().id()).withStyle(ChatFormatting.UNDERLINE),
+			CommandLogger.ItemData(stack.getHoverName()).withStyle(ChatFormatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getItem())
 		);
 		logger.Info("----");
 
 		if (!logger.metamodule().targets().contains(stack.getItem()))
-			logger.Info(Formatting.GOLD, "[WARN] This module would normally not be applied to items of type {}", stack.getItem());
+			logger.Info(ChatFormatting.GOLD, "[WARN] This module would normally not be applied to items of type {}", stack.getItem());
 
-		Identifier modelId = module.Walkthrough(logger, stack);
+		ResourceLocation modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){
 			logger.Info("The module returned the model: {}", CommandLogger.PackData(modelId));
 		}

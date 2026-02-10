@@ -1,15 +1,15 @@
 package fr.estecka.variantscit.format.properties;
 
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 
 public class IntegerComponentProperty
 extends AMonoComponentProperty<Integer>
 {
-	static public final IntegerComponentProperty DAMAGE     = new IntegerComponentProperty(DataComponentTypes.DAMAGE);
-	static public final IntegerComponentProperty MAX_DAMAGE = new IntegerComponentProperty(DataComponentTypes.MAX_DAMAGE);
+	static public final IntegerComponentProperty DAMAGE     = new IntegerComponentProperty(DataComponents.DAMAGE);
+	static public final IntegerComponentProperty MAX_DAMAGE = new IntegerComponentProperty(DataComponents.MAX_DAMAGE);
 
-	public IntegerComponentProperty(ComponentType<Integer> componentType){
+	public IntegerComponentProperty(DataComponentType<Integer> componentType){
 		super(componentType);
 	}
 

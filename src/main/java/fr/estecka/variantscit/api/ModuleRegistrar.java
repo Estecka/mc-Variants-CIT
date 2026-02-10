@@ -1,20 +1,20 @@
 package fr.estecka.variantscit.api;
 
 import fr.estecka.variantscit.VCitRegistries;
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.util.Identifier;
 
 public final class ModuleRegistrar
 {
-	static public void Register(Identifier moduleId, MapCodec<? extends ICitModule> moduleCodec){
+	static public void Register(ResourceLocation moduleId, MapCodec<? extends ICitModule> moduleCodec){
 		VCitRegistries.RegisterSimpleModule(moduleId, moduleCodec);
 	}
 
-	static public void Register(Identifier moduleId, ISimpleCitModule module){
+	static public void Register(ResourceLocation moduleId, ISimpleCitModule module){
 		VCitRegistries.RegisterSimpleModule(moduleId, module);
 	}
 
-	static public void Register(Identifier moduleId, ICitModule module){
+	static public void Register(ResourceLocation moduleId, ICitModule module){
 		VCitRegistries.RegisterSimpleModule(moduleId, module);
 	}
 }

@@ -4,16 +4,16 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public record FallbackModule(ICitModule... innerQueue)
 implements ICitModule
 {
 	@Override
-	public @Nullable Identifier GetItemModel(ItemStack stack, IVariantManager modelProvider) {
+	public @Nullable ResourceLocation GetItemModel(ItemStack stack, IVariantManager modelProvider) {
 		for (ICitModule m : innerQueue){
-			Identifier result = m.GetItemModel(stack, modelProvider);
+			ResourceLocation result = m.GetItemModel(stack, modelProvider);
 			if (result != null) return result;
 		}
 
@@ -21,9 +21,9 @@ implements ICitModule
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
 		for (ICitModule m : innerQueue){
-			Identifier result = m.Walkthrough(stack, library, logger);
+			ResourceLocation result = m.Walkthrough(stack, library, logger);
 			if (result != null) return result;
 		}
 

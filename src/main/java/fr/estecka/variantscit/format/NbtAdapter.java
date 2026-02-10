@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.Tag;
 
 public class NbtAdapter
 {
@@ -38,7 +38,7 @@ public class NbtAdapter
 		this.type = type;
 	}
 
-	public final @Nullable String ResolveData(NbtElement nbt){
+	public final @Nullable String ResolveData(Tag nbt){
 		nbt = this.nbtPath.Resolve(nbt);
 		if (nbt == null)
 			return null;

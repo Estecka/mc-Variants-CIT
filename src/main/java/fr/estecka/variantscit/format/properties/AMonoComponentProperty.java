@@ -1,16 +1,16 @@
 package fr.estecka.variantscit.format.properties;
 
 import java.util.Objects;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
 
 public abstract class AMonoComponentProperty<T>
 implements IStringProperty
 {
-	protected final ComponentType<T> componentType;
+	protected final DataComponentType<T> componentType;
 
-	protected AMonoComponentProperty(ComponentType<T> componentType){
+	protected AMonoComponentProperty(DataComponentType<T> componentType){
 		this.componentType = componentType;
 	}
 

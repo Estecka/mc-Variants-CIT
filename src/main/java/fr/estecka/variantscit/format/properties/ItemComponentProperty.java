@@ -11,23 +11,23 @@ import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import fr.estecka.variantscit.format.NbtPath;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public record ItemComponentProperty(
-	ComponentType<?> componentType,
+	DataComponentType<?> componentType,
 	NbtAdapter nbtAdapter
 )
 implements IStringProperty
 {
 	static public final MapCodec<ItemComponentProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
+			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
 			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter)
 		)
 		.apply(builder, ItemComponentProperty::new)
@@ -51,7 +51,7 @@ implements IStringProperty
 
 	@Override
 	public String GetPropertyString(ItemStack stack){
-		NbtElement nbt = CodecUtil.GetComponentNbt(stack, this.componentType);
+		Tag nbt = CodecUtil.GetComponentNbt(stack, this.componentType);
 		if (nbt == null)
 			return null;
 
@@ -63,7 +63,7 @@ implements IStringProperty
 		int pathLocation;
 		for (pathLocation = 0; pathLocation<input.length(); pathLocation++){
 			char c = input.charAt(pathLocation);
-			if (c == '.' || !Identifier.isCharValid(c))
+			if (c == '.' || !ResourceLocation.isAllowedInResourceLocation(c))
 				break;
 		}
 
@@ -71,7 +71,7 @@ implements IStringProperty
 		String s_path      = input.substring(pathLocation);
 
 		var r_path = (!s_path.isEmpty()) ? NbtPath.Parse(s_path) : DataResult.success(NbtPath.IDENTITY);
-		var r_component = Registries.DATA_COMPONENT_TYPE.getCodec().decode(NbtOps.INSTANCE, NbtString.of(s_component)).map(Pair::getFirst);
+		var r_component = BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().decode(NbtOps.INSTANCE, StringTag.valueOf(s_component)).map(Pair::getFirst);
 
 		if (r_path.isError())
 			return r_path.map(__->null);
@@ -80,7 +80,7 @@ implements IStringProperty
 			return r_component.map(__->null);
 
 		NbtPath path = r_path.getOrThrow();
-		ComponentType<?> component = r_component.getOrThrow();
+		DataComponentType<?> component = r_component.getOrThrow();
 
 		return DataResult.success(new TransformableProperty<>(
 			new ItemComponentProperty(component, new NbtAdapter(path, INbtInput.AUTO)),

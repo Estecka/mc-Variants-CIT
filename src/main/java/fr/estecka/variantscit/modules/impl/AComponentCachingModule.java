@@ -1,14 +1,14 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.WeakHashMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.api.ICitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 /**
  * Optimization for deterministic modules that may require expensive computation
@@ -20,7 +20,7 @@ import net.minecraft.util.Identifier;
 abstract class AComponentCachingModule<T>
 implements ICitModule
 {
-	protected final ComponentType<T> componentType;
+	protected final DataComponentType<T> componentType;
 
 	/*
 	 * The lifetime of each entry  is roughly equivalent  to the lifetime of the
@@ -28,16 +28,16 @@ implements ICitModule
 	 * immutable, so a cache  should never  need  to be  recomputed  for a given
 	 * identity.
 	 */
-	private final WeakHashMap<T, @Nullable Identifier> cachedModels = new WeakHashMap<>();
+	private final WeakHashMap<T, @Nullable ResourceLocation> cachedModels = new WeakHashMap<>();
 	private int reloadCounts = 0;
 
-	public AComponentCachingModule(ComponentType<T> component){
+	public AComponentCachingModule(DataComponentType<T> component){
 		this.componentType = component;
 	}
 
 
 	@Override
-	public final Identifier GetItemModel(ItemStack stack, IVariantManager models){
+	public final ResourceLocation GetItemModel(ItemStack stack, IVariantManager models){
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
@@ -57,7 +57,7 @@ implements ICitModule
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
@@ -65,5 +65,5 @@ implements ICitModule
 		return GetModelForComponent(component, library);
 	}
 
-	public abstract Identifier GetModelForComponent(T component, IVariantManager models);
+	public abstract ResourceLocation GetModelForComponent(T component, IVariantManager models);
 }

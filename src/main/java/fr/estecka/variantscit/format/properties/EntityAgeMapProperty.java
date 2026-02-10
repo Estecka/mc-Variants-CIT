@@ -4,13 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.component.CustomData;
 
 public class EntityAgeMapProperty
-extends AMonoComponentProperty<NbtComponent>
+extends AMonoComponentProperty<CustomData>
 {
 	static public final EntityAgeMapProperty UNIT = new EntityAgeMapProperty("", "_baby");
 
@@ -25,16 +25,16 @@ extends AMonoComponentProperty<NbtComponent>
 	private final String adult, baby;
 
 	public EntityAgeMapProperty(String adult, String baby){
-		super(DataComponentTypes.BUCKET_ENTITY_DATA);
+		super(DataComponents.BUCKET_ENTITY_DATA);
 		this.adult = adult;
 		this.baby = baby;
 	}
 
 	@Override
-	public @NotNull String GetPropertyString(NbtComponent bucket) {
-		NbtCompound nbt;
+	public @NotNull String GetPropertyString(CustomData bucket) {
+		CompoundTag nbt;
 
-		if (bucket == null || (nbt=bucket.getNbt()) == null || !nbt.contains("Age", NbtElement.NUMBER_TYPE))
+		if (bucket == null || (nbt=bucket.getUnsafe()) == null || !nbt.contains("Age", Tag.TAG_ANY_NUMERIC))
 			return adult;
 
 		float age = nbt.getFloat("Age");

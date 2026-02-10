@@ -1,20 +1,20 @@
 package fr.estecka.variantscit.modules.impl;
 
 import fr.estecka.variantscit.api.ISimpleCitModule;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.JukeboxPlayableComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.JukeboxPlayable;
 
 public class MusicDiscModule
 implements ISimpleCitModule
 {
 	@Override
-	public Identifier GetItemVariant(ItemStack stack){
-		JukeboxPlayableComponent component = stack.get(DataComponentTypes.JUKEBOX_PLAYABLE);
+	public ResourceLocation GetItemVariant(ItemStack stack){
+		JukeboxPlayable component = stack.get(DataComponents.JUKEBOX_PLAYABLE);
 		if (component == null)
 			return null;
 
-		return component.song().key().getValue();
+		return component.song().key().location();
 	}
 }

@@ -7,15 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 
 
 public final class ModuleLoader
@@ -23,10 +22,10 @@ public final class ModuleLoader
 	static public class Result {
 		public final Map<Item, IBakedModule> itemModules  = new HashMap<>();
 		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
-		public final Map<Identifier, MetaModule> allModules = new HashMap<>();
+		public final Map<ResourceLocation, MetaModule> allModules = new HashMap<>();
 		public final VariantAggregator variantAggregator;
 
-		private Result(Map<Identifier,ModuleDefinition> modules){
+		private Result(Map<ResourceLocation,ModuleDefinition> modules){
 			this.variantAggregator = new VariantAggregator(modules);
 		}
 	}
@@ -36,15 +35,15 @@ public final class ModuleLoader
 		final ModuleLoader.Result result;
 		final List<MetaModule> metamodules = new ArrayList<>();
 
-		Map<Identifier, Resource> resources = new HashMap<>();
-		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
+		Map<ResourceLocation, Resource> resources = new HashMap<>();
+		Map<ResourceLocation, ModuleDefinition> definitions = new HashMap<>();
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variant-cits/item", ".json"));
 		ObsoletePathWarning(resources);
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/item", ".json"));
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/modules", ".json"));
 		for (var entry : resources.entrySet())
 		{
-			Identifier moduleId = entry.getKey();
+			ResourceLocation moduleId = entry.getKey();
 			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
 				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
@@ -71,7 +70,7 @@ public final class ModuleLoader
 
 		for (var entry : definitions.entrySet())
 		{
-			Identifier moduleId = entry.getKey();
+			ResourceLocation moduleId = entry.getKey();
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
 			MetaModule meta = new MetaModule(
@@ -104,10 +103,10 @@ public final class ModuleLoader
 		return result;
 	}
 
-	static private void ObsoletePathWarning(Map<Identifier, Resource> resources){
+	static private void ObsoletePathWarning(Map<ResourceLocation, Resource> resources){
 		if (!resources.isEmpty()){
 			String names = "";
-			for (Identifier id : resources.keySet()) {
+			for (ResourceLocation id : resources.keySet()) {
 				names += ' ';
 				names += id.toString();
 			}
@@ -120,17 +119,17 @@ public final class ModuleLoader
 /* # Target Item Baking                                                       */
 /******************************************************************************/
 
-	static private Set<Item> ItemsFromModule(Identifier moduleId, ModuleDefinition module){
+	static private Set<Item> ItemsFromModule(ResourceLocation moduleId, ModuleDefinition module){
 		return module.targets()
 			.map(ModuleLoader::ItemsFromTarget)
 			.orElseGet(()->ItemsFromModuleId(moduleId))
 			;
 	}
 
-	static private Set<Item> ItemsFromTarget(List<Identifier> targets){
+	static private Set<Item> ItemsFromTarget(List<ResourceLocation> targets){
 		Set<Item> result = new HashSet<>();
 		targets.stream()
-			.map(id->Registries.ITEM.getEntry(id))
+			.map(id->BuiltInRegistries.ITEM.get(id))
 			.filter(Optional::isPresent)
 			.map(opt->opt.get().value())
 			.forEach(result::add)
@@ -138,9 +137,9 @@ public final class ModuleLoader
 		return result;
 	}
 
-	static private Set<Item> ItemsFromModuleId(Identifier moduleId){
-		if (Registries.ITEM.containsId(moduleId))
-			return Set.of(Registries.ITEM.getEntry(moduleId).get().value());
+	static private Set<Item> ItemsFromModuleId(ResourceLocation moduleId){
+		if (BuiltInRegistries.ITEM.containsKey(moduleId))
+			return Set.of(BuiltInRegistries.ITEM.get(moduleId).get().value());
 		else
 			return Set.of();
 	}

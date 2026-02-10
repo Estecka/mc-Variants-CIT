@@ -11,6 +11,11 @@ import java.util.Set;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
@@ -25,11 +30,6 @@ import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 
 public class EnchantmentVectorModule
@@ -37,10 +37,10 @@ implements IBakedModule
 {
 	static private class VectorSpace
 	{
-		public final Object2IntMap<Identifier> indices;
+		public final Object2IntMap<ResourceLocation> indices;
 		private final EnchantVector maxLevels;
 
-		public VectorSpace(Map<Identifier,Integer> maxLevels){
+		public VectorSpace(Map<ResourceLocation,Integer> maxLevels){
 			this.indices = new Object2IntOpenHashMap<>(maxLevels.size());
 			int i = 0;
 			for (var entry : maxLevels.entrySet())
@@ -48,10 +48,10 @@ implements IBakedModule
 			this.maxLevels = VectorFromMap(maxLevels);
 		}
 
-		public EnchantVector TruncatedVectorFromComponent(ItemEnchantmentsComponent enchants){
+		public EnchantVector TruncatedVectorFromComponent(ItemEnchantments enchants){
 			EnchantVector vector = new EnchantVector(this.indices.size());
-			for (var entry : enchants.getEnchantmentEntries()){
-				int i = this.indices.getOrDefault(entry.getKey().getKey().get().getValue(), -1);
+			for (var entry : enchants.entrySet()){
+				int i = this.indices.getOrDefault(entry.getKey().unwrapKey().get().location(), -1);
 				if (i >= 0)
 					vector.values[i] = Math.min(entry.getIntValue(), maxLevels.values[i]);
 			}
@@ -59,7 +59,7 @@ implements IBakedModule
 			return vector;
 		}
 
-		public EnchantVector VectorFromMap(Map<Identifier,Integer> enchants){
+		public EnchantVector VectorFromMap(Map<ResourceLocation,Integer> enchants){
 			EnchantVector vector = new EnchantVector(this.indices.size());
 			for (var entry : enchants.entrySet()){
 				int i = this.indices.getOrDefault(entry.getKey(), -1);
@@ -135,7 +135,7 @@ implements IBakedModule
 
 	static public record VariantEntry(
 		EnchantVector vector,
-		Identifier modelId
+		ResourceLocation modelId
 	) {}
 
 	static public record Parameters(
@@ -145,7 +145,7 @@ implements IBakedModule
 		List<ToIntFunction<EnchantVector>> ordering,
 		String enchantSeparator,
 		Optional<String> levelSeparator,
-		Map<Identifier,Identifier> aliases,
+		Map<ResourceLocation,ResourceLocation> aliases,
 		String namespace
 	) {}
 
@@ -166,15 +166,15 @@ implements IBakedModule
 			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
 			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
 			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
-			Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
+			Codec.unboundedMap(ResourceLocation.CODEC, ResourceLocation.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(Parameters::namespace)
 		)
 		.apply(builder, Parameters::new)
 	);
 
-	private final ComponentType<ItemEnchantmentsComponent> componentType;
+	private final DataComponentType<ItemEnchantments> componentType;
 	private final MultiPropertyCache cache;
-	private final Identifier fallback;
+	private final ResourceLocation fallback;
 	private final VectorSpace vectorSpace;
 	private final LinearSnapMap<VariantEntry> modelLine;
 	private final ToIntFunction<EnchantVector> magnitudeGetter;
@@ -185,14 +185,14 @@ implements IBakedModule
 /* # Baking                                                                   */
 /******************************************************************************/
 
-	static public IModuleBaker<Parameters> GetBaker(ComponentType<ItemEnchantmentsComponent> component){
+	static public IModuleBaker<Parameters> GetBaker(DataComponentType<ItemEnchantments> component){
 		return new IModuleBaker<>() {
 			@Override
 			public IBakedModule Bake(VariantLibrary library, Parameters parameters) {
 				return new EnchantmentVectorModule(library, parameters, component);
 			};
 			@Override
-			public boolean AcceptVariant(Identifier variantId, Parameters parameters) {
+			public boolean AcceptVariant(ResourceLocation variantId, Parameters parameters) {
 				if (!parameters.namespace.equals(variantId.getNamespace()))
 					return false;
 
@@ -206,7 +206,7 @@ implements IBakedModule
 		};
 	}
 
-	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, ComponentType<ItemEnchantmentsComponent> component){
+	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, DataComponentType<ItemEnchantments> component){
 		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
 		this.params = params;
 		this.componentType = component;
@@ -217,8 +217,8 @@ implements IBakedModule
 
 		Pattern enchantRegex = BakeRegex(params);
 
-		Map<Identifier,Integer> enchant2MaxLevel = new HashMap<>();
-		Map<Map<Identifier,Integer>, Identifier> vector2Model = new HashMap<>();
+		Map<ResourceLocation,Integer> enchant2MaxLevel = new HashMap<>();
+		Map<Map<ResourceLocation,Integer>, ResourceLocation> vector2Model = new HashMap<>();
 		Set<String> duplicateIds = new HashSet<>();
 
 		for (var model : variantLibrary.variantModels().entrySet())
@@ -240,7 +240,7 @@ implements IBakedModule
 
 		if (params.bakingDebug){
 			String msg = "These enchantments were detected in the CITs. If this looks wrong, check your filenames and your aliases:";
-			for (Identifier id : enchant2MaxLevel.keySet())
+			for (ResourceLocation id : enchant2MaxLevel.keySet())
 				msg += '\n' + id.toString();
 			VariantsCitMod.LOGGER.info(msg);
 		}
@@ -283,8 +283,8 @@ implements IBakedModule
 		});
 	}
 
-	static private Optional<Map<Identifier,Integer>> VariantId2Map(Pattern regex, Identifier variantId, Map<Identifier,Identifier> aliases){
-		Map<Identifier,Integer> vector = new HashMap<>();
+	static private Optional<Map<ResourceLocation,Integer>> VariantId2Map(Pattern regex, ResourceLocation variantId, Map<ResourceLocation,ResourceLocation> aliases){
+		Map<ResourceLocation,Integer> vector = new HashMap<>();
 		Matcher matches = regex.matcher(variantId.getPath());
 		if (!matches.matches()){
 			VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
@@ -297,7 +297,7 @@ implements IBakedModule
 			String namespace = Optional.ofNullable(matches.group("namespace")).orElse("minecraft");
 			int    level     = Optional.ofNullable(matches.group("lvl")).flatMap(i->SafeParseInt(regex, variantId, i)).orElse(1);
 
-			Identifier enchantId = Identifier.of(namespace, path);
+			ResourceLocation enchantId = ResourceLocation.fromNamespaceAndPath(namespace, path);
 			enchantId = aliases.getOrDefault(enchantId, enchantId);
 			if (vector.containsKey(enchantId)){
 				VariantsCitMod.LOGGER.warn("Duplicate enchantment '{}' in set: {}", enchantId, variantId.getPath());
@@ -313,7 +313,7 @@ implements IBakedModule
 		return Optional.of(vector);
 	}
 
-	static private Optional<Integer> SafeParseInt(Pattern regex, Identifier variantId, String input){
+	static private Optional<Integer> SafeParseInt(Pattern regex, ResourceLocation variantId, String input){
 		try {
 			return Optional.of(Integer.parseInt(input));
 		}
@@ -372,11 +372,11 @@ implements IBakedModule
 /******************************************************************************/
 
 	@Override
-	public Identifier GetModelForItem(ItemStack stack) {
+	public ResourceLocation GetModelForItem(ItemStack stack) {
 		return cache.ComputeIfAbsent(stack, this::ComputeItemModel);
 	}
 
-	public Identifier ComputeItemModel(ItemStack stack) {
+	public ResourceLocation ComputeItemModel(ItemStack stack) {
 		var enchants = stack.get(componentType);
 		if (enchants == null || enchants.isEmpty())
 			return null;
@@ -385,7 +385,7 @@ implements IBakedModule
 		return (result != null) ? result.modelId : fallback;
 	}
 
-	public VariantEntry FindEntry(ItemEnchantmentsComponent enchants) {
+	public VariantEntry FindEntry(ItemEnchantments enchants) {
 		EnchantVector enchantBox = this.vectorSpace.TruncatedVectorFromComponent(enchants);
 		VariantEntry result = modelLine.GetClosestValue(
 			magnitudeGetter.applyAsInt(enchantBox),
@@ -401,14 +401,14 @@ implements IBakedModule
 /* # Debug Commands                                                           */
 /******************************************************************************/
 
-	private Identifier[] GetEnchantIds(){
-		Identifier[] enchantIds = new Identifier[vectorSpace.indices.size()];
+	private ResourceLocation[] GetEnchantIds(){
+		ResourceLocation[] enchantIds = new ResourceLocation[vectorSpace.indices.size()];
 		for (var dimension : vectorSpace.indices.object2IntEntrySet())
 			enchantIds[dimension.getIntValue()] = dimension.getKey();
 		return enchantIds;
 	}
 
-	private void PrintVector(CommandLogger logger, EnchantVector vector, Identifier[] enchantIds, boolean itemSided){
+	private void PrintVector(CommandLogger logger, EnchantVector vector, ResourceLocation[] enchantIds, boolean itemSided){
 		for (int i=0; i<enchantIds.length; ++i)
 		if  (vector.values[i] != 0)
 		{
@@ -419,14 +419,14 @@ implements IBakedModule
 		}
 	}
 
-	private boolean IsPerfectMatch(EnchantVector model, ItemEnchantmentsComponent item){
+	private boolean IsPerfectMatch(EnchantVector model, ItemEnchantments item){
 		boolean checkLevels = params.optionalLevel || params.levelSeparator.isPresent();
 
-		if (item.getEnchantmentEntries().size() != model.Dimensionality())
+		if (item.entrySet().size() != model.Dimensionality())
 			return false;
 
-		for (var entry : item.getEnchantmentEntries()){
-			Identifier enchantId = entry.getKey().getKey().get().getValue();
+		for (var entry : item.entrySet()){
+			ResourceLocation enchantId = entry.getKey().unwrapKey().get().location();
 			if (!vectorSpace.indices.containsKey(enchantId))
 				return false;
 			int index = vectorSpace.indices.getInt(enchantId);
@@ -438,7 +438,7 @@ implements IBakedModule
 		return true;
 	}
 
-	private String GetPerfectVariantId(ItemEnchantmentsComponent item){
+	private String GetPerfectVariantId(ItemEnchantments item){
 		String result = "";
 		boolean first = true;
 		String enchantSep = params.enchantSeparator.replace("\\", "");
@@ -446,11 +446,11 @@ implements IBakedModule
 		if (levelSep != null)
 			levelSep = levelSep.replace("\\", "");
 
-		for (var entry : item.getEnchantmentEntries()){
+		for (var entry : item.entrySet()){
 			if (!first)
 				result += enchantSep;
 			first = false;
-			Identifier id = entry.getKey().getKey().get().getValue();
+			ResourceLocation id = entry.getKey().unwrapKey().get().location();
 			if (!id.getNamespace().equals("minecraft"))
 				result += id.getNamespace()+"..";
 			result += id.getPath();
@@ -468,13 +468,13 @@ implements IBakedModule
 		logger.Info("{}", CommandLogger.PackData(BakeRegex(this.params).pattern()));
 
 		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.size(), this.vectorSpace.indices.size());
-		for (Identifier id : this.vectorSpace.indices.keySet())
+		for (ResourceLocation id : this.vectorSpace.indices.keySet())
 			logger.Info(" - {}", CommandLogger.ItemData(id));
 	}
 
 	@Override
 	public void Dump(CommandLogger logger) {
-		Identifier[] enchantIds = GetEnchantIds();
+		ResourceLocation[] enchantIds = GetEnchantIds();
 
 		if (this.modelLine.size() <= 0)
 			logger.Info("This module does not have any variant.");
@@ -488,7 +488,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+	public ResourceLocation Walkthrough(CommandLogger logger, ItemStack stack) {
 		var enchants = stack.get(componentType);
 		if (enchants == null || enchants.isEmpty()){
 			logger.Info("The item has no enchantment.");
@@ -506,9 +506,9 @@ implements IBakedModule
 
 		if (result == null || !IsPerfectMatch(result.vector, enchants)){
 			String perfectVariant = GetPerfectVariantId(enchants);
-			logger.Info(Formatting.GRAY, "[TIP] An optimal variant ID for this item could be: {}", CommandLogger.ItemData(perfectVariant));
-			logger.Info(Formatting.GRAY, "This estimation does not take into account aliases or syntax issues arising from oddly named enchantments.");
-			logger.PrintVariantIdTip(Identifier.of(this.params.namespace, perfectVariant));
+			logger.Info(ChatFormatting.GRAY, "[TIP] An optimal variant ID for this item could be: {}", CommandLogger.ItemData(perfectVariant));
+			logger.Info(ChatFormatting.GRAY, "This estimation does not take into account aliases or syntax issues arising from oddly named enchantments.");
+			logger.PrintVariantIdTip(ResourceLocation.fromNamespaceAndPath(this.params.namespace, perfectVariant));
 		}
 		else
 			logger.Info("This is a perfect match.");

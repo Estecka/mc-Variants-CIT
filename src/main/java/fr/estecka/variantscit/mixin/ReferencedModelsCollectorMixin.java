@@ -4,34 +4,34 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import net.minecraft.client.resources.model.ModelDiscovery;
+import net.minecraft.client.resources.model.ResolvableModel;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import fr.estecka.variantscit.duck.DynamicModelResolverDuck;
-import net.minecraft.client.render.model.ReferencedModelsCollector;
-import net.minecraft.client.render.model.ResolvableModel;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.util.Identifier;
 
-@Mixin(ReferencedModelsCollector.class)
+@Mixin(ModelDiscovery.class)
 public interface ReferencedModelsCollectorMixin
 {
 	@Accessor
-	public Map<Identifier,UnbakedModel> getInputs();
+	public Map<ResourceLocation,UnbakedModel> getInputModels();
 
-	@Mixin(targets={"net.minecraft.client.render.model.ReferencedModelsCollector$ResolverImpl"})
+	@Mixin(targets={"net.minecraft.client.resources.model.ModelDiscovery$ResolverImpl"})
 	public abstract class ResolverImplMixin
 	implements ResolvableModel.Resolver, DynamicModelResolverDuck
 	{
 		//super.this
-		@Shadow(remap=false) private @Final ReferencedModelsCollector field_53669;
+		@Shadow(remap=false) private @Final ModelDiscovery field_53669;
 
 		@Override
-		public <T> Map<Identifier,T> variantscit$ResolveIf(Function<Identifier,Optional<T>> predicate){
-			var result = new HashMap<Identifier,T>();
+		public <T> Map<ResourceLocation,T> variantscit$ResolveIf(Function<ResourceLocation,Optional<T>> predicate){
+			var result = new HashMap<ResourceLocation,T>();
 
-			for (Identifier id : ((ReferencedModelsCollectorMixin)field_53669).getInputs().keySet()){
+			for (ResourceLocation id : ((ReferencedModelsCollectorMixin)field_53669).getInputModels().keySet()){
 				Optional<T> r = predicate.apply(id);
 				if (r.isPresent()){
 					this.resolve(id);

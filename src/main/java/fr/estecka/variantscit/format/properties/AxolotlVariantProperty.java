@@ -1,27 +1,27 @@
 package fr.estecka.variantscit.format.properties;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.passive.AxolotlEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.animal.axolotl.Axolotl;
+import net.minecraft.world.item.component.CustomData;
 
 public class AxolotlVariantProperty
-extends AMonoComponentProperty<NbtComponent>
+extends AMonoComponentProperty<CustomData>
 {
 	static public final AxolotlVariantProperty UNIT = new AxolotlVariantProperty();
 
 	public AxolotlVariantProperty(){
-		super(DataComponentTypes.BUCKET_ENTITY_DATA);
+		super(DataComponents.BUCKET_ENTITY_DATA);
 	}
 
 	@Override
-	public String GetPropertyString(NbtComponent component) {
-		NbtCompound nbt;
-		if ((nbt=component.getNbt()) == null || !nbt.contains("Variant", NbtElement.NUMBER_TYPE))
+	public String GetPropertyString(CustomData component) {
+		CompoundTag nbt;
+		if ((nbt=component.getUnsafe()) == null || !nbt.contains("Variant", Tag.TAG_ANY_NUMERIC))
 			return null;
 
 		int variantRaw = nbt.getInt("Variant");
-		return AxolotlEntity.Variant.byId(variantRaw).getName();
+		return Axolotl.Variant.byId(variantRaw).getName();
 	}
 }

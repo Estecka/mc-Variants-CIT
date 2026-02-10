@@ -2,28 +2,28 @@ package fr.estecka.variantscit.vanilla;
 
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.render.item.property.numeric.NumericProperty;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 public class EnchantedBookLevelPredicate
-implements NumericProperty
+implements RangeSelectItemModelProperty
 {
 	static public final MapCodec<EnchantedBookLevelPredicate> CODEC = MapCodec.unit(new EnchantedBookLevelPredicate());
 
 	@Override
-	public float getValue(ItemStack stack, @Nullable ClientWorld world, LivingEntity entity, int seed){
-		ItemEnchantmentsComponent enchants = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
+	public float get(ItemStack stack, @Nullable ClientLevel world, LivingEntity entity, int seed){
+		ItemEnchantments enchants = stack.get(DataComponents.STORED_ENCHANTMENTS);
 		if (enchants == null || enchants.isEmpty())
 			return 0;
 		else
-			return enchants.getEnchantmentEntries().iterator().next().getIntValue();
+			return enchants.entrySet().iterator().next().getIntValue();
 	}
 
-	public MapCodec<EnchantedBookLevelPredicate> getCodec(){
+	public MapCodec<EnchantedBookLevelPredicate> type(){
 		return CODEC;
 	}
 }

@@ -3,8 +3,8 @@ package fr.estecka.variantscit.modules.libraries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.libraries.IDebuggableLibrary.Snitch;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class GenericBakedModule<L>
 implements IBakedModule
@@ -20,7 +20,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier GetModelForItem(ItemStack stack) {
+	public ResourceLocation GetModelForItem(ItemStack stack) {
 		return logic.GetItemModel(stack, library);
 	}
 
@@ -35,9 +35,9 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+	public ResourceLocation Walkthrough(CommandLogger logger, ItemStack stack) {
 		Snitch<L> snitch = this.debug.CreateSnitch(logger);
-		Identifier result = this.logic.Walkthrough(stack, snitch.GetLibrary(), logger);
+		ResourceLocation result = this.logic.Walkthrough(stack, snitch.GetLibrary(), logger);
 		snitch.PrintConclusion();
 		return result;
 	}

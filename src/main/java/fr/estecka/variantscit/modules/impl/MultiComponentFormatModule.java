@@ -2,6 +2,9 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,10 +15,6 @@ import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.format.properties.TransformableProperty;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
 
 public class MultiComponentFormatModule
 extends ASimpleMultiComponentCachingModule
@@ -24,7 +23,7 @@ extends ASimpleMultiComponentCachingModule
 		.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IStringProperty.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
+			ExtraCodecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IStringProperty.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
@@ -41,7 +40,7 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Override
-	public Identifier RecomputeItemVariant(ItemStack stack){
+	public ResourceLocation RecomputeItemVariant(ItemStack stack){
 		Map<String,String> variables = new HashMap<>();
 
 		if (debug)
@@ -61,12 +60,12 @@ extends ASimpleMultiComponentCachingModule
 		if (debug)
 			VariantsCitMod.LOGGER.info("\t= {}", rawId);
 		variables.clear();
-		Identifier id = Identifier.tryParse(rawId);
+		ResourceLocation id = ResourceLocation.tryParse(rawId);
 		return id;
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
 		boolean failure = false;
 		Map<String,String> variables = new HashMap<>();
 

@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.IoSupplier;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
-import net.minecraft.resource.InputSupplier;
-import net.minecraft.util.Identifier;
 
 /**
  * Binds some variables to a template. The template is never guaranteed to be
@@ -22,7 +22,7 @@ public record FilledTemplate(
 	Substitution rawTemplate,
 	Map<String,String> variables
 )
-implements InputSupplier<InputStream>
+implements IoSupplier<InputStream>
 {
 	static public final Codec<FilledTemplate> STRING_CODEC = TemplateRepository.CODEC.xmap(
 		subst -> new FilledTemplate(subst, Map.of()),
@@ -76,7 +76,7 @@ implements InputSupplier<InputStream>
 /* # Variables Util                                                           */
 /******************************************************************************/
 
-	static public HashMap<String,String> IdVariables(String varname, Identifier identifier){
+	static public HashMap<String,String> IdVariables(String varname, ResourceLocation identifier){
 		HashMap<String,String> variables = new HashMap<>();
 
 		variables.put(varname+"_ID", identifier.toString());

@@ -2,11 +2,11 @@ package fr.estecka.variantscit.format;
 
 import java.text.Normalizer;
 import java.util.function.Function;
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.util.Identifier;
 
 @FunctionalInterface
 public interface IStringTransform
@@ -49,7 +49,7 @@ extends Function<String,String>
 	}
 
 	static public String AutoSanitize(String input){
-		if (Identifier.tryParse(input) != null)
+		if (ResourceLocation.tryParse(input) != null)
 			return input;
 		else
 			return SANITIZE_PATH.apply(input);

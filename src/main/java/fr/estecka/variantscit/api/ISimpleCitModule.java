@@ -1,8 +1,8 @@
 package fr.estecka.variantscit.api;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 @FunctionalInterface
 public interface ISimpleCitModule
@@ -14,10 +14,10 @@ extends ICitModule
 	 * 
 	 * @return The variant's identifier, or null if the item has none.
 	 */
-	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
+	public abstract @Nullable ResourceLocation GetItemVariant(ItemStack stack);
 
 	@Override
-	public default @Nullable Identifier GetItemModel(ItemStack stack, IVariantManager modelProvider){
+	public default @Nullable ResourceLocation GetItemModel(ItemStack stack, IVariantManager modelProvider){
 		return modelProvider.GetVariantModel(GetItemVariant(stack));
 	}
 }

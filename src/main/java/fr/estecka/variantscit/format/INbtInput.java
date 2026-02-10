@@ -5,16 +5,16 @@ import java.util.function.Function;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
-import net.minecraft.nbt.AbstractNbtNumber;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.NumericTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.resources.ResourceLocation;
 
 public interface INbtInput
-extends Function<NbtElement,String>
+extends Function<Tag,String>
 {
 	static public final INbtInput AUTO = Grouped(INbtInput::RichText, INbtInput::String, INbtInput::Number, INbtInput::RichTextArray);
 	static public final INbtInput PRIMITIVE = Grouped(INbtInput::String, INbtInput::Number);
@@ -26,7 +26,7 @@ extends Function<NbtElement,String>
 	public record Group(INbtInput... content)
 	implements INbtInput
 	{
-		public String apply(NbtElement nbt){
+		public String apply(Tag nbt){
 			for (int i=0; i<content.length; ++i){
 				String result = content[i].apply(nbt);
 				if (result != null)
@@ -44,30 +44,30 @@ extends Function<NbtElement,String>
 			return new Group(group);
 	}
 
-	static public String String (NbtElement nbt) { return nbt instanceof NbtString string ? string.asString() : null; }
-	static public String Number (NbtElement nbt) { return nbt instanceof AbstractNbtNumber number ? number.numberValue().toString() : null; }
-	static public String Identifier (NbtElement nbt) {
-		Identifier id;
-		if (nbt instanceof NbtString && null != (id=Identifier.tryParse(nbt.asString())))
+	static public String String (Tag nbt) { return nbt instanceof StringTag string ? string.getAsString() : null; }
+	static public String Number (Tag nbt) { return nbt instanceof NumericTag number ? number.getAsNumber().toString() : null; }
+	static public String Identifier (Tag nbt) {
+		ResourceLocation id;
+		if (nbt instanceof StringTag && null != (id=ResourceLocation.tryParse(nbt.getAsString())))
 			return id.toString();
 		else
 			return null;
 	}
 
-	static public String RichText(NbtElement nbt){
-		var text = TextCodecs.STRINGIFIED_CODEC.parse(NbtOps.INSTANCE, nbt);
+	static public String RichText(Tag nbt){
+		var text = ComponentSerialization.FLAT_CODEC.parse(NbtOps.INSTANCE, nbt);
 		if (text.isSuccess())
 			return text.getOrThrow().getString();
 
 		return null;
 	}
 
-	static public String RichTextArray(NbtElement nbt){
-		var result = TextCodecs.STRINGIFIED_CODEC.sizeLimitedListOf(256).parse(NbtOps.INSTANCE, nbt);
+	static public String RichTextArray(Tag nbt){
+		var result = ComponentSerialization.FLAT_CODEC.sizeLimitedListOf(256).parse(NbtOps.INSTANCE, nbt);
 		if (!result.isSuccess())
 			return null;
 
-		List<Text> lines = result.getOrThrow();
+		List<Component> lines = result.getOrThrow();
 		StringBuilder builder = new StringBuilder();
 		for (var l : lines) {
 			builder.append(l.getString());

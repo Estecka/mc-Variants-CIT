@@ -1,16 +1,16 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
 import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.decoration.painting.PaintingVariant;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 /**
  * @implNote
@@ -21,22 +21,22 @@ import net.minecraft.world.World;
  * actual reloading of painting variants.
  */
 public class PaintingVariantModule
-extends AComponentCachingModule<NbtComponent>
+extends AComponentCachingModule<CustomData>
 {
 	public PaintingVariantModule(){
-		super(DataComponentTypes.ENTITY_DATA);
+		super(DataComponents.ENTITY_DATA);
 	}
 
 	static public Optional<Registry<PaintingVariant>> GetPaintingRegistry(){
 		@SuppressWarnings("resource")
-		World world = MinecraftClient.getInstance().world;
+		Level world = Minecraft.getInstance().level;
 		if (world != null)
-			return world.getRegistryManager().getOptional(RegistryKeys.PAINTING_VARIANT);
+			return world.registryAccess().lookup(Registries.PAINTING_VARIANT);
 		else
 			return Optional.empty();
 	}
 
-	public Identifier GetModelForComponent(NbtComponent component, IVariantManager models){
+	public ResourceLocation GetModelForComponent(CustomData component, IVariantManager models){
 		if (component == null)
 			return null;
 
@@ -44,12 +44,12 @@ extends AComponentCachingModule<NbtComponent>
 		if (rawVariant == null)
 			return null;
 
-		Identifier variantId = Identifier.tryParse(rawVariant);
+		ResourceLocation variantId = ResourceLocation.tryParse(rawVariant);
 		if (variantId == null)
 			return models.GetSpecialModel("invalid");
 
 		var registry = GetPaintingRegistry();
-		if (registry.isPresent() && !registry.get().containsId(variantId))
+		if (registry.isPresent() && !registry.get().containsKey(variantId))
 			return models.GetSpecialModel("invalid");
 
 		return models.GetVariantModel(variantId);

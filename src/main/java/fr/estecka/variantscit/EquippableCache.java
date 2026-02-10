@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.EquipmentAssets;
+import net.minecraft.world.item.equipment.Equippable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import fr.estecka.variantscit.modules.IBakedModule;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.EquippableComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.equipment.EquipmentAssetKeys;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
 
 public class EquippableCache
 {
@@ -20,24 +20,24 @@ public class EquippableCache
 	 * Key 1: Maps original components to a list of their known variations.
 	 * Key 2: Maps variant ID to the modified copy of the component.
 	 */
-	private final WeakHashMap<EquippableComponent, Map<Identifier, EquippableComponent>> cache = new WeakHashMap<>();
+	private final WeakHashMap<Equippable, Map<ResourceLocation, Equippable>> cache = new WeakHashMap<>();
 
 	public void Clear(){
 		this.cache.clear();
 	}
 
-	public EquippableComponent GetWithAssetId(EquippableComponent original, Identifier id){
+	public Equippable GetWithAssetId(Equippable original, ResourceLocation id){
 		return this.cache
 			.computeIfAbsent(original, _0->new HashMap<>())
 			.computeIfAbsent(id, _0->CopyWithAssetId(original, id))
 			;
 	}
 
-	static private EquippableComponent CopyWithAssetId(EquippableComponent original, Identifier id){
-		return new EquippableComponent(
+	static private Equippable CopyWithAssetId(Equippable original, ResourceLocation id){
+		return new Equippable(
 			original.slot(),
 			original.equipSound(),
-			Optional.of(RegistryKey.of(EquipmentAssetKeys.REGISTRY_KEY, id)),
+			Optional.of(ResourceKey.create(EquipmentAssets.ROOT_ID, id)),
 			original.cameraOverlay(),
 			original.allowedEntities(),
 			original.dispensable(),
@@ -50,17 +50,17 @@ public class EquippableCache
 	 * Mixin injection.
 	 * See: {@link fr.estecka.variantscit.mixin.FeatureRendererMixins}
 	 */
-	public Object GetEquipableVariant(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+	public Object GetEquipableVariant(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 		Object original = originalOp.call(stack, type);
 
-		if (type != DataComponentTypes.EQUIPPABLE
-		|| !(original instanceof EquippableComponent equipable) )
+		if (type != DataComponents.EQUIPPABLE
+		|| !(original instanceof Equippable equipable) )
 		{
 			return original;
 		}
 
 		final IBakedModule module = VariantsCitMod.GetEquipmentModule(stack.getItem());
-		Identifier assetId = null;
+		ResourceLocation assetId = null;
 
 		if (module != null){
 			VariantsCitMod.LOGGER.PushLabel(stack.getItem());

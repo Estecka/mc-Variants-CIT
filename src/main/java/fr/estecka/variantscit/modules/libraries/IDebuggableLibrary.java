@@ -2,7 +2,7 @@ package fr.estecka.variantscit.modules.libraries;
 
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.commands.CommandLogger;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Implementations MUST be of type LIB.
@@ -22,7 +22,7 @@ public interface IDebuggableLibrary<LIB>
 	 */
 	public abstract class Snitch<LIB> {
 		protected final CommandLogger logger;
-		private @Nullable Identifier mainVariant = null;
+		private @Nullable ResourceLocation mainVariant = null;
 		private boolean foundModel = false;
 
 		protected Snitch(CommandLogger logger){
@@ -33,7 +33,7 @@ public interface IDebuggableLibrary<LIB>
 			return (LIB)this;
 		}
 
-		protected void OnTriedVariant(Identifier variant, boolean exists){
+		protected void OnTriedVariant(ResourceLocation variant, boolean exists){
 			this.foundModel |= exists;
 			if (this.mainVariant == null)
 				mainVariant = variant;

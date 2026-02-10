@@ -1,13 +1,13 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.WeakHashMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.api.ISimpleCitModule;
 import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 /**
  * Optimization for deterministic modules that may require expensive computation
@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 abstract class ASimpleComponentCachingModule<T>
 implements ISimpleCitModule
 {
-	protected final ComponentType<T> componentType;
+	protected final DataComponentType<T> componentType;
 
 	/*
 	 * The lifetime of each entry  is roughly equivalent  to the lifetime of the
@@ -26,15 +26,15 @@ implements ISimpleCitModule
 	 * immutable, so a variant  should never need  to be recomputed  for a given
 	 * component.
 	 */
-	final WeakHashMap<T, @Nullable Identifier> cachedVariants = new WeakHashMap<>();
+	final WeakHashMap<T, @Nullable ResourceLocation> cachedVariants = new WeakHashMap<>();
 
-	public ASimpleComponentCachingModule(ComponentType<T> component){
+	public ASimpleComponentCachingModule(DataComponentType<T> component){
 		this.componentType = component;
 	}
 
 
 	@Override
-	public final Identifier GetItemVariant(ItemStack stack){
+	public final ResourceLocation GetItemVariant(ItemStack stack){
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
@@ -50,7 +50,7 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
@@ -58,5 +58,5 @@ implements ISimpleCitModule
 		return library.GetVariantModel(GetVariantForComponent(component));
 	}
 
-	public abstract Identifier GetVariantForComponent(T component);
+	public abstract ResourceLocation GetVariantForComponent(T component);
 }

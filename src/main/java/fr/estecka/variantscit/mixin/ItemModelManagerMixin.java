@@ -5,24 +5,24 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modules.IBakedModule;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
-@Mixin(ItemModelManager.class)
+@Mixin(ItemModelResolver.class)
 public class ItemModelManagerMixin
 {
 	@WrapOperation(
-		method="update(Lnet/minecraft/client/render/item/ItemRenderState;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;I)V",
+		method="appendItemLayers(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;I)V",
 		at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
 	)
-	private @Nullable Object GetVariantModel(ItemStack stack, ComponentType<Identifier> type, Operation<Identifier> original)
+	private @Nullable Object GetVariantModel(ItemStack stack, DataComponentType<ResourceLocation> type, Operation<ResourceLocation> original)
 	{
 		final IBakedModule module = VariantsCitMod.GetItemModule(stack.getItem());
-		Identifier modelId = null;
+		ResourceLocation modelId = null;
 
 		if (module != null){
 			VariantsCitMod.LOGGER.PushLabel(stack.getItem());

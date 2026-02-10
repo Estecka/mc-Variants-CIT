@@ -239,3 +239,6 @@ Since v2.5:
 - Fixed the `fishing_rod` assetGen preset.
 ### 3.16.2
 - Fixed asset-baking failing in prod.
+
+# v5
+- Migrated to Mojmap

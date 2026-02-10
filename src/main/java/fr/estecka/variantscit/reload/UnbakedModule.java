@@ -1,9 +1,9 @@
 package fr.estecka.variantscit.reload;
 
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
+import net.minecraft.resources.ResourceLocation;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
-import net.minecraft.util.Identifier;
 
 public record UnbakedModule<T>(
 	IModuleBaker<T> baker,
@@ -13,7 +13,7 @@ public record UnbakedModule<T>(
 		return baker.Bake(library, parameters);
 	}
 
-	public boolean AcceptsVariant(Identifier variantId){
+	public boolean AcceptsVariant(ResourceLocation variantId){
 		return baker.AcceptVariant(variantId, parameters);
 	}
 }

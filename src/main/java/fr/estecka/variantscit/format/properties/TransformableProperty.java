@@ -1,12 +1,12 @@
 package fr.estecka.variantscit.format.properties;
 
 import java.util.Optional;
+import net.minecraft.world.item.ItemStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
-import net.minecraft.item.ItemStack;
 
 public record TransformableProperty<T extends IStringProperty>(T inner, IStringTransform transform, Optional<String> fallback)
 implements IStringProperty

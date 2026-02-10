@@ -1,6 +1,12 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Map;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.NumericTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -11,12 +17,6 @@ import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.NbtPath;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.AbstractNbtNumber;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 
 public class ComponentThresholdModule
 implements ILinearCitModule
@@ -30,7 +30,7 @@ implements ILinearCitModule
 	static public final MapCodec<ComponentThresholdModule> MAPCODEC = RecordCodecBuilder.<ComponentThresholdModule>mapCodec(builder->
 		builder.group(
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(o->o.namespace),
-			Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(o->o.componentType),
+			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
 			NbtPath.CODEC.optionalFieldOf("nbtPath", NbtPath.IDENTITY).forGetter(o->o.nbtPath),
 			BIAS_CODEC.fieldOf("modelRange").forGetter(o->o.bias),
 			Codec.FLOAT.optionalFieldOf("scale",  1f).forGetter(o->o.scale),
@@ -42,14 +42,14 @@ implements ILinearCitModule
 	private final String namespace;
 
 	private final MultiPropertyCache cache;
-	private final ComponentType<?> componentType;
+	private final DataComponentType<?> componentType;
 	private final NbtPath nbtPath;
 	private final int bias;
 	private final float scale;
 	private final float offset;
 
 
-	public ComponentThresholdModule(String namespace, ComponentType<?> component, NbtPath path, int bias, float scale, float offset){
+	public ComponentThresholdModule(String namespace, DataComponentType<?> component, NbtPath path, int bias, float scale, float offset){
 		this.componentType = component;
 		this.namespace = namespace;
 		this.nbtPath = path;
@@ -66,11 +66,11 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable Identifier GetItemModel(ItemStack stack, ILinearLibrary library) {
+	public @Nullable ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library) {
 		return this.cache.ComputeIfAbsent(stack, _0->this.RecomputeItemModel(stack, library));
 	}
 
-	public @Nullable Identifier RecomputeItemModel(ItemStack stack, ILinearLibrary library) {
+	public @Nullable ResourceLocation RecomputeItemModel(ItemStack stack, ILinearLibrary library) {
 		Integer value = this.GetComponentValue(stack);
 		if (value == null)
 			return null;
@@ -79,7 +79,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, ILinearLibrary library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, ILinearLibrary library, CommandLogger logger) {
 		Integer value = this.GetComponentValue(stack);
 		logger.Info("Raw data: {}", CommandLogger.ItemData(value, "missing or invalid"));
 		if (value == null)
@@ -91,14 +91,14 @@ implements ILinearCitModule
 	}
 
 	private @Nullable Integer GetComponentValue(ItemStack stack){
-		NbtElement nbt = CodecUtil.GetComponentNbt(stack, componentType);
+		Tag nbt = CodecUtil.GetComponentNbt(stack, componentType);
 		if (nbt == null)
 			return null;
 
 		nbt = this.nbtPath.Resolve(nbt);
-		if (nbt == null	||	!(nbt instanceof AbstractNbtNumber number))
+		if (nbt == null	||	!(nbt instanceof NumericTag number))
 			return null;
 
-		return number.intValue();
+		return number.getAsInt();
 	}
 }

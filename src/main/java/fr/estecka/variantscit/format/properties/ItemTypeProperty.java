@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.format.properties;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public record ItemTypeProperty()
 implements IStringProperty

@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.HashMap;
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,7 +14,6 @@ import fr.estecka.variantscit.format.properties.EntityAgeMapProperty;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
-import net.minecraft.util.Identifier;
 
 public final class AxolotlBucketModule
 {
@@ -25,7 +25,7 @@ public final class AxolotlBucketModule
 			return library.Bake(parameters.module);
 		};
 		@Override
-		public boolean AcceptVariant(Identifier variantId, Params parameters) {
+		public boolean AcceptVariant(ResourceLocation variantId, Params parameters) {
 			return variantId.getPath().endsWith(parameters.adult)
 			    || variantId.getPath().endsWith(parameters.baby)
 			    ;

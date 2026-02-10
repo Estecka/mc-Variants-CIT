@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.format.properties;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemCountProperty
 implements IStringProperty

@@ -1,16 +1,16 @@
 package fr.estecka.variantscit.reload;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
 public enum EModuleContext
-implements StringIdentifiable
+implements StringRepresentable
 {
 	ITEM_MODEL("item_model"),
 	EQUIPPABLE("equippable"),
 	;
 
-	static public final Codec<EModuleContext> CODEC = StringIdentifiable.createCodec(EModuleContext::values);
+	static public final Codec<EModuleContext> CODEC = StringRepresentable.fromEnum(EModuleContext::values);
 
 	public final String name;
 
@@ -19,7 +19,7 @@ implements StringIdentifiable
 	}
 
 	@Override
-	public String asString() {
+	public String getSerializedName() {
 		return name;
 	}
 

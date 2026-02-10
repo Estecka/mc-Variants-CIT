@@ -3,8 +3,8 @@ package fr.estecka.variantscit.format.properties;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.VCitRegistries;
+import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.MultiPropertyCache;
-import net.minecraft.item.ItemStack;
 
 public interface IStringProperty
 extends MultiPropertyCache.ICachableItemProperty
