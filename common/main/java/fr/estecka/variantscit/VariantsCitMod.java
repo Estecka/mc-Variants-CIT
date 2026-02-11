@@ -18,7 +18,6 @@ import fr.estecka.variantscit.vanilla.*;
 
 
 public class VariantsCitMod
-implements ClientModInitializer
 {
 	static public final String MODID = "variants-cit";
 	public static final LabelledLogger LOGGER = new LabelledLogger();
@@ -55,7 +54,6 @@ implements ClientModInitializer
 		}
 	}
 
-	@Override
 	public void onInitializeClient(){
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "block_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "bucket_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
@@ -63,9 +61,6 @@ implements ClientModInitializer
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.ENTITY_DATA));
 		NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
 		ItemModelTypes.ID_MAPPER.put(Identifier.ofVanilla("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
-
-		ModuleCommands.Register();
-		AssetGenCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){
