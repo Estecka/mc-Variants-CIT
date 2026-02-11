@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "variants-cit",
+  "version": "${version}",
+  "name": "Variants-CIT",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/variants-cit/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "fr.estecka.variantscit.fabric.ExampleModFabric"
+    ],
+    "client": [
+      "fr.estecka.variantscit.fabric.client.ExampleModFabricClient"
+    ]
+  },
+  "mixins": [
+    "variants-cit.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "architectury": ">=15.0.3",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
