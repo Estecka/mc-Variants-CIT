@@ -87,11 +87,13 @@ implements ResourcePack
 	}
 
 	static private InputSupplier<InputStream> GetIcon(){
-		ModContainer mod = FabricLoader.getInstance().getModContainer("variants-cit").get();
-		return mod.findPath("assets/variants-cit/icon.png")
-			.map(InputSupplier::create)
-			.orElse(null)
-			;
+		return null;
+		// TODO: Fix for forge
+		// ModContainer mod = FabricLoader.getInstance().getModContainer("variants-cit").get();
+		// return mod.findPath("assets/variants-cit/icon.png")
+		// 	.map(InputSupplier::create)
+		// 	.orElse(null)
+		// 	;
 	}
 
 	@Override
