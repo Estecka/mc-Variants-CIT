@@ -4,8 +4,8 @@ issueTrackerURL = "https://github.com/Estecka/mc-Variants-CIT/issues"
 license = "EUPL-1.2"
 
 [[mods]]
-modId = "variants-cit"
-version = "${version}"
+modId = "variantscit"
+version = "3.99+1.21.4"
 displayName = "Variants CIT"
 authors = "Estecka"
 description = '''
