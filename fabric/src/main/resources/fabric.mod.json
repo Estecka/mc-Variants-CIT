@@ -1,38 +1,32 @@
 {
-  "schemaVersion": 1,
-  "id": "variants-cit",
-  "version": "${version}",
-  "name": "Variants-CIT",
-  "description": "This is an example description! Tell everyone what your mod is about!",
-  "authors": [
-    "Me!"
-  ],
-  "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
-  },
-  "license": "CC0-1.0",
-  "icon": "assets/variants-cit/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "fr.estecka.variantscit.fabric.ExampleModFabric"
-    ],
-    "client": [
-      "fr.estecka.variantscit.fabric.client.ExampleModFabricClient"
-    ]
-  },
-  "mixins": [
-    "variants-cit.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.18.4",
-    "minecraft": "~1.21.4",
-    "java": ">=21",
-    "architectury": ">=15.0.3",
-    "fabric-api": "*"
-  },
-  "suggests": {
-    "another-mod": "*"
-  }
+	"schemaVersion": 1,
+	"id": "variants-cit",
+	"version": "${version}",
+	"name": "Variants CIT",
+	"description": "Alternative CIT format for large collections of variants.",
+	"authors": [
+		"Estecka"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/variants-cit",
+		"sources": "https://github.com/Estecka/mc-Variants-CIT",
+		"issues":  "https://github.com/Estecka/mc-Variants-CIT/issues"
+	},
+	"license": "EUPL-1.2",
+	"icon": "assets/variants-cit/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"fr.estecka.variantscit.VariantsCitFabric"
+		]
+	},
+	"mixins": [
+		{ "environment": "client", "config": "variants-cit.mixins.json" }
+	],
+	"depends": {
+		"minecraft": ">=1.21.4 <1.21.5",
+		"fabricloader": ">=0.16.9",
+		"fabric-api": ">=0.106.1",
+		"java": ">=21"
+	}
 }
