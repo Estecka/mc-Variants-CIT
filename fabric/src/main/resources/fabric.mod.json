@@ -17,7 +17,7 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"fr.estecka.variantscit.VariantsCitFabric"
+			"fr.estecka.variantscit.fabric.VariantsCitFabric"
 		]
 	},
 	"mixins": [
