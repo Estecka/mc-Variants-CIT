@@ -1,13 +1,22 @@
 {
-  "required": true,
-  "package": "fr.estecka.variantscit.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "minVersion": "0.8",
-  "client": [
-  ],
-  "mixins": [
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+	"required": true,
+	"package": "fr.estecka.variantscit.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"FeatureRendererMixin$Armor",
+		"FeatureRendererMixin$Cape",
+		"FeatureRendererMixin$Elytra",
+		"FeatureRendererMixin$Horse",
+		"FeatureRendererMixin$Llama",
+		"FeatureRendererMixin$Wolf",
+		"ItemModelTypesMixin",
+		"ItemModelManagerMixin",
+		"ReferencedModelsCollectorMixin",
+		"ReferencedModelsCollectorMixin$ResolverImplMixin",
+		"ReloadableResourceManagerImplMixin",
+		"MinecraftClientMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }
