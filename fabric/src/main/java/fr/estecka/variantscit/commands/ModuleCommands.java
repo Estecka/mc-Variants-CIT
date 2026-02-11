@@ -116,7 +116,12 @@ public class ModuleCommands
 			return -1;
 		}
 
-		CommandLogger logger = new CommandLogger(context, moduleContext, meta);
+		CommandLogger logger = new CommandLogger(
+			context.getSource()::sendFeedback,
+			context.getSource()::sendError,
+			moduleContext,
+			meta
+		);
 		return command.Execute(context, logger, module);
 	}
 

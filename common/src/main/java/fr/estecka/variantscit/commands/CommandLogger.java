@@ -1,18 +1,18 @@
 package fr.estecka.variantscit.commands;
 
+import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.reload.EAssetType;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.MetaModule;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public record CommandLogger(
-	CommandContext<FabricClientCommandSource> commandContext,
+	Consumer<Text> infoConsumer,
+	Consumer<Text> errorConsumer,
 	EModuleContext moduleContext,
 	MetaModule metamodule
 )
@@ -66,7 +66,7 @@ public record CommandLogger(
 	}
 
 	public void Info(Text message){
-		commandContext.getSource().sendFeedback(message);
+		infoConsumer.accept(message);
 	}
 
 	public void Error(String message){
@@ -74,7 +74,7 @@ public record CommandLogger(
 	}
 
 	public void Error(Text message){
-		commandContext.getSource().sendError(message);
+		errorConsumer.accept(message);
 	}
 
 /******************************************************************************/
