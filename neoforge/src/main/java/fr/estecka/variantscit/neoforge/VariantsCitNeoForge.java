@@ -6,6 +6,6 @@ import net.neoforged.fml.common.Mod;
 @Mod("variantscit")
 public final class VariantsCitNeoForge {
 	public VariantsCitNeoForge() {
-		VariantsCitMod.onInitializeClient();
+		VariantsCitMod.initialize(new NeoForgeModLoader());
 	}
 }

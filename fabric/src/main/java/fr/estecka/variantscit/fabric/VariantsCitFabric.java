@@ -11,7 +11,7 @@ implements ClientModInitializer
 {
 	@Override
 	public void onInitializeClient(){
-		VariantsCitMod.onInitializeClient();
+		VariantsCitMod.initialize(new FabricModLoader());
 
 		ModuleCommands.Register();
 		AssetGenCommands.Register();

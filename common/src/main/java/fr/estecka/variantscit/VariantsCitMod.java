@@ -13,7 +13,8 @@ import fr.estecka.variantscit.modules.IBakedModule;
 public class VariantsCitMod
 {
 	static public final String MODID = "variants-cit";
-	public static final LabelledLogger LOGGER = new LabelledLogger();
+	static public final LabelledLogger LOGGER = new LabelledLogger();
+	static private IModLoader MODLOADER;
 
 	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
@@ -23,6 +24,10 @@ public class VariantsCitMod
 
 	static public Identifier Identifier(String path){
 		return Identifier.of(MODID, path);
+	}
+
+	static public IModLoader GetModLoader(){
+		return MODLOADER;
 	}
 
 	static public @Nullable IBakedModule GetItemModule(Item itemType){
@@ -47,7 +52,9 @@ public class VariantsCitMod
 		}
 	}
 
-	static public void onInitializeClient(){
+	static public void initialize(IModLoader modloader){
+		MODLOADER = modloader;
+		MODLOADER.LetYourNameBeKnownToAll();
 		// TODO: Create accessors
 		// NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "block_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		// NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "bucket_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));

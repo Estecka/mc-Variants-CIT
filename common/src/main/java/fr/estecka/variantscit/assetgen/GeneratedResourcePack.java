@@ -10,8 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.SharedConstants;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
@@ -87,13 +86,10 @@ implements ResourcePack
 	}
 
 	static private InputSupplier<InputStream> GetIcon(){
-		return null;
-		// TODO: Fix for forge
-		// ModContainer mod = FabricLoader.getInstance().getModContainer("variants-cit").get();
-		// return mod.findPath("assets/variants-cit/icon.png")
-		// 	.map(InputSupplier::create)
-		// 	.orElse(null)
-		// 	;
+		return VariantsCitMod.GetModLoader().GetModFile("assets/variants-cit/icon.png")
+			.map(InputSupplier::create)
+			.orElse(null)
+			;
 	}
 
 	@Override
