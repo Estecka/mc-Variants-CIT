@@ -86,7 +86,7 @@ implements ResourcePack
 	}
 
 	static private InputSupplier<InputStream> GetIcon(){
-		return VariantsCitMod.GetModLoader().GetModFile("assets/variants-cit/icon.png")
+		return VariantsCitMod.GetPlatform().GetFile("assets/variants-cit/icon.png")
 			.map(InputSupplier::create)
 			.orElse(null)
 			;

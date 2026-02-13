@@ -2,7 +2,9 @@ package fr.estecka.variantscit;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
@@ -10,11 +12,11 @@ import fr.estecka.variantscit.reload.MetaModule;
 import fr.estecka.variantscit.modules.IBakedModule;
 
 
-public class VariantsCitMod
+public abstract class VariantsCitMod
 {
 	static public final String MODID = "variants-cit";
 	static public final LabelledLogger LOGGER = new LabelledLogger();
-	static private IModLoader MODLOADER;
+	static private VariantsCitMod PLATFORM;
 
 	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
@@ -26,8 +28,8 @@ public class VariantsCitMod
 		return Identifier.of(MODID, path);
 	}
 
-	static public IModLoader GetModLoader(){
-		return MODLOADER;
+	static public VariantsCitMod GetPlatform(){
+		return PLATFORM;
 	}
 
 	static public @Nullable IBakedModule GetItemModule(Item itemType){
@@ -52,9 +54,9 @@ public class VariantsCitMod
 		}
 	}
 
-	static public void initialize(IModLoader modloader){
-		MODLOADER = modloader;
-		MODLOADER.LetYourNameBeKnownToAll();
+	static protected void initialize(VariantsCitMod platform){
+		PLATFORM = platform;
+		PLATFORM.LetYourNameBeKnownToAll();
 		// TODO: Create accessors
 		// NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "block_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BLOCK_ENTITY_DATA));
 		// NumericProperties.ID_MAPPER.put(Identifier.of(MODID, "bucket_entity_data"), NbtNumberProperty.CreateCodec(DataComponentTypes.BUCKET_ENTITY_DATA));
@@ -71,5 +73,8 @@ public class VariantsCitMod
 		EQUIP_MODULES = result.equipModules;
 		META = result.allModules;
 	}
+
+	public abstract void LetYourNameBeKnownToAll();
+	public abstract Optional<Path> GetFile(String path);
 
 }
