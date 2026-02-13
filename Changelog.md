@@ -237,6 +237,8 @@ Since v2.5:
 - Added module `component_threshold`
 ### 3.16.1
 - Fixed the `fishing_rod` assetGen preset.
+### 3.16.2
+- Fixed asset-baking failing in prod.
 
 # v4
 ## 4.0
@@ -331,3 +333,5 @@ Since v3.5:
 - Added module `component_threshold`
 ### 4.11.1
 - Fixed the `fishing_rod` assetGen preset.
+### 4.11.2
+- Fixed asset-baking failing in prod.
