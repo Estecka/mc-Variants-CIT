@@ -15,7 +15,7 @@ public class MinecraftClientMixin
 		index = 0,
 		at = @At(
 			value="INVOKE",
-			target="net/minecraft/resource/ResourcePackManager.<init>([Lnet/minecraft/resource/ResourcePackProvider;)V"
+			target="net/minecraft/server/packs/repository/PackRepository.<init>([Lnet/minecraft/server/packs/repository/RepositorySource;)V"
 		)
 	)
 	private RepositorySource[] AddAssetGenPack(RepositorySource[] original){

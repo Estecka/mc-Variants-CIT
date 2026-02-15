@@ -17,7 +17,7 @@ public class ItemModelManagerMixin
 {
 	@WrapOperation(
 		method="appendItemLayers(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;I)V",
-		at=@At(value="INVOKE", target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+		at=@At(value="INVOKE", target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 	)
 	private @Nullable Object GetVariantModel(ItemStack stack, DataComponentType<ResourceLocation> type, Operation<ResourceLocation> original)
 	{

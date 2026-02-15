@@ -21,7 +21,7 @@ public class FeatureRendererMixin
 	{
 		@WrapOperation(
 			method = { "renderArmorPiece", "shouldRender" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
 		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
@@ -33,7 +33,7 @@ public class FeatureRendererMixin
 	{
 		@WrapOperation(
 			method = { "hasLayer" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
 		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
@@ -45,7 +45,7 @@ public class FeatureRendererMixin
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
 		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
@@ -57,7 +57,7 @@ public class FeatureRendererMixin
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
 		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
@@ -69,7 +69,7 @@ public class FeatureRendererMixin
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
 		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
@@ -81,7 +81,7 @@ public class FeatureRendererMixin
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
 		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);

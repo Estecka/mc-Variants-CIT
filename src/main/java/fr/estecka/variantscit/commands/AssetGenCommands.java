@@ -188,7 +188,7 @@ public class AssetGenCommands
 		else if (cleanUpError)
 			Error(context, "Reloading, but cleanup failed so results may be incorrect.");
 		else
-			context.getSource().sendFeedback(Text.literal("Done !"));
+			context.getSource().sendFeedback(Component.literal("Done !"));
 
 		PackRepository packManager = Minecraft.getInstance().getResourcePackRepository();
 		String packId = "file/"+BAKED_PACK_DIR;
