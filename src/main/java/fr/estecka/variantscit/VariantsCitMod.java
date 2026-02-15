@@ -1,9 +1,6 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.client.renderer.item.ItemModels;
-import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import java.util.Map;
@@ -14,7 +11,6 @@ import fr.estecka.variantscit.reload.MetaModule;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modules.IBakedModule;
-import fr.estecka.variantscit.vanilla.*;
 
 
 public class VariantsCitMod
@@ -57,13 +53,6 @@ implements ClientModInitializer
 
 	@Override
 	public void onInitializeClient(){
-		RangeSelectItemModelProperties.ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(MODID, "block_entity_data"), NbtNumberProperty.CreateCodec(DataComponents.BLOCK_ENTITY_DATA));
-		RangeSelectItemModelProperties.ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(MODID, "bucket_entity_data"), NbtNumberProperty.CreateCodec(DataComponents.BUCKET_ENTITY_DATA));
-		RangeSelectItemModelProperties.ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(MODID, "custom_data"), NbtNumberProperty.CreateCodec(DataComponents.CUSTOM_DATA));
-		RangeSelectItemModelProperties.ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(MODID, "entity_data"), NbtNumberProperty.CreateCodec(DataComponents.ENTITY_DATA));
-		RangeSelectItemModelProperties.ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(MODID, "stored_enchantment_level"), EnchantedBookLevelPredicate.CODEC);
-		ItemModels.ID_MAPPER.put(ResourceLocation.withDefaultNamespace("range_dispatch"), DynamicRangeDispatchUnbaked.CODEC);
-
 		ModuleCommands.Register();
 		AssetGenCommands.Register();
 	}

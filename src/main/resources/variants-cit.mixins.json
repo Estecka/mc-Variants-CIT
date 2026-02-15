@@ -11,8 +11,6 @@
 		"FeatureRendererMixin$Wolf",
 		"ItemModelTypesMixin",
 		"ItemModelManagerMixin",
-		"ReferencedModelsCollectorMixin",
-		"ReferencedModelsCollectorMixin$ResolverImplMixin",
 		"ReloadableResourceManagerImplMixin",
 		"MinecraftClientMixin"
 	],
