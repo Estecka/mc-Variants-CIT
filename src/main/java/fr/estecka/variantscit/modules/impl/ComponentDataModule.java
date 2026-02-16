@@ -32,7 +32,7 @@ extends ASimpleMultiComponentCachingModule
 	);
 
 	@Deprecated
-	static public final <T> MapCodec<ComponentDataModule<TransformableProperty<ItemComponentProperty>>> CreateLegacyCodec(DataComponentType<T> componentType){
+	static public final <T> MapCodec<ComponentDataModule<TransformableProperty<ItemComponentProperty<T>>>> CreateLegacyCodec(DataComponentType<T> componentType){
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				LegacyPropertyCodec(componentType).forGetter(o->o.property),
@@ -46,10 +46,10 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Deprecated
-	static public final <T> MapCodec<TransformableProperty<ItemComponentProperty>> LegacyPropertyCodec(DataComponentType<T> componentType){
+	static public final <T> MapCodec<TransformableProperty<ItemComponentProperty<T>>> LegacyPropertyCodec(DataComponentType<T> componentType){
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
-				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter()),
+				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter),
 				CodecUtil.MapWithAlternative(SuccessiveTransform.CODEC.fieldOf("transform"), IStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(IStringTransform.NOOP).forGetter(o->o.transform())
 			)
 			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty(componentType, adapter), transform, Optional.empty()))

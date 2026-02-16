@@ -21,8 +21,33 @@ implements ICacheableProvider
 {
 	static public interface ICachableItemProperty
 	{
+		/**
+		 * Used  for  caching  the variant IDs  associated  with  a given  property.
+		 * Typically the hash of {@link #GetReference}.
+		 * 
+		 * A given  hash can  only be  associated  with a  single  value  of  {@link
+		 * #GetPropertyString}. On the  other  hand, the  same  string value  can be
+		 * associated with multiple different hashes in cases when the encompassing
+		 * component has changed elsewhere.
+		 */
 		int GetPropertyHash(ItemStack stack);
+	
+		/**
+		 * A direct reference  to the property  or its encompassing object. Used for
+		 * clearing caches whenever a property is no longer used anywhere.
+		 * 
+		 * The  returned  object  should  be  immutable. Like  for  hashes, a  given
+		 * identity  must always  correspond  to the  same  return  value of  {@link
+		 * #GetPropertyString}, but  the  same  string  value  is allowed  to  match
+		 * multiple identities.
+		 */
 		Object GetReference(ItemStack stack);
+
+		/**
+		 * @return Whether two properties pull their data from the same source. This
+		 * must never return false-positives, but false-negatives aretolerated.
+		 */
+		boolean SameSourceAs(ICachableItemProperty other);
 	}
 
 	@Deprecated public final boolean debug;

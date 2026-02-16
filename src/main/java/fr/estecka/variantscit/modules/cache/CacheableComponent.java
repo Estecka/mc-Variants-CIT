@@ -26,14 +26,9 @@ implements ICachableItemProperty
 	}
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean SameSourceAs(ICachableItemProperty other) {
 		return this == other
 		    || other instanceof CacheableComponent othComp && this.componentType.equals(othComp.componentType)
 		    ;
-	}
-
-	@Override
-	public int hashCode() {
-		return componentType.hashCode();
 	}
 }

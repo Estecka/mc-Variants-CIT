@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.format.properties;
 
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICachableItemProperty;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemCountProperty
@@ -14,6 +15,11 @@ implements IStringProperty
 	@Override
 	public Object GetReference(ItemStack stack) {
 		return null;
+	}
+
+	@Override
+	public boolean SameSourceAs(ICachableItemProperty other) {
+		return this.getClass().equals(other.getClass());
 	}
 
 	@Override

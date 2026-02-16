@@ -17,41 +17,34 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 
-public record ItemComponentProperty(
-	DataComponentType<?> componentType,
-	NbtAdapter nbtAdapter
-)
-implements IStringProperty
+
+public class ItemComponentProperty<T>
+extends AMonoComponentProperty<T>
 {
-	static public final MapCodec<ItemComponentProperty> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<ItemComponentProperty<?>> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
-			NbtAdapter.MAPCODEC.forGetter(ItemComponentProperty::nbtAdapter)
+			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
+			NbtAdapter.MAPCODEC.forGetter(o->o.nbtAdapter)
 		)
 		.apply(builder, ItemComponentProperty::new)
 	);
 
-	static public final Codec<TransformableProperty<ItemComponentProperty>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
+	static public final Codec<TransformableProperty<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
 		ItemComponentProperty::MonostringParse,
 		__->DataResult.error(()->"Encoding not supported")
 	);
 
-	@Override
-	public int GetPropertyHash(ItemStack stack){
-		Object cmp = stack.get(this.componentType);
-		return (cmp!=null) ? cmp.hashCode() : 0;
+	public final NbtAdapter nbtAdapter;
+
+	public ItemComponentProperty(DataComponentType<T> type, NbtAdapter adapter){
+		super(type);
+		this.nbtAdapter = adapter;
 	}
 
 	@Override
-	public Object GetReference(ItemStack stack) {
-		return stack.get(this.componentType);
-	}
-
-	@Override
-	public String GetPropertyString(ItemStack stack){
-		Tag nbt = CodecUtil.GetComponentNbt(stack, this.componentType);
+	public String GetPropertyString(T component){
+		Tag nbt = CodecUtil.GetComponentNbt(component, componentType.codec());
 		if (nbt == null)
 			return null;
 
@@ -59,7 +52,7 @@ implements IStringProperty
 		return result;
 	}
 
-	static private DataResult<TransformableProperty<ItemComponentProperty>> MonostringParse(String input){
+	static private DataResult<TransformableProperty<ItemComponentProperty<?>>> MonostringParse(String input){
 		int pathLocation;
 		for (pathLocation = 0; pathLocation<input.length(); pathLocation++){
 			char c = input.charAt(pathLocation);
@@ -83,7 +76,7 @@ implements IStringProperty
 		DataComponentType<?> component = r_component.getOrThrow();
 
 		return DataResult.success(new TransformableProperty<>(
-			new ItemComponentProperty(component, new NbtAdapter(path, INbtInput.AUTO)),
+			new ItemComponentProperty<>(component, new NbtAdapter(path, INbtInput.AUTO)),
 			IStringTransform.SANITIZE_AUTO,
 			Optional.empty()
 		));
