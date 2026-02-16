@@ -11,7 +11,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.MultiPropertyCache;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.properties.IntegerComponentProperty;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;

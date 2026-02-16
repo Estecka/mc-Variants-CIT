@@ -1,17 +1,23 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.modules.cache;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+/**
+ * @deprecated TODO: Merge into CacheModule completely
+ */
+@Deprecated
 public class MultiPropertyCache
+implements ICacheableProvider
 {
 	static public interface ICachableItemProperty
 	{
@@ -19,7 +25,7 @@ public class MultiPropertyCache
 		Object GetReference(ItemStack stack);
 	}
 
-	public final boolean debug;
+	@Deprecated public final boolean debug;
 	private final ICachableItemProperty[] properties;
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
 	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
@@ -30,20 +36,12 @@ public class MultiPropertyCache
 	}
 
 	public MultiPropertyCache(boolean debug, DataComponentType<?> component){
-		this(debug, Stream.of(ComponentProperty(component)));
+		this(debug, Stream.of(new CacheableComponent<>(component)));
 	}
 
-	static private ICachableItemProperty ComponentProperty(DataComponentType<?> type){
-		return new ICachableItemProperty() {
-			@Override
-			public int GetPropertyHash(ItemStack stack) {
-				return Objects.hashCode(stack.get(type));
-			}
-			@Override
-			public Object GetReference(ItemStack stack) {
-				return stack.get(type);
-			}
-		};
+	@Override
+	public Iterable<ICachableItemProperty> GetProperties() {
+		return Set.of(this.properties);
 	}
 
 	public ResourceLocation ComputeIfAbsent(ItemStack stack, Function<ItemStack,ResourceLocation> computer){
