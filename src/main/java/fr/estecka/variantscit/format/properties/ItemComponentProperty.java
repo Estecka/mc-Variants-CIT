@@ -24,7 +24,7 @@ extends AMonoComponentProperty<T>
 {
 	static public final MapCodec<ItemComponentProperty<?>> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
+			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.source.componentType()),
 			NbtAdapter.MAPCODEC.forGetter(o->o.nbtAdapter)
 		)
 		.apply(builder, ItemComponentProperty::new)
@@ -44,7 +44,7 @@ extends AMonoComponentProperty<T>
 
 	@Override
 	public String GetPropertyString(T component){
-		Tag nbt = CodecUtil.GetComponentNbt(component, componentType.codec());
+		Tag nbt = CodecUtil.GetComponentNbt(component, source.componentType().codec());
 		if (nbt == null)
 			return null;
 

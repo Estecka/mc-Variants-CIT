@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.format.properties.IStringProperty;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -52,6 +53,12 @@ implements ICacheableProvider
 	public MultiPropertyCache(boolean debug, Stream<? extends ICacheablePropertySource> properties){
 		this.debug = debug;
 		this.properties = properties.distinct().toArray(ICacheablePropertySource[]::new);
+	}
+
+	@Deprecated
+	public MultiPropertyCache(boolean debug, IStringProperty... properties){
+		this.debug = debug;
+		this.properties = Stream.of(properties).map(IStringProperty::GetSource).distinct().toArray(ICacheablePropertySource[]::new);
 	}
 
 	public MultiPropertyCache(boolean debug, DataComponentType<?> component){

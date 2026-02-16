@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.util.stream.Stream;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +28,7 @@ implements IVariantCitModule
 	protected final boolean debug;
 	private final MultiPropertyCache cache;
 
-	protected AMultiComponentCachingModule(boolean debug, Stream<IStringProperty> properties){
+	protected AMultiComponentCachingModule(boolean debug, IStringProperty... properties){
 		this.debug = debug;
 		this.cache = new MultiPropertyCache(debug, properties);
 	}

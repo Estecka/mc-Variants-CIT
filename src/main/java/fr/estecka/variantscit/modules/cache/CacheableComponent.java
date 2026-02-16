@@ -6,15 +6,11 @@ import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropert
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 
-public final class CacheableComponent<T>
+public record CacheableComponent<T>(
+	DataComponentType<T> componentType
+)
 implements ICacheablePropertySource
 {
-	protected final DataComponentType<T> componentType;
-
-	public CacheableComponent(DataComponentType<T> componentType){
-		this.componentType = componentType;
-	}
-
 	@Override
 	public final @Nullable T GetReference(ItemStack stack) {
 		return stack.get(componentType);

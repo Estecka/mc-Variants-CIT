@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
@@ -34,7 +33,7 @@ implements ILinearCitModule
 	private final Optional<Integer> scale;
 
 	public DurabilityModule (boolean debug, String namespace, Optional<Integer> scale){
-		this.cache = new MultiPropertyCache(debug, Stream.of(IntegerComponentProperty.DAMAGE, IntegerComponentProperty.MAX_DAMAGE));
+		this.cache = new MultiPropertyCache(debug, IntegerComponentProperty.DAMAGE, IntegerComponentProperty.MAX_DAMAGE);
 		this.namespace = namespace;
 		this.scale = scale;
 	}

@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.util.stream.Stream;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +11,7 @@ import fr.estecka.variantscit.format.properties.IStringProperty;
 abstract class ASimpleMultiComponentCachingModule
 extends AMultiComponentCachingModule
 {
-	protected ASimpleMultiComponentCachingModule(boolean debug, Stream<IStringProperty> properties){
+	protected ASimpleMultiComponentCachingModule(boolean debug, IStringProperty... properties){
 		super(debug, properties);
 	}
 

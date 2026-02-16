@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -59,7 +58,7 @@ extends ASimpleMultiComponentCachingModule
 	private final P property;
 
 	public ComponentDataModule(P property, boolean debug){
-		super(debug, Stream.of(property));
+		super(debug, property);
 		this.property = property;
 	}
 

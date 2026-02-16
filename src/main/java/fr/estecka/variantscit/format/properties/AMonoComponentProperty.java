@@ -3,12 +3,11 @@ package fr.estecka.variantscit.format.properties;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.modules.cache.CacheableComponent;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 
 public abstract class AMonoComponentProperty<T>
 implements IStringProperty
 {
-	private final CacheableComponent<T> source;
+	protected final CacheableComponent<T> source;
 
 	protected AMonoComponentProperty(DataComponentType<T> componentType){
 		this.source = new CacheableComponent<>(componentType);
@@ -23,7 +22,7 @@ implements IStringProperty
 	}
 
 	@Override
-	public ICacheablePropertySource GetSource() {
+	public CacheableComponent<T> GetSource() {
 		return source;
 	}
 }

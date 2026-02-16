@@ -32,7 +32,7 @@ extends ASimpleMultiComponentCachingModule
 	private final Map<String, IStringProperty> varGetters;
 
 	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String,IStringProperty> variables){
-		super(debug, variables.values().stream());
+		super(debug, variables.values().toArray(IStringProperty[]::new));
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 
