@@ -11,7 +11,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
@@ -70,7 +70,7 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		String raw = TransformableProperty.GetRaw(this.property).GetPropertyString(stack);
 		String transformed = property.GetPropertyString(stack);
 

@@ -1,9 +1,9 @@
-package fr.estecka.variantscit.api;
+package fr.estecka.variantscit.modules.libraries;
 
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-public interface IVariantManager
+public interface IVariantLibrary
 {
 	/**
 	 * @return  Whether this variant  has it's own model, ignoring  the fallback

@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
-import fr.estecka.variantscit.api.ISimpleCitModule;
+import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;

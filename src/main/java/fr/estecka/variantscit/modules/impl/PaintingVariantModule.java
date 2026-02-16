@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
 
 /**
@@ -36,7 +36,7 @@ extends AComponentCachingModule<CustomData>
 			return Optional.empty();
 	}
 
-	public ResourceLocation GetModelForComponent(CustomData component, IVariantManager models){
+	public ResourceLocation GetModelForComponent(CustomData component, IVariantLibrary models){
 		if (component == null)
 			return null;
 

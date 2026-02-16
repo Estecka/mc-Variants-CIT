@@ -7,7 +7,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
-import fr.estecka.variantscit.api.ICitModule;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.AxolotlVariantProperty;
 import fr.estecka.variantscit.format.properties.EntityAgeMapProperty;
@@ -17,7 +17,7 @@ import fr.estecka.variantscit.modules.IModuleBaker;
 
 public final class AxolotlBucketModule
 {
-	static private record Params(ICitModule module, String adult, String baby) {}
+	static private record Params(IVariantCitModule module, String adult, String baby) {}
 
 	static public final IModuleBaker<Params> BAKER = new IModuleBaker<>() {
 		@Override
@@ -54,8 +54,8 @@ public final class AxolotlBucketModule
 		ageInvariantVariables.put("variant", AxolotlVariantProperty.UNIT);
 	}
 
-	static public ICitModule Create(boolean debug, String adult, String baby){
-		ICitModule result = CreateAgeInvariantModule(debug, adult);
+	static public IVariantCitModule Create(boolean debug, String adult, String baby){
+		IVariantCitModule result = CreateAgeInvariantModule(debug, adult);
 
 		if (!adult.equals(baby))
 			result = new FallbackModule(CreateAgedModule(debug, adult, baby), result);

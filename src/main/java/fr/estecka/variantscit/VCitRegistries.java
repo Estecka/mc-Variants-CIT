@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
-import fr.estecka.variantscit.api.ICitModule;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.properties.*;
@@ -95,11 +95,11 @@ public final class VCitRegistries
 		));
 	}
 
-	static public void RegisterSimpleModule(ResourceLocation id, MapCodec<? extends ICitModule> mapcodec){
+	static public void RegisterSimpleModule(ResourceLocation id, MapCodec<? extends IVariantCitModule> mapcodec){
 		RegisterBakedModule(id, mapcodec, VariantLibrary::Bake);
 	}
 
-	static public void RegisterSimpleModule(ResourceLocation id, ICitModule unit){
+	static public void RegisterSimpleModule(ResourceLocation id, IVariantCitModule unit){
 		RegisterSimpleModule(id, MapCodec.unit(unit));
 	}
 

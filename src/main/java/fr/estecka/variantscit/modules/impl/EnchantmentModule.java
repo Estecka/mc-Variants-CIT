@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
@@ -46,7 +46,7 @@ extends AComponentCachingModule<ItemEnchantments>
 	}
 
 	@Override
-	public ResourceLocation GetModelForComponent(ItemEnchantments enchants, IVariantManager library)
+	public ResourceLocation GetModelForComponent(ItemEnchantments enchants, IVariantLibrary library)
 	{
 		if (enchants == null || enchants.isEmpty() || !this.MatchesPrecondition(enchants))
 			return null;
@@ -76,7 +76,7 @@ extends AComponentCachingModule<ItemEnchantments>
 		return true;
 	}
 
-	private @Nullable Entry<Holder<Enchantment>> GetBestEnchant(ItemEnchantments enchants, IVariantManager library){
+	private @Nullable Entry<Holder<Enchantment>> GetBestEnchant(ItemEnchantments enchants, IVariantLibrary library){
 		Entry<Holder<Enchantment>> bestFit = null;
 		for (var enchant : enchants.entrySet()){
 			if (!this.precondition.containsKey(enchant.getKey().unwrapKey().get().location())
@@ -89,7 +89,7 @@ extends AComponentCachingModule<ItemEnchantments>
 		return bestFit;
 	}
 
-	private int CompareEnchants(Entry<Holder<Enchantment>> a, Entry<Holder<Enchantment>> b, IVariantManager library){
+	private int CompareEnchants(Entry<Holder<Enchantment>> a, Entry<Holder<Enchantment>> b, IVariantLibrary library){
 		int result = 0;
 
 		if (a == null) return -1;
@@ -110,7 +110,7 @@ extends AComponentCachingModule<ItemEnchantments>
 		return result;
 	}
 
-	private ResourceLocation GetEnchantModel(Entry<Holder<Enchantment>> enchant, IVariantManager library){
+	private ResourceLocation GetEnchantModel(Entry<Holder<Enchantment>> enchant, IVariantLibrary library){
 		ResourceLocation variantId = enchant.getKey().unwrapKey().get().location();
 
 		if (separator.isPresent()) {
@@ -130,12 +130,12 @@ extends AComponentCachingModule<ItemEnchantments>
 		return library.GetVariantModel(variantId);
 	}
 
-	private boolean HasVariantModel(Entry<Holder<Enchantment>> enchant, IVariantManager library){
+	private boolean HasVariantModel(Entry<Holder<Enchantment>> enchant, IVariantLibrary library){
 		return null != GetEnchantModel(enchant, library);
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		ItemEnchantments enchants = stack.get(this.componentType);
 		if (enchants == null || enchants.isEmpty()){
 			logger.Info("The item does not have any enchantment.");

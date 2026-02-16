@@ -5,8 +5,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.api.ISimpleCitModule;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 
 /**
@@ -50,7 +50,7 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;

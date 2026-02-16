@@ -10,7 +10,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.format.properties.IStringProperty;
@@ -65,7 +65,7 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		boolean failure = false;
 		Map<String,String> variables = new HashMap<>();
 

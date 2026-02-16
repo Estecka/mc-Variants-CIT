@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.modules.cache.MultiPropertyCache;
-import fr.estecka.variantscit.api.ICitModule;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 
@@ -24,7 +24,7 @@ import fr.estecka.variantscit.format.properties.IStringProperty;
  * reconstructed during resource-reload.
  */
 abstract class AMultiComponentCachingModule
-implements ICitModule
+implements IVariantCitModule
 {
 	protected final boolean debug;
 	private final MultiPropertyCache cache;
@@ -35,15 +35,15 @@ implements ICitModule
 	}
 
 	// TODO: Ensure child classes can't access unregistered non-cached components.
-	public abstract @Nullable ResourceLocation RecomputeItemModel(ItemStack stack, IVariantManager library);
+	public abstract @Nullable ResourceLocation RecomputeItemModel(ItemStack stack, IVariantLibrary library);
 
 	@Override
-	public final ResourceLocation GetItemModel(ItemStack stack, IVariantManager library){
+	public final ResourceLocation GetItemModel(ItemStack stack, IVariantLibrary library){
 		return this.cache.ComputeIfAbsent(stack, s->this.RecomputeItemModel(s, library));
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		return this.RecomputeItemModel(stack, library);
 	}
 }

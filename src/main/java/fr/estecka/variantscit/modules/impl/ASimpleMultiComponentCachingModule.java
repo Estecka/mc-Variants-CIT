@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.properties.IStringProperty;
 
@@ -19,7 +19,7 @@ extends AMultiComponentCachingModule
 	public abstract @Nullable ResourceLocation RecomputeItemVariant(ItemStack stack);
 
 	@Override
-	public @Nullable ResourceLocation RecomputeItemModel(ItemStack stack, IVariantManager library) {
+	public @Nullable ResourceLocation RecomputeItemModel(ItemStack stack, IVariantLibrary library) {
 		ResourceLocation variant = this.RecomputeItemVariant(stack);
 		if (debug)
 			VariantsCitMod.LOGGER.info("[ASimpleMultiComponent] Variant Id: {}", variant);
@@ -27,7 +27,7 @@ extends AMultiComponentCachingModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		return this.RecomputeItemModel(stack, library);
 	}
 }

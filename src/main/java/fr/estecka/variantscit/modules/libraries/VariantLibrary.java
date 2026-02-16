@@ -3,8 +3,6 @@ package fr.estecka.variantscit.modules.libraries;
 import java.util.Map;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.api.ICitModule;
-import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 
@@ -13,7 +11,7 @@ public record VariantLibrary(
 	Map<ResourceLocation, ResourceLocation> variantModels,
 	Map<String, ResourceLocation> specialModels
 )
-implements IVariantManager, IDebuggableLibrary<IVariantManager>
+implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 {
 	@Override
 	public boolean HasVariantModel(ResourceLocation variant){
@@ -44,8 +42,8 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 		    ;
 	}
 
-	public IBakedModule Bake(ICitModule logic){
-		return new GenericBakedModule<IVariantManager>(this, logic);
+	public IBakedModule Bake(IVariantCitModule logic){
+		return new GenericBakedModule<IVariantLibrary>(this, logic);
 	}
 
 
@@ -72,13 +70,13 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 	}
 
 	@Override
-	public Snitch<IVariantManager> CreateSnitch(CommandLogger logger) {
+	public Snitch<IVariantLibrary> CreateSnitch(CommandLogger logger) {
 		return new SnitchingLibrary(logger);
 	}
 
 	private class SnitchingLibrary
-	extends IDebuggableLibrary.Snitch<IVariantManager>
-	implements IVariantManager
+	extends IDebuggableLibrary.Snitch<IVariantLibrary>
+	implements IVariantLibrary
 	{
 		public SnitchingLibrary (CommandLogger logger){
 			super(logger);
