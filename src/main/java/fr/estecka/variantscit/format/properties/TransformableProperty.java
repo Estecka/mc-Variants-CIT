@@ -7,7 +7,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICachableItemProperty;
 
 public record TransformableProperty<T extends IStringProperty>(T inner, IStringTransform transform, Optional<String> fallback)
 implements IStringProperty
@@ -33,8 +32,8 @@ implements IStringProperty
 	}
 
 	@Override
-	public boolean SameSourceAs(ICachableItemProperty other) {
-		return inner.SameSourceAs(other);
+	public int SourceHashcode() {
+		return inner.SourceHashcode();
 	}
 
 	@Override

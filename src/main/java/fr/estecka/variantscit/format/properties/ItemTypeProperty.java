@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.format.properties;
 
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICachableItemProperty;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,8 +17,8 @@ implements IStringProperty
 	}
 
 	@Override
-	public boolean SameSourceAs(ICachableItemProperty other) {
-		return this.getClass().equals(other.getClass());
+	public int SourceHashcode() {
+		return this.getClass().hashCode();
 	}
 
 	@Override

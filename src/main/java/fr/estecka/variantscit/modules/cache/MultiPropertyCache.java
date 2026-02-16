@@ -44,10 +44,14 @@ implements ICacheableProvider
 		Object GetReference(ItemStack stack);
 
 		/**
-		 * @return Whether two properties pull their data from the same source. This
-		 * must never return false-positives, but false-negatives aretolerated.
+		 * @return A hashcode  used to compare  the equality  of two properties'
+		 * sources. I.e, this only represents where the data comes from, not the
+		 * way it is processed.
+		 * @implNote A `bool sourceEquals(other)` method would not work for that
+		 * purpose. It would fail when passed a wrapper such as a transformable
+		 * property.
 		 */
-		boolean SameSourceAs(ICachableItemProperty other);
+		int SourceHashcode();
 	}
 
 	@Deprecated public final boolean debug;
