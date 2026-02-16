@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,8 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
+import fr.estecka.variantscit.modules.cache.CacheableComponent;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
@@ -198,6 +201,11 @@ implements IBakedModule
 				return true;
 			};
 		};
+	}
+
+	@Override
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		return CacheableComponent.SourcesOf(componentType);
 	}
 
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, DataComponentType<ItemEnchantments> component){

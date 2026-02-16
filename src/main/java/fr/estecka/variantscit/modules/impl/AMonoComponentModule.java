@@ -3,6 +3,9 @@ package fr.estecka.variantscit.modules.impl;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import java.util.Collection;
+import fr.estecka.variantscit.modules.cache.CacheableComponent;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 
@@ -16,6 +19,10 @@ implements IVariantCitModule
 		this.componentType = component;
 	}
 
+	@Override
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		return CacheableComponent.SourcesOf(componentType);
+	}
 
 	@Override
 	public final ResourceLocation GetItemModel(ItemStack stack, IVariantLibrary models){

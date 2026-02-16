@@ -1,0 +1,38 @@
+package fr.estecka.variantscit.modules;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+
+/**
+ * TODO: Unwrap inner lists
+ */
+public class ModuleList
+extends ArrayList<IBakedModule>
+implements IBakedModule
+{
+	public ModuleList(Collection<? extends IBakedModule> submodules){
+		super(submodules);
+	}
+
+	@Override
+	public ResourceLocation GetModelForItem(ItemStack stack) {
+		for(IBakedModule m : this){
+			ResourceLocation result = m.GetModelForItem(stack);
+			if (result != null) return result;
+		}
+		return null;
+	}
+
+	@Override
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		Set<ICacheablePropertySource> set = new HashSet<>();
+		for(IBakedModule m : this)
+			set.addAll(m.GetCacheSources());
+		return set;
+	}
+}

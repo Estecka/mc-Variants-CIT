@@ -7,19 +7,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class CacheModule
-implements ICacheableModule
+implements IBakedModule
 {
 	private final MultiPropertyCache cache;
-	private final ICacheableModule[] submodules;
+	private final IBakedModule submodule;
 
-	public CacheModule(Collection<ICacheableModule> submodules){
-		this.submodules = submodules.toArray(ICacheableModule[]::new);
+	public CacheModule(IBakedModule submodule){
+		this.submodule = submodule;
 		this.cache = null;
 	}
 
 	@Override
-	public Iterable<ICacheablePropertySource> GetProperties() {
-		return this.cache.GetProperties();
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		return this.submodule.GetCacheSources();
 	}
 
 	@Override
@@ -28,11 +28,6 @@ implements ICacheableModule
 	}
 
 	private ResourceLocation RecomputeItemModel(ItemStack stack){
-		for (IBakedModule m : this.submodules){
-			ResourceLocation result = m.GetModelForItem(stack);
-			if (result != null) return result;
-		}
-
-		return null;
+		return submodule.GetModelForItem(stack);
 	}
 }

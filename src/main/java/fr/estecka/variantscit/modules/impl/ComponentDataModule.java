@@ -1,5 +1,7 @@
 package fr.estecka.variantscit.modules.impl;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
@@ -8,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -46,6 +49,11 @@ implements ISimpleCitModule
 
 	public ComponentDataModule(P property){
 		this.property = property;
+	}
+
+	@Override
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		return List.of(property.GetSource());
 	}
 
 	@Override

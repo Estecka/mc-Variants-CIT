@@ -6,6 +6,8 @@ import net.minecraft.world.item.ItemStack;
 public class ItemCountProperty
 implements IStringProperty, ICacheablePropertySource
 {
+	static public final ItemCountProperty UNIT = new ItemCountProperty();
+
 	@Override
 	public int GetPropertyHash(ItemStack stack){
 		return stack.getCount();
@@ -18,7 +20,7 @@ implements IStringProperty, ICacheablePropertySource
 	}
 
 	@Override
-	public ICacheablePropertySource GetSource() {
+	public ItemCountProperty GetSource() {
 		return this;
 	}
 

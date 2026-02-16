@@ -12,17 +12,11 @@ import net.minecraft.world.level.Level;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
 
-/**
- * @implNote
- * Because of the "invalid" special model, this particular module's cache should
- * not be allowed to survive  **datapack**  reloads. However this is unlikely to
- * cause  any issue: so long as  an item stack's lifetime  is tied to its world,
- * then the cached keys  will not survive that world, and thus won't survive the
- * actual reloading of painting variants.
- */
 public class PaintingVariantModule
 extends AMonoComponentModule<CustomData>
 {
+	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
+
 	public PaintingVariantModule(){
 		super(DataComponents.ENTITY_DATA);
 	}

@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
+import java.util.Collection;
 import java.util.Map;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,6 +15,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.NbtPath;
+import fr.estecka.variantscit.modules.cache.CacheableComponent;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
@@ -59,6 +62,11 @@ implements ILinearCitModule
 	@Override
 	public String GetNamespace() {
 		return this.namespace;
+	}
+
+	@Override
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		return CacheableComponent.SourcesOf(componentType);
 	}
 
 	@Override

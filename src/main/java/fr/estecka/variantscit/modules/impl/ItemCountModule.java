@@ -1,7 +1,11 @@
 package fr.estecka.variantscit.modules.impl;
 
+import java.util.Collection;
+import java.util.List;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.format.properties.ItemCountProperty;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +22,11 @@ implements ILinearCitModule
 	@Override
 	public String GetNamespace() {
 		return namespace;
+	}
+
+	@Override
+	public Collection<ICacheablePropertySource> GetCacheSources() {
+		return List.of(ItemCountProperty.UNIT);
 	}
 
 	@Override

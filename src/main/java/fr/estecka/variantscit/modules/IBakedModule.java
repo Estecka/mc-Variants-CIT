@@ -4,26 +4,18 @@ import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.modules.cache.ICacheSourceProvider;
 
 public interface IBakedModule
+extends ICacheSourceProvider
 {
 	ResourceLocation GetModelForItem(ItemStack stack);
 
 	static public IBakedModule OfList(List<? extends IBakedModule> modules){
-		if (modules.isEmpty())
-			return __->null;
-		else if (modules.size() == 1)
+		if (modules.size() == 1)
 			return modules.get(0);
-
-		return (ItemStack stack)->{
-			for (var m : modules){
-				ResourceLocation id = m.GetModelForItem(stack);
-				if (id != null)
-					return id;
-			}
-
-			return null;
-		};
+		else
+			return new ModuleList(modules);
 	}
 
 	default void Summary(CommandLogger logger){

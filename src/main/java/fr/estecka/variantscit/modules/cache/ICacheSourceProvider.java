@@ -1,9 +1,10 @@
 package fr.estecka.variantscit.modules.cache;
 
+import java.util.Collection;
 import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 
 @FunctionalInterface
-public interface ICacheableProvider
+public interface ICacheSourceProvider
 {
-	Iterable<ICacheablePropertySource> GetProperties();
+	Collection<ICacheablePropertySource> GetCacheSources();
 }

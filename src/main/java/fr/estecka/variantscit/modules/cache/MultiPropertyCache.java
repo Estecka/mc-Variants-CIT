@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules.cache;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -18,7 +19,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  */
 @Deprecated
 public class MultiPropertyCache
-implements ICacheableProvider
+implements ICacheSourceProvider
 {
 	static public interface ICacheablePropertySource
 	{
@@ -66,7 +67,7 @@ implements ICacheableProvider
 	}
 
 	@Override
-	public Iterable<ICacheablePropertySource> GetProperties() {
+	public Collection<ICacheablePropertySource> GetCacheSources() {
 		return Set.of(this.properties);
 	}
 

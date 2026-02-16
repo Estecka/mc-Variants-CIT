@@ -38,26 +38,26 @@ public final class VCitRegistries
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponents.ENTITY_DATA));
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), new GoatHornModule());
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), GoatHornModule.UNIT);
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("jukebox_playable"), new MusicDiscModule());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("painting_variant"), new PaintingVariantModule());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_effect"), new PotionEffectModule());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_type"), new PotionTypeModule());
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("jukebox_playable"), MusicDiscModule.UNIT);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantModule.UNIT);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_effect"), PotionEffectModule.UNIT);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_type"), PotionTypeModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("stored_enchantments"), CodecUtil.WithWarning(
 			MapCodec.unit(new EnchantmentModule(DataComponents.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
 			"Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead."
 		));
-		RegisterBakedModule(ResourceLocation.withDefaultNamespace("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim"), new TrimModule());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_pattern"), new TrimPatternModule());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_material"), new TrimPatternModule());
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim"), TrimModule.UNIT);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_pattern"), TrimPatternModule.UNIT);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_material"), TrimPatternModule.UNIT);
 
 		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(ResourceLocation.withDefaultNamespace("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
 		ITEM_PROPERTIES.RegisterMap(ResourceLocation.withDefaultNamespace("item_component"), ItemComponentProperty.MAP_CODEC);
-		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_count"), new ItemCountProperty());
+		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_count"), ItemCountProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_type"), new ItemTypeProperty());
 		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantProperty.UNIT);
 
