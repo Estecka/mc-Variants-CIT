@@ -12,7 +12,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.NbtPath;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
@@ -41,7 +40,6 @@ implements ILinearCitModule
 
 	private final String namespace;
 
-	private final MultiPropertyCache cache;
 	private final DataComponentType<?> componentType;
 	private final NbtPath nbtPath;
 	private final int bias;
@@ -56,8 +54,6 @@ implements ILinearCitModule
 		this.bias = bias;
 		this.scale = scale;
 		this.offset = offset;
-
-		this.cache = new MultiPropertyCache(false, component);
 	}
 
 	@Override
@@ -67,10 +63,6 @@ implements ILinearCitModule
 
 	@Override
 	public @Nullable ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library) {
-		return this.cache.ComputeIfAbsent(stack, _0->this.RecomputeItemModel(stack, library));
-	}
-
-	public @Nullable ResourceLocation RecomputeItemModel(ItemStack stack, ILinearLibrary library) {
 		Integer value = this.GetComponentValue(stack);
 		if (value == null)
 			return null;
@@ -87,7 +79,7 @@ implements ILinearCitModule
 
 		value = (int)(value*scale + offset);
 		logger.Info("Transformed: {}", CommandLogger.ItemData(value));
-		return this.RecomputeItemModel(stack, library);
+		return this.GetItemModel(stack, library);
 	}
 
 	private @Nullable Integer GetComponentValue(ItemStack stack){

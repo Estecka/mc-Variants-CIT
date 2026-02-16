@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
 
 public class TrimModule
-extends ASimpleComponentCachingModule<ArmorTrim>
+extends ASimpleMonoComponentModule<ArmorTrim>
 {
 	public TrimModule(){
 		super(DataComponents.TRIM);

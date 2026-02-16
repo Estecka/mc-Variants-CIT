@@ -21,7 +21,7 @@ import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
  * actual reloading of painting variants.
  */
 public class PaintingVariantModule
-extends AComponentCachingModule<CustomData>
+extends AMonoComponentModule<CustomData>
 {
 	public PaintingVariantModule(){
 		super(DataComponents.ENTITY_DATA);

@@ -18,7 +18,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 
 public class EnchantmentModule
-extends AComponentCachingModule<ItemEnchantments>
+extends AMonoComponentModule<ItemEnchantments>
 {
 	static public final MapCodec<EnchantmentModule> CreateCodec(DataComponentType<ItemEnchantments> targetComponent){
 		return RecordCodecBuilder.mapCodec(builder->builder

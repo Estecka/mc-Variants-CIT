@@ -7,26 +7,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.VariantsCitMod;
 
 public class CustomNameModule
-extends ASimpleComponentCachingModule<Component>
+extends ASimpleMonoComponentModule<Component>
 {
-	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(p->p.debug),
-			Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC).optionalFieldOf("specialNames", Map.of()).forGetter(p->p.specialNames)
-		)
-		.apply(builder, CustomNameModule::new)
-	);
+	static public final MapCodec<CustomNameModule> CODEC =
+		Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC)
+			.optionalFieldOf("specialNames", Map.of())
+			.xmap(CustomNameModule::new, p->p.specialNames)
+		;
 
-	private final boolean debug;
 	private final Map<String,ResourceLocation> specialNames;
 
-	public CustomNameModule(boolean debug, Map<String, ResourceLocation> specialNames){
+	public CustomNameModule(Map<String, ResourceLocation> specialNames){
 		super(DataComponents.CUSTOM_NAME);
-		this.debug = debug;
 		this.specialNames = specialNames;
 	}
 
@@ -37,8 +31,6 @@ extends ASimpleComponentCachingModule<Component>
 			return specialNames.get(name);
 		
 		name = this.Transform(name);
-		if (debug)
-			VariantsCitMod.LOGGER.info("[custom_name VCIT] #{} \"{}\" -> `{}`", super.cachedVariants.size(), text.getString(), name);
 		return ResourceLocation.tryParse(name);
 	}
 

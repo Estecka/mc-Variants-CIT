@@ -5,11 +5,10 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.IStringTransform;
@@ -20,27 +19,15 @@ import fr.estecka.variantscit.format.properties.TransformableProperty;
 import fr.estecka.variantscit.format.transforms.SuccessiveTransform;
 
 public class ComponentDataModule<P extends IStringProperty>
-extends ASimpleMultiComponentCachingModule
+implements ISimpleCitModule
 {
-	static public final MapCodec<ComponentDataModule<IStringProperty>> CODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			IStringProperty.MAP_CODEC.forGetter(o->o.property),
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->o.debug)
-		)
-		.apply(builder, ComponentDataModule::new)
-	);
+	static public final MapCodec<ComponentDataModule<IStringProperty>> CODEC = IStringProperty.MAP_CODEC.xmap(ComponentDataModule::new, o->o.property);
 
 	@Deprecated
 	static public final <T> MapCodec<ComponentDataModule<TransformableProperty<ItemComponentProperty<T>>>> CreateLegacyCodec(DataComponentType<T> componentType){
-		return RecordCodecBuilder.mapCodec(builder->builder
-			.group(
-				LegacyPropertyCodec(componentType).forGetter(o->o.property),
-				Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o -> o.debug)
-			)
-			.apply(builder, (property, debug) -> {
-				VariantsCitMod.LOGGER.warn("Module types `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data` are being deprecated. Use `component_data` instead.");
-				return new ComponentDataModule<>(property, debug);
-			})
+		return CodecUtil.WithWarning(
+			LegacyPropertyCodec(componentType).xmap(ComponentDataModule::new, o->o.property),
+			"Module types `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data` are deprecated. Use `component_data` instead."
 		);
 	}
 
@@ -51,19 +38,18 @@ extends ASimpleMultiComponentCachingModule
 				CodecUtil.MapWithAlternative(NbtAdapter.MAPCODEC, NbtAdapter.LEGACY_MAPCODEC).forGetter(o->o.inner().nbtAdapter),
 				CodecUtil.MapWithAlternative(SuccessiveTransform.CODEC.fieldOf("transform"), IStringTransform.LEGACY_CODEC.fieldOf("lowercase")).orElse(IStringTransform.NOOP).forGetter(o->o.transform())
 			)
-			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty(componentType, adapter), transform, Optional.empty()))
+			.apply(builder, (adapter, transform) -> new TransformableProperty<>(new ItemComponentProperty<>(componentType, adapter), transform, Optional.empty()))
 		);
 	}
 
 	private final P property;
 
-	public ComponentDataModule(P property, boolean debug){
-		super(debug, property);
+	public ComponentDataModule(P property){
 		this.property = property;
 	}
 
 	@Override
-	public @Nullable ResourceLocation RecomputeItemVariant(ItemStack stack) {
+	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
 		String result = this.property.GetPropertyString(stack);
 		return (result!=null) ? ResourceLocation.tryParse(result) : null;
 	}
@@ -76,6 +62,6 @@ extends ASimpleMultiComponentCachingModule
 		logger.Info("Raw data: {}",    CommandLogger.ItemData(raw, "Missing or invalid"));
 		logger.Info("Transformed: {}", CommandLogger.ItemData(transformed));
 
-		return this.RecomputeItemModel(stack, library);
+		return this.GetItemModel(stack, library);
 	}
 }

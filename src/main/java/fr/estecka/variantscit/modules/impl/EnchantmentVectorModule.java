@@ -22,7 +22,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.modules.libraries.LinearSnapMap;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -139,8 +138,6 @@ implements IBakedModule
 	) {}
 
 	static public record Parameters(
-		boolean bakingDebug,
-		boolean runtimeDebug,
 		boolean optionalLevel,
 		List<ToIntFunction<EnchantVector>> ordering,
 		String enchantSeparator,
@@ -160,8 +157,6 @@ implements IBakedModule
 
 	static public final MapCodec<Parameters> PARAM_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
-			Codec.BOOL.optionalFieldOf("bakingDebug",  false).forGetter(Parameters::bakingDebug),
-			Codec.BOOL.optionalFieldOf("runtimeDebug", false).forGetter(Parameters::runtimeDebug),
 			Codec.BOOL.optionalFieldOf("optionalLevel", true).forGetter(Parameters::optionalLevel),
 			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
 			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
@@ -173,7 +168,6 @@ implements IBakedModule
 	);
 
 	private final DataComponentType<ItemEnchantments> componentType;
-	private final MultiPropertyCache cache;
 	private final ResourceLocation fallback;
 	private final VectorSpace vectorSpace;
 	private final LinearSnapMap<VariantEntry> modelLine;
@@ -211,7 +205,6 @@ implements IBakedModule
 		this.params = params;
 		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
-		this.cache = new MultiPropertyCache(params.runtimeDebug, componentType);
 		this.magnitudeGetter = params.ordering.get(0);
 		this.modelLine = OrderedSnapMap(params.ordering);
 
@@ -236,13 +229,6 @@ implements IBakedModule
 							enchant2MaxLevel.put(e.getKey(), e.getValue());
 				}
 			}
-		}
-
-		if (params.bakingDebug){
-			String msg = "These enchantments were detected in the CITs. If this looks wrong, check your filenames and your aliases:";
-			for (ResourceLocation id : enchant2MaxLevel.keySet())
-				msg += '\n' + id.toString();
-			VariantsCitMod.LOGGER.info(msg);
 		}
 
 		if (!duplicateIds.isEmpty()){
@@ -349,8 +335,6 @@ implements IBakedModule
 			lvlRegex = "(?:"+lvlRegex+"){0}"; // Causes the group to be accessible, but evaluate to null.
 
 		String regex = "(?<=^|."+enchantSep+")(?:(?<namespace>[a-z0-9_.-]*?)\\.\\.)?(?<path>[a-z0-9_.-]+?)"+lvlRegex+"(?="+enchantSep+".+|$)";
-		// if (params.bakingDebug)
-		// 	VariantsCitMod.LOGGER.info("Filenames will be parsed using this regex:\n{}", regex);
 
 		return Pattern.compile(regex);
 	}
@@ -373,10 +357,6 @@ implements IBakedModule
 
 	@Override
 	public ResourceLocation GetModelForItem(ItemStack stack) {
-		return cache.ComputeIfAbsent(stack, this::ComputeItemModel);
-	}
-
-	public ResourceLocation ComputeItemModel(ItemStack stack) {
 		var enchants = stack.get(componentType);
 		if (enchants == null || enchants.isEmpty())
 			return null;
@@ -513,7 +493,7 @@ implements IBakedModule
 		else
 			logger.Info("This is a perfect match.");
 
-		return this.ComputeItemModel(stack);
+		return this.GetModelForItem(stack);
 	}
 
 }

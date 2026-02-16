@@ -68,10 +68,10 @@ public final class AxolotlBucketModule
 		variables.put("variant", AxolotlVariantProperty.UNIT);
 		variables.put("age", new EntityAgeMapProperty(adult, baby));
 
-		return new MultiComponentFormatModule(debug, agedFormat, variables);
+		return new MultiComponentFormatModule(agedFormat, variables);
 	}
 
 	static public MultiComponentFormatModule CreateAgeInvariantModule(boolean debug, String suffix){
-		return new MultiComponentFormatModule(debug, Substitution.Parse("${variant}"+suffix).getOrThrow(), ageInvariantVariables);
+		return new MultiComponentFormatModule(Substitution.Parse("${variant}"+suffix).getOrThrow(), ageInvariantVariables);
 	}
 }

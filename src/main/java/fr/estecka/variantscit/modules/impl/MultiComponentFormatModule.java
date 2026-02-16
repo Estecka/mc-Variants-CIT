@@ -6,10 +6,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
@@ -17,11 +16,10 @@ import fr.estecka.variantscit.format.properties.IStringProperty;
 import fr.estecka.variantscit.format.properties.TransformableProperty;
 
 public class MultiComponentFormatModule
-extends ASimpleMultiComponentCachingModule
+implements ISimpleCitModule
 {
 	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			ExtraCodecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IStringProperty.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
@@ -31,8 +29,7 @@ extends ASimpleMultiComponentCachingModule
 	private final Substitution format;
 	private final Map<String, IStringProperty> varGetters;
 
-	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String,IStringProperty> variables){
-		super(debug, variables.values().toArray(IStringProperty[]::new));
+	public MultiComponentFormatModule(Substitution format, Map<String,IStringProperty> variables){
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 
@@ -40,16 +37,11 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Override
-	public ResourceLocation RecomputeItemVariant(ItemStack stack){
+	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
 		Map<String,String> variables = new HashMap<>();
-
-		if (debug)
-			VariantsCitMod.LOGGER.info("[component_format] {}", this.format);
 
 		for (var entry : this.varGetters.entrySet()){
 			String value = entry.getValue().GetPropertyString(stack);
-			if (debug)
-				VariantsCitMod.LOGGER.info("\t${{}} -> {}", entry.getKey(), value);
 			if (value == null)
 				return null;
 
@@ -57,11 +49,9 @@ extends ASimpleMultiComponentCachingModule
 		}
 
 		String rawId = this.format.Substitute(variables);
-		if (debug)
-			VariantsCitMod.LOGGER.info("\t= {}", rawId);
 		variables.clear();
-		ResourceLocation id = ResourceLocation.tryParse(rawId);
-		return id;
+		ResourceLocation variantId = ResourceLocation.tryParse(rawId);
+		return variantId;
 	}
 
 	@Override
@@ -87,6 +77,6 @@ extends ASimpleMultiComponentCachingModule
 		else
 			logger.Info("Formatted variant: {}", CommandLogger.ItemData(this.format.Substitute(variables)));
 
-		return this.RecomputeItemModel(stack, library);
+		return this.GetItemModel(stack, library);
 	}
 }
