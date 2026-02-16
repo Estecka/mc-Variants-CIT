@@ -1,9 +1,10 @@
 package fr.estecka.variantscit.format.properties;
 
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemCountProperty
-implements IStringProperty
+implements IStringProperty, ICacheablePropertySource
 {
 	@Override
 	public int GetPropertyHash(ItemStack stack){
@@ -17,8 +18,8 @@ implements IStringProperty
 	}
 
 	@Override
-	public int SourceHashcode() {
-		return this.getClass().hashCode();
+	public ICacheablePropertySource GetSource() {
+		return this;
 	}
 
 	@Override

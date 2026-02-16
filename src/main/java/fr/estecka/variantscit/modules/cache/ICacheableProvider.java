@@ -1,9 +1,9 @@
 package fr.estecka.variantscit.modules.cache;
 
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICachableItemProperty;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 
 @FunctionalInterface
 public interface ICacheableProvider
 {
-	Iterable<ICachableItemProperty> GetProperties();
+	Iterable<ICacheablePropertySource> GetProperties();
 }

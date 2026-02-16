@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 public class MultiPropertyCache
 implements ICacheableProvider
 {
-	static public interface ICachableItemProperty
+	static public interface ICacheablePropertySource
 	{
 		/**
 		 * Used  for  caching  the variant IDs  associated  with  a given  property.
@@ -42,26 +42,16 @@ implements ICacheableProvider
 		 * multiple identities.
 		 */
 		Object GetReference(ItemStack stack);
-
-		/**
-		 * @return A hashcode  used to compare  the equality  of two properties'
-		 * sources. I.e, this only represents where the data comes from, not the
-		 * way it is processed.
-		 * @implNote A `bool sourceEquals(other)` method would not work for that
-		 * purpose. It would fail when passed a wrapper such as a transformable
-		 * property.
-		 */
-		int SourceHashcode();
 	}
 
 	@Deprecated public final boolean debug;
-	private final ICachableItemProperty[] properties;
+	private final ICacheablePropertySource[] properties;
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
 	private final ReferenceQueue<Object> expiredComponents = new ReferenceQueue<>();
 
-	public MultiPropertyCache(boolean debug, Stream<? extends ICachableItemProperty> properties){
+	public MultiPropertyCache(boolean debug, Stream<? extends ICacheablePropertySource> properties){
 		this.debug = debug;
-		this.properties = properties.distinct().toArray(ICachableItemProperty[]::new);
+		this.properties = properties.distinct().toArray(ICacheablePropertySource[]::new);
 	}
 
 	public MultiPropertyCache(boolean debug, DataComponentType<?> component){
@@ -69,7 +59,7 @@ implements ICacheableProvider
 	}
 
 	@Override
-	public Iterable<ICachableItemProperty> GetProperties() {
+	public Iterable<ICacheablePropertySource> GetProperties() {
 		return Set.of(this.properties);
 	}
 

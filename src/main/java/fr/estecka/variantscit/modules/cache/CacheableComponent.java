@@ -2,16 +2,16 @@ package fr.estecka.variantscit.modules.cache;
 
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICachableItemProperty;
+import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 
-public class CacheableComponent<T>
-implements ICachableItemProperty
+public final class CacheableComponent<T>
+implements ICacheablePropertySource
 {
 	protected final DataComponentType<T> componentType;
 
-	protected CacheableComponent(DataComponentType<T> componentType){
+	public CacheableComponent(DataComponentType<T> componentType){
 		this.componentType = componentType;
 	}
 
@@ -26,7 +26,14 @@ implements ICachableItemProperty
 	}
 
 	@Override
-	public int SourceHashcode() {
+	public boolean equals(Object other) {
+		return this == other
+		    || other instanceof CacheableComponent othComp && othComp.componentType.equals(this.componentType)
+		    ;
+	}
+
+	@Override
+	public int hashCode() {
 		return componentType.hashCode();
 	}
 }
