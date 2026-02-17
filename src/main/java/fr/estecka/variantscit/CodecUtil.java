@@ -32,7 +32,7 @@ public final class CodecUtil
 {
 	static private final Minecraft client = Minecraft.getInstance();
 
-	static public final Codec<ResourceLocation> VCIT_IDENTIFIER = Codec.STRING.comapFlatMap(CodecUtil::VCitIdenfitier, ResourceLocation::toString);
+	static public final Codec<ResourceLocation> VCIT_IDENTIFIER = Codec.STRING.comapFlatMap(CodecUtil::VCitIdentifier, ResourceLocation::toString);
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->ResourceLocation.isValidPath(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->ResourceLocation.isValidNamespace(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
@@ -44,7 +44,7 @@ public final class CodecUtil
 /* # Base Types                                                               */
 /******************************************************************************/
 
-	static public DataResult<ResourceLocation> VCitIdenfitier(String input){
+	static public DataResult<ResourceLocation> VCitIdentifier(String input){
 		if (!input.contains(":"))
 			input = VariantsCitMod.MODID + ":" + input;
 		return ResourceLocation.read(input);
