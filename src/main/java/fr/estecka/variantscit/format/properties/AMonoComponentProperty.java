@@ -2,15 +2,15 @@ package fr.estecka.variantscit.format.properties;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
-import fr.estecka.variantscit.modules.cache.CacheableComponent;
+import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 
 public abstract class AMonoComponentProperty<T>
 implements IStringProperty
 {
-	protected final CacheableComponent<T> source;
+	protected final ComponentCacheKey<T> source;
 
 	protected AMonoComponentProperty(DataComponentType<T> componentType){
-		this.source = new CacheableComponent<>(componentType);
+		this.source = new ComponentCacheKey<>(componentType);
 	}
 
 	public abstract String GetPropertyString(T component);
@@ -22,7 +22,7 @@ implements IStringProperty
 	}
 
 	@Override
-	public CacheableComponent<T> GetSource() {
+	public ComponentCacheKey<T> GetCacheKey() {
 		return source;
 	}
 }

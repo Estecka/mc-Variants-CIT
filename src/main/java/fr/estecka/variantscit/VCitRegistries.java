@@ -58,7 +58,7 @@ public final class VCitRegistries
 		ITEM_PROPERTIES.Register(ResourceLocation.withDefaultNamespace("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
 		ITEM_PROPERTIES.RegisterMap(ResourceLocation.withDefaultNamespace("item_component"), ItemComponentProperty.MAP_CODEC);
 		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_count"), ItemCountProperty.UNIT);
-		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_type"), new ItemTypeProperty());
+		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_type"), ItemTypeProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantProperty.UNIT);
 
 		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("noop"),               IStringTransform.NOOP);

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -52,8 +52,8 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public Collection<ICacheablePropertySource> GetCacheSources() {
-		return List.of(property.GetSource());
+	public Collection<ICacheKey> GetCacheKeys() {
+		return List.of(property.GetCacheKey());
 	}
 
 	@Override

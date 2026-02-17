@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -39,9 +39,9 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public Collection<ICacheablePropertySource> GetCacheSources() {
+	public Collection<ICacheKey> GetCacheKeys() {
 		return varGetters.values().stream()
-			.map(IStringProperty::GetSource)
+			.map(IStringProperty::GetCacheKey)
 			.distinct()
 			.toList()
 			;

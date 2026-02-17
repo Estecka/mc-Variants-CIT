@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -35,10 +35,10 @@ implements IVariantCitModule
 	}
 
 	@Override
-	public Collection<ICacheablePropertySource> GetCacheSources() {
-		Set<ICacheablePropertySource> set = new HashSet<>();
+	public Collection<ICacheKey> GetCacheKeys() {
+		Set<ICacheKey> set = new HashSet<>();
 		for(IVariantCitModule m : innerQueue)
-			set.addAll(m.GetCacheSources());
+			set.addAll(m.GetCacheKeys());
 		return set;
 	}
 }

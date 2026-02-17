@@ -1,16 +1,13 @@
 package fr.estecka.variantscit.format.properties;
 
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public record ItemTypeProperty()
-implements IStringProperty, ICacheablePropertySource
+implements IStringProperty, ICacheKey
 {
-	@Override
-	public int GetPropertyHash(ItemStack stack){
-		return stack.getItem().hashCode();
-	}
+	static public final ItemTypeProperty UNIT = new ItemTypeProperty();
 
 	@Override
 	public Item GetReference(ItemStack stack) {
@@ -18,7 +15,7 @@ implements IStringProperty, ICacheablePropertySource
 	}
 
 	@Override
-	public ICacheablePropertySource GetSource() {
+	public ICacheKey GetCacheKey() {
 		return this;
 	}
 

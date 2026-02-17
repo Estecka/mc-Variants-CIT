@@ -3,7 +3,7 @@ package fr.estecka.variantscit.modules.libraries;
 import java.util.Collection;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
-import fr.estecka.variantscit.modules.cache.MultiPropertyCache.ICacheablePropertySource;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.IDebuggableLibrary.Snitch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -27,8 +27,8 @@ implements IBakedModule
 	}
 
 	@Override
-	public Collection<ICacheablePropertySource> GetCacheSources() {
-		return null;
+	public Collection<ICacheKey> GetCacheKeys() {
+		return logic.GetCacheKeys();
 	}
 
 	@Override

@@ -4,10 +4,10 @@ import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.commands.CommandLogger;
-import fr.estecka.variantscit.modules.cache.ICacheSourceProvider;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 
 public interface IBakedModule
-extends ICacheSourceProvider
+extends ICacheKey.Cacheable
 {
 	ResourceLocation GetModelForItem(ItemStack stack);
 
