@@ -1,5 +1,10 @@
 package fr.estecka.variantscit.reload;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 
@@ -28,4 +33,13 @@ implements StringRepresentable
 		return name;
 	}
 
+	static public <T> Map<EModuleContext,T> MapOf(Function<EModuleContext,T> function){
+		Map<EModuleContext,T> result = new HashMap<>();
+		for (EModuleContext ctx : EModuleContext.values()){
+			T value = function.apply(ctx);
+			if (value != null)
+				result.put(ctx, value);
+		}
+		return result;
+	}
 }

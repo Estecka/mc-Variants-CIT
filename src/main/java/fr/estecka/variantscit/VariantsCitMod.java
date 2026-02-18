@@ -41,13 +41,8 @@ implements ClientModInitializer
 		MetaModule meta = META.get(id);
 		if (meta == null)
 			return null;
-		else {
-			return switch (context) {
-				default -> throw new IllegalArgumentException();
-				case ITEM_MODEL -> meta.itemModule().orElse(null);
-				case EQUIPPABLE -> meta.equipModule().orElse(null);
-			};
-		}
+		else
+			return meta.bakedModules().get(context);
 	}
 
 	@Override
@@ -58,9 +53,10 @@ implements ClientModInitializer
 
 	static public void OnResourceReload(ModuleLoader.Result result){
 		EQUIPABLES.Clear();
-		ITEM_MODULES  = result.itemModules;
-		EQUIP_MODULES = result.equipModules;
-		META = result.allModules;
+		// FIXME
+		// ITEM_MODULES  = result.itemModules;
+		// EQUIP_MODULES = result.equipModules;
+		META = result.uniqueModules;
 	}
 
 }

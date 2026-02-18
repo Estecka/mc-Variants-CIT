@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.reload;
 
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -15,6 +15,5 @@ public record MetaModule (
 	int priority,
 	Set<Item> targets,
 	String modelPrefix,
-	Optional<IBakedModule> itemModule,
-	Optional<IBakedModule> equipModule
+	Map<EModuleContext, IBakedModule> bakedModules
 ){}

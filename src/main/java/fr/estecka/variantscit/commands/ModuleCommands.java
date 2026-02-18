@@ -78,14 +78,7 @@ public class ModuleCommands
 	static private CompletableFuture<Suggestions> ModuleAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
 		Stream<ResourceLocation> modules = VariantsCitMod.GetMeta().entrySet().stream()
-			.filter(entry -> {
-				MetaModule meta = entry.getValue();
-				return switch (moduleContext){
-					default -> false;
-					case ITEM_MODEL -> meta.itemModule().isPresent();
-					case EQUIPPABLE -> meta.equipModule().isPresent();
-				};
-			})
+			.filter(entry -> entry.getValue().bakedModules().get(moduleContext) != null)
 			.map(Map.Entry::getKey)
 			;
 

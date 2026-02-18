@@ -35,4 +35,20 @@ implements IBakedModule
 			set.addAll(m.GetCacheKeys());
 		return set;
 	}
+
+	@Override
+	public boolean add(IBakedModule module) {
+		if (module instanceof ModuleList list)
+			return this.addAll(list);
+		else
+			return super.add(module);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends IBakedModule> list) {
+		boolean r = false;
+		for (IBakedModule module : list)
+			r |= this.add(module);
+		return r;
+	}
 }
