@@ -28,8 +28,8 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
-import fr.estecka.variantscit.modules.cache.ICacheKey;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
@@ -204,7 +204,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
+	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(componentType);
 	}
 

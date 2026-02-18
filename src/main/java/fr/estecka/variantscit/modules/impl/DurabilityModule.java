@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.util.Collection;
 import java.util.Optional;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -10,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
-import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
@@ -40,7 +39,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
+	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(
 			DataComponents.MAX_DAMAGE,
 			DataComponents.DAMAGE

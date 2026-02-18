@@ -3,9 +3,8 @@ package fr.estecka.variantscit.modules.impl;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import java.util.Collection;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
-import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 
@@ -20,7 +19,7 @@ implements IVariantCitModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
+	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(componentType);
 	}
 

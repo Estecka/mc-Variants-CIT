@@ -2,9 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import fr.estecka.variantscit.modules.cache.ICacheKey;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -29,11 +27,8 @@ implements IBakedModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
-		Set<ICacheKey> set = new HashSet<>();
-		for(IBakedModule m : this)
-			set.addAll(m.GetCacheKeys());
-		return set;
+	public CacheKeySet GetCacheKeys() {
+		return CacheKeySet.OfCacheables(this);
 	}
 
 	@Override

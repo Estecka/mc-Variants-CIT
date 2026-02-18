@@ -2,8 +2,6 @@ package fr.estecka.variantscit.modules.cache;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.Set;
 import java.util.function.Function;
 import fr.estecka.variantscit.modules.IBakedModule;
 import net.minecraft.resources.ResourceLocation;
@@ -27,8 +25,8 @@ implements IBakedModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
-		return Set.of(this.properties);
+	public CacheKeySet GetCacheKeys() {
+		return CacheKeySet.Of(this.properties);
 	}
 
 	@Override

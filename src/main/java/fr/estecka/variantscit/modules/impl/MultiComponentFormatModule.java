@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.modules.cache.ICacheKey;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -39,12 +38,8 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
-		return varGetters.values().stream()
-			.map(IStringProperty::GetCacheKey)
-			.distinct()
-			.toList()
-			;
+	public CacheKeySet GetCacheKeys() {
+		return CacheKeySet.Of(varGetters.values().stream().map(IStringProperty::GetCacheKey));
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.cache;
 
-import java.util.Collection;
 import java.util.Objects;
 import net.minecraft.world.item.ItemStack;
 
@@ -28,7 +27,7 @@ public interface ICacheKey
 	@FunctionalInterface
 	static public interface Cacheable
 	{
-		Collection<ICacheKey> GetCacheKeys();
+		CacheKeySet GetCacheKeys();
 	}
 
 	@FunctionalInterface

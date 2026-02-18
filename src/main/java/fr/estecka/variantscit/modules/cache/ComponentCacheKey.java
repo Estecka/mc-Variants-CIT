@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.cache;
 
-import java.util.Collection;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.component.DataComponentType;
@@ -11,12 +10,8 @@ public record ComponentCacheKey<T>(
 )
 implements ICacheKey
 {
-	static public Collection<ICacheKey> KeysOf(DataComponentType<?>... types){
-		return Stream.of(types)
-			.distinct()
-			.<ICacheKey>map(ComponentCacheKey::new)
-			.toList()
-			;
+	static public CacheKeySet KeysOf(DataComponentType<?>... types){
+		return CacheKeySet.Of(Stream.of(types).map(ComponentCacheKey::new));
 	}
 
 	@Override

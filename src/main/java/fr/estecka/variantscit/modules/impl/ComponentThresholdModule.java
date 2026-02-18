@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.util.Collection;
 import java.util.Map;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,8 +14,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.NbtPath;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
-import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
@@ -65,7 +64,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public Collection<ICacheKey> GetCacheKeys() {
+	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(componentType);
 	}
 
