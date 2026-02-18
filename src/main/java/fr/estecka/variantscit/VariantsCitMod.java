@@ -19,7 +19,6 @@ implements ClientModInitializer
 	static public final String MODID = "variants-cit";
 	public static final LabelledLogger LOGGER = new LabelledLogger();
 
-	static public int reloadcount = 0;
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
 	static private Map<Item, IBakedModule> ITEM_MODULES  = Map.of();
 	static private Map<Item, IBakedModule> EQUIP_MODULES = Map.of();
@@ -58,7 +57,6 @@ implements ClientModInitializer
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){
-		++reloadcount;
 		EQUIPABLES.Clear();
 		ITEM_MODULES  = result.itemModules;
 		EQUIP_MODULES = result.equipModules;
