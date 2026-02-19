@@ -3,6 +3,7 @@ package fr.estecka.variantscit.modules.libraries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IDebuggableLibrary.Snitch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +29,11 @@ implements IBakedModule
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return logic.GetCacheKeys();
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return logic.GetCachePolicy();
 	}
 
 	@Override

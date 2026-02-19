@@ -16,6 +16,7 @@ import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.NbtPath;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
@@ -66,6 +67,11 @@ implements ILinearCitModule
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(componentType);
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
 	}
 
 	@Override

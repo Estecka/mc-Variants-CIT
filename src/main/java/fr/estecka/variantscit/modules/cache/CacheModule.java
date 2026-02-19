@@ -30,6 +30,11 @@ implements IBakedModule
 	}
 
 	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.UNWRAP;
+	}
+
+	@Override
 	public ResourceLocation GetModelForItem(ItemStack stack) {
 		this.ExpungeExpiredEntries();
 

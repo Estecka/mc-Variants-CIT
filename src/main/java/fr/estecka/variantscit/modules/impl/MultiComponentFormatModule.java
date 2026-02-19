@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -40,6 +41,11 @@ implements ISimpleCitModule
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return CacheKeySet.Of(varGetters.values().stream().map(IStringProperty::GetCacheKey));
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
 	}
 
 	@Override

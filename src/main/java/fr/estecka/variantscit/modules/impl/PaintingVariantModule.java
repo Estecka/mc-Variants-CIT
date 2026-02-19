@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
 
@@ -18,7 +19,7 @@ extends AMonoComponentModule<CustomData>
 	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
 
 	public PaintingVariantModule(){
-		super(DataComponents.ENTITY_DATA);
+		super(DataComponents.ENTITY_DATA, ECachePolicy.ALWAYS);
 	}
 
 	static public Optional<Registry<PaintingVariant>> GetPaintingRegistry(){

@@ -30,6 +30,7 @@ import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
@@ -206,6 +207,11 @@ implements IBakedModule
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(componentType);
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
 	}
 
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, DataComponentType<ItemEnchantments> component){

@@ -24,10 +24,10 @@ public interface ICacheKey
 		return Objects.hashCode(this.GetReference(stack));
 	}
 
-	@FunctionalInterface
 	static public interface Cacheable
 	{
 		CacheKeySet GetCacheKeys();
+		ECachePolicy GetCachePolicy();
 	}
 
 	@FunctionalInterface

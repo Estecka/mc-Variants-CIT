@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 
 public class CustomNameModule
 extends ASimpleMonoComponentModule<Component>
@@ -20,7 +21,7 @@ extends ASimpleMonoComponentModule<Component>
 	private final Map<String,ResourceLocation> specialNames;
 
 	public CustomNameModule(Map<String, ResourceLocation> specialNames){
-		super(DataComponents.CUSTOM_NAME);
+		super(DataComponents.CUSTOM_NAME, ECachePolicy.ALWAYS);
 		this.specialNames = specialNames;
 	}
 

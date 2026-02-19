@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 
@@ -13,14 +14,21 @@ abstract class AMonoComponentModule<T>
 implements IVariantCitModule
 {
 	protected final DataComponentType<T> componentType;
+	private final ECachePolicy cachePolicy;
 
-	public AMonoComponentModule(DataComponentType<T> component){
+	public AMonoComponentModule(DataComponentType<T> component, ECachePolicy cachePolicy){
 		this.componentType = component;
+		this.cachePolicy = cachePolicy;
 	}
 
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return ComponentCacheKey.KeysOf(componentType);
+	}
+
+	@Override
+	public final ECachePolicy GetCachePolicy() {
+		return cachePolicy;
 	}
 
 	@Override

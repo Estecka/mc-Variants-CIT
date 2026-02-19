@@ -11,6 +11,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
@@ -44,6 +45,11 @@ implements ILinearCitModule
 			DataComponents.MAX_DAMAGE,
 			DataComponents.DAMAGE
 		);
+	}
+	
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
 	}
 
 	@Override

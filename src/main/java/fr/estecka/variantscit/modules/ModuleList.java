@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -45,5 +46,10 @@ implements IBakedModule
 		for (IBakedModule module : list)
 			r |= this.add(module);
 		return r;
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.UNWRAP;
 	}
 }

@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -40,7 +42,7 @@ extends AMonoComponentModule<ItemEnchantments>
 		Map<ResourceLocation, Integer> precondition,
 		Optional<String> separator
 	) {
-		super(component);
+		super(component, ECachePolicy.ALWAYS);
 		this.separator = separator;
 		this.precondition = precondition;
 	}

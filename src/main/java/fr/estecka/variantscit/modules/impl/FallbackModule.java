@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules.impl;
 
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -34,5 +35,10 @@ implements IVariantCitModule
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return CacheKeySet.OfCacheables(this.innerQueue);
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
 	}
 }

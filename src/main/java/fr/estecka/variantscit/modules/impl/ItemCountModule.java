@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.format.properties.ItemCountProperty;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
 import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,11 @@ implements ILinearCitModule
 	@Override
 	public CacheKeySet GetCacheKeys() {
 		return CacheKeySet.Of(ItemCountProperty.UNIT);
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.AVOID;
 	}
 
 	@Override
