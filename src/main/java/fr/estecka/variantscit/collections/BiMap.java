@@ -13,19 +13,18 @@ extends HashMap<K1, Map<K0, V>>
 		           ;
 	}
 
-	private Map<K0, V> computeIfAbsent(K1 key1, K0 key0){
-		return this.computeIfAbsent(key1, k->new HashMap<>())
-		           ;
+	private Map<K0, V> computeIfAbsent(K1 key1){
+		return this.computeIfAbsent(key1, k->new HashMap<>());
 	}
 
 	public V put(K1 key1, K0 key0, V value){
-		return this.computeIfAbsent(key1, key0)
+		return this.computeIfAbsent(key1)
 		           .put(key0, value)
 		           ;
 	}
 
 	public V computeIfAbsent(K1 key1, K0 key0, Supplier<V> supplier){
-		return this.computeIfAbsent(key1, key0)
+		return this.computeIfAbsent(key1)
 		           .computeIfAbsent(key0, k->supplier.get())
 		           ;
 	}

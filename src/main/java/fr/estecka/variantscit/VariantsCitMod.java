@@ -11,6 +11,7 @@ import fr.estecka.variantscit.reload.MetaModule;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.cache.CacheBuilder;
 
 
 public class VariantsCitMod
@@ -53,9 +54,9 @@ implements ClientModInitializer
 
 	static public void OnResourceReload(ModuleLoader.Result result){
 		EQUIPABLES.Clear();
-		// FIXME
-		// ITEM_MODULES  = result.itemModules;
-		// EQUIP_MODULES = result.equipModules;
+		var cached = CacheBuilder.BuildAll(result.sortedModules);
+		ITEM_MODULES  = cached.getOrDefault(EModuleContext.ITEM_MODEL, Map.of());
+		EQUIP_MODULES = cached.getOrDefault(EModuleContext.EQUIPPABLE, Map.of());
 		META = result.uniqueModules;
 	}
 

@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.resources.ResourceLocation;
@@ -12,10 +13,26 @@ import net.minecraft.world.item.ItemStack;
  */
 public class ModuleList
 extends ArrayList<IBakedModule>
-implements IBakedModule
+implements IBakedModule, IModuleWrapper
 {
+	public ModuleList(){
+		super();
+	}
+
 	public ModuleList(Collection<? extends IBakedModule> submodules){
 		super(submodules);
+	}
+
+	public IBakedModule UnwrapIfSingle(){
+		if (this.size() == 1)
+			return this.getFirst();
+		else
+			return this;
+	}
+
+	@Override
+	public List<IBakedModule> Unwrap() {
+		return this;
 	}
 
 	@Override

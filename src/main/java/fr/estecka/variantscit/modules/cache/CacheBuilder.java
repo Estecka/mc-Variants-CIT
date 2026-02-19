@@ -1,0 +1,84 @@
+package fr.estecka.variantscit.modules.cache;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import fr.estecka.variantscit.collections.BiMap;
+import fr.estecka.variantscit.collections.TriMap;
+import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.IModuleWrapper;
+import fr.estecka.variantscit.modules.ModuleList;
+import fr.estecka.variantscit.reload.EModuleContext;
+import net.minecraft.world.item.Item;
+
+public abstract class CacheBuilder
+{
+	static public BiMap<EModuleContext,Item,IBakedModule> BuildAll(TriMap<EModuleContext,Item,Integer,List<IBakedModule>> sortedModules){
+		BiMap<EModuleContext,Item,IBakedModule> result = new BiMap<>();
+
+		for (EModuleContext ctx : sortedModules.keySet())
+		for (Item item : sortedModules.get(ctx).keySet())
+		{
+			IBakedModule baked = BuildItem(sortedModules.get(ctx, item));
+			result.put(ctx, item, baked);
+		}
+
+		return result;
+	}
+
+	static public IBakedModule BuildItem(Map<Integer, List<IBakedModule>> modules){
+		ModuleList list = new ModuleList();
+		
+		modules.entrySet().stream()
+			.sorted(Comparator.comparing(Map.Entry::getKey))
+			.forEach(e->{
+				list.addAll(BuildList(e.getValue()));
+			});
+
+		return list.UnwrapIfSingle();
+	}
+
+	static public List<IBakedModule> BuildList(List<IBakedModule> modules){
+		List<IBakedModule> result = new ArrayList<>(modules);
+
+		for (int ia=0; ia<result.size(); ++ia)
+		for (int ib=result.size()-1; ia<ib; --ib)
+		{
+			IBakedModule a = result.get(ia);
+			IBakedModule b = result.get(ib);
+
+			// Create group caches for modules with the same fingerprints.
+			if (a.GetCacheKeys().CompareTo(b.GetCacheKeys()).isEqual()){
+				result.set(ia, CacheModules(a,b));
+				result.remove(ib);
+			}
+		}
+
+		// Create solo-caches for modules that require it.
+		for (int i=0; i<result.size(); ++i){
+			IBakedModule m = result.get(i);
+			if (m.GetCachePolicy() == ECachePolicy.ALWAYS)
+				result.set(i, new CacheModule(m));
+		}
+
+		return result;
+	}
+
+	/**
+	 * Creates a single cache encompassing contains all provided modules, whilst
+	 * minimizing the amount of wrap layers.
+	 */
+	static public CacheModule CacheModules(IBakedModule... modules){
+		ModuleList result = new ModuleList();
+
+		for (IBakedModule m : modules){
+			if (m instanceof IModuleWrapper wrapper)
+				result.addAll(wrapper.Unwrap());
+			else
+				result.add(m);
+		}
+
+		return new CacheModule(result.UnwrapIfSingle());
+	}
+}

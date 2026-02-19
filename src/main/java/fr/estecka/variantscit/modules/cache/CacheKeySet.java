@@ -23,7 +23,7 @@ public class CacheKeySet
 	}
 
 	static public CacheKeySet Of(Stream<ICacheKey> keys){
-		return Of(keys);
+		return Of(keys.toList());
 	}
 
 	static public CacheKeySet OfCacheables(ICacheKey.Cacheable... cacheable){

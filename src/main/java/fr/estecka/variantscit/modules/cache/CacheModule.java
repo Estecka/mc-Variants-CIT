@@ -2,8 +2,11 @@ package fr.estecka.variantscit.modules.cache;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.function.Function;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.IModuleWrapper;
+import fr.estecka.variantscit.modules.ModuleList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -11,7 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 
 public class CacheModule
-implements IBakedModule
+implements IBakedModule, IModuleWrapper
 {
 	private final ICacheKey[] properties;
 	private final Int2ObjectMap<CacheEntry> hashToVariant = new Int2ObjectOpenHashMap<>();
@@ -22,6 +25,16 @@ implements IBakedModule
 	public CacheModule(IBakedModule inner){
 		this.inner = inner;
 		this.properties = inner.GetCacheKeys().stream().distinct().toArray(ICacheKey[]::new);
+	}
+
+	@Override
+	public int size() {
+		return inner instanceof ModuleList list ? list.size() : 1;
+	}
+
+	@Override
+	public List<IBakedModule> Unwrap() {
+		return inner instanceof ModuleList list ? list : List.of(inner);
 	}
 
 	@Override
