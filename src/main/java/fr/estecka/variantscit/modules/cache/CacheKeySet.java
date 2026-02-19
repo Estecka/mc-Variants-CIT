@@ -29,10 +29,10 @@ implements Iterable<ICacheKey>
 	}
 
 	static public CacheKeySet OfCacheables(ICacheKey.Cacheable... cacheable){
-		return OfCacheables(List.of(cacheable));
+		return OfList(List.of(cacheable));
 	}
 
-	static public CacheKeySet OfCacheables(Collection<ICacheKey.Cacheable> cacheable){
+	static public CacheKeySet OfList(Collection<? extends ICacheKey.Cacheable> cacheable){
 		CacheKeySet result = CacheKeySet.Of();
 		for (var c : cacheable) 
 			result = result.Merge(c.GetCacheKeys());

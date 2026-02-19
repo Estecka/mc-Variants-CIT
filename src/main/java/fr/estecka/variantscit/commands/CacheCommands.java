@@ -125,9 +125,9 @@ extends CommandUtil
 
 	static private String ModuleName(IBakedModule module){
 		if (module instanceof CacheModule)
-			return "Cache";
+			return "<cache>";
 		if (module instanceof ModuleList)
-			return "List";
+			return "<list>";
 
 		for (var entry : VariantsCitMod.GetMeta().entrySet())
 		for (IBakedModule firstClassModule : entry.getValue().bakedModules().values())

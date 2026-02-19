@@ -46,7 +46,7 @@ implements IBakedModule, IModuleWrapper
 
 	@Override
 	public CacheKeySet GetCacheKeys() {
-		return CacheKeySet.OfCacheables(this);
+		return CacheKeySet.OfList(this);
 	}
 
 	@Override
