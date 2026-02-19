@@ -41,6 +41,7 @@ import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
 
 public class AssetGenCommands
+extends CommandUtil
 {
 	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "assetgen");
 	static public final String BAKED_PACK_DIR = "VCIT Baked AssetGen";
@@ -84,11 +85,6 @@ public class AssetGenCommands
 /******************************************************************************/
 /* # Command Handlers                                                         */
 /******************************************************************************/
-
-	static private int Error(CommandContext<FabricClientCommandSource> context, String message){
-		context.getSource().sendError(Component.literal(message));
-		return -1;
-	}
 
 	static private int AssetPeek(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
 		ResourceLocation id = context.getArgument(ASSET_ARG, ResourceLocation.class);

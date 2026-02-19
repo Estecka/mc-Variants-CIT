@@ -2,11 +2,13 @@ package fr.estecka.variantscit.modules.cache;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public class CacheKeySet
+implements Iterable<ICacheKey>
 {
 	private final Set<ICacheKey> keyset;
 
@@ -39,6 +41,11 @@ public class CacheKeySet
 
 	public Stream<ICacheKey> stream(){
 		return this.keyset.stream();
+	}
+
+	@Override
+	public Iterator<ICacheKey> iterator() {
+		return this.keyset.iterator();
 	}
 
 	public CacheKeySet Merge(CacheKeySet other){

@@ -14,7 +14,6 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import java.util.Map;
@@ -33,6 +32,7 @@ import static fr.estecka.variantscit.commands.ModuleContextArgumentType.moduleCo
 import static fr.estecka.variantscit.commands.ModuleContextArgumentType.getModuleContext;
 
 public class ModuleCommands
+extends CommandUtil
 {
 	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "modules");
 
@@ -53,8 +53,7 @@ public class ModuleCommands
 
 		var context = literal("module")
 			.then(argument(CONTEXT_ARG, moduleContext())
-				.suggests(ModuleCommands::ContextAutofill)
-				.then(module)	
+				.then(module)
 			);
 
 		var root = literal(VariantsCitMod.MODID)
@@ -68,12 +67,6 @@ public class ModuleCommands
 /******************************************************************************/
 /* # Autofill                                                                 */
 /******************************************************************************/
-
-	static private CompletableFuture<Suggestions> ContextAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
-		for (EModuleContext moduleContext : EModuleContext.values())
-			builder.suggest(moduleContext.name);
-		return builder.buildFuture();
-	}
 
 	static private CompletableFuture<Suggestions> ModuleAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
@@ -104,10 +97,8 @@ public class ModuleCommands
 		MetaModule meta = VariantsCitMod.GetMeta().get(moduleId);
 		IBakedModule module = VariantsCitMod.GetModule(moduleContext, moduleId);
 
-		if (module == null){
-			context.getSource().sendError(Component.literal("No such module: "+moduleContext+" "+moduleId));
-			return -1;
-		}
+		if (module == null)
+			return Error(context, "No such module: "+moduleContext+" "+moduleId);
 
 		CommandLogger logger = new CommandLogger(context, moduleContext, meta);
 		return command.Execute(context, logger, module);

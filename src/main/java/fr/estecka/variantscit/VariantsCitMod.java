@@ -4,11 +4,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import java.util.Map;
+import java.util.Set;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.reload.EModuleContext;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.reload.MetaModule;
 import fr.estecka.variantscit.commands.AssetGenCommands;
+import fr.estecka.variantscit.commands.CacheCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheBuilder;
@@ -45,11 +48,19 @@ implements ClientModInitializer
 		else
 			return meta.bakedModules().get(context);
 	}
+	static public Set<Item> GetItems(EModuleContext context){
+		switch (context) {
+			case ITEM_MODEL: return ITEM_MODULES .keySet();
+			case EQUIPPABLE: return EQUIP_MODULES.keySet();
+			default: throw new NotImplementedException();
+		}
+	}
 
 	@Override
 	public void onInitializeClient(){
 		ModuleCommands.Register();
 		AssetGenCommands.Register();
+		CacheCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){
