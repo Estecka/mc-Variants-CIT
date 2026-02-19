@@ -30,4 +30,11 @@ implements ICacheKey
 	public int hashCode() {
 		return componentType.hashCode();
 	}
+
+	@Override
+	public final String toString() {
+		// ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(this.componentType);
+		// String name = (id == null) ? componentType.toString() : id.toString();
+		return "#component@"+componentType.toString();
+	}
 }

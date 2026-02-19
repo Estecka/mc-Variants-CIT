@@ -23,4 +23,9 @@ implements IStringProperty, ICacheKey
 	public String GetPropertyString(ItemStack stack){
 		return stack.getItem().toString();
 	}
+
+	@Override
+	public final String toString() {
+		return "#item_type";
+	}
 }

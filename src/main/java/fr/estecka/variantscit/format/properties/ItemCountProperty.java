@@ -31,4 +31,9 @@ implements IStringProperty, ICacheKey
 	public String GetPropertyString(ItemStack stack){
 		return String.valueOf(stack.getCount());
 	}
+
+	@Override
+	public String toString() {
+		return "#item_count";
+	}
 }

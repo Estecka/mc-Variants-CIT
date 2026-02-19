@@ -12,6 +12,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
+import fr.estecka.variantscit.modules.ModuleList;
+import fr.estecka.variantscit.modules.cache.CacheModule;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.reload.EModuleContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -103,7 +105,7 @@ extends CommandUtil
 	static private TreeNode TreeNodeOf(IBakedModule module){
 		TreeNode result = new TreeNode();
 
-		result.name = module.getClass().getSimpleName();
+		result.name = ModuleName(module);
 
 		if (module instanceof IModuleWrapper wrapper)
 			for (IBakedModule child : wrapper.Unwrap())
@@ -115,10 +117,26 @@ extends CommandUtil
 		return result;
 	}
 
-	static private TreeNode TreeNodeOf(ICacheKey module){
+	static private TreeNode TreeNodeOf(ICacheKey key){
 		TreeNode result = new TreeNode();
-		result.name = module.getClass().getSimpleName();
+		result.name = key.toString();
 		return result;
+	}
+
+	static private String ModuleName(IBakedModule module){
+		if (module instanceof CacheModule)
+			return "Cache";
+		if (module instanceof ModuleList)
+			return "List";
+
+		for (var entry : VariantsCitMod.GetMeta().entrySet())
+		for (IBakedModule firstClassModule : entry.getValue().bakedModules().values())
+		{
+			if (module == firstClassModule)
+				return entry.getKey().toString();
+		}
+
+		return "[Unknown Module]";
 	}
 
 	static private class TreeNode {
@@ -149,7 +167,7 @@ extends CommandUtil
 
 				NewLine();
 				result.append(isLastChild ? "|- " : "\\- ");
-				PrintNode(child, isLastChild ? "│  " : "   ");
+				PrintNode(child, isLastChild ? "|  " : "   ");
 			}
 			this.indentation = oldIndent;
 		}
