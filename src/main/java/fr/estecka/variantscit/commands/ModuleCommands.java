@@ -70,10 +70,7 @@ extends CommandUtil
 
 	static private CompletableFuture<Suggestions> ModuleAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
-		Stream<ResourceLocation> modules = VariantsCitMod.GetMeta().entrySet().stream()
-			.filter(entry -> entry.getValue().bakedModules().get(moduleContext) != null)
-			.map(Map.Entry::getKey)
-			;
+		Stream<ResourceLocation> modules = VariantsCitMod.GetModules().GetAvailableModules(moduleContext);
 
 		SharedSuggestionProvider.suggestResource(modules, builder);
 
@@ -94,8 +91,8 @@ extends CommandUtil
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
 		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
 		ResourceLocation moduleId = context.getArgument(MODULE_ARG, ResourceLocation.class);
-		MetaModule meta = VariantsCitMod.GetMeta().get(moduleId);
-		IBakedModule module = VariantsCitMod.GetModule(moduleContext, moduleId);
+		MetaModule meta = VariantsCitMod.GetModules().GetMeta(moduleId);
+		IBakedModule module = meta.bakedModules().get(moduleContext);
 
 		if (module == null)
 			return Error(context, "No such module: "+moduleContext+" "+moduleId);

@@ -70,7 +70,7 @@ extends CommandUtil
 /******************************************************************************/
 
 	static public <T> CompletableFuture<Suggestions> ItemAutofill(CommandContext<T> context, SuggestionsBuilder builder) {
-		var availableItems = VariantsCitMod.GetItems(getModuleContext(context, CONTEXT_ARG));
+		var availableItems = VariantsCitMod.GetModules().GetAvailableItem(getModuleContext(context, CONTEXT_ARG));
 		var ids = availableItems.stream()
 			.map(item->BuiltInRegistries.ITEM.getKey(item))
 			.toList()
@@ -86,11 +86,7 @@ extends CommandUtil
 	static private int PrintTree(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
 		EModuleContext modCtx = getModuleContext(context, CONTEXT_ARG);
 		Item item = getItem(context, ITEM_ARG).getItem();
-		IBakedModule rootModule = switch (modCtx) {
-			case ITEM_MODEL -> VariantsCitMod.GetItemModule(item);
-			case EQUIPPABLE -> VariantsCitMod.GetEquipmentModule(item);
-			default -> throw new NotImplementedException();
-		};
+		IBakedModule rootModule = VariantsCitMod.GetModules().GetArchModule(modCtx, item);
 
 		if (rootModule == null)
 			return Info(context, "No modules exist for this item.");
@@ -129,14 +125,11 @@ extends CommandUtil
 		if (module instanceof ModuleList)
 			return "<list>";
 
-		for (var entry : VariantsCitMod.GetMeta().entrySet())
-		for (IBakedModule firstClassModule : entry.getValue().bakedModules().values())
-		{
-			if (module == firstClassModule)
-				return entry.getKey().toString();
-		}
-
-		return "[Unknown Module]";
+		ResourceLocation id = VariantsCitMod.GetModules().GetId(module);
+		if (id != null)
+			return id.toString();
+		else
+			return "[Unknown Module]";
 	}
 
 	static private class TreeNode {

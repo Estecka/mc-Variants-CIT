@@ -13,6 +13,7 @@ import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.reload.EModuleContext;
 
 public class EquippableCache
 {
@@ -59,14 +60,9 @@ public class EquippableCache
 			return original;
 		}
 
-		final IBakedModule module = VariantsCitMod.GetEquipmentModule(stack.getItem());
-		ResourceLocation assetId = null;
-
-		if (module != null){
-			VariantsCitMod.LOGGER.PushLabel(stack.getItem());
-			assetId = module.GetModelForItem(stack);
-			VariantsCitMod.LOGGER.PopLabel();
-		}
+		VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+		ResourceLocation assetId = VariantsCitMod.GetModules().GetModelForItem(EModuleContext.EQUIPPABLE, stack);
+		VariantsCitMod.LOGGER.PopLabel();
 
 		if (assetId == null)
 			return original;

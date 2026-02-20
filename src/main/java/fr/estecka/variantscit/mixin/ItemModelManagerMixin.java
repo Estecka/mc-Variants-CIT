@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.reload.EModuleContext;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
@@ -21,14 +21,11 @@ public class ItemModelManagerMixin
 	)
 	private @Nullable Object GetVariantModel(ItemStack stack, DataComponentType<ResourceLocation> type, Operation<ResourceLocation> original)
 	{
-		final IBakedModule module = VariantsCitMod.GetItemModule(stack.getItem());
 		ResourceLocation modelId = null;
-
-		if (module != null){
-			VariantsCitMod.LOGGER.PushLabel(stack.getItem());
-			modelId = module.GetModelForItem(stack);
-			VariantsCitMod.LOGGER.PopLabel();
-		}
+		
+		VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+		modelId = VariantsCitMod.GetModules().GetModelForItem(EModuleContext.ITEM_MODEL, stack);
+		VariantsCitMod.LOGGER.PopLabel();
 
 		if (modelId == null)
 			return original.call(stack, type);
