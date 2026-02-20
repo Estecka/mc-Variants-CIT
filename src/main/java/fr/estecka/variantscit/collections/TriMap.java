@@ -8,10 +8,11 @@ public class TriMap<K2,K1,K0,V>
 extends BiMap<K2, K1, Map<K0, V>>
 {
 	public V get(K2 key2, K1 key1, K0 key0){
-		return this.getOrDefault(key2, Map.of())
-		           .getOrDefault(key1, Map.of())
-		           .get(key0)
-		           ;
+		var submap = this.get(key2, key1);
+		if (submap == null)
+			return null;
+		else
+			return submap.get(key0);
 	}
 
 	protected Map<K0, V> computeIfAbsent(K2 key2, K1 key1){

@@ -44,7 +44,6 @@ public final class ModuleRepository
 	}
 
 	public @Nullable ResourceLocation GetModelForItem(EModuleContext context, ItemStack stack) {
-		// FIXME: This instantiates one empty map for every rendered item, every frame.
 		@Nullable IBakedModule module = GetArchModule(context, stack.getItem());
 		if (module == null)
 			return null;

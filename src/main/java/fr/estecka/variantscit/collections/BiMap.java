@@ -8,9 +8,11 @@ public class BiMap<K1,K0,V>
 extends HashMap<K1, Map<K0, V>>
 {
 	public V get(K1 key1, K0 key0){
-		return this.getOrDefault(key1, Map.of())
-		           .get(key0)
-		           ;
+		var submap = this.get(key1);
+		if (submap == null)
+			return null;
+		else
+			return submap.get(key0);
 	}
 
 	private Map<K0, V> computeIfAbsent(K1 key1){
