@@ -33,10 +33,10 @@ public final class ModuleRepository
 		this.moduleToId = new IdentityHashMap<>();
 
 		for (ResourceLocation id : metadata.keySet())
-			for (IBakedModule module : metadata.get(id).bakedModules().values())
-			{
-				moduleToId.put(module, id);
-			}
+		for (IBakedModule module : metadata.get(id).bakedModules().values())
+		{
+			moduleToId.put(module, id);
+		}
 	}
 
 	public IBakedModule GetArchModule(EModuleContext context, Item item){
