@@ -10,11 +10,13 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.format.INbtInput;
-import fr.estecka.variantscit.format.IStringTransform;
-import fr.estecka.variantscit.format.transforms.*;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
+import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.extractors.impl.*;
-import fr.estecka.variantscit.itemdata.functions.*;
+import fr.estecka.variantscit.itemdata.functions.IDataFunction;
+import fr.estecka.variantscit.itemdata.functions.IStringTransform;
+import fr.estecka.variantscit.itemdata.functions.SuccessiveTransform;
+import fr.estecka.variantscit.itemdata.functions.impl.*;
 import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.modules.impl.*;
@@ -25,11 +27,10 @@ public final class VCitRegistries
 {
 	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
 	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
-	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("regex"), OptionalTransform::CodecOf);
+	static public final DecodableRegistry<IDataFunction> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
-	static public final DecodableRegistry<IDataFunction> DATA_FUNCTION = new DecodableRegistry<>("function");
 
 	static {
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
@@ -69,13 +70,13 @@ public final class VCitRegistries
 
 		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("noop"),               IStringTransform.NOOP);
 		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("null"),               IStringTransform.NULL);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("lowercase"),          String::toLowerCase);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("discard_path"),       IStringTransform::DiscardPath);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("discard_namespace"),  IStringTransform::DiscardNamespace);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("lowercase"),          (IStringTransform)String::toLowerCase);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("discard_path"),       (IStringTransform)IStringTransform::DiscardPath);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("discard_namespace"),  (IStringTransform)IStringTransform::DiscardNamespace);
 		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize"),           IStringTransform.SANITIZE);
 		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_auto"),      IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_auto"),      (IStringTransform)IStringTransform::AutoSanitize);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("test"),                TestTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("alternative"),         AlternativeTransform.MAPCODEC);

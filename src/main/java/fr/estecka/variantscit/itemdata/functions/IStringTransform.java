@@ -1,13 +1,14 @@
-package fr.estecka.variantscit.format;
+package fr.estecka.variantscit.itemdata.functions;
 
 import java.text.Normalizer;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.itemdata.functions.IStringFunction;
 
+/**
+ * @deprecated Merge with IStringFunction
+ */
 @FunctionalInterface
 public interface IStringTransform
 extends IStringFunction
@@ -20,7 +21,6 @@ extends IStringFunction
 	static public final IStringTransform SANITIZE_AUTO      = IStringTransform::AutoSanitize;
 	static public final IStringTransform LOWERCASE          = String::toLowerCase;
 
-	static public final Codec<IStringTransform> CODEC = VCitRegistries.TRANSFORMS.codec;
 	@Deprecated
 	static public final Codec<IStringTransform> LEGACY_CODEC = Codec.BOOL.xmap(
 		lowercase -> lowercase ? IStringTransform.LOWERCASE : IStringTransform.NOOP,

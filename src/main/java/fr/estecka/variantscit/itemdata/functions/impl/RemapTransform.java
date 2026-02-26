@@ -1,9 +1,9 @@
-package fr.estecka.variantscit.format.transforms;
+package fr.estecka.variantscit.itemdata.functions.impl;
 
 import java.util.Map;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.format.IStringTransform;
+import fr.estecka.variantscit.itemdata.functions.IStringTransform;
 
 public record RemapTransform(Map<String,String> map) 
 implements IStringTransform
