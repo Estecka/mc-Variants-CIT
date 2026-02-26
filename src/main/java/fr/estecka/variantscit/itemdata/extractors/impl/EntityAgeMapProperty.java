@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.format.properties;
+package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.Codec;
@@ -10,7 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.component.CustomData;
 
 public class EntityAgeMapProperty
-extends AMonoComponentProperty<CustomData>
+extends AMonoComponentProperty<CustomData,String>
 {
 	static public final EntityAgeMapProperty UNIT = new EntityAgeMapProperty("", "_baby");
 

@@ -1,11 +1,11 @@
-package fr.estecka.variantscit.format.properties;
+package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.component.CustomData;
 
 public class PaintingVariantProperty
-extends AMonoComponentProperty<CustomData>
+extends AMonoComponentProperty<CustomData,String>
 {
 	static public final PaintingVariantProperty UNIT = new PaintingVariantProperty();
 

@@ -1,8 +1,7 @@
-package fr.estecka.variantscit.format.properties;
+package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import java.util.Optional;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,6 +10,7 @@ import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
 import fr.estecka.variantscit.format.NbtAdapter;
 import fr.estecka.variantscit.format.NbtPath;
+import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
@@ -18,9 +18,8 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
-
 public class ItemComponentProperty<T>
-extends AMonoComponentProperty<T>
+extends AMonoComponentProperty<T,String>
 {
 	static public final MapCodec<ItemComponentProperty<?>> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -30,10 +29,11 @@ extends AMonoComponentProperty<T>
 		.apply(builder, ItemComponentProperty::new)
 	);
 
-	static public final Codec<TransformableProperty<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
-		ItemComponentProperty::MonostringParse,
-		__->DataResult.error(()->"Encoding not supported")
-	);
+	// // FIXME
+	// static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
+	// 	ItemComponentProperty::MonostringParse,
+	// 	__->DataResult.error(()->"Encoding not supported")
+	// );
 
 	public final NbtAdapter nbtAdapter;
 
@@ -52,7 +52,7 @@ extends AMonoComponentProperty<T>
 		return result;
 	}
 
-	static private DataResult<TransformableProperty<ItemComponentProperty<?>>> MonostringParse(String input){
+	static private DataResult<TransformableExtractor<ItemComponentProperty<?>>> MonostringParse(String input){
 		int pathLocation;
 		for (pathLocation = 0; pathLocation<input.length(); pathLocation++){
 			char c = input.charAt(pathLocation);
@@ -75,7 +75,7 @@ extends AMonoComponentProperty<T>
 		NbtPath path = r_path.getOrThrow();
 		DataComponentType<?> component = r_component.getOrThrow();
 
-		return DataResult.success(new TransformableProperty<>(
+		return DataResult.success(new TransformableExtractor<>(
 			new ItemComponentProperty<>(component, new NbtAdapter(path, INbtInput.AUTO)),
 			IStringTransform.SANITIZE_AUTO,
 			Optional.empty()

@@ -11,9 +11,9 @@ import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.format.IStringTransform;
-import fr.estecka.variantscit.format.properties.*;
 import fr.estecka.variantscit.format.transforms.*;
-import fr.estecka.variantscit.itemdata.extractors.*;
+import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
+import fr.estecka.variantscit.itemdata.extractors.impl.*;
 import fr.estecka.variantscit.itemdata.functions.*;
 import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.*;
@@ -24,12 +24,11 @@ import fr.estecka.variantscit.reload.UnbakedModule;
 public final class VCitRegistries
 {
 	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
-	static public final DecodableRegistry<IStringProperty> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableProperty::CodecOf);
+	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
 	static public final DecodableRegistry<IStringTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
-	static public final DecodableRegistry<IDataExtractor> DATA_EXTRACTORS = new DecodableRegistry<>("property");
 	static public final DecodableRegistry<IDataFunction> DATA_FUNCTION = new DecodableRegistry<>("function");
 
 	static {
@@ -96,7 +95,7 @@ public final class VCitRegistries
 
 		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("matches_all"), MatchesAllCondition.MAPCODEC);
 		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("matches_any"), MatchesAnyCondition.MAPCODEC);
-		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("transform"),   DATA_EXTRACTORS.mapCodec);
+		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("transform"),   ITEM_PROPERTIES.mapCodec);
 	}
 
 	static public <T> void RegisterBakedModule(ResourceLocation id, MapCodec<T> mapcodec, IModuleBaker<T> baker){

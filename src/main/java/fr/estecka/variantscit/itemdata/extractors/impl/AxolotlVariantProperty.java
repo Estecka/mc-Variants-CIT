@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.format.properties;
+package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -7,7 +7,7 @@ import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.item.component.CustomData;
 
 public class AxolotlVariantProperty
-extends AMonoComponentProperty<CustomData>
+extends AMonoComponentProperty<CustomData,String>
 {
 	static public final AxolotlVariantProperty UNIT = new AxolotlVariantProperty();
 

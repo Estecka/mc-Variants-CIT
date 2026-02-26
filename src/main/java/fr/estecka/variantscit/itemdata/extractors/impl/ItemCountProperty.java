@@ -1,10 +1,13 @@
-package fr.estecka.variantscit.format.properties;
+package fr.estecka.variantscit.itemdata.extractors.impl;
 
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
+import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemCountProperty
-implements IStringProperty, ICacheKey
+implements IDataExtractor, ICacheKey
 {
 	static public final ItemCountProperty UNIT = new ItemCountProperty();
 
@@ -28,8 +31,8 @@ implements IStringProperty, ICacheKey
 	}
 
 	@Override
-	public String GetPropertyString(ItemStack stack){
-		return String.valueOf(stack.getCount());
+	public IDataContainer Extract(ItemStack stack) {
+		return RawDataContainer.OfNullable(stack.getCount());
 	}
 
 	@Override
