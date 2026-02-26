@@ -41,4 +41,11 @@ implements IDataExtractor
 
 		return result;
 	}
+
+	static public IDataExtractor Unwrap(IDataExtractor wrapper){
+		while (wrapper instanceof TransformableExtractor transformable)
+			wrapper = transformable.inner;
+
+		return wrapper;
+	}
 }

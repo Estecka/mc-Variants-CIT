@@ -9,9 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import fr.estecka.variantscit.itemdata.extractors.impl.PaintingVariantProperty;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
-import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
 
 public class PaintingVariantModule
 extends AMonoComponentModule<CustomData>

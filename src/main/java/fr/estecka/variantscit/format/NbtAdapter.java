@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
 import net.minecraft.nbt.Tag;
 
 public class NbtAdapter
@@ -21,13 +20,6 @@ public class NbtAdapter
 		MAPCODEC.codec(),
 		NbtPath.CODEC.xmap(path->new NbtAdapter(path, INbtInput.AUTO), adp->adp.nbtPath)
 	);
-
-	@Deprecated
-	static public final MapCodec<NbtAdapter> LEGACY_MAPCODEC = CodecUtil.MapWithAlternatives(
-		NbtPath.CODEC.fieldOf("nbtPath"),
-		NbtPath.DOT_SEPARATED_CODEC.fieldOf("nbtPath"),
-		NbtPath.NBTKEY_CODEC.fieldOf("nbtKey")
-	).xmap((path)->new NbtAdapter(path,INbtInput.AUTO), (adp)->adp.nbtPath);
 
 
 	private final NbtPath nbtPath;

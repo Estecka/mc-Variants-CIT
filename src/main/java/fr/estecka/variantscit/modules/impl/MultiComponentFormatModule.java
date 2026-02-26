@@ -14,8 +14,8 @@ import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
-import fr.estecka.variantscit.format.properties.IStringProperty;
-import fr.estecka.variantscit.format.properties.TransformableProperty;
+import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
+import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 
 public class MultiComponentFormatModule
 implements ISimpleCitModule
@@ -23,15 +23,15 @@ implements ISimpleCitModule
 	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			ExtraCodecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IStringProperty.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
+			ExtraCodecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IDataExtractor.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
 
 	private final Substitution format;
-	private final Map<String, IStringProperty> varGetters;
+	private final Map<String, IDataExtractor> varGetters;
 
-	public MultiComponentFormatModule(Substitution format, Map<String,IStringProperty> variables){
+	public MultiComponentFormatModule(Substitution format, Map<String,IDataExtractor> variables){
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 
@@ -40,7 +40,7 @@ implements ISimpleCitModule
 
 	@Override
 	public CacheKeySet GetCacheKeys() {
-		return CacheKeySet.Of(varGetters.values().stream().map(IStringProperty::GetCacheKey));
+		return CacheKeySet.Of(varGetters.values().stream().map(IDataExtractor::GetCacheKey));
 	}
 
 	@Override
@@ -53,7 +53,7 @@ implements ISimpleCitModule
 		Map<String,String> variables = new HashMap<>();
 
 		for (var entry : this.varGetters.entrySet()){
-			String value = entry.getValue().GetPropertyString(stack);
+			String value = entry.getValue().Extract(stack).asString();
 			if (value == null)
 				return null;
 
@@ -73,8 +73,8 @@ implements ISimpleCitModule
 
 		logger.Info("Format: \"{}\"", CommandLogger.PackData(this.format));
 		for (var entry : varGetters.entrySet()){
-			String raw = TransformableProperty.GetRaw(entry.getValue()).GetPropertyString(stack);
-			String transformed = entry.getValue().GetPropertyString(stack);
+			String raw = TransformableExtractor.Unwrap(entry.getValue()).Extract(stack).asString();
+			String transformed = entry.getValue().Extract(stack).asString();
 
 			logger.Info("${{}}:", CommandLogger.PackData(entry.getKey()));
 			logger.Info("- Raw data: {}", CommandLogger.ItemData(raw, "Missing or invalid"));

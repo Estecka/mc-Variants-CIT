@@ -10,24 +10,11 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import fr.estecka.variantscit.VariantsCitMod;
 
 public final class NbtPath
 {
 	static public final Codec<NbtPath> CODEC = Codec.STRING.comapFlatMap(NbtPath::Parse, NbtPath::toString);
 	static public final NbtPath IDENTITY = new NbtPath(new Token[0]);
-
-	@Deprecated
-	static public final Codec<NbtPath> DOT_SEPARATED_CODEC = Codec.STRING.comapFlatMap(NbtPath::DotSeparatedPath, NbtPath::toString).validate(_0 -> {
-		VariantsCitMod.LOGGER.warn("The value of `nbtPath` Uses an obsolete path format. Please add a `.` at the start of the path.");
-		return DataResult.success(_0);
-	});
-
-	@Deprecated
-	static public final Codec<NbtPath> NBTKEY_CODEC = Codec.STRING.xmap(s->new NbtPath(new Token[]{new MapKey(s)}), NbtPath::toString).validate(_0 -> {
-		VariantsCitMod.LOGGER.warn("The parameter `nbtKey` is being deprecated. Use `nbtPath` instead.");
-		return DataResult.success(_0);
-	});
 
 	private final Token[] tokens;
 

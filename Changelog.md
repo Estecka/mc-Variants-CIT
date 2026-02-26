@@ -242,5 +242,8 @@ Since v2.5:
 
 # v5
 - Migrated to Mojmap
+- Removed the deprecated fields `caseSensitive` and `nbtKey` from componentFormat.
+- Removed the deprecated syntax of `nbtPath`.
+- Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
 - TODO: Remove itemsFromModels. Replace it with an assetGen preset?
 - TODO: Rename module contexts to hooks ?

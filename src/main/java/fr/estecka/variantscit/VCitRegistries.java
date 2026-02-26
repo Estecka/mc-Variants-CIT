@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import java.util.Map;
 import java.util.Optional;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
@@ -35,17 +36,13 @@ public final class VCitRegistries
 
 	static {
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("block_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponents.BLOCK_ENTITY_DATA));
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("bucket_entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponents.BUCKET_ENTITY_DATA));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_data"), ComponentDataModule.CODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_format"), MultiComponentFormatModule.CODEC);
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("component_threshold"), ComponentThresholdModule.MAPCODEC, LinearLibrary.GetBaker());
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("custom_data"), ComponentDataModule.CreateLegacyCodec(DataComponents.CUSTOM_DATA));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("custom_name"), CustomNameModule.CODEC);
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("entity_data"), ComponentDataModule.CreateLegacyCodec(DataComponents.ENTITY_DATA));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), GoatHornModule.UNIT);
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("jukebox_playable"), MusicDiscModule.UNIT);
@@ -61,6 +58,11 @@ public final class VCitRegistries
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim"), TrimModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_pattern"), TrimPatternModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_material"), TrimPatternModule.UNIT);
+
+		RegisterRemoved("block_entity_data",  "component_data");
+		RegisterRemoved("bucket_entity_data", "component_data");
+		RegisterRemoved("custom_data",        "component_data");
+		RegisterRemoved("entity_data",        "component_data");
 
 		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(ResourceLocation.withDefaultNamespace("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
@@ -120,5 +122,15 @@ public final class VCitRegistries
 			.optionalFieldOf("parameters", new CompoundTag())
 			.flatMap(nbt -> NbtOps.INSTANCE.withParser(mapcodec.decoder()).apply(nbt))
 			;
+	}
+
+	static private void RegisterRemoved(String oldName, String newName){
+		RegisterSimpleModule(
+			ResourceLocation.withDefaultNamespace(oldName),
+			MapCodec.unit(PaintingVariantModule.UNIT).flatXmap(
+				_0->DataResult.error(()->"Module type `"+oldName+"` was removed, use `"+newName+"` isntead"),
+				_0->null
+			)
+		);
 	}
 }

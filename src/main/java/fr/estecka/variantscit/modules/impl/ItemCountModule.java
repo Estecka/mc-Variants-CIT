@@ -2,7 +2,7 @@ package fr.estecka.variantscit.modules.impl;
 
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.format.properties.ItemCountProperty;
+import fr.estecka.variantscit.itemdata.extractors.impl.ItemCountProperty;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;

@@ -9,9 +9,9 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.format.Substitution;
-import fr.estecka.variantscit.format.properties.AxolotlVariantProperty;
-import fr.estecka.variantscit.format.properties.EntityAgeMapProperty;
-import fr.estecka.variantscit.format.properties.IStringProperty;
+import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
+import fr.estecka.variantscit.itemdata.extractors.impl.AxolotlVariantProperty;
+import fr.estecka.variantscit.itemdata.extractors.impl.EntityAgeMapProperty;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleBaker;
 
@@ -48,7 +48,7 @@ public final class AxolotlBucketModule
 
 	static private final Substitution agedFormat = Substitution.Parse("${variant}${age}").getOrThrow();
 
-	static private final HashMap<String,IStringProperty> ageInvariantVariables;
+	static private final HashMap<String,IDataExtractor> ageInvariantVariables;
 	static {
 		ageInvariantVariables = new HashMap<>();
 		ageInvariantVariables.put("variant", AxolotlVariantProperty.UNIT);
@@ -64,7 +64,7 @@ public final class AxolotlBucketModule
 	}
 
 	static public MultiComponentFormatModule CreateAgedModule(boolean debug, String adult, String baby){
-		var variables = new HashMap<String, IStringProperty>();
+		var variables = new HashMap<String, IDataExtractor>();
 		variables.put("variant", AxolotlVariantProperty.UNIT);
 		variables.put("age", new EntityAgeMapProperty(adult, baby));
 
