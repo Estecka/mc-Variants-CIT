@@ -48,6 +48,10 @@ implements Iterable<ICacheKey>
 		return this.keyset.iterator();
 	}
 
+	public boolean isEmpty(){
+		return this.keyset.isEmpty();
+	}
+
 	public CacheKeySet Merge(CacheKeySet other){
 		Set<ICacheKey> all = new HashSet<>();
 		all.addAll(this.keyset);

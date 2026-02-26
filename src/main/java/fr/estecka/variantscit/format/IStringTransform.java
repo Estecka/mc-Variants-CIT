@@ -1,16 +1,16 @@
 package fr.estecka.variantscit.format;
 
 import java.text.Normalizer;
-import java.util.function.Function;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.itemdata.functions.IStringFunction;
 
 @FunctionalInterface
 public interface IStringTransform
-extends Function<String,String>
+extends IStringFunction
 {
 	static public final IStringTransform NOOP               = o->o;
 	static public final IStringTransform NULL               = o->null;
