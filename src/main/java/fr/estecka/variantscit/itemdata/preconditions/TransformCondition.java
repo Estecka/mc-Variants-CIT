@@ -2,13 +2,13 @@ package fr.estecka.variantscit.itemdata.preconditions;
 
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
-import fr.estecka.variantscit.itemdata.functions.IDataFunction;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.world.item.ItemStack;
 
 public record TransformCondition(
 	IDataExtractor extractor,
-	IDataFunction transform
+	IDataTransform transform
 )
 implements IItemPrecondition
 {

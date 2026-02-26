@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.itemdata.functions.impl;
+package fr.estecka.variantscit.itemdata.transforms.impl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,7 +8,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.itemdata.functions.IStringTransform;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 
 public record RegexTransform(Pattern pattern, String substitution, boolean matchAll, @Deprecated boolean validate)
 implements IStringTransform

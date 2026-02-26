@@ -1,11 +1,11 @@
-package fr.estecka.variantscit.itemdata.functions.impl;
+package fr.estecka.variantscit.itemdata.transforms.impl;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.itemdata.functions.IStringTransform;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 
 public record FilterlistTransform(Set<String> filter, boolean isWhiteList)
 implements IStringTransform

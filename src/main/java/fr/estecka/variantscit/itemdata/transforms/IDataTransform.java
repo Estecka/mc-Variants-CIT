@@ -1,14 +1,14 @@
-package fr.estecka.variantscit.itemdata.functions;
+package fr.estecka.variantscit.itemdata.transforms;
 
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 
 @FunctionalInterface
-public interface IDataFunction
+public interface IDataTransform
 {
-	static public final Codec<IDataFunction> CODEC = VCitRegistries.DATA_FUNCTION.codec;
-	static public final IDataFunction NOOP = o->o;
+	static public final Codec<IDataTransform> CODEC = VCitRegistries.TRANSFORMS.codec;
+	static public final IDataTransform NOOP = o->o;
 
 	IDataContainer LooseTypedTransform(IDataContainer input);
 }

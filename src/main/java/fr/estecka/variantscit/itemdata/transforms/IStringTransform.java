@@ -1,17 +1,17 @@
-package fr.estecka.variantscit.itemdata.functions;
+package fr.estecka.variantscit.itemdata.transforms;
 
 import java.text.Normalizer;
+import java.util.function.Function;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
 
-/**
- * @deprecated Merge with IStringFunction
- */
 @FunctionalInterface
 public interface IStringTransform
-extends IStringFunction
+extends IDataTransform, Function<String,String>
 {
 	static public final IStringTransform NOOP               = o->o;
 	static public final IStringTransform NULL               = o->null;
@@ -29,6 +29,18 @@ extends IStringFunction
 		VariantsCitMod.LOGGER.warn("The parameter `caseSensitive:true` is being deprecated. Use `transform:lowercase` instead.");
 		return DataResult.success(_0);
 	});
+
+	@Override
+	default IDataContainer LooseTypedTransform(IDataContainer container) {
+		String input = container.asString();
+		if (input == null)
+			return null;
+		String output = this.apply(input);
+		if (output == null)
+			return null;
+
+		return RawDataContainer.OfNullable(output);
+	}
 
 	static public IStringTransform Sanitize(String charset){
 		return input -> Normalizer.normalize(input, Normalizer.Form.NFD)

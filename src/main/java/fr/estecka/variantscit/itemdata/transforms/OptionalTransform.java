@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.itemdata.functions;
+package fr.estecka.variantscit.itemdata.transforms;
 
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
@@ -11,39 +11,39 @@ import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
 import net.minecraft.nbt.Tag;
 
 
-public record OptionalTransform(IDataFunction inner, @Nullable RawDataContainer<Tag> fallback)
-implements IDataFunction
+public record OptionalTransform(IDataTransform inner, @Nullable RawDataContainer<Tag> fallback)
+implements IDataTransform
 {
-	static public <T extends IDataFunction> MapCodec<IDataFunction> CodecOf(MapCodec<T> inner){
-		return RecordCodecBuilder.<IDataFunction>mapCodec(builder->
+	static public <T extends IDataTransform> MapCodec<IDataTransform> CodecOf(MapCodec<T> inner){
+		return RecordCodecBuilder.<IDataTransform>mapCodec(builder->
 			builder.group(
 				Codec.BOOL.optionalFieldOf("optional", false).forGetter(OptionalTransform::IsOptional),
 				RawDataContainer.LITTERAL_CODEC.optionalFieldOf("fallback").forGetter(OptionalTransform::GetFallback),
-				CodecUtil.<IDataFunction,T>Anonymize(inner).forGetter(OptionalTransform::Unwrap)
+				CodecUtil.<IDataTransform,T>Anonymize(inner).forGetter(OptionalTransform::Unwrap)
 			)
 			.apply(builder, OptionalTransform::Wrap)
 		);
 	}
 
-	static private IDataFunction Wrap(boolean optional, Optional<RawDataContainer<Tag>> fallback, IDataFunction inner){
+	static private IDataTransform Wrap(boolean optional, Optional<RawDataContainer<Tag>> fallback, IDataTransform inner){
 		if (optional || fallback.isPresent())
 			return new OptionalTransform(inner, fallback.orElse(null));
 		else
 			return inner;
 	}
 
-	static private IDataFunction Unwrap(IDataFunction transform){
+	static private IDataTransform Unwrap(IDataTransform transform){
 		if (transform instanceof OptionalTransform opt)
 			return opt.inner;
 		else
 			return transform;
 	}
 
-	static private boolean IsOptional(IDataFunction transform){
+	static private boolean IsOptional(IDataTransform transform){
 		return transform instanceof OptionalTransform;
 	}
 
-	static private Optional<RawDataContainer<Tag>> GetFallback(IDataFunction transform){
+	static private Optional<RawDataContainer<Tag>> GetFallback(IDataTransform transform){
 		if (transform instanceof OptionalTransform opt)
 			return Optional.of(opt.fallback);
 		else

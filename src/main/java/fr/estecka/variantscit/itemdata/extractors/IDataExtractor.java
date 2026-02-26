@@ -12,8 +12,8 @@ import net.minecraft.world.item.ItemStack;
 public interface IDataExtractor
 extends ICacheKey.Keyable, IItemPrecondition
 {
-	static public final Codec<IDataExtractor> CODEC = VCitRegistries.DATA_EXTRACTORS.codec;
-	static public final MapCodec<IDataExtractor> MAPCODEC = VCitRegistries.DATA_EXTRACTORS.mapCodec;
+	static public final Codec<IDataExtractor> CODEC = VCitRegistries.ITEM_PROPERTIES.codec;
+	static public final MapCodec<IDataExtractor> MAPCODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec;
 
 	IDataContainer Extract(ItemStack stack);
 

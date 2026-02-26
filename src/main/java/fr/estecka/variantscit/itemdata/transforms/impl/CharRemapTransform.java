@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.itemdata.functions.impl;
+package fr.estecka.variantscit.itemdata.transforms.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.itemdata.functions.IStringTransform;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 

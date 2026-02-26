@@ -13,10 +13,11 @@ import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.extractors.impl.*;
-import fr.estecka.variantscit.itemdata.functions.IDataFunction;
-import fr.estecka.variantscit.itemdata.functions.IStringTransform;
-import fr.estecka.variantscit.itemdata.functions.SuccessiveTransform;
-import fr.estecka.variantscit.itemdata.functions.impl.*;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
+import fr.estecka.variantscit.itemdata.transforms.OptionalTransform;
+import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
+import fr.estecka.variantscit.itemdata.transforms.impl.*;
 import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.modules.impl.*;
@@ -27,7 +28,7 @@ public final class VCitRegistries
 {
 	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
 	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
-	static public final DecodableRegistry<IDataFunction> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("regex"), OptionalTransform::CodecOf);
+	static public final DecodableRegistry<IDataTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("regex"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));

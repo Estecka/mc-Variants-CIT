@@ -7,18 +7,18 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
-import fr.estecka.variantscit.itemdata.functions.IDataFunction;
-import fr.estecka.variantscit.itemdata.functions.SuccessiveFunction;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
+import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 
-public record TransformableExtractor<T extends IDataExtractor>(T inner, IDataFunction transform, Optional<RawDataContainer<Tag>> fallback)
+public record TransformableExtractor<T extends IDataExtractor>(T inner, IDataTransform transform, Optional<RawDataContainer<Tag>> fallback)
 implements IDataExtractor
 {
 	static public <T extends IDataExtractor> MapCodec<TransformableExtractor<T>> CodecOf(MapCodec<T> innerCodec){
 		return RecordCodecBuilder.<TransformableExtractor<T>>mapCodec(builder->
 			builder.group(
 				innerCodec.forGetter(TransformableExtractor::inner),
-				SuccessiveFunction.CODEC.optionalFieldOf("transform", IDataFunction.NOOP).forGetter(TransformableExtractor::transform),
+				SuccessiveTransform.CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(TransformableExtractor::transform),
 				RawDataContainer.LITTERAL_CODEC.optionalFieldOf("fallback").forGetter(TransformableExtractor::fallback)
 			).apply(builder, TransformableExtractor::new)
 		);
