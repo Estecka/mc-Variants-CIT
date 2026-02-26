@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.extractors.impl.ItemComponentProperty;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
@@ -12,8 +13,11 @@ import net.minecraft.world.item.ItemStack;
 public interface IDataExtractor
 extends ICacheKey.Keyable, IItemPrecondition
 {
-	static public final Codec<IDataExtractor> CODEC = VCitRegistries.ITEM_PROPERTIES.codec;
 	static public final MapCodec<IDataExtractor> MAPCODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec;
+	static public final Codec<IDataExtractor> CODEC = Codec.withAlternative(
+		VCitRegistries.ITEM_PROPERTIES.codec,
+		ItemComponentProperty.MONOSTRING_DECODER
+	);
 
 	IDataContainer Extract(ItemStack stack);
 

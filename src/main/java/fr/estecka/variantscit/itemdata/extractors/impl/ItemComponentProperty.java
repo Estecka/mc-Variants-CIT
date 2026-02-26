@@ -2,6 +2,7 @@ package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import java.util.Optional;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -29,11 +30,10 @@ extends AMonoComponentProperty<T,String>
 		.apply(builder, ItemComponentProperty::new)
 	);
 
-	// // FIXME
-	// static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
-	// 	ItemComponentProperty::MonostringParse,
-	// 	__->DataResult.error(()->"Encoding not supported")
-	// );
+	static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
+		ItemComponentProperty::MonostringParse,
+		__->DataResult.error(()->"Encoding not supported")
+	);
 
 	public final NbtAdapter nbtAdapter;
 
