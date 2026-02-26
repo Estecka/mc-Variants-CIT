@@ -37,7 +37,7 @@ implements ISimpleCitModule
 
 	@Override
 	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
-		String result = this.property.Extract(stack).asString();
+		String result = IDataContainer.asString(this.property.Extract(stack));
 		return (result!=null) ? ResourceLocation.tryParse(result) : null;
 	}
 

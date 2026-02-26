@@ -11,6 +11,10 @@ public interface IDataContainer
 {
 	@NotNull Object value();
 
+	static public String asString(IDataContainer container){
+		return (container == null) ? null : container.asString();
+	}
+
 	default @Nullable String asString(){
 		return this.value() instanceof String string ? string :
 		       this.value() instanceof StringTag nbt ? nbt.getAsString() :

@@ -14,6 +14,7 @@ import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 
@@ -53,7 +54,7 @@ implements ISimpleCitModule
 		Map<String,String> variables = new HashMap<>();
 
 		for (var entry : this.varGetters.entrySet()){
-			String value = entry.getValue().Extract(stack).asString();
+			String value = IDataContainer.asString(entry.getValue().Extract(stack));
 			if (value == null)
 				return null;
 
@@ -73,8 +74,8 @@ implements ISimpleCitModule
 
 		logger.Info("Format: \"{}\"", CommandLogger.PackData(this.format));
 		for (var entry : varGetters.entrySet()){
-			String raw = TransformableExtractor.Unwrap(entry.getValue()).Extract(stack).asString();
-			String transformed = entry.getValue().Extract(stack).asString();
+			String raw = IDataContainer.asString(TransformableExtractor.Unwrap(entry.getValue()).Extract(stack));
+			String transformed = IDataContainer.asString(entry.getValue().Extract(stack));
 
 			logger.Info("${{}}:", CommandLogger.PackData(entry.getKey()));
 			logger.Info("- Raw data: {}", CommandLogger.ItemData(raw, "Missing or invalid"));
