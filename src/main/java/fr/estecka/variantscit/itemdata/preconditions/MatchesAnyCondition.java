@@ -17,7 +17,7 @@ implements IItemPrecondition
 		.xmap(MatchesAnyCondition::new, MatchesAnyCondition::conditions)
 		;
 
-	static public final MapCodec<MatchesAnyCondition> MAPCODEC = ARRAY_CODEC.fieldOf("subConditions");
+	static public final MapCodec<MatchesAnyCondition> MAPCODEC = ARRAY_CODEC.fieldOf("any");
 
 	@Override
 	public boolean Matches(ItemStack stack) {

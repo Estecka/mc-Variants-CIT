@@ -247,3 +247,4 @@ Since v2.5:
 - Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
 - TODO: Remove itemsFromModels. Replace it with an assetGen preset?
 - TODO: Rename module contexts to hooks ?
+- TODO: Do something about regex and multiline !!!
