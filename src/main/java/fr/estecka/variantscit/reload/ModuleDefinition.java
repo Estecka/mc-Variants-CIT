@@ -12,12 +12,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 
 public record ModuleDefinition(
 	@Deprecated ResourceLocation type,
 	UnbakedModule<?> parameters,
 	List<EModuleContext> contexts,
 	Optional<List<ResourceLocation>> targets,
+	Optional<IItemPrecondition> precondition,
 	int priority,
 	String modelPrefix,
 	boolean itemGen,
@@ -33,6 +35,7 @@ public record ModuleDefinition(
 			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::parameters),
 			CodecUtil.OneOrMany(EModuleContext.CODEC).optionalFieldOf("context", List.of(EModuleContext.ITEM_MODEL)).forGetter(ModuleDefinition::contexts),
 			CodecUtil.OneOrMany(ResourceLocation.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
+			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),

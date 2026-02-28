@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.PreconditionModule;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
@@ -76,8 +77,12 @@ public final class ModuleLoader
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
 			var baked = EModuleContext.MapOf(
-				ctx -> result.variantAggregator.GetLibrary(ctx, definition).map(definition.parameters()::Bake).orElse(null)
+				ctx -> result.variantAggregator.GetLibrary(ctx, definition)
+					.map(definition.parameters()::Bake)
+					.map(module -> definition.precondition().isPresent() ? new PreconditionModule(definition.precondition().get(), module) : module)
+					.orElse(null)
 			);
+
 			MetaModule meta = new MetaModule(
 				moduleId,
 				definition.priority(),
