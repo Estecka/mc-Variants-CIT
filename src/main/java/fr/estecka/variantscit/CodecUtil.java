@@ -91,6 +91,10 @@ public final class CodecUtil
 		return codec.validate(WithWarning(warning, args));
 	}
 
+	static public <I,O> DataResult<O> NoEncode(I _0){
+		return DataResult.error(()->"Encoding not implemented");
+	}
+
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
 		var listCodec = original.listOf();
 		return Codec.withAlternative(
@@ -147,7 +151,13 @@ public final class CodecUtil
 	 * Downcast the decoder's result to a superclass. This strips the codec of
 	 * its encoding abilities.
 	 */
-	static public <SUPER, SUB extends SUPER> MapCodec<SUPER> Anonymize(MapCodec<SUB> original){
+	static public <SUPER, SUB extends SUPER> MapCodec<SUPER> AnonymizeMap(MapCodec<SUB> original){
+		return original.flatXmap(
+			o->DataResult.success((SUPER)o),
+			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
+		);
+	}
+	static public <SUPER, SUB extends SUPER> Codec<SUPER> Anonymize(Codec<SUB> original){
 		return original.flatXmap(
 			o->DataResult.success((SUPER)o),
 			o->DataResult.error(()->"Encoding not supported by anonymized codec.")

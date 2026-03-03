@@ -12,12 +12,15 @@ public record MatchesAnyCondition(
 )
 implements IItemPrecondition
 {
-	static public final Codec<MatchesAnyCondition> ARRAY_CODEC = VCitRegistries.PRECONDITIONS.codec
-		.listOf(1, Integer.MAX_VALUE)
+	static public final Codec<MatchesAnyCondition> CODEC = Codec.withAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
 		.xmap(MatchesAnyCondition::new, MatchesAnyCondition::conditions)
 		;
 
-	static public final MapCodec<MatchesAnyCondition> MAPCODEC = ARRAY_CODEC.fieldOf("any");
+	static public final Codec<MatchesAnyCondition> MONOSTRINGMAP_CODEC = IItemPrecondition.MONOSTRINGMAP_CODEC
+		.xmap(MatchesAnyCondition::new, MatchesAnyCondition::conditions)
+		;
+
+	static public final MapCodec<MatchesAnyCondition> MAPCODEC = CODEC.fieldOf("any");
 
 	@Override
 	public boolean Matches(ItemStack stack) {

@@ -18,6 +18,10 @@ extends ICacheKey.Keyable, IItemPrecondition
 		VCitRegistries.ITEM_PROPERTIES.codec,
 		ItemComponentProperty.MONOSTRING_DECODER
 	);
+	static public final Codec<IDataExtractor> MONOSTRING_CODEC = Codec.withAlternative(
+		VCitRegistries.ITEM_PROPERTIES.unitCodec,
+		ItemComponentProperty.MONOSTRING_DECODER
+	);
 
 	IDataContainer Extract(ItemStack stack);
 

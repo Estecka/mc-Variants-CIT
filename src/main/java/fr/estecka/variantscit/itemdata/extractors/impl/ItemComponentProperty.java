@@ -32,7 +32,7 @@ extends AMonoComponentProperty<T,String>
 
 	static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
 		ItemComponentProperty::MonostringParse,
-		__->DataResult.error(()->"Encoding not supported")
+		CodecUtil::NoEncode
 	);
 
 	public final NbtAdapter nbtAdapter;

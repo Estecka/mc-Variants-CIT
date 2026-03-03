@@ -19,7 +19,7 @@ implements IDataTransform
 			builder.group(
 				Codec.BOOL.optionalFieldOf("optional", false).forGetter(OptionalTransform::IsOptional),
 				RawDataContainer.LITTERAL_CODEC.optionalFieldOf("fallback").forGetter(OptionalTransform::GetFallback),
-				CodecUtil.<IDataTransform,T>Anonymize(inner).forGetter(OptionalTransform::Unwrap)
+				CodecUtil.<IDataTransform,T>AnonymizeMap(inner).forGetter(OptionalTransform::Unwrap)
 			)
 			.apply(builder, OptionalTransform::Wrap)
 		);

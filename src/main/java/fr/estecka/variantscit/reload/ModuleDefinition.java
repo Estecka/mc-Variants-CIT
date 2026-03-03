@@ -13,6 +13,8 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
+import fr.estecka.variantscit.itemdata.preconditions.MatchesAllCondition;
+
 
 public record ModuleDefinition(
 	@Deprecated ResourceLocation type,
@@ -29,13 +31,18 @@ public record ModuleDefinition(
 	Map<String,ResourceLocation> specialModels
 )
 {
+	static private final Codec<IItemPrecondition> PRECONDITION_CODEC = CodecUtil.WithAlternatives(
+		VCitRegistries.PRECONDITIONS.codec,
+		CodecUtil.Anonymize(MatchesAllCondition.CODEC)
+	);
+
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			ResourceLocation.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
 			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::parameters),
 			CodecUtil.OneOrMany(EModuleContext.CODEC).optionalFieldOf("context", List.of(EModuleContext.ITEM_MODEL)).forGetter(ModuleDefinition::contexts),
 			CodecUtil.OneOrMany(ResourceLocation.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
-			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
+			PRECONDITION_CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			Codec.BOOL.fieldOf("itemsFromModels").orElse(true).forGetter(ModuleDefinition::itemGen),
