@@ -92,7 +92,7 @@ public final class CodecUtil
 	}
 
 	static public <I,O> DataResult<O> NoEncode(I _0){
-		return DataResult.error(()->"Encoding not implemented");
+		return DataResult.error(()->"Encoding not supported.");
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
@@ -103,31 +103,29 @@ public final class CodecUtil
 		);
 	}
 
-	static public <T> MapCodec<T> MapWithAlternative(MapCodec<T> primary, MapCodec<? extends T> alternative){
+	static public <T> MapCodec<T> MapWithAlternative(MapCodec<? extends T> primary, MapCodec<? extends T> alternative){
 		return MapCodec.assumeMapUnsafe(
 			Codec.withAlternative(
-				primary.codec(),
+				Anonymize(primary.codec()),
 				alternative.codec()
 			)
 		);
 	}
 
 	@SafeVarargs
-	static public <T> Codec<T> WithAlternatives(Codec<T> primary, Codec<T>... altArray){
-		int i = altArray.length - 1;
-		Codec<T> alternative = altArray[i];
+	static public <T> Codec<T> WithAlternatives(Codec<? extends T> primary, Codec<? extends T>... altArray){
+		Codec<T> result = Anonymize(primary);
 
-		for (i=i-1; i>=0; --i){
-			alternative = Codec.withAlternative(altArray[i], alternative);
-		}
+		for (var alt : altArray)
+			result = Codec.withAlternative(result, alt);
 
-		return Codec.withAlternative(primary, alternative);
+		return result;
 	}
 
 	@SafeVarargs
-	static public <T> MapCodec<T> MapWithAlternatives(MapCodec<T> primaryMap, MapCodec<T>... mapArray){
+	static public <T> MapCodec<T> MapWithAlternatives(MapCodec<? extends T> primaryMap, MapCodec<? extends T>... mapArray){
 		@SuppressWarnings("unchecked")
-		Codec<T>[] codecArray = new Codec[mapArray.length];
+		Codec<? extends T>[] codecArray = new Codec[mapArray.length];
 		for (int i=0; i<mapArray.length; ++i)
 			codecArray[i] = mapArray[i].codec();
 		return MapCodec.assumeMapUnsafe(WithAlternatives(primaryMap.codec(), codecArray));
@@ -154,13 +152,13 @@ public final class CodecUtil
 	static public <SUPER, SUB extends SUPER> MapCodec<SUPER> AnonymizeMap(MapCodec<SUB> original){
 		return original.flatXmap(
 			o->DataResult.success((SUPER)o),
-			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
+			CodecUtil::NoEncode
 		);
 	}
 	static public <SUPER, SUB extends SUPER> Codec<SUPER> Anonymize(Codec<SUB> original){
 		return original.flatXmap(
 			o->DataResult.success((SUPER)o),
-			o->DataResult.error(()->"Encoding not supported by anonymized codec.")
+			CodecUtil::NoEncode
 		);
 	}
 

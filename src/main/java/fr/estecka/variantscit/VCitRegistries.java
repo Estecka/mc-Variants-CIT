@@ -29,7 +29,7 @@ public final class VCitRegistries
 {
 	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
 	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
-	static public final DecodableRegistry<IDataTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("regex"), OptionalTransform::CodecOf);
+	static public final DecodableRegistry<IDataTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("auto"), OptionalTransform::CodecOf);
 	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
@@ -88,6 +88,25 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("charset_remap"),       CharRemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("remap"),               RemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("regex"),               RegexTransform.MAPCODEC);
+
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("equals"),              CodecUtil.MapWithAlternative(StringCompareTransform.MAPCODEC,NumberCompareTransform.MAPCODEC_EQUAL));
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("smaller_than"),        NumberCompareTransform.MAPCODEC_SMALLER);
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("greater_than"),        NumberCompareTransform.MAPCODEC_GREATER);
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("smaller_or_equals"),   NumberCompareTransform.MAPCODEC_GREAT_OR_EQ);
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("greater_or_equals"),   NumberCompareTransform.MAPCODEC_SMALL_OR_EQ);
+
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("auto"), CodecUtil.MapWithAlternatives(
+			RegexTransform.MAPCODEC,
+			FilterlistTransform.MAPCODEC_BLACKLIST,
+			FilterlistTransform.MAPCODEC_WHITELIST,
+			StringCompareTransform.MAPCODEC,
+			NumberCompareTransform.MAPCODEC_EQUAL,
+			NumberCompareTransform.MAPCODEC_GREATER,
+			NumberCompareTransform.MAPCODEC_SMALLER,
+			NumberCompareTransform.MAPCODEC_GREAT_OR_EQ,
+			NumberCompareTransform.MAPCODEC_SMALL_OR_EQ
+		));
+
 
 		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("auto"),            INbtInput.AUTO);
 		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("primitive"),       INbtInput.PRIMITIVE);

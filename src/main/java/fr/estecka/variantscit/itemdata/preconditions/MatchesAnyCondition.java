@@ -12,7 +12,7 @@ public record MatchesAnyCondition(
 )
 implements IItemPrecondition
 {
-	static public final Codec<MatchesAnyCondition> CODEC = Codec.withAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
+	static public final Codec<MatchesAnyCondition> LITERAL_CODEC = Codec.withAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
 		.xmap(MatchesAnyCondition::new, MatchesAnyCondition::conditions)
 		;
 
@@ -20,7 +20,7 @@ implements IItemPrecondition
 		.xmap(MatchesAnyCondition::new, MatchesAnyCondition::conditions)
 		;
 
-	static public final MapCodec<MatchesAnyCondition> MAPCODEC = CODEC.fieldOf("any");
+	static public final MapCodec<MatchesAnyCondition> MAPCODEC = LITERAL_CODEC.fieldOf("any");
 
 	@Override
 	public boolean Matches(ItemStack stack) {

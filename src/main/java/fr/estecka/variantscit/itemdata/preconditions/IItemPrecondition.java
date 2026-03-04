@@ -10,6 +10,8 @@ import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
+import fr.estecka.variantscit.itemdata.transforms.impl.NumberCompareTransform;
+import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.world.item.ItemStack;
@@ -19,10 +21,18 @@ extends ICacheKey.Cacheable
 {
 	static public final Codec<IItemPrecondition> CODEC = Codec.withAlternative(
 		VCitRegistries.PRECONDITIONS.mapCodec.codec(),
-		MatchesAllCondition.ARRAY_CODEC
+		MatchesAllCondition.LITERAL_CODEC
 	);
 
-	static public final Codec<List<IItemPrecondition>> MONOSTRINGMAP_CODEC = Codec.unboundedMap(IDataExtractor.MONOSTRING_CODEC, VCitRegistries.TRANSFORMS.codec)
+	static public final Codec<List<IItemPrecondition>> MONOSTRINGMAP_CODEC = 
+		Codec.unboundedMap(
+			IDataExtractor.MONOSTRING_CODEC,
+			CodecUtil.WithAlternatives(
+				StringCompareTransform.LITERAL_CODEC,
+				NumberCompareTransform.LITERAL_CODEC_EQUAL,
+				VCitRegistries.TRANSFORMS.mapCodec.codec()
+			)
+		)
 		.flatComapMap(IItemPrecondition::MonostringMapToList, CodecUtil::NoEncode)
 		;
 

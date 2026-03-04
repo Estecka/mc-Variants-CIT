@@ -12,11 +12,11 @@ public record MatchesAllCondition(
 )
 implements IItemPrecondition
 {
-	static public final Codec<MatchesAllCondition> CODEC = Codec.withAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
+	static public final Codec<MatchesAllCondition> LITERAL_CODEC = Codec.withAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
 		.xmap(MatchesAllCondition::new, MatchesAllCondition::conditions)
 		;
 
-	static public final MapCodec<MatchesAllCondition> MAPCODEC = CODEC.fieldOf("all");
+	static public final MapCodec<MatchesAllCondition> MAPCODEC = LITERAL_CODEC.fieldOf("all");
 
 	@Override
 	public boolean Matches(ItemStack stack) {
