@@ -40,9 +40,14 @@ implements IDataExtractor
 		.apply(builder, ItemComponentProperty::new)
 	);
 
-	static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
+	static public final Codec<ItemComponentProperty<?>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
 		ItemComponentProperty::MonostringParse,
 		CodecUtil::NoEncode
+	);
+
+	static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> SANE_MONOSTRING_DECODER = MONOSTRING_DECODER.xmap(
+		inner -> new TransformableExtractor<>(inner, IStringTransform.SANITIZE_AUTO, Optional.empty()),
+		TransformableExtractor::inner
 	);
 
 	@Override
@@ -64,7 +69,7 @@ implements IDataExtractor
 		return result;
 	}
 
-	static private DataResult<TransformableExtractor<ItemComponentProperty<?>>> MonostringParse(String input){
+	static private DataResult<ItemComponentProperty<?>> MonostringParse(String input){
 		int pathLocation;
 		for (pathLocation = 0; pathLocation<input.length(); pathLocation++){
 			char c = input.charAt(pathLocation);
@@ -72,25 +77,21 @@ implements IDataExtractor
 				break;
 		}
 
-		String s_component = input.substring(0, pathLocation);
-		String s_path      = input.substring(pathLocation);
+		String componentName = input.substring(0, pathLocation);
+		String pathString      = input.substring(pathLocation);
 
-		var r_path = (!s_path.isEmpty()) ? NbtPath.Parse(s_path) : DataResult.success(NbtPath.IDENTITY);
-		var r_component = BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().decode(NbtOps.INSTANCE, StringTag.valueOf(s_component)).map(Pair::getFirst);
+		var optPath = (!pathString.isEmpty()) ? NbtPath.Parse(pathString).map(Optional::of) : DataResult.<Optional<NbtPath>>success(Optional.empty());
+		var optComponent = BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().decode(NbtOps.INSTANCE, StringTag.valueOf(componentName)).map(Pair::getFirst);
 
-		if (r_path.isError())
-			return r_path.map(__->null);
+		if (optPath.isError())
+			return optPath.map(__->null);
 
-		if (r_component.isError())
-			return r_component.map(__->null);
+		if (optComponent.isError())
+			return optComponent.map(__->null);
 
-		NbtPath path = r_path.getOrThrow();
-		DataComponentType<?> component = r_component.getOrThrow();
+		Optional<NbtPath> path = optPath.getOrThrow();
+		DataComponentType<?> component = optComponent.getOrThrow();
 
-		return DataResult.success(new TransformableExtractor<>(
-			new ItemComponentProperty<>(component, Optional.of(path), Optional.empty()),
-			IStringTransform.SANITIZE_AUTO, // FIXME Can't use that in preconditions
-			Optional.empty()
-		));
+		return DataResult.success(new ItemComponentProperty<>(component, path, Optional.empty()));
 	}
 }

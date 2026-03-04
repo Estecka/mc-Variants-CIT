@@ -9,6 +9,7 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
+import fr.estecka.variantscit.itemdata.extractors.impl.ItemComponentProperty;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.NumberCompareTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
@@ -26,7 +27,10 @@ extends ICacheKey.Cacheable
 
 	static public final Codec<List<IItemPrecondition>> MONOSTRINGMAP_CODEC = 
 		Codec.unboundedMap(
-			IDataExtractor.MONOSTRING_CODEC,
+			Codec.withAlternative(
+				VCitRegistries.ITEM_PROPERTIES.unitCodec,
+				ItemComponentProperty.MONOSTRING_DECODER
+			),
 			CodecUtil.WithAlternatives(
 				StringCompareTransform.LITERAL_CODEC,
 				NumberCompareTransform.LITERAL_CODEC_EQUAL,

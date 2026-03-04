@@ -8,6 +8,7 @@ import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
@@ -17,7 +18,7 @@ import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 public class ComponentDataModule<P extends IDataExtractor>
 implements ISimpleCitModule
 {
-	static public final MapCodec<ComponentDataModule<?>> CODEC = IDataExtractor.MAPCODEC.xmap(ComponentDataModule::new, o->o.property);
+	static public final MapCodec<ComponentDataModule<?>> CODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec.xmap(ComponentDataModule::new, o->o.property);
 
 	private final P property;
 
