@@ -247,9 +247,11 @@ Since v2.5:
 - Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
 - Removed the `debug` parameters from various modules.
 - Removed the `itemsFromModels` option.
-- Transforms are now able to handle numbers, and other data types.
 - Added `precondition` option to modules
-- Added transforms: `equals`, `smaller_than`, `smaller_or_equal`, `greater_than`, `greater_or_equal`
+- Transforms are now able to handle data types other than strings.
+- Added string transform: `equals`
+- Added number transforms: `equals`, `smaller_than`, `smaller_or_equal`, `greater_than`, `greater_or_equal`
+- Added nbt transform: `nbt_path`
 
 # TODO
 - TODO: Rename module contexts to hooks ?

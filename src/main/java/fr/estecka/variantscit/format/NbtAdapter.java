@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
 import net.minecraft.nbt.Tag;
 
 public class NbtAdapter

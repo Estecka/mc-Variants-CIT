@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.format;
+package fr.estecka.variantscit.itemdata.transforms.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,16 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 
 public final class NbtPath
+implements IDataTransform
 {
 	static public final Codec<NbtPath> CODEC = Codec.STRING.comapFlatMap(NbtPath::Parse, NbtPath::toString);
+	static public final MapCodec<NbtPath> MAPCODEC = CODEC.fieldOf("nbtPath");
 	static public final NbtPath IDENTITY = new NbtPath(new Token[0]);
 
 	private final Token[] tokens;
@@ -32,6 +38,15 @@ public final class NbtPath
 		}
 
 		return nbt;
+	}
+
+	@Override
+	public IDataContainer LooseTypedTransform(IDataContainer input) {
+		Tag nbt = input.asNbt();
+		if (nbt != null)
+			return RawDataContainer.OfNullable(this.Resolve(nbt));
+		else
+			return null;
 	}
 
 

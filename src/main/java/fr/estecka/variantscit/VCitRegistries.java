@@ -88,6 +88,7 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("charset_remap"),       CharRemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("remap"),               RemapTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("regex"),               RegexTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("nbt_path"),            NbtPath.MAPCODEC);
 
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("equals"),              CodecUtil.MapWithAlternative(StringCompareTransform.MAPCODEC,NumberCompareTransform.MAPCODEC_EQUAL));
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("smaller_than"),        NumberCompareTransform.MAPCODEC_SMALLER);
