@@ -246,12 +246,13 @@ Since v2.5:
 - Removed the deprecated syntax of `nbtPath`.
 - Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
 - Removed the `debug` parameters from various modules.
-- Transforms are now able to handle numbers.
+- Removed the `itemsFromModels` option.
+- Transforms are now able to handle numbers, and other data types.
 - Added `precondition` option to modules
 - Added transforms: `equals`, `smaller_than`, `smaller_or_equal`, `greater_than`, `greater_or_equal`
 
 # TODO
-- TODO: Remove itemsFromModels. Replace it with an assetGen preset?
 - TODO: Rename module contexts to hooks ?
 - TODO: Do something about regex and multiline !!!
 - TODO: `group` module, `predicate` module
+- TODO: Turn nbtPath and nbtInputs into transforms

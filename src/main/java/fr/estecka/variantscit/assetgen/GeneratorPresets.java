@@ -30,8 +30,7 @@ public final class GeneratorPresets
 		IAssetGenerator items;
 		IAssetGenerator models;
 
-		// itemsFromModel
-		if (!module.itemGen())
+		if (!module.modelParent().isPresent())
 			return IAssetGenerator.NOOP;
 
 		var itemsTemplate = FilledTemplate.Stateless();
@@ -40,10 +39,6 @@ public final class GeneratorPresets
 			return IAssetGenerator.NOOP;
 		}
 		items  = new TemplatedAssetGenerator(EAssetGenPass.ITEM_STATES , acceptAll, itemsTemplate.getOrThrow());
-
-		// modelParent
-		if (!module.modelParent().isPresent())
-			return items;
 
 		var modelTemplate = FilledTemplate.ModelParent(module.modelParent().get().toString());
 		if (modelTemplate.isError()){
