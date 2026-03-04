@@ -14,12 +14,12 @@ extends AMonoComponentProperty<CustomData,String>
 	}
 
 	@Override
-	public String GetPropertyString(CustomData component) {
+	public String GetPropertyValue(CustomData component) {
 		return component.getUnsafe().getString("variant");
 	}
 
 	public ResourceLocation GetPropertyId(CustomData component){
-		String rawVariant = GetPropertyString(component);
+		String rawVariant = GetPropertyValue(component);
 		return (rawVariant!=null) ?  ResourceLocation.tryParse(rawVariant) : null;
 	}
 	

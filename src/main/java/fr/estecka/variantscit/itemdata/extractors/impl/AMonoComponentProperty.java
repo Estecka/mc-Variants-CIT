@@ -16,12 +16,12 @@ implements IDataExtractor
 		this.source = new ComponentCacheKey<>(componentType);
 	}
 
-	public abstract O GetPropertyString(I component);
+	public abstract O GetPropertyValue(I component);
 
 	@Override
 	public IDataContainer Extract(ItemStack stack) {
 		I component = source.GetReference(stack);
-		return RawDataContainer.OfNullable((component!=null) ? GetPropertyString(component) : null);
+		return RawDataContainer.OfNullable((component!=null) ? GetPropertyValue(component) : null);
 	}
 
 	@Override

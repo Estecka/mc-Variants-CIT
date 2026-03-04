@@ -31,7 +31,7 @@ extends AMonoComponentProperty<CustomData,String>
 	}
 
 	@Override
-	public @NotNull String GetPropertyString(CustomData bucket) {
+	public @NotNull String GetPropertyValue(CustomData bucket) {
 		CompoundTag nbt;
 
 		if (bucket == null || (nbt=bucket.getUnsafe()) == null || !nbt.contains("Age", Tag.TAG_ANY_NUMERIC))

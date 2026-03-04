@@ -16,7 +16,7 @@ extends AMonoComponentProperty<CustomData,String>
 	}
 
 	@Override
-	public String GetPropertyString(CustomData component) {
+	public String GetPropertyValue(CustomData component) {
 		CompoundTag nbt;
 		if ((nbt=component.getUnsafe()) == null || !nbt.contains("Variant", Tag.TAG_ANY_NUMERIC))
 			return null;

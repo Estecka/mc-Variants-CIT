@@ -35,7 +35,7 @@ extends AMonoComponentModule<CustomData>
 		if (component == null)
 			return null;
 
-		String rawVariant = PaintingVariantProperty.UNIT.GetPropertyString(component);
+		String rawVariant = PaintingVariantProperty.UNIT.GetPropertyValue(component);
 		if (rawVariant == null)
 			return null;
 

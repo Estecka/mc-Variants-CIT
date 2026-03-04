@@ -14,7 +14,7 @@ extends AMonoComponentProperty<Integer,Integer>
 	}
 
 	@Override
-	public Integer GetPropertyString(Integer component){
+	public Integer GetPropertyValue(Integer component){
 		return component;
 	}
 }

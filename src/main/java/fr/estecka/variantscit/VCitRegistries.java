@@ -10,10 +10,10 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
-import fr.estecka.variantscit.format.INbtInput;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.extractors.impl.*;
+import fr.estecka.variantscit.itemdata.transforms.IDataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.OptionalTransform;
@@ -30,7 +30,7 @@ public final class VCitRegistries
 	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
 	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
 	static public final DecodableRegistry<IDataTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("auto"), OptionalTransform::CodecOf);
-	static public final DecodableRegistry<INbtInput> NBT_INPUTS = new DecodableRegistry<>("type");
+	static public final DecodableRegistry<IDataConversions<?>> NBT_INPUTS = new DecodableRegistry<>("type");
 
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
 
@@ -108,14 +108,13 @@ public final class VCitRegistries
 			NumberCompareTransform.MAPCODEC_SMALL_OR_EQ
 		));
 
-
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("auto"),            INbtInput.AUTO);
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("primitive"),       INbtInput.PRIMITIVE);
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("string"),          INbtInput::String);
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("number"),          INbtInput::Number);
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("identifier"),      INbtInput::Identifier);
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("rich_text"),       INbtInput::RichText);
-		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("rich_text_array"), INbtInput::RichTextArray);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("auto"),            IDataConversions.TO_STRING);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("primitive"),       IDataConversions::SoftCastToString);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("string"),          IDataConversions::SoftCastToString);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("number"),          IDataConversions::SoftCastToNumber);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("identifier"),      IDataConversions::SoftCastToId);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("rich_text"),       IDataConversions::SoftCastToText);
+		NBT_INPUTS.RegisterUnit(ResourceLocation.withDefaultNamespace("rich_text_array"), IDataConversions::LooseCastTextArray);
 
 		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("matches_all"), MatchesAllCondition.MAPCODEC);
 		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("matches_any"), MatchesAnyCondition.MAPCODEC);
