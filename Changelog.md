@@ -259,4 +259,3 @@ Since v2.5:
 - TODO: Rename module contexts to hooks ?
 - TODO: Do something about regex and multiline !!!
 - TODO: `group` module, `predicate` module
-- TODO: Turn nbtPath and nbtInputs into transforms
