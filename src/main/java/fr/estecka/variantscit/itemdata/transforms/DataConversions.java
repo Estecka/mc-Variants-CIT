@@ -18,55 +18,29 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.component.ItemLore;
 
-@FunctionalInterface
-public interface IDataConversions<T>
-extends IDataTransform
+public final class DataConversions
 {
-	abstract T flatLooseTransform(Object value);
-
-	@Override
-	default IDataContainer LooseTypedTransform(IDataContainer input) {
-		return (input != null) ? RawDataContainer.OfNullable(flatLooseTransform(input)) : null;
-	}
-
-
 	static public final Codec<IDataTransform> EXPECT_UNIT_CODEC = CodecUtil.Enum(Codec.STRING, Map.of(
-		"string",          IDataConversions::StrictString,
-		"identifier",      IDataConversions::StricIdentifier,
-		"number",          IDataConversions::StrictNumber,
-		"rich_text",       IDataConversions::StrictRichText,
-		"rich_text_array", IDataConversions::StrictRichTextArray
+		"string",          DataConversions::StrictString,
+		"identifier",      DataConversions::StricIdentifier,
+		"number",          DataConversions::StrictNumber,
+		"rich_text",       DataConversions::StrictRichText,
+		"rich_text_array", DataConversions::StrictRichTextArray
 	));
 
 	static public final Codec<IDataTransform> EXPECT_GROUP_CODEC = CodecUtil.OneOrMany(EXPECT_UNIT_CODEC)
 		.xmap(AlternativeTransform::Wrap, AlternativeTransform::Unwrap)
 		;
 
-	static public IDataConversions<String> AGGRESSIVE_TO_STRING = Alternatives(
-		IDataConversions::SoftCastToString,
-		o->SoftCastToString(SoftCastToText(o)),
-		o->SoftCastToString(LooseCastTextArray(o))
-	);
-
-	@SafeVarargs
-	static public <T> IDataConversions<T> Alternatives(Function<Object,T>... functions){
-		return value -> {
-			for (var f : functions){
-				T result = f.apply(value);
-				if (result != null) return result;
-			}
-			return null;
-		};
-	}
-
 
 /******************************************************************************/
-/* # "Expect" field                                                           */
+/* # Strict Casts                                                             */
 /******************************************************************************/
 
 static public IDataContainer StricIdentifier(IDataContainer input) {
-	if (input.value() instanceof ResourceLocation id)
+	if (input.value() instanceof ResourceLocation)
 		return input;
 	if (input.value() instanceof String string)
 		return RawDataContainer.OfNullable(ResourceLocation.tryParse(string));
@@ -79,7 +53,7 @@ static public IDataContainer StrictString(IDataContainer input) {
 	if (input.value() instanceof String)
 		return input;
 	if (input.value() instanceof ResourceLocation id)
-		return RawDataContainer.OfNullable(input.asString());
+		return RawDataContainer.OfNullable(id.toString());
 	if (input.asNbt() instanceof StringTag nbt)
 		return RawDataContainer.OfNullable(nbt.getAsString());
 	return null;
@@ -118,6 +92,42 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 
 
 /******************************************************************************/
+/* # Aggressive Conversions                                                   */
+/******************************************************************************/
+
+	static public String AggressiveString(IDataContainer data){
+		String result = null;
+
+		result = SoftCastToString(data.value());
+		if (result != null)
+			return result;
+
+		Tag nbt = data.asNbt();
+		if (nbt == null)
+			return null;
+
+		result = SoftCastToString(NbtToText(nbt));
+		if (result != null)
+			return result;
+
+		result = TextArrayToString(NbtToTextArray(nbt));
+
+		return result;
+	}
+
+	static public Number AggressiveNumber(IDataContainer data){
+		Number result = null;
+		result = SoftCastToNumber(data.value());
+		if (result != null)
+			return result;
+
+		result =  SoftCastToNumber(data.asNbt());
+
+		return result;
+	}
+
+
+/******************************************************************************/
 /* # Natural Conversions                                                      */
 /******************************************************************************/
 
@@ -128,10 +138,12 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		       value instanceof NumericTag nbt ? nbt.getAsNumber().toString() :
 		       value instanceof ResourceLocation id ? id.toString() :
 		       value instanceof Component id ? id.getString() :
+		       value instanceof ItemLore lore ? TextArrayToString(lore.lines()) :
 		       null
 		       ;
 	};
 
+	@Deprecated
 	static public @Nullable ResourceLocation SoftCastToId(@Nullable Object value){
 		return value instanceof ResourceLocation id ? id :
 		       value instanceof String string ? ResourceLocation.tryParse(string) :
@@ -155,6 +167,7 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		       ;
 	};
 
+	@Deprecated
 	static public @Nullable Component SoftCastToText(@Nullable Object value){
 		return value instanceof Component text ? text :
 		       value instanceof Tag nbt ? NbtToText(nbt) :
@@ -162,9 +175,11 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		       ;
 	}
 
+
 /******************************************************************************/
 /* # Rich Text Util                                                           */
 /******************************************************************************/
+
 	static public Component NbtToText(@NotNull Tag nbt){
 		return ComponentSerialization.FLAT_CODEC
 			.parse(NbtOps.INSTANCE, nbt)
@@ -190,6 +205,7 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		return builder.toString();
 	}
 
+	@Deprecated
 	static public String LooseCastTextArray(Object value){
 		if (value instanceof String s)
 			return s;

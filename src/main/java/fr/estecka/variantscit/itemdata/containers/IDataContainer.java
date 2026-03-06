@@ -2,10 +2,8 @@ package fr.estecka.variantscit.itemdata.containers;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.nbt.NumericTag;
-import net.minecraft.nbt.StringTag;
+import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 
 public interface IDataContainer
 {
@@ -16,23 +14,14 @@ public interface IDataContainer
 	}
 
 	default @Nullable String asString(){
-		return this.value() instanceof String string ? string :
-		       this.value() instanceof StringTag nbt ? nbt.getAsString() :
-		       this.value() instanceof Number number ? number.toString() :
-		       this.value() instanceof NumericTag nbt ? nbt.getAsNumber().toString() :
-		       this.value() instanceof ResourceLocation id ? id.toString() :
-		       null
-		       ;
+		return DataConversions.AggressiveString(this);
 	};
 
 	default @Nullable Number asNumber(){
-		return this.value() instanceof Number number ? number :
-		       this.value() instanceof NumericTag nbt ? nbt.getAsNumber() :
-		       null
-		       ;
+		return DataConversions.AggressiveNumber(this);
 	};
 
 	default @Nullable Tag asNbt(){
-		return this.value() instanceof Tag nbt ? nbt : null;
+		return DataConversions.SoftCastToNbt(this.value());
 	};
 }

@@ -11,7 +11,7 @@ import fr.estecka.variantscit.itemdata.containers.ComponentContainer;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
-import fr.estecka.variantscit.itemdata.transforms.IDataConversions;
+import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
@@ -36,7 +36,7 @@ implements IDataExtractor
 		.group(
 			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
 			NbtPath.CODEC.optionalFieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
-			IDataConversions.EXPECT_GROUP_CODEC.optionalFieldOf("expect", IDataTransform.NOOP).forGetter(adp -> adp.expectedType)
+			DataConversions.EXPECT_GROUP_CODEC.optionalFieldOf("expect", IDataTransform.NOOP).forGetter(adp -> adp.expectedType)
 		)
 		.apply(builder, ItemComponentProperty::new)
 	);
