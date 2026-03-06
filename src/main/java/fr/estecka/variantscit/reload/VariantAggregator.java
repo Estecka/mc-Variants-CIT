@@ -170,7 +170,7 @@ public class VariantAggregator
 			this.generatedAssets.put(resourceId, new GeneratedAsset(resource, priority));
 			// VariantsCitMod.LOGGER.warn("Generated asset: {}", resourceId);
 		}
-		// // TODO: Fix false positives
+		// // FIXME: Fix false positives
 		// else if (oldAsset != null && oldAsset.priority == priority && !oldAsset.resource.equals(resource))
 		// 	this.conflictingModelPrefixes.add(modelPrefix);
 	}

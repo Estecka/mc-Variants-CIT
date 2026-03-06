@@ -15,7 +15,7 @@ extends AMonoComponentProperty<CustomData,String>
 
 	@Override
 	public String GetPropertyValue(CustomData component) {
-		return component.getUnsafe().getString("variant");
+		return component.copyTag().getString("variant");
 	}
 
 	public ResourceLocation GetPropertyId(CustomData component){

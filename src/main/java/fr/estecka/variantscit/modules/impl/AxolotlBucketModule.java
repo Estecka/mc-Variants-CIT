@@ -32,12 +32,11 @@ public final class AxolotlBucketModule
 		};
 	};
 
-	// TODO: Proper getters
 	static public final MapCodec<Params> CODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->false),
-			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(o->""),
-			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(o->"")
+			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(o->null),
+			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(o->null)
 		)
 		.apply(builder, (debug,adult,baby) -> new Params(
 			AxolotlBucketModule.Create(debug,adult,baby),

@@ -4,7 +4,6 @@ import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
-import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 

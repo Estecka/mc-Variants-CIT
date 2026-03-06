@@ -8,9 +8,6 @@ import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * TODO: Unwrap inner lists
- */
 public class ModuleList
 extends ArrayList<IBakedModule>
 implements IBakedModule, IModuleWrapper
@@ -20,7 +17,8 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	public ModuleList(Collection<? extends IBakedModule> submodules){
-		super(submodules);
+		super(submodules.size());
+		this.addAll(submodules);
 	}
 
 	public IBakedModule UnwrapIfSingle(){

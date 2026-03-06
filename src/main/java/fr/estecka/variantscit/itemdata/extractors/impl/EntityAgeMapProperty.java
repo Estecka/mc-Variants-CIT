@@ -34,7 +34,7 @@ extends AMonoComponentProperty<CustomData,String>
 	public @NotNull String GetPropertyValue(CustomData bucket) {
 		CompoundTag nbt;
 
-		if (bucket == null || (nbt=bucket.getUnsafe()) == null || !nbt.contains("Age", Tag.TAG_ANY_NUMERIC))
+		if (bucket == null || (nbt=bucket.copyTag()) == null || !nbt.contains("Age", Tag.TAG_ANY_NUMERIC))
 			return adult;
 
 		float age = nbt.getFloat("Age");

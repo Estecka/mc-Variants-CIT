@@ -23,7 +23,6 @@ extends AMonoComponentModule<CustomData>
 	}
 
 	static public Optional<Registry<PaintingVariant>> GetPaintingRegistry(){
-		@SuppressWarnings("resource")
 		Level world = Minecraft.getInstance().level;
 		if (world != null)
 			return world.registryAccess().lookup(Registries.PAINTING_VARIANT);

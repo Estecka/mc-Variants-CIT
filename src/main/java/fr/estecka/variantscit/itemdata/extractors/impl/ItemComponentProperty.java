@@ -32,6 +32,7 @@ public record ItemComponentProperty<T>(
 )
 implements IDataExtractor
 {
+	@SuppressWarnings("unchecked")
 	static public final MapCodec<ItemComponentProperty<?>> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),

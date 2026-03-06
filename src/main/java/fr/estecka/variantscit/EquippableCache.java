@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.reload.EModuleContext;
 
 public class EquippableCache

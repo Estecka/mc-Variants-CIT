@@ -10,6 +10,7 @@ public record ComponentCacheKey<T>(
 )
 implements ICacheKey
 {
+	@SuppressWarnings("unchecked")
 	static public CacheKeySet KeysOf(DataComponentType<?>... types){
 		return CacheKeySet.Of(Stream.of(types).map(ComponentCacheKey::new));
 	}

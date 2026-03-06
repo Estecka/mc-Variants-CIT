@@ -14,6 +14,7 @@ public interface IDebuggableLibrary<LIB>
 	public Snitch<LIB> CreateSnitch(CommandLogger logger);
 
 	public default LIB GetLibrary(){
+		// Unsafe
 		return (LIB)this;
 	}
 
@@ -30,6 +31,7 @@ public interface IDebuggableLibrary<LIB>
 		}
 
 		public LIB GetLibrary(){
+			// Unsafe
 			return (LIB)this;
 		}
 

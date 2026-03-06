@@ -2,7 +2,6 @@ package fr.estecka.variantscit.reload;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.mojang.serialization.Codec;
