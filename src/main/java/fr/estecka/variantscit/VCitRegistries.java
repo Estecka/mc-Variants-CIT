@@ -13,6 +13,7 @@ import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.extractors.impl.*;
+import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.OptionalTransform;
@@ -92,6 +93,12 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("greater_than"),        NumberCompareTransform.MAPCODEC_GREATER);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("smaller_or_equals"),   NumberCompareTransform.MAPCODEC_GREAT_OR_EQ);
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("greater_or_equals"),   NumberCompareTransform.MAPCODEC_SMALL_OR_EQ);
+
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_identifier"),      DataConversions::StricIdentifier);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_number"),          DataConversions::StrictNumber);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_rich_text"),       DataConversions::StrictRichText);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_rich_text_array"), DataConversions::StrictRichTextArray);
+		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_string"),          DataConversions::StrictString);
 
 		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("auto"), CodecUtil.MapWithAlternatives(
 			RegexTransform.MAPCODEC,
