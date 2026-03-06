@@ -91,6 +91,10 @@ public final class CodecUtil
 		return codec.validate(WithWarning(warning, args));
 	}
 
+	static public <T> Codec<T> WithWarning(Codec<T> codec, String warning, Object... args){
+		return codec.validate(WithWarning(warning, args));
+	}
+
 	static public <I,O> DataResult<O> NoEncode(I _0){
 		return DataResult.error(()->"Encoding not supported.");
 	}

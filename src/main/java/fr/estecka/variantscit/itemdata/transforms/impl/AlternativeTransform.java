@@ -23,4 +23,20 @@ implements IDataTransform
 
 		return null;
 	}
+
+	static public IDataTransform Wrap(List<IDataTransform> alternatives){
+		if (alternatives.size() <= 0)
+			return IDataTransform.NOOP;
+		if (alternatives.size() == 1)
+			return alternatives.get(1);
+		else
+			return new AlternativeTransform(alternatives);
+	}
+
+	static public List<IDataTransform> Unwrap(IDataTransform function){
+		if (function instanceof AlternativeTransform group)
+			return group.alternatives;
+		else
+			return List.of(function);
+	}
 }

@@ -12,6 +12,7 @@ import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.transforms.IDataConversions;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
@@ -27,7 +28,7 @@ import net.minecraft.world.item.ItemStack;
 public record ItemComponentProperty<T>(
 	DataComponentType<T> componentType,
 	Optional<NbtPath> nbtPath,
-	Optional<IDataConversions<?>> dataType
+	IDataTransform expectedType
 )
 implements IDataExtractor
 {
@@ -35,7 +36,7 @@ implements IDataExtractor
 		.group(
 			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
 			NbtPath.CODEC.optionalFieldOf("nbtPath").forGetter(adp -> adp.nbtPath),
-			IDataConversions.LEGACY_GROUP_CODEC.optionalFieldOf("expect").forGetter(adp -> adp.dataType)
+			IDataConversions.EXPECT_GROUP_CODEC.optionalFieldOf("expect", IDataTransform.NOOP).forGetter(adp -> adp.expectedType)
 		)
 		.apply(builder, ItemComponentProperty::new)
 	);
@@ -64,9 +65,8 @@ implements IDataExtractor
 		IDataContainer result = new ComponentContainer<T>(component, componentType);
 		if (this.nbtPath.isPresent())
 			result = nbtPath.get().LooseTypedTransform(result);
-		if (dataType.isPresent())
-			result = dataType.get().LooseTypedTransform(result);
-		return result;
+
+		return expectedType.LooseTypedTransform(result);
 	}
 
 	static private DataResult<ItemComponentProperty<?>> MonostringParse(String input){
@@ -92,6 +92,6 @@ implements IDataExtractor
 		Optional<NbtPath> path = optPath.getOrThrow();
 		DataComponentType<?> component = optComponent.getOrThrow();
 
-		return DataResult.success(new ItemComponentProperty<>(component, path, Optional.empty()));
+		return DataResult.success(new ItemComponentProperty<>(component, path, IDataTransform.NOOP));
 	}
 }

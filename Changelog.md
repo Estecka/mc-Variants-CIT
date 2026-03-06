@@ -252,6 +252,8 @@ Since v2.5:
 - Added string transform: `equals`
 - Added number transforms: `equals`, `smaller_than`, `smaller_or_equal`, `greater_than`, `greater_or_equal`
 - Added nbt transform: `nbt_path`
+- Removed `expect` values: `auto`, `primitive`.
+- `expect` now defaults to accepting every data type.
 
 # TODO
 - TODO: Rename module contexts to hooks ?
