@@ -3,6 +3,7 @@ package fr.estecka.variantscit.itemdata.preconditions;
 import java.util.List;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.world.item.ItemStack;
@@ -12,7 +13,7 @@ public record MatchesAllCondition(
 )
 implements IItemPrecondition
 {
-	static public final Codec<MatchesAllCondition> LITERAL_CODEC = Codec.withAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
+	static public final Codec<MatchesAllCondition> LITERAL_CODEC = CodecUtil.WithAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
 		.xmap(MatchesAllCondition::new, MatchesAllCondition::conditions)
 		;
 

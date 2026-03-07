@@ -11,6 +11,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 
@@ -37,7 +38,7 @@ implements IoSupplier<InputStream>
 		.apply(builder, FilledTemplate::new)
 	);
 
-	static public final Codec<FilledTemplate> CODEC = Codec.withAlternative(STRING_CODEC, MAPCODEC.codec());
+	static public final Codec<FilledTemplate> CODEC = CodecUtil.WithAlternative(STRING_CODEC, MAPCODEC.codec());
 
 
 /******************************************************************************/

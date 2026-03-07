@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -101,15 +102,23 @@ public final class CodecUtil
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
 		var listCodec = original.listOf();
-		return Codec.withAlternative(
+		return WithAlternative(
 			listCodec,
 			Codec.of(listCodec, original.map(List::of))
 		);
 	}
 
+	static public <T> Codec<T> WithAlternative(Codec<T> primary, Codec<? extends T> alternative){
+		assert primary != null && alternative != null;
+		return Codec.withAlternative(
+			Objects.requireNonNull(primary),
+			Objects.requireNonNull(alternative)
+		);
+	}
+
 	static public <T> MapCodec<T> MapWithAlternative(MapCodec<? extends T> primary, MapCodec<? extends T> alternative){
 		return MapCodec.assumeMapUnsafe(
-			Codec.withAlternative(
+			WithAlternative(
 				Anonymize(primary.codec()),
 				alternative.codec()
 			)
@@ -121,7 +130,7 @@ public final class CodecUtil
 		Codec<T> result = Anonymize(primary);
 
 		for (var alt : altArray)
-			result = Codec.withAlternative(result, alt);
+			result = WithAlternative(result, alt);
 
 		return result;
 	}

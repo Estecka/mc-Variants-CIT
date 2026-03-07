@@ -20,14 +20,14 @@ import net.minecraft.world.item.ItemStack;
 public interface IItemPrecondition
 extends ICacheKey.Cacheable
 {
-	static public final Codec<IItemPrecondition> CODEC = Codec.withAlternative(
+	static public final Codec<IItemPrecondition> CODEC = CodecUtil.WithAlternative(
 		VCitRegistries.PRECONDITIONS.mapCodec.codec(),
 		MatchesAllCondition.LITERAL_CODEC
 	);
 
 	static public final Codec<List<IItemPrecondition>> MONOSTRINGMAP_CODEC = 
 		Codec.unboundedMap(
-			Codec.withAlternative(
+			CodecUtil.WithAlternative(
 				VCitRegistries.ITEM_PROPERTIES.unitCodec,
 				ItemComponentProperty.MONOSTRING_DECODER
 			),

@@ -30,7 +30,7 @@ public class DecodableRegistry<T>
 	private final MapDecoder<ResourceLocation> typeCodec;
 	public final Codec<T>    unitCodec = CodecUtil.Enum(ResourceLocation.CODEC, this.units);
 	public final MapCodec<T> mapCodec  = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
-	public final Codec<T>    codec     = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
+	public final Codec<T>    codec     = CodecUtil.WithAlternative(this.unitCodec, this.mapCodec.codec());
 
 	public DecodableRegistry(String typeKey){
 		this(typeKey, null, c->c);

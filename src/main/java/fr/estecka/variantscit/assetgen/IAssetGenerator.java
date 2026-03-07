@@ -17,7 +17,7 @@ public interface IAssetGenerator
 	// }
 
 	static public final IAssetGenerator NOOP = (_0,_1)->new Result();
-	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(Codec.withAlternative(
+	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(CodecUtil.WithAlternative(
 		GeneratorPresets.PRESET_CODEC,
 		TemplatedAssetGenerator.MAPCODEC.codec()
 	)).xmap(ListGenerator::Wrap, ListGenerator::Unwrap);
