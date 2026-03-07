@@ -254,8 +254,8 @@ Since v2.5:
 - Added nbt transform: `nbt_path`
 - Removed `expect` values: `auto`, `primitive`.
 - `expect` now defaults to accepting every data type.
+- Added a `multiline_handling` option for regex. Changed the default to return the first matching line only.
 
 # TODO
 - TODO: Rename module contexts to hooks ?
-- TODO: Do something about regex and multiline !!!
 - TODO: `group` module, `predicate` module
