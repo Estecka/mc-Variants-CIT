@@ -19,7 +19,7 @@ import fr.estecka.variantscit.itemdata.preconditions.MatchesAllCondition;
 public record ModuleDefinition(
 	@Deprecated ResourceLocation type,
 	UnbakedModule<?> parameters,
-	List<EModuleContext> contexts,
+	List<EModuleHook> hooks,
 	Optional<List<ResourceLocation>> targets,
 	Optional<IItemPrecondition> precondition,
 	int priority,
@@ -34,7 +34,7 @@ public record ModuleDefinition(
 		.group(
 			ResourceLocation.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
 			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::parameters),
-			CodecUtil.OneOrMany(EModuleContext.CODEC).optionalFieldOf("context", List.of(EModuleContext.ITEM_MODEL)).forGetter(ModuleDefinition::contexts),
+			CodecUtil.WithAlias(CodecUtil.OneOrMany(EModuleHook.CODEC), "hook", "context").orElse(List.of(EModuleHook.ITEM_MODEL)).forGetter(ModuleDefinition::hooks),
 			CodecUtil.OneOrMany(ResourceLocation.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			CodecUtil.WithAlternatives(VCitRegistries.PRECONDITIONS.codec, MatchesAllCondition.LITERAL_CODEC).optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),

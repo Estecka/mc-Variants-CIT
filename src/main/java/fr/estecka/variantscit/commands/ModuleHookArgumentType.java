@@ -7,36 +7,36 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 
 
-public class ModuleContextArgumentType
-implements ArgumentType<EModuleContext>
+public class ModuleHookArgumentType
+implements ArgumentType<EModuleHook>
 {
-	static public ModuleContextArgumentType moduleContext(){
-		return new ModuleContextArgumentType();
+	static public ModuleHookArgumentType moduleHook(){
+		return new ModuleHookArgumentType();
 	}
 
-	static public EModuleContext getModuleContext(CommandContext<?> context, String name) {
-		return context.getArgument(name, EModuleContext.class);
+	static public EModuleHook getModuleHook(CommandContext<?> context, String name) {
+		return context.getArgument(name, EModuleHook.class);
 	}
 
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-		for (EModuleContext moduleContext : EModuleContext.values())
-			builder.suggest(moduleContext.name);
+		for (EModuleHook hook : EModuleHook.values())
+			builder.suggest(hook.name);
 		return builder.buildFuture();
 	}
 
 	@Override
-	public EModuleContext parse(StringReader reader)
+	public EModuleHook parse(StringReader reader)
 	throws CommandSyntaxException
 	{
 		String literal = reader.readUnquotedString();
 
 		return switch (literal) {
-			case "item_model" -> EModuleContext.ITEM_MODEL;
-			case "equippable" -> EModuleContext.EQUIPPABLE;
+			case "item_model" -> EModuleHook.ITEM_MODEL;
+			case "equippable" -> EModuleHook.EQUIPPABLE;
 			default -> throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.literalIncorrect().createWithContext(reader, literal);
 		};
 	}

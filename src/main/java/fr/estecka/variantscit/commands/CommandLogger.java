@@ -3,7 +3,7 @@ package fr.estecka.variantscit.commands;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.reload.EAssetType;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
-	EModuleContext moduleContext,
+	EModuleHook moduleHook,
 	MetaModule metamodule
 )
 {
@@ -113,10 +113,10 @@ public record CommandLogger(
 		);
 
 		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
-		switch (moduleContext())
+		switch (this.moduleHook)
 		{
 			default:
-				Error("Error: unknown context");
+				Error("Error: unknown hook");
 				break;
 			case EQUIPPABLE:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));

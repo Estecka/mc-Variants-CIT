@@ -7,7 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modules.IBakedModule;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -28,15 +28,15 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
-import static fr.estecka.variantscit.commands.ModuleContextArgumentType.moduleContext;
-import static fr.estecka.variantscit.commands.ModuleContextArgumentType.getModuleContext;
+import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
+import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHook;
 
 public class ModuleCommands
 extends CommandUtil
 {
 	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "modules");
 
-	static public final String CONTEXT_ARG = "context";
+	static public final String HOOK_ARG    = "hook";
 	static public final String MODULE_ARG  = "module id";
 	
 	static public void	Register(){
@@ -51,13 +51,13 @@ extends CommandUtil
 			.then(literal("walkthrough").executes(c->Execute(c, ModuleCommands::Walkthrough)))
 			;
 
-		var context = literal("module")
-			.then(argument(CONTEXT_ARG, moduleContext())
+		var hook = literal("module")
+			.then(argument(HOOK_ARG, moduleHook())
 				.then(module)
 			);
 
 		var root = literal(VariantsCitMod.MODID)
-			.then(context)
+			.then(hook)
 			;
 
 		dispatcher.register(root);
@@ -69,8 +69,8 @@ extends CommandUtil
 /******************************************************************************/
 
 	static private CompletableFuture<Suggestions> ModuleAutofill(final CommandContext<FabricClientCommandSource> context, final SuggestionsBuilder builder){
-		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
-		Stream<ResourceLocation> modules = VariantsCitMod.GetModules().GetAvailableModules(moduleContext);
+		EModuleHook hook = getModuleHook(context, HOOK_ARG);
+		Stream<ResourceLocation> modules = VariantsCitMod.GetModules().GetAvailableModules(hook);
 
 		SharedSuggestionProvider.suggestResource(modules, builder);
 
@@ -89,7 +89,7 @@ extends CommandUtil
 	}
 
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
-		EModuleContext moduleContext = getModuleContext(context, CONTEXT_ARG);
+		EModuleHook moduleContext = getModuleHook(context, HOOK_ARG);
 		ResourceLocation moduleId = context.getArgument(MODULE_ARG, ResourceLocation.class);
 		MetaModule meta = VariantsCitMod.GetModules().GetMeta(moduleId);
 		IBakedModule module = meta.bakedModules().get(moduleContext);
@@ -116,7 +116,7 @@ extends CommandUtil
 
 		logger.Info("--------");
 		logger.Info("Testing {} module {} on main-hand item: {} ({})",
-			CommandLogger.PackData(logger.moduleContext()),
+			CommandLogger.PackData(logger.moduleHook()),
 			CommandLogger.PackData(logger.metamodule().id()).withStyle(ChatFormatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getHoverName()).withStyle(ChatFormatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getItem())

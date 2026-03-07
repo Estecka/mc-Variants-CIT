@@ -7,18 +7,18 @@ import java.util.function.Function;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 
-public enum EModuleContext
+public enum EModuleHook
 implements StringRepresentable
 {
 	ITEM_MODEL("item_model"),
 	EQUIPPABLE("equippable"),
 	;
 
-	static public final Codec<EModuleContext> CODEC = StringRepresentable.fromEnum(EModuleContext::values);
+	static public final Codec<EModuleHook> CODEC = StringRepresentable.fromEnum(EModuleHook::values);
 
 	public final String name;
 
-	private EModuleContext(String name){
+	private EModuleHook(String name){
 		this.name = name;
 	}
 
@@ -32,12 +32,12 @@ implements StringRepresentable
 		return name;
 	}
 
-	static public <T> Map<EModuleContext,T> MapOf(Function<EModuleContext,T> function){
-		Map<EModuleContext,T> result = new HashMap<>();
-		for (EModuleContext ctx : EModuleContext.values()){
-			T value = function.apply(ctx);
+	static public <T> Map<EModuleHook,T> MapOf(Function<EModuleHook,T> function){
+		Map<EModuleHook,T> result = new HashMap<>();
+		for (EModuleHook hook : EModuleHook.values()){
+			T value = function.apply(hook);
 			if (value != null)
-				result.put(ctx, value);
+				result.put(hook, value);
 		}
 		return result;
 	}

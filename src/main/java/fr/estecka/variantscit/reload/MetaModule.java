@@ -15,5 +15,5 @@ public record MetaModule (
 	int priority,
 	Set<Item> targets,
 	String modelPrefix,
-	Map<EModuleContext, IBakedModule> bakedModules
+	Map<EModuleHook, IBakedModule> bakedModules
 ){}

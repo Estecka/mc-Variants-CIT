@@ -6,28 +6,28 @@ import org.jetbrains.annotations.Nullable;
 
 public enum EAssetType
 {
-	ITEM_TEXTURE  (EModuleContext.ITEM_MODEL, false, "textures/item", ".png"),
-	BAKED_MODEL   (EModuleContext.ITEM_MODEL, false, "models/item"  , ".json"),
-	ITEM_STATE    (EModuleContext.ITEM_MODEL, true , "items"        , ".json"),
+	ITEM_TEXTURE  (EModuleHook.ITEM_MODEL, false, "textures/item", ".png"),
+	BAKED_MODEL   (EModuleHook.ITEM_MODEL, false, "models/item"  , ".json"),
+	ITEM_STATE    (EModuleHook.ITEM_MODEL, true , "items"        , ".json"),
 
-	EQUIP_TEXTURE (EModuleContext.EQUIPPABLE, false, "textures/entity/equipment", ".png"),
-	EQUIPMENT     (EModuleContext.EQUIPPABLE, true , "equipment"                , ".json"),
+	EQUIP_TEXTURE (EModuleHook.EQUIPPABLE, false, "textures/entity/equipment", ".png"),
+	EQUIPMENT     (EModuleHook.EQUIPPABLE, true , "equipment"                , ".json"),
 	;
 
-	public final EModuleContext context;
+	public final EModuleHook hook;
 	/**
 	 * Fundamental asset types are the ones  that are actually used within their
-	 * attributed  context.  Other  asset types  may only  be collected  for the
-	 * purpose of asset generation, and must always  result in the generation of
-	 * an equivalent fundamental asset somewhere down the line.
+	 * attributed hook. Other asset types may only be collected  for the purpose
+	 * of asset  generation, and  must always  result  in the  generation  of an
+	 * equivalent fundamental asset somewhere down the line.
 	 */
 	public final boolean isFundamental;
 	public final @Nullable String vanillaPrefix;
 	public final String directory;
 	public final String suffix;
 
-	private EAssetType(EModuleContext context, boolean isFundamental, String directory, String suffix){
-		this.context = context;
+	private EAssetType(EModuleHook hook, boolean isFundamental, String directory, String suffix){
+		this.hook = hook;
 		this.isFundamental = isFundamental;
 		this.directory = directory;
 		this.suffix = suffix;

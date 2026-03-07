@@ -247,6 +247,7 @@ Since v2.5:
 - Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
 - Removed the `debug` parameters from various modules.
 - Removed the `itemsFromModels` option.
+- Renaming module `context` to hooks. The old name is marked as deprecated.
 - Added `precondition` option to modules
 - Transforms are now able to handle data types other than strings.
 - Added string transform: `equals`
@@ -257,5 +258,4 @@ Since v2.5:
 - Added a `multiline_handling` option for regex. Changed the default to return the first matching line only.
 
 # TODO
-- TODO: Rename module contexts to hooks ?
 - TODO: `group` module, `predicate` module

@@ -14,7 +14,7 @@ import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
 import fr.estecka.variantscit.modules.cache.CacheModule;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandBuildContext;
@@ -33,16 +33,16 @@ import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
 import static net.minecraft.commands.arguments.item.ItemArgument.item;
 import static net.minecraft.commands.arguments.item.ItemArgument.getItem;
-import static fr.estecka.variantscit.commands.ModuleContextArgumentType.moduleContext;
-import static fr.estecka.variantscit.commands.ModuleContextArgumentType.getModuleContext;
+import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
+import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHook;
 
 
 public class CacheCommands
 extends CommandUtil
 {
 	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "cache");
-	static public final String CONTEXT_ARG = "context";
-	static public final String ITEM_ARG    = "item id";
+	static public final String HOOK_ARG = "hook";
+	static public final String ITEM_ARG = "item id";
 
 	static public void	Register(){
 		ClientCommandRegistrationCallback.EVENT.register(ID, CacheCommands::RegisterWith);
@@ -50,7 +50,7 @@ extends CommandUtil
 
 	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess){
 		var cachetree = literal("cachetree")
-			.then(argument(CONTEXT_ARG, moduleContext())
+			.then(argument(HOOK_ARG, moduleHook())
 				.then(argument(ITEM_ARG, item(registryAccess))
 					.suggests(CacheCommands::ItemAutofill)
 					.executes(CacheCommands::PrintTree)
@@ -69,7 +69,7 @@ extends CommandUtil
 /******************************************************************************/
 
 	static public <T> CompletableFuture<Suggestions> ItemAutofill(CommandContext<T> context, SuggestionsBuilder builder) {
-		var availableItems = VariantsCitMod.GetModules().GetAvailableItem(getModuleContext(context, CONTEXT_ARG));
+		var availableItems = VariantsCitMod.GetModules().GetAvailableItem(getModuleHook(context, HOOK_ARG));
 		var ids = availableItems.stream()
 			.map(item->BuiltInRegistries.ITEM.getKey(item))
 			.toList()
@@ -83,16 +83,16 @@ extends CommandUtil
 /******************************************************************************/
 
 	static private int PrintTree(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
-		EModuleContext modCtx = getModuleContext(context, CONTEXT_ARG);
+		EModuleHook hook = getModuleHook(context, HOOK_ARG);
 		Item item = getItem(context, ITEM_ARG).getItem();
-		IBakedModule rootModule = VariantsCitMod.GetModules().GetArchModule(modCtx, item);
+		IBakedModule rootModule = VariantsCitMod.GetModules().GetArchModule(hook, item);
 
 		if (rootModule == null)
 			return Info(context, "No modules exist for this item.");
 
 		TreePrinter printer = new TreePrinter();
 		printer.PrintRoot(TreeNodeOf(rootModule));
-		VariantsCitMod.LOGGER.info("Cache tree for {} {}:\n{}", modCtx, item, printer);
+		VariantsCitMod.LOGGER.info("Cache tree for {} {}:\n{}", hook, item, printer);
 
 		return Success(context, "Cache tree was printed into the log.");
 	}

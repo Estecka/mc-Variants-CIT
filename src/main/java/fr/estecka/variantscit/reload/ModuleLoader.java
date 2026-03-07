@@ -22,8 +22,8 @@ import fr.estecka.variantscit.collections.TriMap;
 public final class ModuleLoader
 {
 	static public class Result {
-		/** Sorted by context, target, and priority. */
-		public final TriMap<EModuleContext,Item,Integer,List<IBakedModule>> sortedModules = new TriMap<>();
+		/** Sorted by hook, target, and priority. */
+		public final TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new TriMap<>();
 
 		public final Map<ResourceLocation, MetaModule> uniqueModules = new HashMap<>();
 		public final VariantAggregator variantAggregator;
@@ -54,8 +54,8 @@ public final class ModuleLoader
 			}
 
 			ModuleDefinition definition = optDefinition.getOrThrow();
-			if (definition.contexts().isEmpty()){
-				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no context: {}", moduleId);
+			if (definition.hooks().isEmpty()){
+				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no hook: {}", moduleId);
 				continue;
 			}
 			if (ItemsFromModule(moduleId, definition).isEmpty()){
@@ -76,7 +76,7 @@ public final class ModuleLoader
 			ResourceLocation moduleId = entry.getKey();
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
-			var baked = EModuleContext.MapOf(
+			var baked = EModuleHook.MapOf(
 				ctx -> result.variantAggregator.GetLibrary(ctx, definition)
 					.map(definition.parameters()::Bake)
 					.map(module -> definition.precondition().isPresent() ? new PreconditionModule(definition.precondition().get(), module) : module)

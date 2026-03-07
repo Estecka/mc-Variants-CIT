@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.collections.BiMap;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheBuilder;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ModuleRepository
 {
-	private final BiMap<EModuleContext, Item, IBakedModule> modelResolver;
+	private final BiMap<EModuleHook, Item, IBakedModule> modelResolver;
 	private final Map<ResourceLocation, MetaModule> metadata;
 	private final IdentityHashMap<IBakedModule, ResourceLocation> moduleToId;
 
@@ -39,25 +39,25 @@ public final class ModuleRepository
 		}
 	}
 
-	public IBakedModule GetArchModule(EModuleContext context, Item item){
-		return this.modelResolver.get(context, item);
+	public IBakedModule GetArchModule(EModuleHook hook, Item item){
+		return this.modelResolver.get(hook, item);
 	}
 
-	public @Nullable ResourceLocation GetModelForItem(EModuleContext context, ItemStack stack) {
-		@Nullable IBakedModule module = GetArchModule(context, stack.getItem());
+	public @Nullable ResourceLocation GetModelForItem(EModuleHook hook, ItemStack stack) {
+		@Nullable IBakedModule module = GetArchModule(hook, stack.getItem());
 		if (module == null)
 			return null;
 		else
 			return module.GetModelForItem(stack);
 	}
 
-	public Set<Item> GetAvailableItem(EModuleContext context){
-		return Set.copyOf(modelResolver.getOrDefault(context, Map.of()).keySet());
+	public Set<Item> GetAvailableItem(EModuleHook hook){
+		return Set.copyOf(modelResolver.getOrDefault(hook, Map.of()).keySet());
 	}
 
-	public Stream<ResourceLocation> GetAvailableModules(EModuleContext context){
+	public Stream<ResourceLocation> GetAvailableModules(EModuleHook hook){
 		return metadata.entrySet().stream()
-			.filter(meta -> meta.getValue().bakedModules().get(context) != null)
+			.filter(meta -> meta.getValue().bakedModules().get(hook) != null)
 			.map(Map.Entry::getKey)
 			;
 	}

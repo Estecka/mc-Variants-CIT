@@ -39,8 +39,8 @@ public class VariantAggregator
 		for (var entry : modules.entrySet()){
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
-			for (EModuleContext context : module.contexts())
-				GetLibraryMap(context).put(module, EmptyLibrary(module));
+			for (EModuleHook hook : module.hooks())
+				GetLibraryMap(hook).put(module, EmptyLibrary(module));
 
 			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
 		}
@@ -54,16 +54,16 @@ public class VariantAggregator
 		);
 	}
 
-	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleContext context){
-		return switch (context){
-			default -> throw new AssertionError("Invalid Context");
+	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
+		return switch (hook){
+			default -> throw new AssertionError("Invalid hook");
 			case EQUIPPABLE -> this.equippable;
 			case ITEM_MODEL -> this.item_model;
 		};
 	}
 
-	public Optional<VariantLibrary> GetLibrary(EModuleContext context, ModuleDefinition module){
-		return Optional.ofNullable(GetLibraryMap(context).get(module));
+	public Optional<VariantLibrary> GetLibrary(EModuleHook hook, ModuleDefinition module){
+		return Optional.ofNullable(GetLibraryMap(hook).get(module));
 	}
 
 	public void GatherAll(HotswappableResourceManager manager){
@@ -100,7 +100,7 @@ public class VariantAggregator
 			case EAssetType.BAKED_MODEL   -> EAssetGenPass.ITEM_STATES;
 		};
 
-		for (var entry : GetLibraryMap(assetType.context).entrySet())
+		for (var entry : GetLibraryMap(assetType.hook).entrySet())
 		{
 			ModuleDefinition module = entry.getKey();
 			VariantLibrary library = entry.getValue();

@@ -9,19 +9,19 @@ import fr.estecka.variantscit.collections.TriMap;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 import net.minecraft.world.item.Item;
 
 public abstract class CacheBuilder
 {
-	static public BiMap<EModuleContext,Item,IBakedModule> BuildAll(TriMap<EModuleContext,Item,Integer,List<IBakedModule>> sortedModules){
-		BiMap<EModuleContext,Item,IBakedModule> result = new BiMap<>();
+	static public BiMap<EModuleHook,Item,IBakedModule> BuildAll(TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules){
+		BiMap<EModuleHook,Item,IBakedModule> result = new BiMap<>();
 
-		for (EModuleContext ctx : sortedModules.keySet())
-		for (Item item : sortedModules.get(ctx).keySet())
+		for (EModuleHook hook : sortedModules.keySet())
+		for (Item item : sortedModules.get(hook).keySet())
 		{
-			IBakedModule baked = BuildItem(sortedModules.get(ctx, item));
-			result.put(ctx, item, baked);
+			IBakedModule baked = BuildItem(sortedModules.get(hook, item));
+			result.put(hook, item, baked);
 		}
 
 		return result;
