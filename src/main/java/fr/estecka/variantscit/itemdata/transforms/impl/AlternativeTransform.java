@@ -28,7 +28,7 @@ implements IDataTransform
 		if (alternatives.size() <= 0)
 			return IDataTransform.NOOP;
 		if (alternatives.size() == 1)
-			return alternatives.get(1);
+			return alternatives.get(0);
 		else
 			return new AlternativeTransform(alternatives);
 	}
