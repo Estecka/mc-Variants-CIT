@@ -17,14 +17,14 @@ import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * FIXME: Dangerous circular dependency with {@link MatchesAllCondition#LITERAL_CODEC}.
+ * As is, {@link #CODEC} **MUST** be placed after {@link #MONOSTRINGMAP_CODEC}
+ * for the static initialization to succeed.
+ */
 public interface IItemPrecondition
 extends ICacheKey.Cacheable
 {
-	static public final Codec<IItemPrecondition> CODEC = CodecUtil.WithAlternative(
-		VCitRegistries.PRECONDITIONS.mapCodec.codec(),
-		MatchesAllCondition.LITERAL_CODEC
-	);
-
 	static public final Codec<List<IItemPrecondition>> MONOSTRINGMAP_CODEC = 
 		Codec.unboundedMap(
 			CodecUtil.WithAlternative(
@@ -39,6 +39,11 @@ extends ICacheKey.Cacheable
 		)
 		.flatComapMap(IItemPrecondition::MonostringMapToList, CodecUtil::NoEncode)
 		;
+
+	static public final Codec<IItemPrecondition> CODEC = CodecUtil.WithAlternative(
+		VCitRegistries.PRECONDITIONS.mapCodec.codec(),
+		MatchesAllCondition.LITERAL_CODEC
+	);
 
 	static private List<IItemPrecondition> MonostringMapToList(Map<IDataExtractor, IDataTransform> map){
 		List<IItemPrecondition> result = new ArrayList<>();

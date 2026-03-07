@@ -13,7 +13,11 @@ public record MatchesAllCondition(
 )
 implements IItemPrecondition
 {
-	static public final Codec<MatchesAllCondition> LITERAL_CODEC = CodecUtil.WithAlternative(IItemPrecondition.MONOSTRINGMAP_CODEC, VCitRegistries.PRECONDITIONS.codec.listOf())
+	static public final Codec<MatchesAllCondition> LITERAL_CODEC = CodecUtil
+		.WithAlternative(
+			IItemPrecondition.MONOSTRINGMAP_CODEC,
+			VCitRegistries.PRECONDITIONS.codec.listOf()
+		)
 		.xmap(MatchesAllCondition::new, MatchesAllCondition::conditions)
 		;
 
