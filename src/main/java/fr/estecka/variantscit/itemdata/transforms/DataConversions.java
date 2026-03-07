@@ -80,12 +80,12 @@ static public IDataContainer StrictRichText(IDataContainer input) {
 }
 
 static public IDataContainer StrictRichTextArray(IDataContainer input) {
-	if (input.value() instanceof Component)
+	if (input.value() instanceof ItemLore)
 		return input;
 	
 	var nbt = input.asNbt();
 	if (nbt != null)
-		return RawDataContainer.OfNullable(NbtToText(nbt));
+		return RawDataContainer.OfNullable(NbtToTextArray(nbt));
 	else
 		return null;
 }
