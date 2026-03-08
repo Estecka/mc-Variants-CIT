@@ -2,6 +2,9 @@ package fr.estecka.variantscit.modules.cache;
 
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.itemdata.containers.ComponentContainer;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 
@@ -13,6 +16,11 @@ implements ICacheKey
 	@SuppressWarnings("unchecked")
 	static public CacheKeySet KeysOf(DataComponentType<?>... types){
 		return CacheKeySet.Of(Stream.of(types).map(ComponentCacheKey::new));
+	}
+
+	@Override
+	public IDataContainer Extract(ItemStack stack) {
+		return ComponentContainer.OfNullable(this.GetReference(stack), componentType);
 	}
 
 	@Override
@@ -36,6 +44,6 @@ implements ICacheKey
 	public final String toString() {
 		// ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(this.componentType);
 		// String name = (id == null) ? componentType.toString() : id.toString();
-		return "@"+componentType.toString();
+		return "@"+CodecUtil.ShortIdString(componentType);
 	}
 }

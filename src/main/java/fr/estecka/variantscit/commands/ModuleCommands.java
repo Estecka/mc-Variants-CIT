@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -16,7 +17,6 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -108,6 +108,12 @@ extends CommandUtil
 
 	static private int Summary(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module){
 		module.Summary(logger);
+		logger.Info("Data used by this module:");
+		for (ICacheKey key : module.GetCacheKeys())
+			logger.Info(" - {}", CommandLogger.PackData(key.toString()));
+		if (module.GetCacheKeys().isEmpty())
+			logger.Error("[ERR] This module does not declare any data or component.");
+
 		return 0;
 	}
 
@@ -125,6 +131,13 @@ extends CommandUtil
 
 		if (!logger.metamodule().targets().contains(stack.getItem()))
 			logger.Info(ChatFormatting.GOLD, "[WARN] This module would normally not be applied to items of type {}", stack.getItem());
+
+		logger.Info("Data found on this item:");
+		for (ICacheKey key : module.GetCacheKeys())
+			logger.Info("- {}: {}", CommandLogger.PackData(key.toString()), CommandLogger.ItemData(key.Extract(stack)));
+		if (module.GetCacheKeys().isEmpty())
+			logger.Error("[ERR] This module does not declare any data or component.");
+		logger.Info("----");
 
 		ResourceLocation modelId = module.Walkthrough(logger, stack);
 		if (modelId != null){

@@ -110,9 +110,11 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		if (result != null)
 			return result;
 
-		result = TextArrayToString(NbtToTextArray(nbt));
+		var lines = NbtToTextArray(nbt);
+		if (lines != null)
+			return TextArrayToString(lines);
 
-		return result;
+		return null;
 	}
 
 	static public Number AggressiveNumber(IDataContainer data){

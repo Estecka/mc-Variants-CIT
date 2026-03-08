@@ -1,10 +1,14 @@
 package fr.estecka.variantscit.modules.cache;
 
 import java.util.Objects;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import net.minecraft.world.item.ItemStack;
 
 public interface ICacheKey
 {
+	// TODO: Fix duplicata with IDataExtractor
+	IDataContainer Extract(ItemStack stack);
+
 	/**
 	 * A direct reference  to the property or its  encompassing object. Used for
 	 * clearing caches whenever a property it depends on gets garbage-collected.

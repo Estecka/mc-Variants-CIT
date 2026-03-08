@@ -24,6 +24,7 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -48,6 +49,14 @@ public final class CodecUtil
 			return id.getPath();
 		else
 			return id.toString();
+	}
+
+	static public String ShortIdString(DataComponentType<?> componentType){
+		String result = "???";
+		ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(componentType);
+		if (id != null)
+			result = CodecUtil.ShortIdString(id);
+		return result;
 	}
 
 
