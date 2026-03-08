@@ -43,6 +43,13 @@ public final class CodecUtil
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 	static public final Codec<Tag> NBT = Codec.PASSTHROUGH.xmap( dyn->dyn.convert(NbtOps.INSTANCE).getValue(), nbt->new Dynamic<>(NbtOps.INSTANCE, nbt.copy()) );
 
+	static public String ShortIdString(ResourceLocation id){
+		if (id.getNamespace() == ResourceLocation.DEFAULT_NAMESPACE)
+			return id.getPath();
+		else
+			return id.toString();
+	}
+
 
 /******************************************************************************/
 /* # Base Types                                                               */

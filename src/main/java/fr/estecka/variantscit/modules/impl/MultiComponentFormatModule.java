@@ -60,7 +60,7 @@ implements ISimpleCitModule
 		Map<String,String> variables = new HashMap<>();
 
 		for (var entry : this.varGetters.entrySet()){
-			String value = IDataContainer.asString(entry.getValue().Extract(stack));
+			String value = IDataContainer.NullableAsString(entry.getValue().Extract(stack));
 			if (value == null)
 				return null;
 
@@ -80,15 +80,15 @@ implements ISimpleCitModule
 
 		logger.Info("Format: \"{}\"", CommandLogger.PackData(this.format));
 		for (var entry : varGetters.entrySet()){
-			String raw = IDataContainer.asString(TransformableExtractor.Unwrap(entry.getValue()).Extract(stack));
-			String transformed = IDataContainer.asString(entry.getValue().Extract(stack));
+			IDataContainer raw = TransformableExtractor.Unwrap(entry.getValue()).Extract(stack);
+			IDataContainer transformed = entry.getValue().Extract(stack);
 
 			logger.Info("${{}}:", CommandLogger.PackData(entry.getKey()));
 			logger.Info("- Raw data: {}", CommandLogger.ItemData(raw, "Missing or invalid"));
 			logger.Info("- Transformed: {}", CommandLogger.ItemData(transformed));
 
 			failure |= (transformed == null);
-			variables.put(entry.getKey(), transformed);
+			variables.put(entry.getKey(), IDataContainer.NullableAsString(transformed));
 		}
 
 		if (failure)

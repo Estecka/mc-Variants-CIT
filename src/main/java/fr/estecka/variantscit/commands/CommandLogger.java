@@ -2,6 +2,7 @@ package fr.estecka.variantscit.commands;
 
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.reload.EAssetType;
 import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
@@ -25,6 +26,8 @@ public record CommandLogger(
 	static public MutableComponent TextOf(Object obj){
 		if (obj instanceof Component text)
 			return text.copy();
+		else if (obj instanceof IDataContainer data)
+			return Component.empty().append(data.toText()); // Prevents overriding root styling of original text.
 		else
 			return Component.literal(String.valueOf(obj));
 	}

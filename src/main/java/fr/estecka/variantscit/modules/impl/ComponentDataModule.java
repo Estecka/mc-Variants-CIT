@@ -38,7 +38,7 @@ implements ISimpleCitModule
 
 	@Override
 	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
-		String result = IDataContainer.asString(this.property.Extract(stack));
+		String result = IDataContainer.NullableAsString(this.property.Extract(stack));
 		return (result!=null) ? ResourceLocation.tryParse(result) : null;
 	}
 
@@ -47,8 +47,8 @@ implements ISimpleCitModule
 		IDataContainer raw = TransformableExtractor.Unwrap(this.property).Extract(stack);
 		IDataContainer transformed = property.Extract(stack);
 
-		logger.Info("Raw data: {}",    CommandLogger.ItemData(raw.value(), "Missing or invalid"));
-		logger.Info("Transformed: {}", CommandLogger.ItemData(transformed.value()));
+		logger.Info("Raw data: {}",    CommandLogger.ItemData(raw, "Missing or invalid"));
+		logger.Info("Transformed: {}", CommandLogger.ItemData(transformed));
 
 		return this.GetItemModel(stack, library);
 	}
