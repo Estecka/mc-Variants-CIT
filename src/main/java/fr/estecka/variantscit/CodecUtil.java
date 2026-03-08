@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
@@ -98,6 +99,15 @@ public final class CodecUtil
 
 	static public <I,O> DataResult<O> NoEncode(I _0){
 		return DataResult.error(()->"Encoding not supported.");
+	}
+
+	@Deprecated
+	static public <I,O> Function<I,O> NoGetter(){
+		return (I _0) -> { throw new NotImplementedException("Encoding not supported due to missing getter."); };
+	}
+
+	static public <I,O> Function<I,O> NoGetter(String getterName){
+		return (I _0) -> { throw new NotImplementedException("Encoding not supported due to missing getter: "+getterName); };
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){

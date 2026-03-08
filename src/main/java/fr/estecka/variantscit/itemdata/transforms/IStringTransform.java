@@ -35,11 +35,9 @@ extends IDataTransform, Function<String,String>
 		String input = container.asString();
 		if (input == null)
 			return null;
-		String output = this.apply(input);
-		if (output == null)
-			return null;
 
-		return RawDataContainer.OfNullable(output);
+		return RawDataContainer.OfNullable(this.apply(input));
+
 	}
 
 	static public IStringTransform Sanitize(String charset){

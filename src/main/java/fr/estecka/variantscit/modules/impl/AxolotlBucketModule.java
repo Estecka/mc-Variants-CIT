@@ -2,7 +2,6 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.HashMap;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
@@ -34,12 +33,11 @@ public final class AxolotlBucketModule
 
 	static public final MapCodec<Params> CODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(o->false),
-			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(o->null),
-			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(o->null)
+			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(CodecUtil.NoGetter("AxolotlBucketModule")),
+			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(CodecUtil.NoGetter("AxolotlBucketModule"))
 		)
-		.apply(builder, (debug,adult,baby) -> new Params(
-			AxolotlBucketModule.Create(debug,adult,baby),
+		.apply(builder, (adult,baby) -> new Params(
+			AxolotlBucketModule.Create(adult,baby),
 			adult,
 			baby
 		))
@@ -53,16 +51,16 @@ public final class AxolotlBucketModule
 		ageInvariantVariables.put("variant", AxolotlVariantProperty.UNIT);
 	}
 
-	static public IVariantCitModule Create(boolean debug, String adult, String baby){
-		IVariantCitModule result = CreateAgeInvariantModule(debug, adult);
+	static public IVariantCitModule Create(String adult, String baby){
+		IVariantCitModule result = CreateAgeInvariantModule(adult);
 
 		if (!adult.equals(baby))
-			result = new FallbackModule(CreateAgedModule(debug, adult, baby), result);
+			result = new FallbackModule(CreateAgedModule(adult, baby), result);
 
 		return result;
 	}
 
-	static public MultiComponentFormatModule CreateAgedModule(boolean debug, String adult, String baby){
+	static public MultiComponentFormatModule CreateAgedModule(String adult, String baby){
 		var variables = new HashMap<String, IDataExtractor>();
 		variables.put("variant", AxolotlVariantProperty.UNIT);
 		variables.put("age", new EntityAgeMapProperty(adult, baby));
@@ -70,7 +68,7 @@ public final class AxolotlBucketModule
 		return new MultiComponentFormatModule(agedFormat, variables);
 	}
 
-	static public MultiComponentFormatModule CreateAgeInvariantModule(boolean debug, String suffix){
+	static public MultiComponentFormatModule CreateAgeInvariantModule(String suffix){
 		return new MultiComponentFormatModule(Substitution.Parse("${variant}"+suffix).getOrThrow(), ageInvariantVariables);
 	}
 }

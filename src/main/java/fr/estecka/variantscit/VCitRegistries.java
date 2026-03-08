@@ -144,7 +144,7 @@ public final class VCitRegistries
 			ResourceLocation.withDefaultNamespace(oldName),
 			MapCodec.unit(PaintingVariantModule.UNIT).flatXmap(
 				_0->DataResult.error(()->"Module type `"+oldName+"` was removed, use `"+newName+"` isntead"),
-				_0->null
+				CodecUtil::NoEncode
 			)
 		);
 	}
