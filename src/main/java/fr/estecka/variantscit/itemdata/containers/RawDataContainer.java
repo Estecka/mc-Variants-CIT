@@ -19,11 +19,6 @@ implements IDataContainer
 			return new RawDataContainer<>(value);
 	}
 
-	@Override
-	public final String toString() {
-		return value.toString();
-	}
-
 	public final MutableComponent toText(ChatFormatting innerFormat){
 		return Component.literal("[#").withStyle(ChatFormatting.GRAY)
 			.append(this.value.getClass().getSimpleName())
@@ -31,5 +26,10 @@ implements IDataContainer
 			.append(Component.literal(IDataContainer.printableValue(this)).withStyle(innerFormat))
 			.append("}")
 			;
+	}
+
+	@Override
+	public final String toString() {
+		return this.toText().getString();
 	}
 }

@@ -12,8 +12,8 @@ public record NumberCompareTransform(
 implements IDataTransform
 {
 	static private final short STRICTLY_EQUAL   = 1 << 0;
-	static private final short STRICTLY_SMALLER = 1 << 2;
-	static private final short STRICTLY_GREATER = 1 << 3;
+	static private final short STRICTLY_SMALLER = 1 << 1;
+	static private final short STRICTLY_GREATER = 1 << 2;
 	static private final short SMALLER_OR_EQUAL = STRICTLY_EQUAL | STRICTLY_SMALLER;
 	static private final short GREATER_OR_EQUAL = STRICTLY_EQUAL | STRICTLY_GREATER;
 

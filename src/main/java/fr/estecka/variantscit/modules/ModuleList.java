@@ -35,7 +35,7 @@ implements IBakedModule, IModuleWrapper
 
 	@Override
 	public ResourceLocation GetModelForItem(ItemStack stack) {
-		for(IBakedModule m : this){
+		for (IBakedModule m : this){
 			ResourceLocation result = m.GetModelForItem(stack);
 			if (result != null) return result;
 		}

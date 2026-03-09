@@ -6,10 +6,12 @@ import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.world.item.ItemStack;
 
-public class ItemCountProperty
+public final class ItemCountProperty
 implements IDataExtractor, ICacheKey
 {
 	static public final ItemCountProperty UNIT = new ItemCountProperty();
+
+	private ItemCountProperty(){}
 
 	@Override
 	public int GetPropertyHash(ItemStack stack){

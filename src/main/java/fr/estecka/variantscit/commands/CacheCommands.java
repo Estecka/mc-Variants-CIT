@@ -69,7 +69,7 @@ extends CommandUtil
 /******************************************************************************/
 
 	static public <T> CompletableFuture<Suggestions> ItemAutofill(CommandContext<T> context, SuggestionsBuilder builder) {
-		var availableItems = VariantsCitMod.GetModules().GetAvailableItem(getModuleHook(context, HOOK_ARG));
+		var availableItems = VariantsCitMod.GetModules().GetAvailableItems(getModuleHook(context, HOOK_ARG));
 		var ids = availableItems.stream()
 			.map(item->BuiltInRegistries.ITEM.getKey(item))
 			.toList()

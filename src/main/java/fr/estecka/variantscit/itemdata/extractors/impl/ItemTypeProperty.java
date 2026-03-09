@@ -7,10 +7,12 @@ import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public record ItemTypeProperty()
+public final class ItemTypeProperty
 implements IDataExtractor, ICacheKey
 {
 	static public final ItemTypeProperty UNIT = new ItemTypeProperty();
+
+	private ItemTypeProperty(){}
 
 	@Override
 	public Item GetReference(ItemStack stack) {

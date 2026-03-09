@@ -17,18 +17,18 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ModuleRepository
 {
-	private final BiMap<EModuleHook, Item, IBakedModule> modelResolver;
+	private final BiMap<EModuleHook, Item, IBakedModule> archModules;
 	private final Map<ResourceLocation, MetaModule> metadata;
 	private final IdentityHashMap<IBakedModule, ResourceLocation> moduleToId;
 
 	ModuleRepository(){
-		this.modelResolver = new BiMap<>();
+		this.archModules = new BiMap<>();
 		this.metadata = Map.of();
 		this.moduleToId = new IdentityHashMap<>();
 	}
 
 	ModuleRepository(ModuleLoader.Result result){
-		this.modelResolver = CacheBuilder.BuildAll(result.sortedModules);
+		this.archModules = CacheBuilder.BuildAll(result.sortedModules);
 		this.metadata = Map.copyOf(result.uniqueModules);
 		this.moduleToId = new IdentityHashMap<>();
 
@@ -40,7 +40,7 @@ public final class ModuleRepository
 	}
 
 	public IBakedModule GetArchModule(EModuleHook hook, Item item){
-		return this.modelResolver.get(hook, item);
+		return this.archModules.get(hook, item);
 	}
 
 	public @Nullable ResourceLocation GetModelForItem(EModuleHook hook, ItemStack stack) {
@@ -51,8 +51,8 @@ public final class ModuleRepository
 			return module.GetModelForItem(stack);
 	}
 
-	public Set<Item> GetAvailableItem(EModuleHook hook){
-		return Set.copyOf(modelResolver.getOrDefault(hook, Map.of()).keySet());
+	public Set<Item> GetAvailableItems(EModuleHook hook){
+		return Set.copyOf(archModules.getOrDefault(hook, Map.of()).keySet());
 	}
 
 	public Stream<ResourceLocation> GetAvailableModules(EModuleHook hook){

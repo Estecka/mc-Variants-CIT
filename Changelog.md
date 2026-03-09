@@ -243,6 +243,7 @@ Since v2.5:
 # v5
 - Migrated to Mojmap
 - Reimplemented caches at the global level, instead of inside each module's implementation.
+- `walkthrough` and `summary` commands now display the raw data used by a module.
 - Modules using similar components may now be grouped into the same caches.
 - Removed the deprecated fields `caseSensitive` and `nbtKey` from component_data.
 - Removed the deprecated syntax of `nbtPath`.

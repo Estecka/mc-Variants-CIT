@@ -35,7 +35,7 @@ implements Iterable<ICacheKey>
 	static public CacheKeySet OfList(Collection<? extends ICacheKey.Cacheable> cacheable){
 		CacheKeySet result = CacheKeySet.Of();
 		for (var c : cacheable) 
-			result = result.Merge(c.GetCacheKeys());
+			result = result.MergedWith(c.GetCacheKeys());
 		return result;
 	}
 
@@ -52,7 +52,7 @@ implements Iterable<ICacheKey>
 		return this.keyset.isEmpty();
 	}
 
-	public CacheKeySet Merge(CacheKeySet other){
+	public CacheKeySet MergedWith(CacheKeySet other){
 		Set<ICacheKey> all = new HashSet<>();
 		all.addAll(this.keyset);
 		all.addAll(other.keyset);

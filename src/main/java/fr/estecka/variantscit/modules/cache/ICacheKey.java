@@ -4,6 +4,10 @@ import java.util.Objects;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Keys with  the same sources  must return true  for {@link Object#equals}, and
+ * have the same hashcode.
+ */
 public interface ICacheKey
 {
 	// TODO: Fix duplicata with IDataExtractor

@@ -41,7 +41,6 @@ implements IBakedModule
 			logger.Info("Precondition failed.");
 			return null;
 		}
-
 	}
 
 	@Override

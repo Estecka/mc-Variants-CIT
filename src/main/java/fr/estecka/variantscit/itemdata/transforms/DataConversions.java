@@ -207,12 +207,4 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		return builder.toString();
 	}
 
-	@Deprecated
-	static public String LooseCastTextArray(Object value){
-		if (value instanceof String s)
-			return s;
-
-		var lines = value instanceof Tag nbt ? NbtToTextArray(nbt) : null;
-		return (lines != null) ? TextArrayToString(lines) : null;
-	}
 }

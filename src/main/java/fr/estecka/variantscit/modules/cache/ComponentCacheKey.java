@@ -42,8 +42,6 @@ implements ICacheKey
 
 	@Override
 	public final String toString() {
-		// ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(this.componentType);
-		// String name = (id == null) ? componentType.toString() : id.toString();
 		return "@"+CodecUtil.ShortIdString(componentType);
 	}
 }

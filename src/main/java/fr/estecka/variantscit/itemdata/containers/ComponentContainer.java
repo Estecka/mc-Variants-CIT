@@ -36,4 +36,9 @@ implements IDataContainer
 			.append("}")
 			;
 	}
+
+	@Override
+	public final String toString() {
+		return this.toText().toString();
+	}
 }
