@@ -18,6 +18,9 @@ extends ICacheKey.Cacheable
 			return new ModuleList(modules);
 	}
 
+	/**
+	 * TODO: remove default implementations.
+	 */
 	default void Summary(CommandLogger logger){
 		logger.Error("This module type does not support `summary`. Please report this issue.");
 	}

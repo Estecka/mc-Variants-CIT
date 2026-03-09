@@ -20,30 +20,29 @@ import fr.estecka.variantscit.itemdata.transforms.OptionalTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.*;
 import fr.estecka.variantscit.itemdata.preconditions.*;
-import fr.estecka.variantscit.modules.*;
 import fr.estecka.variantscit.modules.impl.*;
 import fr.estecka.variantscit.modules.libraries.*;
-import fr.estecka.variantscit.reload.UnbakedModule;
+import fr.estecka.variantscit.reload.IUnbakedModule;
 
 public final class VCitRegistries
 {
-	static public final DecodableRegistry<UnbakedModule<?>> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
+	static public final DecodableRegistry<IUnbakedModule> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
 	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
 	static public final DecodableRegistry<IDataTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("auto"), OptionalTransform::CodecOf);
 
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
 
 	static {
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.CODEC, AxolotlBucketModule.BAKER);
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.CODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_data"), ComponentDataModule.CODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_format"), MultiComponentFormatModule.CODEC);
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("component_threshold"), ComponentThresholdModule.MAPCODEC, LinearLibrary.GetBaker());
+		RegisterLinearModule(ResourceLocation.withDefaultNamespace("component_threshold"), ComponentThresholdModule.MAPCODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("custom_name"), CustomNameModule.CODEC);
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.CODEC, LinearLibrary.GetBaker());
+		RegisterLinearModule(ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.CODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), GoatHornModule.UNIT);
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("item_count"), ItemCountModule.CODEC, LinearLibrary.GetBaker());
+		RegisterLinearModule(ResourceLocation.withDefaultNamespace("item_count"), ItemCountModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("jukebox_playable"), MusicDiscModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_effect"), PotionEffectModule.UNIT);
@@ -53,7 +52,7 @@ public final class VCitRegistries
 			MapCodec.unit(new EnchantmentModule(DataComponents.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
 			"Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead."
 		));
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("stored_enchantment_vector"), EnchantmentVectorModule.PARAM_MAPCODEC, EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("stored_enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim"), TrimModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_pattern"), TrimPatternModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_material"), TrimPatternModule.UNIT);
@@ -117,19 +116,24 @@ public final class VCitRegistries
 		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("transform"),   ITEM_PROPERTIES.mapCodec);
 	}
 
-	static public <T> void RegisterBakedModule(ResourceLocation id, MapCodec<T> mapcodec, IModuleBaker<T> baker){
-		MODULES.RegisterMap(id, mapcodec.xmap(
-			parameters -> new UnbakedModule<>(baker, parameters),
-			UnbakedModule::parameters
-		));
+	static public void RegisterBakedModule(ResourceLocation id, MapCodec<? extends IUnbakedModule> mapcodec){
+		MODULES.RegisterMap(id, mapcodec);
 	}
 
 	static public void RegisterSimpleModule(ResourceLocation id, MapCodec<? extends IVariantCitModule> mapcodec){
-		RegisterBakedModule(id, mapcodec, VariantLibrary::Bake);
+		RegisterBakedModule(id, VariantModuleBaker.Of(mapcodec));
 	}
 
 	static public void RegisterSimpleModule(ResourceLocation id, IVariantCitModule unit){
 		RegisterSimpleModule(id, MapCodec.unit(unit));
+	}
+
+	static public void RegisterLinearModule(ResourceLocation id, MapCodec<? extends ILinearCitModule> mapcodec){
+		RegisterBakedModule(id, LinearModuleBaker.Of(mapcodec));
+	}
+
+	static public void RegisterLinearModule(ResourceLocation id, ILinearCitModule unit){
+		RegisterLinearModule(id, MapCodec.unit(unit));
 	}
 
 	static private <T> MapDecoder<T> OptionalParameters(MapDecoder<T> mapcodec){

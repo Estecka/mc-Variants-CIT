@@ -1,7 +1,6 @@
 package fr.estecka.variantscit.modules.libraries;
 
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.modules.IModuleBaker;
 import net.minecraft.resources.ResourceLocation;
 import fr.estecka.variantscit.commands.CommandLogger;
 
@@ -42,44 +41,6 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 
 	public ResourceLocation GetOrGreater(int magnitude){
 		return GetWithBias(magnitude, +1);
-	}
-
-
-/******************************************************************************/
-/* # Baking                                                                   */
-/******************************************************************************/
-
-	static public interface ILinearCitModule
-	extends IGenericCitModule<ILinearLibrary>
-	{
-		String GetNamespace();
-	}
-
-	static public <M extends ILinearCitModule> IModuleBaker<M> GetBaker(){
-		return new IModuleBaker<>() {
-			@Override
-			public boolean AcceptVariant(ResourceLocation variantId, M parameters) {
-				if (!variantId.getNamespace().equals(parameters.GetNamespace()))
-					return false;
-
-				try {
-					Integer.parseUnsignedInt(variantId.getPath());
-				}
-				catch (NumberFormatException e){
-					return false;
-				}
-
-				return true;
-			};
-
-			@Override
-			public GenericBakedModule<ILinearLibrary> Bake(VariantLibrary library, M linearModule){
-				return new GenericBakedModule<ILinearLibrary>(
-					new LinearLibrary(library, linearModule.GetNamespace()),
-					linearModule
-				);
-			};
-		};
 	}
 
 

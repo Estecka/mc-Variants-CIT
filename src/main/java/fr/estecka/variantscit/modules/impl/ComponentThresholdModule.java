@@ -17,8 +17,8 @@ import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.modules.libraries.ILinearCitModule;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
-import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
 public class ComponentThresholdModule
 implements ILinearCitModule
@@ -31,7 +31,6 @@ implements ILinearCitModule
 
 	static public final MapCodec<ComponentThresholdModule> MAPCODEC = RecordCodecBuilder.<ComponentThresholdModule>mapCodec(builder->
 		builder.group(
-			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(o->o.namespace),
 			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
 			NbtPath.CODEC.optionalFieldOf("nbtPath", NbtPath.IDENTITY).forGetter(o->o.nbtPath),
 			BIAS_CODEC.fieldOf("modelRange").forGetter(o->o.bias),
@@ -41,8 +40,6 @@ implements ILinearCitModule
 		.apply(builder, ComponentThresholdModule::new)
 	);
 
-	private final String namespace;
-
 	private final DataComponentType<?> componentType;
 	private final NbtPath nbtPath;
 	private final int bias;
@@ -50,18 +47,12 @@ implements ILinearCitModule
 	private final float offset;
 
 
-	public ComponentThresholdModule(String namespace, DataComponentType<?> component, NbtPath path, int bias, float scale, float offset){
+	public ComponentThresholdModule(DataComponentType<?> component, NbtPath path, int bias, float scale, float offset){
 		this.componentType = component;
-		this.namespace = namespace;
 		this.nbtPath = path;
 		this.bias = bias;
 		this.scale = scale;
 		this.offset = offset;
-	}
-
-	@Override
-	public String GetNamespace() {
-		return this.namespace;
 	}
 
 	@Override

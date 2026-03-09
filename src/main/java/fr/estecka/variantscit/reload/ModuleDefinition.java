@@ -18,7 +18,7 @@ import fr.estecka.variantscit.itemdata.preconditions.MatchesAllCondition;
 
 public record ModuleDefinition(
 	@Deprecated ResourceLocation type,
-	UnbakedModule<?> parameters,
+	IUnbakedModule parameters,
 	List<EModuleHook> hooks,
 	Optional<List<ResourceLocation>> targets,
 	Optional<IItemPrecondition> precondition,

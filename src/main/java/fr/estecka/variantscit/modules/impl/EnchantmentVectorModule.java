@@ -23,10 +23,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.modules.libraries.LinearSnapMap;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
+import fr.estecka.variantscit.reload.IUnbakedModule;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
-import fr.estecka.variantscit.modules.IModuleBaker;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
@@ -182,25 +182,36 @@ implements IBakedModule
 /* # Baking                                                                   */
 /******************************************************************************/
 
-	static public IModuleBaker<Parameters> GetBaker(DataComponentType<ItemEnchantments> component){
-		return new IModuleBaker<>() {
-			@Override
-			public IBakedModule Bake(VariantLibrary library, Parameters parameters) {
-				return new EnchantmentVectorModule(library, parameters, component);
-			};
-			@Override
-			public boolean AcceptVariant(ResourceLocation variantId, Parameters parameters) {
-				if (!parameters.namespace.equals(variantId.getNamespace()))
-					return false;
-
-				Pattern vectorRegex = BakeRegex(parameters);
-				if (!vectorRegex.matcher(variantId.getPath()).matches()){
-					VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
-					return false;
-				}
-				return true;
-			};
+	static public record Unbaked(
+		DataComponentType<ItemEnchantments> component,
+		Parameters params
+	)
+	implements IUnbakedModule
+	{
+		@Override
+		public IBakedModule Bake(VariantLibrary library) {
+			return new EnchantmentVectorModule(library, params, component);
 		};
+
+		@Override
+		public boolean AcceptsVariant(ResourceLocation variantId) {
+			if (!params.namespace.equals(variantId.getNamespace()))
+				return false;
+
+			Pattern vectorRegex = BakeRegex(params);
+			if (!vectorRegex.matcher(variantId.getPath()).matches()){
+				VariantsCitMod.LOGGER.warn("Not a valid enchantment set: {}", variantId.getPath());
+				return false;
+			}
+			return true;
+		};
+	}
+
+	static public MapCodec<Unbaked> GetBaker(DataComponentType<ItemEnchantments> component){
+		return PARAM_MAPCODEC.xmap(
+			params -> new Unbaked(component, params),
+			Unbaked::params
+		);
 	}
 
 	@Override

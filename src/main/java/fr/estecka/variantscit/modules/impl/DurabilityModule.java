@@ -7,37 +7,22 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.modules.libraries.ILinearCitModule;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
-import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
 
-public class DurabilityModule
+
+public record DurabilityModule(
+	Optional<Integer> scale
+)
 implements ILinearCitModule
 {
-	static public final MapCodec<DurabilityModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(DurabilityModule::GetNamespace),
-			ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("scale").forGetter(o->o.scale)
-		)
-		.apply(builder, DurabilityModule::new)
-	);
-
-	private final String namespace;
-	private final Optional<Integer> scale;
-
-	public DurabilityModule (String namespace, Optional<Integer> scale){
-		this.namespace = namespace;
-		this.scale = scale;
-	}
-
-	@Override
-	public String GetNamespace() {
-		return namespace;
-	}
+	static public final MapCodec<DurabilityModule> CODEC = ExtraCodecs.NON_NEGATIVE_INT
+		.optionalFieldOf("scale")
+		.xmap(DurabilityModule::new, DurabilityModule::scale)
+		;
 
 	@Override
 	public CacheKeySet GetCacheKeys() {
