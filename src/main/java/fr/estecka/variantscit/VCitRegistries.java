@@ -41,6 +41,7 @@ public final class VCitRegistries
 		RegisterLinearModule(ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.MAPCODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("group"), GroupModule.Unbaked.MAPCODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), GoatHornModule.UNIT);
 		RegisterLinearModule(ResourceLocation.withDefaultNamespace("item_count"), ItemCountModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("jukebox_playable"), MusicDiscModule.UNIT);

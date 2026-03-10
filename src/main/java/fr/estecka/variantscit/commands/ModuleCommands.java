@@ -97,7 +97,7 @@ extends CommandUtil
 		if (module == null)
 			return Error(context, "No such module: "+moduleContext+" "+moduleId);
 
-		CommandLogger logger = new CommandLogger(context, moduleContext, meta);
+		CommandLogger logger = new CommandLogger(context, moduleContext, meta, meta.modelPrefix());
 		return command.Execute(context, logger, module);
 	}
 

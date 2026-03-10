@@ -1,10 +1,10 @@
 package fr.estecka.variantscit.modules.libraries;
 
+import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.commands.CommandLogger;
-import fr.estecka.variantscit.modules.IBakedModule;
 
 public record VariantLibrary(
 	@Nullable ResourceLocation fallbackModel,
@@ -42,8 +42,22 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 		    ;
 	}
 
-	public IBakedModule Bake(IVariantCitModule logic){
-		return new GenericBakedModule<IVariantLibrary>(this, logic);
+	public VariantLibrary GetSubLibrary(String subPrefix){
+		Map<ResourceLocation,ResourceLocation> subVariants = new HashMap<>();
+		for (var entry : this.variantModels.entrySet())
+		if  (entry.getKey().getPath().startsWith(subPrefix))
+		{
+			subVariants.put(
+				entry.getKey().withPath(path->path.substring(subPrefix.length())),
+				entry.getValue()
+			);
+		}
+
+		return new VariantLibrary(
+			this.fallbackModel,
+			Map.copyOf(subVariants),
+			this.specialModels
+		);
 	}
 
 

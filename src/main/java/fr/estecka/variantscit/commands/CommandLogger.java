@@ -15,9 +15,19 @@ import net.minecraft.resources.ResourceLocation;
 public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
 	EModuleHook moduleHook,
-	MetaModule metamodule
+	MetaModule metamodule,
+	String modelPrefix
 )
 {
+
+	public CommandLogger WithSubPrefix(String subPrefix){
+		return new CommandLogger(
+			commandContext,
+			moduleHook,
+			metamodule,
+			modelPrefix + subPrefix
+		);
+	}
 
 /******************************************************************************/
 /* # Generic logging                                                          */
@@ -103,7 +113,7 @@ public record CommandLogger(
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.directory,
-			metamodule.modelPrefix(),
+			modelPrefix,
 			ItemData(variantId.getPath()),
 			assetType.suffix
 		);
@@ -111,7 +121,7 @@ public record CommandLogger(
 
 	public void PrintVariantIdTip(ResourceLocation variantId){
 		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
-			PackData(metamodule.modelPrefix()),
+			PackData(modelPrefix),
 			ItemData(variantId)
 		);
 

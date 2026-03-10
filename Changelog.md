@@ -252,6 +252,7 @@ Since v2.5:
 - Removed the `itemsFromModels` option.
 - Renaming module `context` to hooks. The old name is marked as deprecated.
 - Added `precondition` option to modules
+- Added module types: `group`
 - Transforms are now able to handle data types other than strings.
 - Added string transform: `equals`
 - Added number transforms: `equals`, `smaller_than`, `smaller_or_equal`, `greater_than`, `greater_or_equal`
@@ -261,4 +262,4 @@ Since v2.5:
 - Added a `multiline_handling` option for regex. Changed the default to return the first matching line only.
 
 # TODO
-- TODO: `group` module, `predicate` module
+- TODO: `predicate` module

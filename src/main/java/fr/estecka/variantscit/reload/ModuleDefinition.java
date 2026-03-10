@@ -13,7 +13,6 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
-import fr.estecka.variantscit.itemdata.preconditions.MatchesAllCondition;
 
 
 public record ModuleDefinition(
@@ -36,7 +35,7 @@ public record ModuleDefinition(
 			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::parameters),
 			CodecUtil.WithAlias(CodecUtil.OneOrMany(EModuleHook.CODEC), "hook", "context").orElse(List.of(EModuleHook.ITEM_MODEL)).forGetter(ModuleDefinition::hooks),
 			CodecUtil.OneOrMany(ResourceLocation.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
-			CodecUtil.WithAlternatives(VCitRegistries.PRECONDITIONS.codec, MatchesAllCondition.LITERAL_CODEC).optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
+			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
 			ResourceLocation.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
