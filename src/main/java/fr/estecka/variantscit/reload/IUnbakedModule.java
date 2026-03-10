@@ -9,7 +9,7 @@ public interface IUnbakedModule
 {
 	public IBakedModule Bake(VariantLibrary library);
 
-	public  default boolean AcceptsVariant(ResourceLocation variantId){
+	public default boolean AcceptsVariant(ResourceLocation variantId){
 		return true;
 	}
 }

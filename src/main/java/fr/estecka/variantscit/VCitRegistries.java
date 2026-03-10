@@ -48,6 +48,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_effect"), PotionEffectModule.UNIT);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_type"), PotionTypeModule.UNIT);
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("predicates"), PredicatesModule.Unbaked.MAPCODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("stored_enchantments"), CodecUtil.WithWarning(
 			MapCodec.unit(new EnchantmentModule(DataComponents.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
