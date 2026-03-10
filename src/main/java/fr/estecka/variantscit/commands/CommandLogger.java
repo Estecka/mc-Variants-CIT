@@ -119,6 +119,16 @@ public record CommandLogger(
 		);
 	}
 
+	private MutableComponent EquipTextureFilename(ResourceLocation variantId){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
+			ItemData(variantId.getNamespace()),
+			"textures/entity/equipment/<layer name>",
+			modelPrefix,
+			ItemData(variantId.getPath()),
+			".png"
+		);
+	}
+
 	public void PrintVariantIdTip(ResourceLocation variantId){
 		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
 			PackData(modelPrefix),
@@ -133,6 +143,7 @@ public record CommandLogger(
 				break;
 			case EQUIPPABLE:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));
+				Info(bullet.copy().append(EquipTextureFilename(variantId)));
 				break;
 			case ITEM_MODEL:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));
