@@ -24,7 +24,7 @@ import fr.estecka.variantscit.itemdata.extractors.impl.ItemComponentProperty;
 public class MultiComponentFormatModule
 implements ISimpleCitModule
 {
-	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<MultiComponentFormatModule> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			ExtraCodecs.strictUnboundedMap(

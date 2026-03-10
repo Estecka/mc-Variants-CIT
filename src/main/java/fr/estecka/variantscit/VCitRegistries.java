@@ -33,12 +33,12 @@ public final class VCitRegistries
 	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
 
 	static {
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.CODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_data"), ComponentDataModule.CODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_format"), MultiComponentFormatModule.CODEC);
+		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_data"), ComponentDataModule.MAPCODEC);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_format"), MultiComponentFormatModule.MAPCODEC);
 		RegisterLinearModule(ResourceLocation.withDefaultNamespace("component_threshold"), ComponentThresholdModule.MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("custom_name"), CustomNameModule.CODEC);
-		RegisterLinearModule(ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.CODEC);
+		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("custom_name"), CustomNameModule.MAPCODEC);
+		RegisterLinearModule(ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.MAPCODEC);
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
 		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
 		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), GoatHornModule.UNIT);

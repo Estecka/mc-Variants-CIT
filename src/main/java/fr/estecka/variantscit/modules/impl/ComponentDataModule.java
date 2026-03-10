@@ -18,7 +18,7 @@ import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 public class ComponentDataModule<P extends IDataExtractor>
 implements ISimpleCitModule
 {
-	static public final MapCodec<ComponentDataModule<?>> CODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec.xmap(ComponentDataModule::new, o->o.property);
+	static public final MapCodec<ComponentDataModule<?>> MAPCODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec.xmap(ComponentDataModule::new, o->o.property);
 
 	private final P property;
 

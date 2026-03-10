@@ -12,7 +12,7 @@ import fr.estecka.variantscit.modules.cache.ECachePolicy;
 public class CustomNameModule
 extends ASimpleMonoComponentModule<Component>
 {
-	static public final MapCodec<CustomNameModule> CODEC =
+	static public final MapCodec<CustomNameModule> MAPCODEC =
 		Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC)
 			.optionalFieldOf("specialNames", Map.of())
 			.xmap(CustomNameModule::new, p->p.specialNames)

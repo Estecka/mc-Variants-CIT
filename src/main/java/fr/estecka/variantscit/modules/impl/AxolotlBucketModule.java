@@ -19,7 +19,7 @@ import fr.estecka.variantscit.modules.IBakedModule;
 public record AxolotlBucketModule(String adultSuffix, String babySuffix)
 implements IUnbakedModule
 {
-	static public final MapCodec<AxolotlBucketModule> CODEC = RecordCodecBuilder.mapCodec(builder->
+	static public final MapCodec<AxolotlBucketModule> UNBAKED_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("adultSuffix", "").forGetter(AxolotlBucketModule::adultSuffix),
 			CodecUtil.IDENTIFIER_PATH.optionalFieldOf("babySuffix", "_baby").forGetter(AxolotlBucketModule::babySuffix)

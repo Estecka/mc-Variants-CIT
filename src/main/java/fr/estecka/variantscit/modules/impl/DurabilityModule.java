@@ -19,7 +19,7 @@ public record DurabilityModule(
 )
 implements ILinearCitModule
 {
-	static public final MapCodec<DurabilityModule> CODEC = ExtraCodecs.NON_NEGATIVE_INT
+	static public final MapCodec<DurabilityModule> MAPCODEC = ExtraCodecs.NON_NEGATIVE_INT
 		.optionalFieldOf("scale")
 		.xmap(DurabilityModule::new, DurabilityModule::scale)
 		;
