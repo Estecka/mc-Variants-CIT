@@ -120,9 +120,10 @@ public record CommandLogger(
 	}
 
 	private MutableComponent EquipTextureFilename(ResourceLocation variantId){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
-			"textures/entity/equipment/<layer name>",
+			"textures/entity/equipment/",
+			ItemData("<layer name>"),
 			modelPrefix,
 			ItemData(variantId.getPath()),
 			".png"

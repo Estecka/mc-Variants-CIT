@@ -250,7 +250,7 @@ Since v2.5:
 - Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
 - Removed the `debug` parameters from various modules.
 - Removed the `itemsFromModels` option.
-- Renaming module `context` to hooks. The old name is marked as deprecated.
+- Renaming module `context` to `hook`. The old name is marked as deprecated.
 - Added `precondition` option to modules
 - Added module types: `group`, `predicate`
 - Transforms are now able to handle data types other than strings.
