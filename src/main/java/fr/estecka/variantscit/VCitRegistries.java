@@ -26,82 +26,106 @@ import fr.estecka.variantscit.reload.IUnbakedModule;
 
 public final class VCitRegistries
 {
-	static public final DecodableRegistry<IUnbakedModule> MODULES = new DecodableRegistry<>("type", VCitRegistries::OptionalParameters);
-	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = new DecodableRegistry<>("property", ResourceLocation.withDefaultNamespace("item_component"), TransformableExtractor::CodecOf);
-	static public final DecodableRegistry<IDataTransform> TRANSFORMS = new DecodableRegistry<>("function", ResourceLocation.withDefaultNamespace("auto"), OptionalTransform::CodecOf);
+	static public final DecodableRegistry<IUnbakedModule> MODULES =
+		new DecodableRegistry
+			.Builder<IUnbakedModule>("type")
+			.WithWrapper(VCitRegistries::OptionalParameters)
+			.Build()
+			;
 
-	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = new DecodableRegistry<>("condition", ResourceLocation.withDefaultNamespace("transform"));
+	static public final DecodableRegistry<IDataExtractor> ITEM_PROPERTIES = 
+		new DecodableRegistry
+			.Builder<IDataExtractor>("property")
+			.WithDefault(VariantsCitMod.Identifier("item_component"))
+			.WithWrapper(TransformableExtractor::CodecOf)
+			.Build()
+			;
+
+	static public final DecodableRegistry<IDataTransform> TRANSFORMS = 
+		new DecodableRegistry
+			.Builder<IDataTransform>("function")
+			.WithDefault(VariantsCitMod.Identifier("auto"))
+			.WithWrapper(OptionalTransform::CodecOf)
+			.Build()
+			;
+
+	static public final DecodableRegistry<IItemPrecondition> PRECONDITIONS = 
+		new DecodableRegistry
+			.Builder<IItemPrecondition>("condition")
+			.WithDefault(VariantsCitMod.Identifier("transform"))
+			.Build()
+			;
 
 	static {
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_data"), ComponentDataModule.MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("component_format"), MultiComponentFormatModule.MAPCODEC);
-		RegisterLinearModule(ResourceLocation.withDefaultNamespace("component_threshold"), ComponentThresholdModule.MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("custom_name"), CustomNameModule.MAPCODEC);
-		RegisterLinearModule(ResourceLocation.withDefaultNamespace("durability"), DurabilityModule.MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("group"), GroupModule.Unbaked.MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("instrument"), GoatHornModule.UNIT);
-		RegisterLinearModule(ResourceLocation.withDefaultNamespace("item_count"), ItemCountModule.UNIT);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("jukebox_playable"), MusicDiscModule.UNIT);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantModule.UNIT);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_effect"), PotionEffectModule.UNIT);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("potion_type"), PotionTypeModule.UNIT);
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("predicates"), PredicatesModule.Unbaked.MAPCODEC);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("stored_enchantments"), CodecUtil.WithWarning(
+		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
+		RegisterSimpleModule(VariantsCitMod.Identifier("component_data"), ComponentDataModule.MAPCODEC);
+		RegisterSimpleModule(VariantsCitMod.Identifier("component_format"), MultiComponentFormatModule.MAPCODEC);
+		RegisterLinearModule(VariantsCitMod.Identifier("component_threshold"), ComponentThresholdModule.MAPCODEC);
+		RegisterSimpleModule(VariantsCitMod.Identifier("custom_name"), CustomNameModule.MAPCODEC);
+		RegisterLinearModule(VariantsCitMod.Identifier("durability"), DurabilityModule.MAPCODEC);
+		RegisterSimpleModule(VariantsCitMod.Identifier("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
+		RegisterBakedModule (VariantsCitMod.Identifier("enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.ENCHANTMENTS));
+		RegisterBakedModule (VariantsCitMod.Identifier("group"), GroupModule.Unbaked.MAPCODEC);
+		RegisterSimpleModule(VariantsCitMod.Identifier("instrument"), GoatHornModule.UNIT);
+		RegisterLinearModule(VariantsCitMod.Identifier("item_count"), ItemCountModule.UNIT);
+		RegisterSimpleModule(VariantsCitMod.Identifier("jukebox_playable"), MusicDiscModule.UNIT);
+		RegisterSimpleModule(VariantsCitMod.Identifier("painting_variant"), PaintingVariantModule.UNIT);
+		RegisterSimpleModule(VariantsCitMod.Identifier("potion_effect"), PotionEffectModule.UNIT);
+		RegisterSimpleModule(VariantsCitMod.Identifier("potion_type"), PotionTypeModule.UNIT);
+		RegisterBakedModule (VariantsCitMod.Identifier("predicates"), PredicatesModule.Unbaked.MAPCODEC);
+		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
+		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantments"), CodecUtil.WithWarning(
 			MapCodec.unit(new EnchantmentModule(DataComponents.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
 			"Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead."
 		));
-		RegisterBakedModule (ResourceLocation.withDefaultNamespace("stored_enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim"), TrimModule.UNIT);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_pattern"), TrimPatternModule.UNIT);
-		RegisterSimpleModule(ResourceLocation.withDefaultNamespace("trim_material"), TrimPatternModule.UNIT);
+		RegisterBakedModule (VariantsCitMod.Identifier("stored_enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
+		RegisterSimpleModule(VariantsCitMod.Identifier("trim"), TrimModule.UNIT);
+		RegisterSimpleModule(VariantsCitMod.Identifier("trim_pattern"), TrimPatternModule.UNIT);
+		RegisterSimpleModule(VariantsCitMod.Identifier("trim_material"), TrimPatternModule.UNIT);
 
 		RegisterRemoved("block_entity_data",  "component_data");
 		RegisterRemoved("bucket_entity_data", "component_data");
 		RegisterRemoved("custom_data",        "component_data");
 		RegisterRemoved("entity_data",        "component_data");
 
-		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("axolotl_variant"), AxolotlVariantProperty.UNIT);
-		ITEM_PROPERTIES.Register(ResourceLocation.withDefaultNamespace("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
-		ITEM_PROPERTIES.RegisterMap(ResourceLocation.withDefaultNamespace("item_component"), ItemComponentProperty.MAP_CODEC);
-		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_count"), ItemCountProperty.UNIT);
-		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("item_type"), ItemTypeProperty.UNIT);
-		ITEM_PROPERTIES.RegisterUnit(ResourceLocation.withDefaultNamespace("painting_variant"), PaintingVariantProperty.UNIT);
+		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("axolotl_variant"), AxolotlVariantProperty.UNIT);
+		ITEM_PROPERTIES.Register(VariantsCitMod.Identifier("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
+		ITEM_PROPERTIES.RegisterMap(VariantsCitMod.Identifier("item_component"), ItemComponentProperty.MAP_CODEC);
+		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_count"), ItemCountProperty.UNIT);
+		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_type"), ItemTypeProperty.UNIT);
+		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("painting_variant"), PaintingVariantProperty.UNIT);
 
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("noop"),               IStringTransform.NOOP);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("null"),               IStringTransform.NULL);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("lowercase"),          (IStringTransform)String::toLowerCase);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("discard_path"),       (IStringTransform)IStringTransform::DiscardPath);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("discard_namespace"),  (IStringTransform)IStringTransform::DiscardNamespace);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize"),           IStringTransform.SANITIZE);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_path"),      IStringTransform.SANITIZE_PATH);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("sanitize_auto"),      (IStringTransform)IStringTransform::AutoSanitize);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("test"),                TestTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("successive"),          SuccessiveTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("alternative"),         AlternativeTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("blacklist"),           FilterlistTransform.MAPCODEC_BLACKLIST);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("charset_remap"),       CharRemapTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("remap"),               RemapTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("regex"),               RegexTransform.MAPCODEC);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("noop"),               IStringTransform.NOOP);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("null"),               IStringTransform.NULL);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("lowercase"),          (IStringTransform)String::toLowerCase);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("discard_path"),       (IStringTransform)IStringTransform::DiscardPath);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("discard_namespace"),  (IStringTransform)IStringTransform::DiscardNamespace);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize"),           IStringTransform.SANITIZE);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_path"),      IStringTransform.SANITIZE_PATH);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      (IStringTransform)IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("test"),                TestTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("successive"),          SuccessiveTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("alternative"),         AlternativeTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist"),           FilterlistTransform.MAPCODEC_BLACKLIST);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("charset_remap"),       CharRemapTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("remap"),               RemapTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("regex"),               RegexTransform.MAPCODEC);
 
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("equals"),              CodecUtil.MapWithAlternative(StringCompareTransform.MAPCODEC,NumberCompareTransform.MAPCODEC_EQUAL));
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("smaller_than"),        NumberCompareTransform.MAPCODEC_SMALLER);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("greater_than"),        NumberCompareTransform.MAPCODEC_GREATER);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("smaller_or_equals"),   NumberCompareTransform.MAPCODEC_GREAT_OR_EQ);
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("greater_or_equals"),   NumberCompareTransform.MAPCODEC_SMALL_OR_EQ);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("equals"),              CodecUtil.MapWithAlternative(StringCompareTransform.MAPCODEC,NumberCompareTransform.MAPCODEC_EQUAL));
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("smaller_than"),        NumberCompareTransform.MAPCODEC_SMALLER);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("greater_than"),        NumberCompareTransform.MAPCODEC_GREATER);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("smaller_or_equals"),   NumberCompareTransform.MAPCODEC_GREAT_OR_EQ);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("greater_or_equals"),   NumberCompareTransform.MAPCODEC_SMALL_OR_EQ);
 
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_identifier"),      DataConversions::StricIdentifier);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_number"),          DataConversions::StrictNumber);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_rich_text"),       DataConversions::StrictRichText);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_rich_text_array"), DataConversions::StrictRichTextArray);
-		TRANSFORMS.RegisterUnit(ResourceLocation.withDefaultNamespace("get_string"),          DataConversions::StrictString);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_identifier"),      DataConversions::StricIdentifier);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_number"),          DataConversions::StrictNumber);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text"),       DataConversions::StrictRichText);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text_array"), DataConversions::StrictRichTextArray);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_string"),          DataConversions::StrictString);
 
-		TRANSFORMS.RegisterMap(ResourceLocation.withDefaultNamespace("auto"), CodecUtil.MapWithAlternatives(
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("auto"), CodecUtil.MapWithAlternatives(
 			RegexTransform.MAPCODEC,
 			FilterlistTransform.MAPCODEC_BLACKLIST,
 			FilterlistTransform.MAPCODEC_WHITELIST,
@@ -113,9 +137,9 @@ public final class VCitRegistries
 			NumberCompareTransform.MAPCODEC_SMALL_OR_EQ
 		));
 
-		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("matches_all"), MatchesAllCondition.MAPCODEC);
-		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("matches_any"), MatchesAnyCondition.MAPCODEC);
-		PRECONDITIONS.RegisterMap(ResourceLocation.withDefaultNamespace("transform"),   ITEM_PROPERTIES.mapCodec);
+		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_all"), MatchesAllCondition.MAPCODEC);
+		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_any"), MatchesAnyCondition.MAPCODEC);
+		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("transform"),   ITEM_PROPERTIES.mapCodec);
 	}
 
 	static public void RegisterBakedModule(ResourceLocation id, MapCodec<? extends IUnbakedModule> mapcodec){
@@ -147,7 +171,7 @@ public final class VCitRegistries
 
 	static private void RegisterRemoved(String oldName, String newName){
 		RegisterSimpleModule(
-			ResourceLocation.withDefaultNamespace(oldName),
+			VariantsCitMod.Identifier(oldName),
 			MapCodec.unit(PaintingVariantModule.UNIT).flatXmap(
 				_0->DataResult.error(()->"Module type `"+oldName+"` was removed, use `"+newName+"` isntead"),
 				CodecUtil::NoEncode

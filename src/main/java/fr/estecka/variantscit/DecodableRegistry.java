@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.CompressorHolder;
@@ -27,30 +28,49 @@ public class DecodableRegistry<T>
 	private final String typeKey;
 	private final IMapWrapper<T> mapWrapper;
 
-	private final MapDecoder<ResourceLocation> typeCodec;
-	public final Codec<T>    unitCodec = CodecUtil.Enum(ResourceLocation.CODEC, this.units);
-	public final MapCodec<T> mapCodec  = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
-	public final Codec<T>    codec     = CodecUtil.WithAlternative(this.unitCodec, this.mapCodec.codec());
+	// private final Codec<ResourceLocation> typeCodec;
+	private final MapDecoder<ResourceLocation> typeMapCodec;
+
+	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
+	public final Codec<T>    unitCodec;
+	public final Codec<T>    codec;
+
+	static public class Builder<T> {
+		private final @NotNull String keyname;
+		private @NotNull Codec<ResourceLocation> keyCodec = CodecUtil.VCIT_IDENTIFIER;
+		private ResourceLocation defaultKey = null;
+		private IMapWrapper<T> wrapper = c->c;
+
+		public Builder(String keyname){
+			this.keyname = keyname;
+		}
+
+		public Builder<T> WithKeyCodec(Codec<ResourceLocation> value){ this.keyCodec = value;   return this; }
+		public Builder<T> WithWrapper (IMapWrapper<T> value)         { this.wrapper = value;    return this; }
+		public Builder<T> WithDefault (ResourceLocation value)       { this.defaultKey = value; return this; }
+
+		public DecodableRegistry<T> Build(){
+			return new DecodableRegistry<>(keyname, keyCodec, defaultKey, wrapper);
+		}
+
+	}
 
 	public DecodableRegistry(String typeKey){
-		this(typeKey, null, c->c);
+		this(typeKey, CodecUtil.VCIT_IDENTIFIER, null, c->c);
 	}
 
-	public DecodableRegistry(String typeKey, ResourceLocation defaultId){
-		this(typeKey, defaultId, c->c);
-	}
-
-	public DecodableRegistry(String typeKey, IMapWrapper<T> mapWrapper){
-		this(typeKey, null, mapWrapper);
-	}
-
-	public DecodableRegistry(String typeKey, @Nullable ResourceLocation defaultId, IMapWrapper<T> mapWrapper){
+	public DecodableRegistry(String typeKey, Codec<ResourceLocation> typeCodec, @Nullable ResourceLocation defaultId, IMapWrapper<T> mapWrapper){
 		this.typeKey = typeKey;
 		this.mapWrapper = mapWrapper;
+
+		// this.typeCodec = typeCodec;
 		if (defaultId == null)
-			this.typeCodec = ResourceLocation.CODEC.fieldOf(this.typeKey);
+			this.typeMapCodec = typeCodec.fieldOf(this.typeKey);
 		else
-			this.typeCodec = ResourceLocation.CODEC.optionalFieldOf(this.typeKey, defaultId);
+			this.typeMapCodec = typeCodec.optionalFieldOf(this.typeKey, defaultId);
+
+		this.unitCodec = CodecUtil.Enum(typeCodec, this.units);
+		this.codec     = CodecUtil.WithAlternative(this.unitCodec, this.mapCodec.codec());
 	}
 
 	public void RegisterUnit(ResourceLocation key, T unit){
@@ -84,7 +104,7 @@ public class DecodableRegistry<T>
 	{
 		@Override
 		public <I> DataResult<T> decode(DynamicOps<I> ops, MapLike<I> data){
-			var typeResult = typeCodec.decode(ops, data);
+			var typeResult = typeMapCodec.decode(ops, data);
 			if (!typeResult.isSuccess())
 				return typeResult.map(_0->null);
 	
