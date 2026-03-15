@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.itemdata.preconditions;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -17,23 +18,46 @@ implements IItemPrecondition
 	static public final boolean MATCHANY_TYPE = true;
 	static public final boolean MATCHALL_TYPE = false;
 
-	static public final Codec<ConditionList> MATCHANY_CODEC = TypedCodec(MATCHANY_TYPE);
-	static public final Codec<ConditionList> MATCHALL_CODEC = TypedCodec(MATCHALL_TYPE);
+	static public final Codec<IItemPrecondition> MATCHANY_CODEC = TypedCodec(MATCHANY_TYPE);
+	static public final Codec<IItemPrecondition> MATCHALL_CODEC = TypedCodec(MATCHALL_TYPE);
 
-	static public final MapCodec<ConditionList> MATCHANY_MAPCODEC = MATCHALL_CODEC.fieldOf("any");
-	static public final MapCodec<ConditionList> MATCHALL_MAPCODEC = MATCHALL_CODEC.fieldOf("all");
+	static public final MapCodec<IItemPrecondition> MATCHANY_MAPCODEC = MATCHALL_CODEC.fieldOf("any");
+	static public final MapCodec<IItemPrecondition> MATCHALL_MAPCODEC = MATCHALL_CODEC.fieldOf("all");
 
 	/**
 	 * @implNote Use {@link Codec#lazyInitialized} to  workaround  the  circular
 	 * dependency with {@link IItemPrecondition#MONOSTRINGMAP_CODEC}
 	 */
-	static private Codec<ConditionList> TypedCodec(boolean type){
+	static private Codec<IItemPrecondition> TypedCodec(boolean type){
 		return CodecUtil.WithAlternative(
 			VCitRegistries.PRECONDITIONS.codec.listOf(),
 			Codec.lazyInitialized(()->IItemPrecondition.MONOSTRINGMAP_CODEC)
 		)
-		.xmap(list->new ConditionList(list, type), ConditionList::conditions)
+		.xmap(list->ConditionList.Wrap(list, type), cond->ConditionList.Unwrap(cond, type))
 		;
+	}
+
+	static public IItemPrecondition Wrap(List<IItemPrecondition> list, boolean type){
+		List<IItemPrecondition> result = new ArrayList<>();
+
+		for (IItemPrecondition cond : list) {
+			if (cond instanceof ConditionList wrapper && wrapper.groupType == type)
+				result.addAll(wrapper.conditions);
+			else
+				result.add(cond);
+		}
+
+		if (result.size() == 1)
+			return result.getFirst();
+		else
+			return new ConditionList(result, type);
+	}
+
+	static public List<IItemPrecondition> Unwrap(IItemPrecondition cond, boolean type){
+		if (cond instanceof ConditionList list && list.groupType == type)
+			return list.conditions;
+		else
+			return List.of(cond);
 	}
 
 	@Override
