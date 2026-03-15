@@ -53,6 +53,7 @@ public final class VCitRegistries
 		new DecodableRegistry
 			.Builder<IItemPrecondition>("condition")
 			.WithDefault(VariantsCitMod.Identifier("transform"))
+			.WithWrapper(NegativeCondition::CodecOf)
 			.Build()
 			;
 

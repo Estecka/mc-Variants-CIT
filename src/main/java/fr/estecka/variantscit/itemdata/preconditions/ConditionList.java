@@ -24,14 +24,10 @@ implements IItemPrecondition
 	static public final MapCodec<IItemPrecondition> MATCHANY_MAPCODEC = MATCHALL_CODEC.fieldOf("any");
 	static public final MapCodec<IItemPrecondition> MATCHALL_MAPCODEC = MATCHALL_CODEC.fieldOf("all");
 
-	/**
-	 * @implNote Use {@link Codec#lazyInitialized} to  workaround  the  circular
-	 * dependency with {@link IItemPrecondition#MONOSTRINGMAP_CODEC}
-	 */
 	static private Codec<IItemPrecondition> TypedCodec(boolean type){
 		return CodecUtil.WithAlternative(
 			VCitRegistries.PRECONDITIONS.codec.listOf(),
-			Codec.lazyInitialized(()->IItemPrecondition.MONOSTRINGMAP_CODEC)
+			MonostringConditionBuilder.MAP_CODEC
 		)
 		.xmap(list->ConditionList.Wrap(list, type), cond->ConditionList.Unwrap(cond, type))
 		;

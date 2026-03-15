@@ -10,10 +10,8 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.itemdata.containers.ComponentContainer;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
-import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
-import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
@@ -45,11 +43,6 @@ implements IDataExtractor
 	static public final Codec<ItemComponentProperty<?>> MONOSTRING_DECODER = Codec.STRING.flatXmap(
 		ItemComponentProperty::MonostringParse,
 		CodecUtil::NoEncode
-	);
-
-	static public final Codec<TransformableExtractor<ItemComponentProperty<?>>> SANE_MONOSTRING_DECODER = MONOSTRING_DECODER.xmap(
-		inner -> new TransformableExtractor<>(inner, IStringTransform.SANITIZE_AUTO, Optional.empty()),
-		TransformableExtractor::inner
 	);
 
 	@Override

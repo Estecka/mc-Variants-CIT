@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -43,21 +44,6 @@ public final class CodecUtil
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 	static public final Codec<Tag> NBT = Codec.PASSTHROUGH.xmap( dyn->dyn.convert(NbtOps.INSTANCE).getValue(), nbt->new Dynamic<>(NbtOps.INSTANCE, nbt.copy()) );
-
-	static public String ShortIdString(ResourceLocation id){
-		if (id.getNamespace() == ResourceLocation.DEFAULT_NAMESPACE)
-			return id.getPath();
-		else
-			return id.toString();
-	}
-
-	static public String ShortIdString(DataComponentType<?> componentType){
-		String result = "???";
-		ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(componentType);
-		if (id != null)
-			result = CodecUtil.ShortIdString(id);
-		return result;
-	}
 
 
 /******************************************************************************/
@@ -203,8 +189,27 @@ public final class CodecUtil
 
 
 /******************************************************************************/
-/* # Component Serialization                                                  */
+/* # Decoding/Encoding                                                        */
 /******************************************************************************/
+
+	static public <T> DataResult<T> ParseString(Codec<T> codec, String string){
+		return codec.parse(NbtOps.INSTANCE, StringTag.valueOf(string));
+	}
+
+	static public String ShortIdString(ResourceLocation id){
+		if (id.getNamespace() == ResourceLocation.DEFAULT_NAMESPACE)
+			return id.getPath();
+		else
+			return id.toString();
+	}
+
+	static public String ShortIdString(DataComponentType<?> componentType){
+		String result = "???";
+		ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(componentType);
+		if (id != null)
+			result = CodecUtil.ShortIdString(id);
+		return result;
+	}
 
 	static public <T> @Nullable Tag GetComponentNbt(ItemStack stack, DataComponentType<T> type){
 		T component = stack.get(type);
