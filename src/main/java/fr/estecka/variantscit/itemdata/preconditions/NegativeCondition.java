@@ -22,8 +22,13 @@ implements IItemPrecondition
 		);
 	}
 
-	static private IItemPrecondition Wrap(boolean negative, IItemPrecondition inner){
-		return negative ? new NegativeCondition(inner) : inner;
+	static private IItemPrecondition Wrap(boolean isNegative, IItemPrecondition inner){
+		if (!isNegative)
+			return inner;
+		else if (inner instanceof NegativeCondition n)
+			return n.inner;
+		else
+			return new NegativeCondition(inner);
 	}
 
 	@Override
