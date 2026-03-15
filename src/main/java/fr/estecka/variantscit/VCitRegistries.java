@@ -137,8 +137,8 @@ public final class VCitRegistries
 			NumberCompareTransform.MAPCODEC_SMALL_OR_EQ
 		));
 
-		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_all"), MatchesAllCondition.MAPCODEC);
-		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_any"), MatchesAnyCondition.MAPCODEC);
+		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_all"), ConditionList.MATCHALL_MAPCODEC);
+		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_any"), ConditionList.MATCHANY_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("transform"),   ITEM_PROPERTIES.mapCodec);
 	}
 

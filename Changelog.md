@@ -263,4 +263,5 @@ Since v2.5:
 - All VCIT registries now default to the `variants-cit` namespace.
 
 ## TODO
-- `maches_any` and `matches_all` simplified keys.
+- Negation option on conditions.
+- Unwrap ConditionList when applicable
