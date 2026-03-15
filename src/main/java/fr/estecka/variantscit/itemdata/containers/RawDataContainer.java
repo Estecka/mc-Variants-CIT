@@ -19,6 +19,7 @@ implements IDataContainer
 			return new RawDataContainer<>(value);
 	}
 
+	@Override
 	public final MutableComponent toText(ChatFormatting innerFormat){
 		return Component.literal("[#").withStyle(ChatFormatting.GRAY)
 			.append(this.value.getClass().getSimpleName())
