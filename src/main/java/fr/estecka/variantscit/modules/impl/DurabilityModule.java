@@ -31,7 +31,7 @@ implements ILinearCitModule
 			DataComponents.DAMAGE
 		);
 	}
-	
+
 	@Override
 	public ECachePolicy GetCachePolicy() {
 		return ECachePolicy.ALWAYS;

@@ -64,7 +64,6 @@ static public IDataContainer StrictNumber(IDataContainer input) {
 		return input;
 	if (input.asNbt() instanceof NumericTag nbt)
 		return RawDataContainer.OfNullable(nbt.getAsNumber());
-
 	return null;
 }
 

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CacheKeySet
+public final class CacheKeySet
 implements Iterable<ICacheKey>
 {
 	private final Set<ICacheKey> keyset;

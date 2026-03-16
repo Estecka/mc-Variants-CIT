@@ -10,7 +10,7 @@ import net.minecraft.network.chat.MutableComponent;
 public record RawDataContainer<T>(T value)
 implements IDataContainer
 {
-	static public final Codec<RawDataContainer<Tag>> LITTERAL_CODEC = CodecUtil.NBT.xmap(RawDataContainer::new, RawDataContainer::value);
+	static public final Codec<RawDataContainer<Tag>> LITTERAL_CODEC = CodecUtil.NBT_ELEMENT.xmap(RawDataContainer::new, RawDataContainer::value);
 
 	static public <T> RawDataContainer<T> OfNullable(T value){
 		if (value == null)

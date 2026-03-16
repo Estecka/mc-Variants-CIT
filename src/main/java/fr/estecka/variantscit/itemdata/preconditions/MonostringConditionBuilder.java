@@ -19,7 +19,6 @@ import net.minecraft.util.ExtraCodecs;
 
 public abstract class MonostringConditionBuilder
 {
-
 	static private final Codec<IDataTransform> TRANSFORM_CODEC = CodecUtil.WithAlternatives(
 		StringCompareTransform.LITERAL_CODEC,
 		NumberCompareTransform.LITERAL_CODEC_EQUAL,
