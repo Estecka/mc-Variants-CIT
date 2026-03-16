@@ -3,18 +3,13 @@ package fr.estecka.variantscit.itemdata.containers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.itemdata.transforms.DataConversions;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.MutableComponent;
 
 public interface IDataContainer
 {
 	@NotNull Object value();
-	@NotNull MutableComponent toText(ChatFormatting innerFormat);
-
-	default @NotNull MutableComponent toText(){
-		return toText(ChatFormatting.AQUA);
-	}
+	@NotNull MutableComponent toText();
 
 	default @Nullable String asString(){
 		return DataConversions.AggressiveString(this);

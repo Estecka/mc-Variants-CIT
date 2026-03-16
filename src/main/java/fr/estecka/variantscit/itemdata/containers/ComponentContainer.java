@@ -28,12 +28,11 @@ implements IDataContainer
 	}
 
 	@Override
-	public @NotNull MutableComponent toText(ChatFormatting innerFormat) {
-		return Component.literal("[@").withStyle(ChatFormatting.GRAY)
-			.append(CodecUtil.ShortIdString(type))
-			.append("]{")
-			.append(Component.literal(IDataContainer.printableValue(this)).withStyle(innerFormat))
-			.append("}")
+	public @NotNull MutableComponent toText() {
+		return Component.empty()
+			.append(Component.literal("[@"+CodecUtil.ShortIdString(type)+"]{").withStyle(ChatFormatting.GRAY))
+			.append(IDataContainer.printableValue(this))
+			.append(Component.literal("}").withStyle(ChatFormatting.GRAY))
 			;
 	}
 

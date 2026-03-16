@@ -37,7 +37,7 @@ public record CommandLogger(
 		if (obj instanceof Component text)
 			return text.copy();
 		else if (obj instanceof IDataContainer data)
-			return Component.empty().append(data.toText()); // Prevents overriding root styling of original text.
+			return data.toText();
 		else
 			return Component.literal(String.valueOf(obj));
 	}

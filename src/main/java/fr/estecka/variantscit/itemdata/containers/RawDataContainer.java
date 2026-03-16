@@ -20,12 +20,11 @@ implements IDataContainer
 	}
 
 	@Override
-	public final MutableComponent toText(ChatFormatting innerFormat){
-		return Component.literal("[#").withStyle(ChatFormatting.GRAY)
-			.append(this.value.getClass().getSimpleName())
-			.append("]{")
-			.append(Component.literal(IDataContainer.printableValue(this)).withStyle(innerFormat))
-			.append("}")
+	public final MutableComponent toText(){
+		return	Component.empty()
+			.append(Component.literal("[#"+this.value.getClass().getSimpleName()+"]{").withStyle(ChatFormatting.GRAY))
+			.append(IDataContainer.printableValue(this))
+			.append(Component.literal("}").withStyle(ChatFormatting.GRAY))
 			;
 	}
 
