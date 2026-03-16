@@ -21,7 +21,7 @@ implements IItemPrecondition
 	static public final Codec<IItemPrecondition> MATCHANY_CODEC = TypedCodec(MATCHANY_TYPE);
 	static public final Codec<IItemPrecondition> MATCHALL_CODEC = TypedCodec(MATCHALL_TYPE);
 
-	static public final MapCodec<IItemPrecondition> MATCHANY_MAPCODEC = MATCHALL_CODEC.fieldOf("any");
+	static public final MapCodec<IItemPrecondition> MATCHANY_MAPCODEC = MATCHANY_CODEC.fieldOf("any");
 	static public final MapCodec<IItemPrecondition> MATCHALL_MAPCODEC = MATCHALL_CODEC.fieldOf("all");
 
 	static private Codec<IItemPrecondition> TypedCodec(boolean type){
