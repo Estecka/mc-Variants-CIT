@@ -261,3 +261,4 @@ Since v2.5:
 - `expect` now defaults to accepting every data type.
 - Added a `multiline_handling` option for regex. Changed the default to return the first matching line only.
 - All VCIT registries now default to the `variants-cit` namespace.
+- Changed `sanitize` to `sanitize_auto`'s behaviour. Added `sanitize_legacy`.

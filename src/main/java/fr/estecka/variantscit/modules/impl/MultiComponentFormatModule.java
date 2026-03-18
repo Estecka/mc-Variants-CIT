@@ -27,7 +27,7 @@ public class MultiComponentFormatModule
 implements ISimpleCitModule
 {
 	static public final Codec<TransformableExtractor<IDataExtractor>> SANITIZED_MONOSTRING_DECODER = IDataExtractor.MONOSTRING_DECODER.xmap(
-		inner -> new TransformableExtractor<>(inner, IStringTransform.SANITIZE_AUTO, Optional.empty()),
+		inner -> new TransformableExtractor<>(inner, IStringTransform.SANITIZE, Optional.empty()),
 		TransformableExtractor::inner
 	);
 

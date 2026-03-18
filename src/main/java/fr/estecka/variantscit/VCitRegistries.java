@@ -104,7 +104,8 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize"),           IStringTransform.SANITIZE);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      (IStringTransform)IStringTransform::AutoSanitize);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_legacy"),    IStringTransform.SANITIZE_LEGACY);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      IStringTransform.SANITIZE);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("test"),                TestTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("alternative"),         AlternativeTransform.MAPCODEC);
