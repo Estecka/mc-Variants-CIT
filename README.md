@@ -6,7 +6,7 @@ This mod excels in scenarios where one item has many variants all based on the s
 Assigning models on a case-by-case basis (similar to how Optifine-CIT handles it) is still possible, but does not boast the same performances.
 
 ## Resource Pack Format
-This is an quick showcase. Refer to [**The Wiki**](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
+This is a quick showcase. Refer to [**The Wiki**](https://github.com/Estecka/mc-Variants-CIT/wiki) for a complete guide.
 
 The format revolves around item variants being automatically associated to models or textures with matching names.
 Instead of defining separate conditions for every variants, you define a single rule that governs all variants in a collection, (so-called **modules**). This module defines what item is affected, how to figure out its variants, and where the variant models are located.
