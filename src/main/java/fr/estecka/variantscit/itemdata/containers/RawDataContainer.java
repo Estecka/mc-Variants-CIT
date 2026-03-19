@@ -21,7 +21,7 @@ implements IDataContainer
 
 	@Override
 	public final MutableComponent toText(){
-		return	Component.empty()
+		return Component.empty()
 			.append(Component.literal("[#"+this.value.getClass().getSimpleName()+"]{").withStyle(ChatFormatting.GRAY))
 			.append(IDataContainer.printableValue(this))
 			.append(Component.literal("}").withStyle(ChatFormatting.GRAY))
