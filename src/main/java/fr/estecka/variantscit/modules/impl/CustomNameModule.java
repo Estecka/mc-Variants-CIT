@@ -1,12 +1,12 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.text.Normalizer;
 import java.util.Map;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 
 public class CustomNameModule
@@ -31,15 +31,7 @@ extends ASimpleMonoComponentModule<Component>
 		if (specialNames.containsKey(name))
 			return specialNames.get(name);
 		
-		name = this.Transform(name);
+		name = IStringTransform.SANITIZE.apply(name);
 		return ResourceLocation.tryParse(name);
-	}
-
-	public String Transform(String name){
-		return Normalizer.normalize(name, Normalizer.Form.NFD)
-			.replace(' ', '_')
-			.toLowerCase()
-			.replaceAll("[^a-zA-Z0-9_.-]", "")
-			;
 	}
 }
