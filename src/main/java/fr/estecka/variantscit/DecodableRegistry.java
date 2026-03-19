@@ -30,6 +30,7 @@ public class DecodableRegistry<T>
 
 	// private final Codec<ResourceLocation> typeCodec;
 	private final MapDecoder<ResourceLocation> typeMapCodec;
+	private final Map<ResourceLocation,String> deprecationWarnings = new HashMap<>();
 
 	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
 	public final Codec<T>    unitCodec;
@@ -63,7 +64,7 @@ public class DecodableRegistry<T>
 		this.typeKey = typeKey;
 		this.mapWrapper = mapWrapper;
 
-		// this.typeCodec = typeCodec;
+		typeCodec = typeCodec.validate(this::Deprecated);
 		if (defaultId == null)
 			this.typeMapCodec = typeCodec.fieldOf(this.typeKey);
 		else
@@ -96,6 +97,17 @@ public class DecodableRegistry<T>
 		if (this.units.containsKey(key) || this.mapCodecs.containsKey(key)){
 			throw new IllegalStateException("Duplicate registration for entry:"+key.toString());
 		}
+	}
+
+	public void Deprecate(ResourceLocation id, String message){
+		this.deprecationWarnings.put(id, message);
+	}
+
+	private <U> DataResult<U> Deprecated(U result){
+		String warning = this.deprecationWarnings.get(result);
+		if (warning != null)
+			VariantsCitMod.LOGGER.warn("{}", warning);
+		return DataResult.success(result);
 	}
 
 	private class MapDecoderImpl

@@ -4,9 +4,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
-import java.util.Map;
-import java.util.Optional;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
@@ -74,11 +71,9 @@ public final class VCitRegistries
 		RegisterSimpleModule(VariantsCitMod.Identifier("potion_effect"), PotionEffectModule.UNIT);
 		RegisterSimpleModule(VariantsCitMod.Identifier("potion_type"), PotionTypeModule.UNIT);
 		RegisterBakedModule (VariantsCitMod.Identifier("predicates"), PredicatesModule.Unbaked.MAPCODEC);
-		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantment"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
-		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantments"), CodecUtil.WithWarning(
-			MapCodec.unit(new EnchantmentModule(DataComponents.STORED_ENCHANTMENTS, Map.of(), Optional.empty())),
-			"Module name `stored_enchantments` (plural) is being deprecated. use `stored_enchantment` (singular) instead."
-		));
+		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantment"),  EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
+		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantments"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
+		MODULES.Deprecate   (VariantsCitMod.Identifier("stored_enchantments"), "Module name `stored_enchantments` (plural) is deprecated. use `stored_enchantment` (singular) instead.");
 		RegisterBakedModule (VariantsCitMod.Identifier("stored_enchantment_vector"), EnchantmentVectorModule.GetBaker(DataComponents.STORED_ENCHANTMENTS));
 		RegisterSimpleModule(VariantsCitMod.Identifier("trim"), TrimModule.UNIT);
 		RegisterSimpleModule(VariantsCitMod.Identifier("trim_pattern"), TrimPatternModule.UNIT);
@@ -106,6 +101,7 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_legacy"),    IStringTransform.SANITIZE_LEGACY);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      IStringTransform.SANITIZE);
+		TRANSFORMS.Deprecate   (VariantsCitMod.Identifier("sanitize_auto"),      "Transform name `sanitize_auto` is deprecated. Use `sanitize` instead.");
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("test"),                TestTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("alternative"),         AlternativeTransform.MAPCODEC);
@@ -172,12 +168,9 @@ public final class VCitRegistries
 	}
 
 	static private void RegisterRemoved(String oldName, String newName){
-		RegisterSimpleModule(
+		MODULES.Deprecate(
 			VariantsCitMod.Identifier(oldName),
-			MapCodec.unit(PaintingVariantModule.UNIT).flatXmap(
-				_0->DataResult.error(()->"Module type `"+oldName+"` was removed, use `"+newName+"` isntead"),
-				CodecUtil::NoEncode
-			)
+			"Module type `"+oldName+"` was removed, use `"+newName+"` isntead"
 		);
 	}
 }
