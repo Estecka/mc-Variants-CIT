@@ -170,7 +170,7 @@ public final class VCitRegistries
 	static private void RegisterRemoved(String oldName, String newName){
 		MODULES.Deprecate(
 			VariantsCitMod.Identifier(oldName),
-			"Module type `"+oldName+"` was removed, use `"+newName+"` isntead"
+			"Module type `"+oldName+"` was removed, use `"+newName+"` instead"
 		);
 	}
 }
