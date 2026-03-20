@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.CompressorHolder;
@@ -15,67 +17,97 @@ import com.mojang.serialization.MapDecoder;
 import com.mojang.serialization.MapEncoder;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
-import net.minecraft.util.Identifier;
 
 public class DecodableRegistry<T>
 {
 	public interface IMapWrapper<T> extends Function<MapCodec<? extends T>, MapDecoder<? extends T>> {}
 
-	private final Map<Identifier, T> units = new HashMap<>();
-	private final Map<Identifier, MapDecoder<? extends T>> mapCodecs = new HashMap<>();
+	private final Map<ResourceLocation, T> units = new HashMap<>();
+	private final Map<ResourceLocation, MapDecoder<? extends T>> mapCodecs = new HashMap<>();
 
 	private final String typeKey;
 	private final IMapWrapper<T> mapWrapper;
 
-	private final MapDecoder<Identifier> typeCodec;
-	public final Codec<T>    unitCodec = CodecUtil.Enum(Identifier.CODEC, this.units);
-	public final MapCodec<T> mapCodec  = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
-	public final Codec<T>    codec     = Codec.withAlternative(this.unitCodec, this.mapCodec.codec());
+	// private final Codec<ResourceLocation> typeCodec;
+	private final MapDecoder<ResourceLocation> typeMapCodec;
+	private final Map<ResourceLocation,String> deprecationWarnings = new HashMap<>();
+
+	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
+	public final Codec<T>    unitCodec;
+	public final Codec<T>    codec;
+
+	static public class Builder<T> {
+		private final @NotNull String keyname;
+		private @NotNull Codec<ResourceLocation> keyCodec = CodecUtil.VCIT_IDENTIFIER;
+		private ResourceLocation defaultKey = null;
+		private IMapWrapper<T> wrapper = c->c;
+
+		public Builder(String keyname){
+			this.keyname = keyname;
+		}
+
+		public Builder<T> WithKeyCodec(Codec<ResourceLocation> value){ this.keyCodec = value;   return this; }
+		public Builder<T> WithWrapper (IMapWrapper<T> value)         { this.wrapper = value;    return this; }
+		public Builder<T> WithDefault (ResourceLocation value)       { this.defaultKey = value; return this; }
+
+		public DecodableRegistry<T> Build(){
+			return new DecodableRegistry<>(keyname, keyCodec, defaultKey, wrapper);
+		}
+
+	}
 
 	public DecodableRegistry(String typeKey){
-		this(typeKey, null, c->c);
+		this(typeKey, CodecUtil.VCIT_IDENTIFIER, null, c->c);
 	}
 
-	public DecodableRegistry(String typeKey, Identifier defaultId){
-		this(typeKey, defaultId, c->c);
-	}
-
-	public DecodableRegistry(String typeKey, IMapWrapper<T> mapWrapper){
-		this(typeKey, null, mapWrapper);
-	}
-
-	public DecodableRegistry(String typeKey, @Nullable Identifier defaultId, IMapWrapper<T> mapWrapper){
+	public DecodableRegistry(String typeKey, Codec<ResourceLocation> typeCodec, @Nullable ResourceLocation defaultId, IMapWrapper<T> mapWrapper){
 		this.typeKey = typeKey;
 		this.mapWrapper = mapWrapper;
+
+		typeCodec = typeCodec.validate(this::Deprecated);
 		if (defaultId == null)
-			this.typeCodec = Identifier.CODEC.fieldOf(this.typeKey);
+			this.typeMapCodec = typeCodec.fieldOf(this.typeKey);
 		else
-			this.typeCodec = Identifier.CODEC.optionalFieldOf(this.typeKey, defaultId);
+			this.typeMapCodec = typeCodec.optionalFieldOf(this.typeKey, defaultId);
+
+		this.unitCodec = CodecUtil.Enum(typeCodec, this.units);
+		this.codec     = CodecUtil.WithAlternative(this.unitCodec, this.mapCodec.codec());
 	}
 
-	public void RegisterUnit(Identifier key, T unit){
+	public void RegisterUnit(ResourceLocation key, T unit){
 		this.Register(key, MapCodec.unit(unit), unit);
 	}
 
-	public void RegisterMap(Identifier key, MapCodec<? extends T> mapCodec){
+	public void RegisterMap(ResourceLocation key, MapCodec<? extends T> mapCodec){
 		AssertUnique(key);
 		this.mapCodecs.put(key, mapWrapper.apply(mapCodec));
 	}
 
-	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
+	public <U extends T> void Register(ResourceLocation key, MapCodec<U> mapCodec, U unit){
 		AssertUnique(key);
 		this.RegisterMap(key, mapCodec);
 		this.units.put(key, unit);
 	}
 
-	public MapDecoder<? extends T> GetDecoder(Identifier type){
+	public MapDecoder<? extends T> GetDecoder(ResourceLocation type){
 		return this.mapCodecs.get(type);
 	}
 
-	private void AssertUnique(Identifier key){
+	private void AssertUnique(ResourceLocation key){
 		if (this.units.containsKey(key) || this.mapCodecs.containsKey(key)){
 			throw new IllegalStateException("Duplicate registration for entry:"+key.toString());
 		}
+	}
+
+	public void Deprecate(ResourceLocation id, String message){
+		this.deprecationWarnings.put(id, message);
+	}
+
+	private <U> DataResult<U> Deprecated(U result){
+		String warning = this.deprecationWarnings.get(result);
+		if (warning != null)
+			VariantsCitMod.LOGGER.warn("{}", warning);
+		return DataResult.success(result);
 	}
 
 	private class MapDecoderImpl
@@ -84,11 +116,11 @@ public class DecodableRegistry<T>
 	{
 		@Override
 		public <I> DataResult<T> decode(DynamicOps<I> ops, MapLike<I> data){
-			var typeResult = typeCodec.decode(ops, data);
+			var typeResult = typeMapCodec.decode(ops, data);
 			if (!typeResult.isSuccess())
 				return typeResult.map(_0->null);
 	
-			Identifier type = typeResult.getOrThrow();
+			ResourceLocation type = typeResult.getOrThrow();
 			MapDecoder<? extends T> codec = mapCodecs.get(type);
 			if (codec == null)
 				return DataResult.error(()->"Unknown key: "+type);

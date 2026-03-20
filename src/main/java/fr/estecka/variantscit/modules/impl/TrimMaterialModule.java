@@ -1,20 +1,12 @@
 package fr.estecka.variantscit.modules.impl;
 
-import fr.estecka.variantscit.api.ISimpleCitModule;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.equipment.trim.ArmorTrim;
-import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
+import net.minecraft.core.component.DataComponents;
 
 public class TrimMaterialModule
-implements ISimpleCitModule
 {
-	@Override
-	public Identifier GetItemVariant(ItemStack stack){
-		ArmorTrim trim = stack.get(DataComponentTypes.TRIM);
-		if (trim == null)
-			return null;
-
-		return trim.material().getKey().get().getValue();
-	}
+	static public final IVariantCitModule UNIT = ASimpleMonoComponentModule.Of(
+		DataComponents.TRIM,
+		trim -> trim.material().unwrapKey().get().location()
+	);
 }

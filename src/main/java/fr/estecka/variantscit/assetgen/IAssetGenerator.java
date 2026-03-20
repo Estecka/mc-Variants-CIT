@@ -3,21 +3,21 @@ package fr.estecka.variantscit.assetgen;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.IoSupplier;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.CodecUtil;
-import net.minecraft.resource.InputSupplier;
-import net.minecraft.util.Identifier;
 
 public interface IAssetGenerator
 {
-	Result AcceptAsset(EAssetGenPass pass, Identifier assetId);
+	Result AcceptAsset(EAssetGenPass pass, ResourceLocation assetId);
 
 	// public default Identifier GetRadical(Identifier assetId){
 	// 	return assetId;
 	// }
 
 	static public final IAssetGenerator NOOP = (_0,_1)->new Result();
-	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(Codec.withAlternative(
+	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(CodecUtil.WithAlternative(
 		GeneratorPresets.PRESET_CODEC,
 		TemplatedAssetGenerator.MAPCODEC.codec()
 	)).xmap(ListGenerator::Wrap, ListGenerator::Unwrap);
@@ -26,7 +26,7 @@ public interface IAssetGenerator
 	implements IAssetGenerator
 	{
 		@Override
-		public Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
+		public Result AcceptAsset(EAssetGenPass pass, ResourceLocation assetId) {
 			Result result = new Result();
 			for (IAssetGenerator generator : subGenerators)
 				result.PutAllIfAbsent(generator.AcceptAsset(pass, assetId));
@@ -55,12 +55,12 @@ public interface IAssetGenerator
 	}
 
 	static public record ParentedResource(
-		Identifier radical,
-		InputSupplier<InputStream> resource
+		ResourceLocation radical,
+		IoSupplier<InputStream> resource
 	) {}
 
 	static public class Result
-	extends HashMap<Identifier,ParentedResource>
+	extends HashMap<ResourceLocation,ParentedResource>
 	{
 		public void PutAllIfAbsent(Result behind){
 			for (var entry : behind.entrySet())

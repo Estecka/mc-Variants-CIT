@@ -1,60 +1,49 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
-import java.util.stream.Stream;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
-import fr.estecka.variantscit.MultiPropertyCache;
-import fr.estecka.variantscit.commands.CommandLogger;
-import fr.estecka.variantscit.format.properties.IntegerComponentProperty;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.modules.libraries.ILinearCitModule;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
-import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
 
-public class DurabilityModule
+
+public record DurabilityModule(
+	Optional<Integer> scale
+)
 implements ILinearCitModule
 {
-	static public final MapCodec<DurabilityModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			Codec.BOOL.optionalFieldOf("debug", false).forGetter(o->o.cache.debug),
-			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(DurabilityModule::GetNamespace),
-			Codecs.NON_NEGATIVE_INT.optionalFieldOf("scale").forGetter(o->o.scale)
-		)
-		.apply(builder, DurabilityModule::new)
-	);
+	static public final MapCodec<DurabilityModule> MAPCODEC = ExtraCodecs.NON_NEGATIVE_INT
+		.optionalFieldOf("scale")
+		.xmap(DurabilityModule::new, DurabilityModule::scale)
+		;
 
-	private final MultiPropertyCache cache;
-	private final String namespace;
-	private final Optional<Integer> scale;
-
-	public DurabilityModule (boolean debug, String namespace, Optional<Integer> scale){
-		this.cache = new MultiPropertyCache(debug, Stream.of(IntegerComponentProperty.DAMAGE, IntegerComponentProperty.MAX_DAMAGE));
-		this.namespace = namespace;
-		this.scale = scale;
+	@Override
+	public CacheKeySet GetCacheKeys() {
+		return ComponentCacheKey.KeysOf(
+			DataComponents.MAX_DAMAGE,
+			DataComponents.DAMAGE
+		);
 	}
 
 	@Override
-	public String GetNamespace() {
-		return namespace;
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
 	}
 
 	@Override
-	public @Nullable Identifier GetItemModel(ItemStack stack, ILinearLibrary library) {
-		return this.cache.ComputeIfAbsent(stack, __->RecomputeItemModel(stack, library));
-	}
-
-	public @Nullable Identifier RecomputeItemModel(ItemStack stack, ILinearLibrary library) {
-		Integer max = stack.get(DataComponentTypes.MAX_DAMAGE);
+	public @Nullable ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library) {
+		Integer max = stack.get(DataComponents.MAX_DAMAGE);
 		if (max == null)
 			return null;
 
-		int damage = stack.get(DataComponentTypes.DAMAGE);
+		int damage = stack.get(DataComponents.DAMAGE);
 		int durability = Math.clamp(max - damage, 0, max);
 
 		if (scale.isPresent()){
@@ -64,10 +53,5 @@ implements ILinearCitModule
 		}
 
 		return library.GetOrGreater(durability);
-	}
-
-	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, ILinearLibrary library, CommandLogger logger) {
-		return this.RecomputeItemModel(stack, library);
 	}
 }

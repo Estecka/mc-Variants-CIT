@@ -1,24 +1,18 @@
 package fr.estecka.variantscit.modules.impl;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.equipment.trim.ArmorTrim;
-import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 
 public class TrimModule
-extends ASimpleComponentCachingModule<ArmorTrim>
 {
-	public TrimModule(){
-		super(DataComponentTypes.TRIM);
-	}
+	static public final IVariantCitModule UNIT = ASimpleMonoComponentModule.Of(
+		DataComponents.TRIM,
+		trim -> {
+			ResourceLocation pattern  = trim.pattern ().unwrapKey().get().location();
+			ResourceLocation material = trim.material().unwrapKey().get().location();
 
-	@Override
-	public Identifier GetVariantForComponent(ArmorTrim trim){
-		if (trim == null)
-			return null;
-
-		Identifier pattern = trim.pattern().getKey().get().getValue();
-		Identifier material = trim.material().getKey().get().getValue();
-
-		return pattern.withSuffixedPath("_" + material.getPath());
-	}
+			return pattern.withSuffix("_" + material.getPath());
+		}
+	);
 }
