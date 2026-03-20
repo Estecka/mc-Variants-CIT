@@ -2,7 +2,7 @@ package fr.estecka.variantscit.reload;
 
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
 
@@ -11,7 +11,7 @@ import fr.estecka.variantscit.modules.IBakedModule;
  * rendering.
  */
 public record MetaModule (
-	ResourceLocation id,
+	Identifier id,
 	int priority,
 	Set<Item> targets,
 	String modelPrefix,

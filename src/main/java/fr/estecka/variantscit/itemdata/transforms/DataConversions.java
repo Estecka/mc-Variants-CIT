@@ -17,7 +17,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.ItemLore;
 
 public final class DataConversions
@@ -40,19 +40,19 @@ public final class DataConversions
 /******************************************************************************/
 
 static public IDataContainer StricIdentifier(IDataContainer input) {
-	if (input.value() instanceof ResourceLocation)
+	if (input.value() instanceof Identifier)
 		return input;
 	if (input.value() instanceof String string)
-		return RawDataContainer.OfNullable(ResourceLocation.tryParse(string));
+		return RawDataContainer.OfNullable(Identifier.tryParse(string));
 	if (input.asNbt() instanceof StringTag nbt)
-		return RawDataContainer.OfNullable(ResourceLocation.tryParse(nbt.value()));
+		return RawDataContainer.OfNullable(Identifier.tryParse(nbt.value()));
 	return null;
 }
 
 static public IDataContainer StrictString(IDataContainer input) {
 	if (input.value() instanceof String)
 		return input;
-	if (input.value() instanceof ResourceLocation id)
+	if (input.value() instanceof Identifier id)
 		return RawDataContainer.OfNullable(id.toString());
 	if (input.asNbt() instanceof StringTag nbt)
 		return RawDataContainer.OfNullable(nbt.value());
@@ -138,7 +138,7 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		       value instanceof StringTag nbt ? nbt.value() :
 		       value instanceof Number number ? number.toString() :
 		       value instanceof NumericTag nbt ? nbt.asNumber().get().toString() :
-		       value instanceof ResourceLocation id ? id.toString() :
+		       value instanceof Identifier id ? id.toString() :
 		       value instanceof Component id ? id.getString() :
 		       value instanceof ItemLore lore ? TextArrayToString(lore.lines()) :
 		       null
@@ -146,10 +146,10 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 	};
 
 	@Deprecated
-	static public @Nullable ResourceLocation SoftCastToId(@Nullable Object value){
-		return value instanceof ResourceLocation id ? id :
-		       value instanceof String string ? ResourceLocation.tryParse(string) :
-		       value instanceof StringTag nbt ? ResourceLocation.tryParse(nbt.value()) :
+	static public @Nullable Identifier SoftCastToId(@Nullable Object value){
+		return value instanceof Identifier id ? id :
+		       value instanceof String string ? Identifier.tryParse(string) :
+		       value instanceof StringTag nbt ? Identifier.tryParse(nbt.value()) :
 		       null
 		       ;
 	};

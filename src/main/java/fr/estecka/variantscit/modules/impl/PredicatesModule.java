@@ -16,7 +16,7 @@ import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public record PredicatesModule(
@@ -29,12 +29,12 @@ implements ISimpleCitModule
 /******************************************************************************/
 	static public record PredicatedVariant(
 		IItemPrecondition precondition,
-		ResourceLocation variantId
+		Identifier variantId
 	) {
 		static public final MapCodec<PredicatedVariant> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 			builder.group(
 				IItemPrecondition.CODEC.fieldOf("precondition").forGetter(PredicatedVariant::precondition),
-				ResourceLocation.CODEC.fieldOf("variantId").forGetter(PredicatedVariant::variantId)
+				Identifier.CODEC.fieldOf("variantId").forGetter(PredicatedVariant::variantId)
 			)
 			.apply(builder, PredicatedVariant::new)
 		);
@@ -58,7 +58,7 @@ implements ISimpleCitModule
 		}
 
 		@Override
-		public boolean AcceptsVariant(ResourceLocation variantId) {
+		public boolean AcceptsVariant(Identifier variantId) {
 			for (var v : parameters.variants)
 				if (v.variantId.equals(variantId))
 					return true;
@@ -82,7 +82,7 @@ implements ISimpleCitModule
 /******************************************************************************/
 
 	@Override
-	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
+	public @Nullable Identifier GetItemVariant(ItemStack stack) {
 		for (PredicatedVariant v : variants) {
 			if (v.precondition.Matches(stack))
 				return v.variantId;
@@ -97,7 +97,7 @@ implements ISimpleCitModule
 /******************************************************************************/
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		logger.Info("Predicates:");
 		int i = 0;
 

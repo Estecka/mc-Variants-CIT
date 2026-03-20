@@ -2,7 +2,7 @@ package fr.estecka.variantscit.itemdata.transforms;
 
 import java.text.Normalizer;
 import java.util.function.Function;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -58,7 +58,7 @@ extends IDataTransform, Function<String,String>
 	}
 
 	static public String AutoSanitize(String input){
-		if (ResourceLocation.tryParse(input) != null)
+		if (Identifier.tryParse(input) != null)
 			return input;
 		else
 			return SANITIZE_PATH.apply(input);

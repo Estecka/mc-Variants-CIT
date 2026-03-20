@@ -6,8 +6,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.level.Level;
 import fr.estecka.variantscit.itemdata.extractors.impl.PaintingVariantProperty;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
@@ -30,11 +30,11 @@ extends AMonoComponentModule<Holder<PaintingVariant>>
 			return Optional.empty();
 	}
 
-	public ResourceLocation GetModelForComponent(Holder<PaintingVariant> component, IVariantLibrary models){
+	public Identifier GetModelForComponent(Holder<PaintingVariant> component, IVariantLibrary models){
 		if (component == null)
 			return null;
 
-		ResourceLocation variantId = PaintingVariantProperty.UNIT.GetPropertyId(component);
+		Identifier variantId = PaintingVariantProperty.UNIT.GetPropertyId(component);
 
 		var registry = GetPaintingRegistry();
 		if (registry.isPresent() && !registry.get().containsKey(variantId))

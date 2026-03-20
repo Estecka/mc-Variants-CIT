@@ -7,7 +7,7 @@ import java.util.function.Function;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -48,25 +48,25 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	@Override
-	public ResourceLocation GetModelForItem(ItemStack stack) {
+	public Identifier GetModelForItem(ItemStack stack) {
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
 		CacheEntry entry = this.hashToVariant.get(hash);
 		if (entry == null) {
-			ResourceLocation variant = inner.GetModelForItem(stack);
+			Identifier variant = inner.GetModelForItem(stack);
 			entry = this.CreateEntry(hash, stack, variant);
 		}
 		return entry.variant;
 	}
 
-	public ResourceLocation ComputeIfAbsent(ItemStack stack, Function<ItemStack,ResourceLocation> computer){
+	public Identifier ComputeIfAbsent(ItemStack stack, Function<ItemStack,Identifier> computer){
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
 		CacheEntry entry = this.hashToVariant.get(hash);
 		if (entry == null) {
-			ResourceLocation variant = computer.apply(stack);
+			Identifier variant = computer.apply(stack);
 			entry = this.CreateEntry(hash, stack, variant);
 		}
 		return entry.variant;
@@ -87,7 +87,7 @@ implements IBakedModule, IModuleWrapper
 	 * TODO: As-is, an entry where all registered components are null will never
 	 * expire. This is limited to one entry per cache, so it is negligible.
 	 */
-	private CacheEntry CreateEntry(int hash, ItemStack stack, ResourceLocation variant){
+	private CacheEntry CreateEntry(int hash, ItemStack stack, Identifier variant){
 		WeakReference<?>[] weakRefs = new WeakReference[properties.length];
 
 		for (int i=0; i<properties.length; ++i){
@@ -128,6 +128,6 @@ implements IBakedModule, IModuleWrapper
 	 * get garbage collected  before its referee. Otherwise, references will not
 	 * get enqueued, and the cache will never be cleared.
 	 */
-	static private record CacheEntry(ResourceLocation variant, WeakReference<?>[] components)
+	static private record CacheEntry(Identifier variant, WeakReference<?>[] components)
 	{}
 }

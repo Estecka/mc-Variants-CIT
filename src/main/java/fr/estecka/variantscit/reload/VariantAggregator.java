@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
@@ -26,16 +26,16 @@ public class VariantAggregator
 		int priority
 	){}
 
-	private final Map<ModuleDefinition, ResourceLocation> moduleIds = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, Identifier> moduleIds = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
 
-	public final Map<ResourceLocation, GeneratedAsset> generatedAssets = new HashMap<>();
+	public final Map<Identifier, GeneratedAsset> generatedAssets = new HashMap<>();
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
 
 
-	public VariantAggregator(Map<ResourceLocation, ModuleDefinition> modules){
+	public VariantAggregator(Map<Identifier, ModuleDefinition> modules){
 		for (var entry : modules.entrySet()){
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
@@ -82,17 +82,17 @@ public class VariantAggregator
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
-		Set<ResourceLocation> resources = manager.listResources(assetType.directory, id->id.getPath().endsWith(assetType.suffix)).keySet();
+		Set<Identifier> resources = manager.listResources(assetType.directory, id->id.getPath().endsWith(assetType.suffix)).keySet();
 
-		Stream<ResourceLocation> shortIds = resources.stream().map(id->assetType.GetShortId(id).get());
+		Stream<Identifier> shortIds = resources.stream().map(id->assetType.GetShortId(id).get());
 		GatherIds(assetType, shortIds);
 	}
 
-	private void GatherIds(EAssetType assetType, Stream<ResourceLocation> assets){
+	private void GatherIds(EAssetType assetType, Stream<Identifier> assets){
 		assets.forEach(shortId -> ApplyModelToAll(assetType, shortId));
 	}
 
-	private void ApplyModelToAll(EAssetType assetType, ResourceLocation shortId){
+	private void ApplyModelToAll(EAssetType assetType, Identifier shortId){
 		EAssetGenPass generatorPass = switch (assetType){
 			default -> null;
 			case EAssetType.EQUIP_TEXTURE -> EAssetGenPass.EQUIPMENTS;
@@ -115,7 +115,7 @@ public class VariantAggregator
 				for (var e : generatedResources.entrySet())
 				if  (this.ApplyModelToModule(false, module, library, e.getValue().radical()))
 				{
-					ResourceLocation resourceId = generatorPass.GetOutputResourceId(e.getKey());
+					Identifier resourceId = generatorPass.GetOutputResourceId(e.getKey());
 					this.OnGeneratedResource(resourceId, module.modelPrefix(), e.getValue().resource());
 				}
 			}
@@ -128,7 +128,7 @@ public class VariantAggregator
 	 * @return Whether the provided ID asset can be added to this library.
 	 * @param isFundamental If true, add the asset to the library on success.
 	 */
-	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation shortId){
+	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, Identifier shortId){
 		boolean accepted = false;
 
 		if (shortId.equals(library.fallbackModel()))
@@ -138,7 +138,7 @@ public class VariantAggregator
 			accepted = true;
 
 		if (shortId.getPath().startsWith(module.modelPrefix())){
-			ResourceLocation variantId = ResourceLocation.fromNamespaceAndPath(
+			Identifier variantId = Identifier.fromNamespaceAndPath(
 				shortId.getNamespace(),
 				shortId.getPath().substring(module.modelPrefix().length())
 			);
@@ -154,14 +154,14 @@ public class VariantAggregator
 		return accepted;
 	}
 
-	private void UpdateGeneratedPack(Map<ResourceLocation, IoSupplier<InputStream>> pack, HotswappableResourceManager manager){
+	private void UpdateGeneratedPack(Map<Identifier, IoSupplier<InputStream>> pack, HotswappableResourceManager manager){
 		for (var entry : this.generatedAssets.entrySet())
 			pack.put(entry.getKey(), entry.getValue().resource);
 
 		manager.Refresh();
 	}
 
-	private void OnGeneratedResource(ResourceLocation resourceId, String modelPrefix, IoSupplier<InputStream> resource){
+	private void OnGeneratedResource(Identifier resourceId, String modelPrefix, IoSupplier<InputStream> resource){
 		int priority = modelPrefix.length();
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 

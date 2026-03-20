@@ -32,3 +32,6 @@ Initial Release
 ## 1.21.11
 ### Backward compatible:
 - `ItemAsset.Properties::new` takes another parameter. Use the statically available `DEFAULT` instead.
+
+## 26.1
+- `ItemArgument::getItem` now returns a holder.

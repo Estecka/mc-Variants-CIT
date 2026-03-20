@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class ModuleList
@@ -34,9 +34,9 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	@Override
-	public ResourceLocation GetModelForItem(ItemStack stack) {
+	public Identifier GetModelForItem(ItemStack stack) {
 		for (IBakedModule m : this){
-			ResourceLocation result = m.GetModelForItem(stack);
+			Identifier result = m.GetModelForItem(stack);
 			if (result != null) return result;
 		}
 		return null;

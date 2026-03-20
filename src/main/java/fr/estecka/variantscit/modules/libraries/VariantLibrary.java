@@ -2,24 +2,24 @@ package fr.estecka.variantscit.modules.libraries;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.commands.CommandLogger;
 
 public record VariantLibrary(
-	@Nullable ResourceLocation fallbackModel,
-	Map<ResourceLocation, ResourceLocation> variantModels,
-	Map<String, ResourceLocation> specialModels
+	@Nullable Identifier fallbackModel,
+	Map<Identifier, Identifier> variantModels,
+	Map<String, Identifier> specialModels
 )
 implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 {
 	@Override
-	public boolean HasVariantModel(ResourceLocation variant){
+	public boolean HasVariantModel(Identifier variant){
 		return this.variantModels.containsKey(variant);
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetVariantModel(ResourceLocation variant){
+	public @Nullable Identifier GetVariantModel(Identifier variant){
 		if (variant == null)
 			return null;
 		else
@@ -27,7 +27,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetSpecialModel(String key){
+	public @Nullable Identifier GetSpecialModel(String key){
 		return this.specialModels.get(key);
 	}
 
@@ -43,7 +43,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	}
 
 	public VariantLibrary GetSubLibrary(String subPrefix){
-		Map<ResourceLocation,ResourceLocation> subVariants = new HashMap<>();
+		Map<Identifier,Identifier> subVariants = new HashMap<>();
 		for (var entry : this.variantModels.entrySet())
 		if  (entry.getKey().getPath().startsWith(subPrefix))
 		{
@@ -97,27 +97,27 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 		}
 
 		@Override
-		public boolean HasVariantModel(@Nullable ResourceLocation variantId) {
+		public boolean HasVariantModel(@Nullable Identifier variantId) {
 			boolean r = VariantLibrary.this.HasVariantModel(variantId);
 			this.OnTriedVariant(variantId, r);
 			return r;
 		}
 
 		@Override
-		public @Nullable ResourceLocation GetVariantModel(ResourceLocation variantId) {
+		public @Nullable Identifier GetVariantModel(Identifier variantId) {
 			this.HasVariantModel(variantId);
 			return VariantLibrary.this.GetVariantModel(variantId);
 		}
 
 		@Override
-		public @Nullable ResourceLocation GetSpecialModel(String key) {
-			ResourceLocation r = VariantLibrary.this.GetSpecialModel(key);
+		public @Nullable Identifier GetSpecialModel(String key) {
+			Identifier r = VariantLibrary.this.GetSpecialModel(key);
 			this.OnTriedSpecial(key, r != null);
 			return r;
 		}
 
 		@Override
-		protected void OnTriedVariant(ResourceLocation variantId, boolean exists) {
+		protected void OnTriedVariant(Identifier variantId, boolean exists) {
 			logger.Info("Tested variant ID: {}", CommandLogger.ItemData(variantId));
 			super.OnTriedVariant(variantId, exists);
 		}

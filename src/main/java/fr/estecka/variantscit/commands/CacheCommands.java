@@ -20,17 +20,17 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
+import static net.minecraft.commands.arguments.IdentifierArgument.id;
 import static net.minecraft.commands.arguments.item.ItemArgument.item;
 import static net.minecraft.commands.arguments.item.ItemArgument.getItem;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
@@ -40,7 +40,7 @@ import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHo
 public class CacheCommands
 extends CommandUtil
 {
-	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "cache");
+	static public final Identifier ID = Identifier.fromNamespaceAndPath(VariantsCitMod.MODID, "cache");
 	static public final String HOOK_ARG = "hook";
 	static public final String ITEM_ARG = "item id";
 
@@ -84,7 +84,7 @@ extends CommandUtil
 
 	static private int PrintTree(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
 		EModuleHook hook = getModuleHook(context, HOOK_ARG);
-		Item item = getItem(context, ITEM_ARG).getItem();
+		Item item = getItem(context, ITEM_ARG).item().value();
 		IBakedModule rootModule = VariantsCitMod.GetModules().GetArchModule(hook, item);
 
 		if (rootModule == null)
@@ -124,7 +124,7 @@ extends CommandUtil
 		if (module instanceof ModuleList)
 			return "<list>";
 
-		ResourceLocation id = VariantsCitMod.GetModules().GetId(module);
+		Identifier id = VariantsCitMod.GetModules().GetId(module);
 		if (id != null)
 			return id.toString();
 		else

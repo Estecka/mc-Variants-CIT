@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.assetgen;
 
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.reload.EAssetType;
@@ -25,7 +25,7 @@ implements StringRepresentable
 		this.output = output;
 	}
 
-	public Optional<ResourceLocation> GetShortInputId(ResourceLocation resourceId){
+	public Optional<Identifier> GetShortInputId(Identifier resourceId){
 		String path = resourceId.getPath();
 		if (!path.startsWith(input.directory+"/") || !path.endsWith(input.suffix))
 			return Optional.empty();
@@ -35,7 +35,7 @@ implements StringRepresentable
 		));
 	}
 
-	public ResourceLocation GetOutputResourceId(ResourceLocation shortAssetId){
+	public Identifier GetOutputResourceId(Identifier shortAssetId){
 		return shortAssetId.withPath(path -> output.directory+"/"+path+output.suffix);
 	}
 

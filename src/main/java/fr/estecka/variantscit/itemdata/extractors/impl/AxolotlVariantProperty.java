@@ -1,12 +1,12 @@
 package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.axolotl.Axolotl.Variant;
 
 public class AxolotlVariantProperty
-extends AMonoComponentProperty<Axolotl.Variant,ResourceLocation>
+extends AMonoComponentProperty<Axolotl.Variant,Identifier>
 {
 	static public final AxolotlVariantProperty UNIT = new AxolotlVariantProperty();
 
@@ -15,7 +15,7 @@ extends AMonoComponentProperty<Axolotl.Variant,ResourceLocation>
 	}
 
 	@Override
-	public ResourceLocation GetPropertyValue(Variant component) {
-		return ResourceLocation.tryParse(component.getName());
+	public Identifier GetPropertyValue(Variant component) {
+		return Identifier.tryParse(component.getName());
 	}
 }

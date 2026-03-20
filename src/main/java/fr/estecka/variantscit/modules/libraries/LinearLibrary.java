@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.modules.libraries;
 
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import fr.estecka.variantscit.commands.CommandLogger;
 
 
@@ -9,8 +9,8 @@ public class LinearLibrary
 implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 {
 	protected final String namespace;
-	protected final ResourceLocation fallback;
-	protected final LinearSnapMap<ResourceLocation> modelLine = new LinearSnapMap<>();
+	protected final Identifier fallback;
+	protected final LinearSnapMap<Identifier> modelLine = new LinearSnapMap<>();
 
 	public LinearLibrary(VariantLibrary variantLibrary, String allowedNamespace){
 		this.fallback = variantLibrary.fallbackModel();
@@ -27,19 +27,19 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 		}
 	}
 
-	private ResourceLocation Fallback(@Nullable ResourceLocation id){
+	private Identifier Fallback(@Nullable Identifier id){
 		return (id != null) ? id : fallback;
 	}
 
-	public ResourceLocation GetWithBias(int magnitude, int bias){
+	public Identifier GetWithBias(int magnitude, int bias){
 		return Fallback(this.modelLine.GetClosestValue(magnitude, bias));
 	}
 
-	public ResourceLocation GetOrLesser(int magnitude){
+	public Identifier GetOrLesser(int magnitude){
 		return GetWithBias(magnitude, -1);
 	}
 
-	public ResourceLocation GetOrGreater(int magnitude){
+	public Identifier GetOrGreater(int magnitude){
 		return GetWithBias(magnitude, +1);
 	}
 
@@ -57,7 +57,7 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 	public void Dump(CommandLogger logger) {
 		if (this.modelLine.size() <= 0)
 			logger.Info("This module does not have any variant.");
-		else for (LinearSnapMap.Entry<ResourceLocation> entry : this.modelLine){
+		else for (LinearSnapMap.Entry<Identifier> entry : this.modelLine){
 			logger.Info("{} -> {}",
 				CommandLogger.ItemData(entry.magnitude()),
 				CommandLogger.PackData(entry.value())
@@ -80,33 +80,33 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 		}
 
 		@Override
-		public ResourceLocation GetWithBias(int magnitude, int bias) {
+		public Identifier GetWithBias(int magnitude, int bias) {
 			if (bias < 0)
 				return GetOrLesser(magnitude);
 			if (bias > 0)
 				return GetOrGreater(magnitude);
 
-			ResourceLocation r = LinearLibrary.this.GetWithBias(magnitude, 0);
+			Identifier r = LinearLibrary.this.GetWithBias(magnitude, 0);
 			LogGet(magnitude, r != null, "strictly equal", namespace);
 			return r;
 		}
 
 		@Override
-		public ResourceLocation GetOrGreater(int magnitude) {
-			ResourceLocation r = LinearLibrary.this.GetOrGreater(magnitude);
+		public Identifier GetOrGreater(int magnitude) {
+			Identifier r = LinearLibrary.this.GetOrGreater(magnitude);
 			LogGet(magnitude, r != null, "greater", namespace);
 			return r;
 		}
 
 		@Override
-		public ResourceLocation GetOrLesser(int magnitude) {
-			ResourceLocation r = LinearLibrary.this.GetOrLesser(magnitude);
+		public Identifier GetOrLesser(int magnitude) {
+			Identifier r = LinearLibrary.this.GetOrLesser(magnitude);
 			LogGet(magnitude, r != null, "lesser", namespace);
 			return r;
 		}
 
 		private void LogGet(int magnitude, boolean exists, String textBias, String namespace){
-			this.OnTriedVariant(ResourceLocation.fromNamespaceAndPath(namespace, String.valueOf(magnitude)), exists);
+			this.OnTriedVariant(Identifier.fromNamespaceAndPath(namespace, String.valueOf(magnitude)), exists);
 			logger.Info("Getting model {} or {}", CommandLogger.ItemData(magnitude), textBias);
 		}
 	}

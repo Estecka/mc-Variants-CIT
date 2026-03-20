@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
@@ -109,7 +109,7 @@ public record CommandLogger(
 		return TextOf(variant).withStyle(ChatFormatting.YELLOW);
 	}
 
-	private MutableComponent AssetFilename(ResourceLocation variantId, EAssetType assetType){
+	private MutableComponent AssetFilename(Identifier variantId, EAssetType assetType){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.directory,
@@ -119,7 +119,7 @@ public record CommandLogger(
 		);
 	}
 
-	private MutableComponent EquipTextureFilename(ResourceLocation variantId){
+	private MutableComponent EquipTextureFilename(Identifier variantId){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			"textures/entity/equipment/",
@@ -130,7 +130,7 @@ public record CommandLogger(
 		);
 	}
 
-	public void PrintVariantIdTip(ResourceLocation variantId){
+	public void PrintVariantIdTip(Identifier variantId){
 		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
 			PackData(modelPrefix),
 			ItemData(variantId)

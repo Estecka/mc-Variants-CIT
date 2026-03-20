@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
@@ -37,13 +37,13 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
+	public @Nullable Identifier GetItemVariant(ItemStack stack) {
 		String result = IDataContainer.NullableAsString(this.property.Extract(stack));
-		return (result!=null) ? ResourceLocation.tryParse(result) : null;
+		return (result!=null) ? Identifier.tryParse(result) : null;
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		IDataContainer raw = TransformableExtractor.Unwrap(this.property).Extract(stack);
 		IDataContainer transformed = property.Extract(stack);
 
