@@ -1,49 +1,43 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
-import fr.estecka.variantscit.api.IVariantManager;
-import fr.estecka.variantscit.format.properties.PaintingVariantProperty;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.decoration.painting.PaintingVariant;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.level.Level;
+import fr.estecka.variantscit.itemdata.extractors.impl.PaintingVariantProperty;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 
-/**
- * @implNote
- * Because of the "invalid" special model, this particular module's cache should
- * not be allowed to survive  **datapack**  reloads. However this is unlikely to
- * cause  any issue: so long as  an item stack's lifetime  is tied to its world,
- * then the cached keys  will not survive that world, and thus won't survive the
- * actual reloading of painting variants.
- */
 public class PaintingVariantModule
-extends AComponentCachingModule<RegistryEntry<PaintingVariant>>
+extends AMonoComponentModule<Holder<PaintingVariant>>
 {
+	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
+
 	public PaintingVariantModule(){
-		super(DataComponentTypes.PAINTING_VARIANT);
+		super(DataComponents.PAINTING_VARIANT, ECachePolicy.AVOID);
 	}
 
 	static public Optional<Registry<PaintingVariant>> GetPaintingRegistry(){
-		@SuppressWarnings("resource")
-		World world = MinecraftClient.getInstance().world;
+		Level world = Minecraft.getInstance().level;
 		if (world != null)
-			return world.getRegistryManager().getOptional(RegistryKeys.PAINTING_VARIANT);
+			return world.registryAccess().lookup(Registries.PAINTING_VARIANT);
 		else
 			return Optional.empty();
 	}
 
-	public Identifier GetModelForComponent(RegistryEntry<PaintingVariant> component, IVariantManager models){
+	public ResourceLocation GetModelForComponent(Holder<PaintingVariant> component, IVariantLibrary models){
 		if (component == null)
 			return null;
-		
-		Identifier variantId = PaintingVariantProperty.UNIT.GetPropertyId(component);
+
+		ResourceLocation variantId = PaintingVariantProperty.UNIT.GetPropertyId(component);
 
 		var registry = GetPaintingRegistry();
-		if (registry.isPresent() && !registry.get().containsId(variantId))
+		if (registry.isPresent() && !registry.get().containsKey(variantId))
 			return models.GetSpecialModel("invalid");
 
 		return models.GetVariantModel(variantId);

@@ -1,27 +1,25 @@
 package fr.estecka.variantscit.modules.libraries;
 
+import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.api.ICitModule;
-import fr.estecka.variantscit.api.IVariantManager;
 import fr.estecka.variantscit.commands.CommandLogger;
-import fr.estecka.variantscit.modules.IBakedModule;
-import net.minecraft.util.Identifier;
 
 public record VariantLibrary(
-	@Nullable Identifier fallbackModel,
-	Map<Identifier, Identifier> variantModels,
-	Map<String, Identifier> specialModels
+	@Nullable ResourceLocation fallbackModel,
+	Map<ResourceLocation, ResourceLocation> variantModels,
+	Map<String, ResourceLocation> specialModels
 )
-implements IVariantManager, IDebuggableLibrary<IVariantManager>
+implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 {
 	@Override
-	public boolean HasVariantModel(Identifier variant){
+	public boolean HasVariantModel(ResourceLocation variant){
 		return this.variantModels.containsKey(variant);
 	}
 
 	@Override
-	public @Nullable Identifier GetVariantModel(Identifier variant){
+	public @Nullable ResourceLocation GetVariantModel(ResourceLocation variant){
 		if (variant == null)
 			return null;
 		else
@@ -29,7 +27,7 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 	}
 
 	@Override
-	public @Nullable Identifier GetSpecialModel(String key){
+	public @Nullable ResourceLocation GetSpecialModel(String key){
 		return this.specialModels.get(key);
 	}
 
@@ -44,8 +42,22 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 		    ;
 	}
 
-	public IBakedModule Bake(ICitModule logic){
-		return new GenericBakedModule<IVariantManager>(this, logic);
+	public VariantLibrary GetSubLibrary(String subPrefix){
+		Map<ResourceLocation,ResourceLocation> subVariants = new HashMap<>();
+		for (var entry : this.variantModels.entrySet())
+		if  (entry.getKey().getPath().startsWith(subPrefix))
+		{
+			subVariants.put(
+				entry.getKey().withPath(path->path.substring(subPrefix.length())),
+				entry.getValue()
+			);
+		}
+
+		return new VariantLibrary(
+			this.fallbackModel,
+			Map.copyOf(subVariants),
+			this.specialModels
+		);
 	}
 
 
@@ -72,40 +84,40 @@ implements IVariantManager, IDebuggableLibrary<IVariantManager>
 	}
 
 	@Override
-	public Snitch<IVariantManager> CreateSnitch(CommandLogger logger) {
+	public Snitch<IVariantLibrary> CreateSnitch(CommandLogger logger) {
 		return new SnitchingLibrary(logger);
 	}
 
 	private class SnitchingLibrary
-	extends IDebuggableLibrary.Snitch<IVariantManager>
-	implements IVariantManager
+	extends IDebuggableLibrary.Snitch<IVariantLibrary>
+	implements IVariantLibrary
 	{
 		public SnitchingLibrary (CommandLogger logger){
 			super(logger);
 		}
 
 		@Override
-		public boolean HasVariantModel(@Nullable Identifier variantId) {
+		public boolean HasVariantModel(@Nullable ResourceLocation variantId) {
 			boolean r = VariantLibrary.this.HasVariantModel(variantId);
 			this.OnTriedVariant(variantId, r);
 			return r;
 		}
 
 		@Override
-		public @Nullable Identifier GetVariantModel(Identifier variantId) {
+		public @Nullable ResourceLocation GetVariantModel(ResourceLocation variantId) {
 			this.HasVariantModel(variantId);
 			return VariantLibrary.this.GetVariantModel(variantId);
 		}
 
 		@Override
-		public @Nullable Identifier GetSpecialModel(String key) {
-			Identifier r = VariantLibrary.this.GetSpecialModel(key);
+		public @Nullable ResourceLocation GetSpecialModel(String key) {
+			ResourceLocation r = VariantLibrary.this.GetSpecialModel(key);
 			this.OnTriedSpecial(key, r != null);
 			return r;
 		}
 
 		@Override
-		protected void OnTriedVariant(Identifier variantId, boolean exists) {
+		protected void OnTriedVariant(ResourceLocation variantId, boolean exists) {
 			logger.Info("Tested variant ID: {}", CommandLogger.ItemData(variantId));
 			super.OnTriedVariant(variantId, exists);
 		}

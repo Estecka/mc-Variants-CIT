@@ -5,85 +5,85 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
-import net.minecraft.client.render.entity.feature.CapeFeatureRenderer;
-import net.minecraft.client.render.entity.feature.ElytraFeatureRenderer;
-import net.minecraft.client.render.entity.feature.LlamaDecorFeatureRenderer;
-import net.minecraft.client.render.entity.feature.SaddleFeatureRenderer;
-import net.minecraft.client.render.entity.feature.WolfArmorFeatureRenderer;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.entity.layers.CapeLayer;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.layers.LlamaDecorLayer;
+import net.minecraft.client.renderer.entity.layers.SimpleEquipmentLayer;
+import net.minecraft.client.renderer.entity.layers.WingsLayer;
+import net.minecraft.client.renderer.entity.layers.WolfArmorLayer;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.ItemStack;
 
 public class FeatureRendererMixin
 {
-	@Mixin(ArmorFeatureRenderer.class)
+	@Mixin(HumanoidArmorLayer.class)
 	static public class Armor
 	{
 		@WrapOperation(
-			method = { "renderArmor", "hasModel" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			method = { "renderArmorPiece", "shouldRender" },
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
-		static private Object GetVariantEquippable(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
 		}
 	}
 
-	@Mixin(CapeFeatureRenderer.class)
+	@Mixin(CapeLayer.class)
 	static public class Cape
 	{
 		@WrapOperation(
-			method = { "hasCustomModelForLayer" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			method = { "hasLayer" },
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
-		static private Object GetVariantEquippable(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
 		}
 	}
 
-	@Mixin(ElytraFeatureRenderer.class)
+	@Mixin(WingsLayer.class)
 	static public class Elytra
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
-		static private Object GetVariantEquippable(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
 		}
 	}
 
-	@Mixin(LlamaDecorFeatureRenderer.class)
+	@Mixin(LlamaDecorLayer.class)
 	static public class Llama
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
-		static private Object GetVariantEquippable(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
 		}
 	}
 
-	@Mixin(SaddleFeatureRenderer.class)
+	@Mixin(SimpleEquipmentLayer.class)
 	static public class Saddle
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
-		static private Object GetVariantEquippable(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
 		}
 	}
 
-	@Mixin(WolfArmorFeatureRenderer.class)
+	@Mixin(WolfArmorLayer.class)
 	static public class Wolf
 	{
 		@WrapOperation(
 			method = { "render" },
-			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/item/ItemStack.get(Lnet/minecraft/component/ComponentType;)Ljava/lang/Object;")
+			at=@At(value="INVOKE", ordinal=0, target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 		)
-		static private Object GetVariantEquippable(ItemStack stack, ComponentType<?> type, Operation<?> originalOp){
+		static private Object GetVariantEquippable(ItemStack stack, DataComponentType<?> type, Operation<?> originalOp){
 			return VariantsCitMod.EQUIPABLES.GetEquipableVariant(stack, type, originalOp);
 		}
 	}

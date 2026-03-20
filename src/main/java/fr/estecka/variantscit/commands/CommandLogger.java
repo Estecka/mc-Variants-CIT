@@ -2,35 +2,48 @@ package fr.estecka.variantscit.commands;
 
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.reload.EAssetType;
-import fr.estecka.variantscit.reload.EModuleContext;
+import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
-	EModuleContext moduleContext,
-	MetaModule metamodule
+	EModuleHook moduleHook,
+	MetaModule metamodule,
+	String modelPrefix
 )
 {
+
+	public CommandLogger WithSubPrefix(String subPrefix){
+		return new CommandLogger(
+			commandContext,
+			moduleHook,
+			metamodule,
+			modelPrefix + subPrefix
+		);
+	}
 
 /******************************************************************************/
 /* # Generic logging                                                          */
 /******************************************************************************/
 
-	static public MutableText TextOf(Object obj){
-		if (obj instanceof Text text)
+	static public MutableComponent TextOf(Object obj){
+		if (obj instanceof Component text)
 			return text.copy();
+		else if (obj instanceof IDataContainer data)
+			return data.toText();
 		else
-			return Text.literal(String.valueOf(obj));
+			return Component.literal(String.valueOf(obj));
 	}
 
-	static public MutableText TextFormat(Formatting style, String format, Object... args){
-		MutableText result = Text.empty().formatted(style);
+	static public MutableComponent TextFormat(ChatFormatting style, String format, Object... args){
+		MutableComponent result = Component.empty().withStyle(style);
 
 		String remainder = format;
 		int i = 0;
@@ -49,31 +62,31 @@ public record CommandLogger(
 		return result;
 	}
 
-	public MutableText TextFormat(String format, Object... args){
-		return TextFormat(Formatting.RESET, format, args);
+	public MutableComponent TextFormat(String format, Object... args){
+		return TextFormat(ChatFormatting.RESET, format, args);
 	}
 
-	public void Info(Formatting formatting, String format, Object... args){
+	public void Info(ChatFormatting formatting, String format, Object... args){
 		this.Info(TextFormat(formatting, format, args));
 	}
 
 	public void Info(String format, Object... args){
-		this.Info(TextFormat(Formatting.RESET, format, args));
+		this.Info(TextFormat(ChatFormatting.RESET, format, args));
 	}
 
 	public void Info(String message){
-		this.Info(Text.literal(message));
+		this.Info(Component.literal(message));
 	}
 
-	public void Info(Text message){
+	public void Info(Component message){
 		commandContext.getSource().sendFeedback(message);
 	}
 
 	public void Error(String message){
-		this.Error(Text.literal(message));
+		this.Error(Component.literal(message));
 	}
 
-	public void Error(Text message){
+	public void Error(Component message){
 		commandContext.getSource().sendError(message);
 	}
 
@@ -81,45 +94,57 @@ public record CommandLogger(
 /* # Preformatted                                                             */
 /******************************************************************************/
 
-	static public MutableText ItemData(@Nullable Object variant){
+	static public MutableComponent ItemData(@Nullable Object variant){
 		return ItemData(variant, "null");
 	}
 
-	static public MutableText ItemData(@Nullable Object variant, String fallback){
+	static public MutableComponent ItemData(@Nullable Object variant, String fallback){
 		if (variant == null)
-			return Text.literal(fallback).formatted(Formatting.RED);
+			return Component.literal(fallback).withStyle(ChatFormatting.RED);
 		else
-			return TextOf(variant).formatted(Formatting.AQUA);
+			return TextOf(variant).withStyle(ChatFormatting.AQUA);
 	}
 
-	static public MutableText PackData(Object variant){
-		return TextOf(variant).formatted(Formatting.YELLOW);
+	static public MutableComponent PackData(Object variant){
+		return TextOf(variant).withStyle(ChatFormatting.YELLOW);
 	}
 
-	private MutableText AssetFilename(Identifier variantId, EAssetType assetType){
-		return TextFormat(Formatting.YELLOW, "/assets/{}/{}/{}{}{}",
+	private MutableComponent AssetFilename(ResourceLocation variantId, EAssetType assetType){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.directory,
-			metamodule.modelPrefix(),
+			modelPrefix,
 			ItemData(variantId.getPath()),
 			assetType.suffix
 		);
 	}
 
-	public void PrintVariantIdTip(Identifier variantId){
-		Info(Formatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
-			PackData(metamodule.modelPrefix()),
+	private MutableComponent EquipTextureFilename(ResourceLocation variantId){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}{}/{}{}{}",
+			ItemData(variantId.getNamespace()),
+			"textures/entity/equipment/",
+			ItemData("<layer name>"),
+			modelPrefix,
+			ItemData(variantId.getPath()),
+			".png"
+		);
+	}
+
+	public void PrintVariantIdTip(ResourceLocation variantId){
+		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
+			PackData(modelPrefix),
 			ItemData(variantId)
 		);
 
-		Text bullet = Text.literal("-").formatted(Formatting.GRAY);
-		switch (moduleContext())
+		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
+		switch (this.moduleHook)
 		{
 			default:
-				Error("Error: unknown context");
+				Error("Error: unknown hook");
 				break;
 			case EQUIPPABLE:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));
+				Info(bullet.copy().append(EquipTextureFilename(variantId)));
 				break;
 			case ITEM_MODEL:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));

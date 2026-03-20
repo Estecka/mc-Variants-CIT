@@ -1,20 +1,20 @@
 package fr.estecka.variantscit.assetgen;
 
 import java.util.Optional;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.reload.EAssetType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
 
 public enum EAssetGenPass
-implements StringIdentifiable
+implements StringRepresentable
 {
 	EQUIPMENTS  ("equipments_from_textures", EAssetType.EQUIP_TEXTURE, EAssetType.EQUIPMENT  ),
 	BAKED_MODELS("models_from_textures",     EAssetType.ITEM_TEXTURE,  EAssetType.BAKED_MODEL),
 	ITEM_STATES ("items_from_models",        EAssetType.BAKED_MODEL,   EAssetType.ITEM_STATE ),
 	;
 
-	static public final Codec<EAssetGenPass> CODEC = StringIdentifiable.createCodec(EAssetGenPass::values);
+	static public final Codec<EAssetGenPass> CODEC = StringRepresentable.fromEnum(EAssetGenPass::values);
 
 	public final String name;
 	public final EAssetType input, output;
@@ -25,7 +25,7 @@ implements StringIdentifiable
 		this.output = output;
 	}
 
-	public Optional<Identifier> GetShortInputId(Identifier resourceId){
+	public Optional<ResourceLocation> GetShortInputId(ResourceLocation resourceId){
 		String path = resourceId.getPath();
 		if (!path.startsWith(input.directory+"/") || !path.endsWith(input.suffix))
 			return Optional.empty();
@@ -35,12 +35,12 @@ implements StringIdentifiable
 		));
 	}
 
-	public Identifier GetOutputResourceId(Identifier shortAssetId){
+	public ResourceLocation GetOutputResourceId(ResourceLocation shortAssetId){
 		return shortAssetId.withPath(path -> output.directory+"/"+path+output.suffix);
 	}
 
 	@Override
-	public String asString() {
+	public String getSerializedName() {
 		return name;
 	}
 

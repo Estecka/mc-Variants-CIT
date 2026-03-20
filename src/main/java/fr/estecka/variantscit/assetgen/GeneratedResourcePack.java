@@ -13,49 +13,49 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.SharedConstants;
-import net.minecraft.resource.InputSupplier;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourcePackCompatibility;
-import net.minecraft.resource.ResourcePackInfo;
-import net.minecraft.resource.ResourcePackPosition;
-import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.resource.ResourcePackSource;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.resource.ResourcePackProfile.InsertionPosition;
-import net.minecraft.resource.ResourcePackProfile.Metadata;
-import net.minecraft.resource.ResourcePackProfile.PackFactory;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.resource.metadata.PackResourceMetadata;
-import net.minecraft.resource.metadata.ResourceMetadataMap;
-import net.minecraft.resource.metadata.ResourceMetadataSerializer;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.BuiltInMetadata;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.Pack.Metadata;
+import net.minecraft.server.packs.repository.Pack.Position;
+import net.minecraft.server.packs.repository.Pack.ResourcesSupplier;
+import net.minecraft.server.packs.repository.PackCompatibility;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.world.flag.FeatureFlagSet;
 
 public class GeneratedResourcePack
-implements ResourcePack
+implements PackResources
 {
 	static public final GeneratedResourcePack INSTANCE = new GeneratedResourcePack();
 
-	static public final Text PACK_TITLE = Text.literal("Variants-CIT Mod");
-	static public final Text PACK_DESC  = Text.literal("Runtime-generated assets");
+	static public final Component PACK_TITLE = Component.literal("Variants-CIT Mod");
+	static public final Component PACK_DESC  = Component.literal("Runtime-generated assets");
 
-	static private final ResourcePackInfo PACK_INFO = new ResourcePackInfo("variants-cit:assetgen", PACK_TITLE, ResourcePackSource.BUILTIN, Optional.empty());
-	static private final ResourcePackPosition POSITION = new ResourcePackPosition(true, InsertionPosition.BOTTOM, true);
-	static private final Metadata METADATA = new Metadata(PACK_DESC, ResourcePackCompatibility.COMPATIBLE, FeatureSet.empty(), List.of());
-	static private final PackResourceMetadata PACK_METADATA = new PackResourceMetadata(
-		Text.literal("PackMetadata"), // TODO: Figure out what this does.
-		SharedConstants.getGameVersion().packVersion(ResourceType.CLIENT_RESOURCES),
+	static private final PackLocationInfo PACK_INFO = new PackLocationInfo("variants-cit:assetgen", PACK_TITLE, PackSource.BUILT_IN, Optional.empty());
+	static private final PackSelectionConfig POSITION = new PackSelectionConfig(true, Position.BOTTOM, true);
+	static private final Metadata METADATA = new Metadata(PACK_DESC, PackCompatibility.COMPATIBLE, FeatureFlagSet.of(), List.of());
+	static private final PackMetadataSection PACK_METADATA = new PackMetadataSection(
+		Component.literal("PackMetadata"), // TODO: Figure out what this does.
+		SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES),
 		Optional.empty()
 	);
 
-	static private final PackFactory FACTORY = new PackFactory() {
-		public ResourcePack open(ResourcePackInfo var1) { return INSTANCE; };
-		public ResourcePack openWithOverlays(ResourcePackInfo var1, Metadata var2) { return INSTANCE; };
+	static private final ResourcesSupplier FACTORY = new ResourcesSupplier() {
+		public PackResources openPrimary(PackLocationInfo var1) { return INSTANCE; };
+		public PackResources openFull(PackLocationInfo var1, Metadata var2) { return INSTANCE; };
 	};
 
-	static public final ResourcePackProfile PROFILE = new ResourcePackProfile(PACK_INFO, FACTORY, METADATA, POSITION);
+	static public final Pack PROFILE = new Pack(PACK_INFO, FACTORY, METADATA, POSITION);
 
-	private Map<Identifier, InputSupplier<InputStream>> resources;
+	private Map<ResourceLocation, IoSupplier<InputStream>> resources;
 	{
 		this.Reset();
 	}
@@ -64,7 +64,7 @@ implements ResourcePack
 	 * Clears the pack  and returns  a mutable map  that can be used  to add new
 	 * assets to the pack.
 	 */
-	public Map<Identifier, InputSupplier<InputStream>> Reset(){
+	public Map<ResourceLocation, IoSupplier<InputStream>> Reset(){
 		this.resources = new IdentityHashMap<>();
 		return this.resources;
 	}
@@ -72,30 +72,30 @@ implements ResourcePack
 	/**
 	 * @return An immutable copy of the pack's content.
 	 */
-	public Map<Identifier, InputSupplier<InputStream>> GetAll(){
+	public Map<ResourceLocation, IoSupplier<InputStream>> GetAll(){
 		return Map.copyOf(this.resources);
 	}
 
 	@Override
-	public ResourcePackInfo getInfo() {
+	public PackLocationInfo location() {
 		return PACK_INFO;
 	}
 
 	@Override
-	public <T> T parseMetadata(ResourceMetadataSerializer<T> reader) throws IOException {
-		return ResourceMetadataMap.of(PackResourceMetadata.SERIALIZER, PACK_METADATA).get(reader);
+	public <T> T getMetadataSection(MetadataSectionType<T> reader) throws IOException {
+		return BuiltInMetadata.of(PackMetadataSection.TYPE, PACK_METADATA).get(reader);
 	}
 
-	static private InputSupplier<InputStream> GetIcon(){
+	static private IoSupplier<InputStream> GetIcon(){
 		ModContainer mod = FabricLoader.getInstance().getModContainer("variants-cit").get();
 		return mod.findPath("assets/variants-cit/icon.png")
-			.map(InputSupplier::create)
+			.map(IoSupplier::create)
 			.orElse(null)
 			;
 	}
 
 	@Override
-	public @Nullable InputSupplier<@NotNull InputStream> openRoot(String... segments) {
+	public @Nullable IoSupplier<@NotNull InputStream> getRootResource(String... segments) {
 		String path = String.join("/", segments);
 		switch (path) {
 			default: return null;
@@ -104,21 +104,21 @@ implements ResourcePack
 	}
 
 	@Override
-	public @Nullable InputSupplier<@NotNull InputStream> open(ResourceType type, Identifier resourceId) {
-		if (type != ResourceType.CLIENT_RESOURCES)
+	public @Nullable IoSupplier<@NotNull InputStream> getResource(PackType type, ResourceLocation resourceId) {
+		if (type != PackType.CLIENT_RESOURCES)
 			return null;
 
 		return this.resources.get(resourceId);
 	}
 
 	@Override
-	public void findResources(ResourceType type, String namespace, String prefix, ResultConsumer consumer) {
-		if (type != ResourceType.CLIENT_RESOURCES)
+	public void listResources(PackType type, String namespace, String prefix, ResourceOutput consumer) {
+		if (type != PackType.CLIENT_RESOURCES)
 			return;
 
 		for (var entry : this.resources.entrySet()){
-			Identifier id = entry.getKey();
-			InputSupplier<InputStream> supplier = entry.getValue();
+			ResourceLocation id = entry.getKey();
+			IoSupplier<InputStream> supplier = entry.getValue();
 
 			if (id.getNamespace().equals(namespace) && id.getPath().startsWith(prefix)){
 				consumer.accept(id, supplier);
@@ -127,9 +127,9 @@ implements ResourcePack
 	}
 
 	@Override
-	public Set<String> getNamespaces(ResourceType type) {
+	public Set<String> getNamespaces(PackType type) {
 		var result = new HashSet<String>();
-		for (Identifier id : this.resources.keySet())
+		for (ResourceLocation id : this.resources.keySet())
 			result.add(id.getNamespace());
 		return result;
 	}

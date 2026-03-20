@@ -1,20 +1,12 @@
 package fr.estecka.variantscit.modules.impl;
 
-import fr.estecka.variantscit.api.ISimpleCitModule;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.InstrumentComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
+import net.minecraft.core.component.DataComponents;
 
 public class GoatHornModule
-implements ISimpleCitModule
 {
-	@Override
-	public Identifier GetItemVariant(ItemStack stack){
-		InstrumentComponent component = stack.get(DataComponentTypes.INSTRUMENT);
-		if (component == null)
-			return null;
-
-		return component.instrument().getKey().get().getValue();
-	}
+	static public final IVariantCitModule UNIT = ASimpleMonoComponentModule.Of(
+		DataComponents.INSTRUMENT,
+		component -> component.instrument().key().get().location()
+	);
 }

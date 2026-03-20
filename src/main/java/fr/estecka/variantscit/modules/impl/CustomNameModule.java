@@ -1,52 +1,37 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.text.Normalizer;
 import java.util.Map;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
 
 public class CustomNameModule
-extends ASimpleComponentCachingModule<Text>
+extends ASimpleMonoComponentModule<Component>
 {
-	static public final MapCodec<CustomNameModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
-		.group(
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(p->p.debug),
-			Codec.unboundedMap(Codec.STRING, Identifier.CODEC).optionalFieldOf("specialNames", Map.of()).forGetter(p->p.specialNames)
-		)
-		.apply(builder, CustomNameModule::new)
-	);
+	static public final MapCodec<CustomNameModule> MAPCODEC =
+		Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC)
+			.optionalFieldOf("specialNames", Map.of())
+			.xmap(CustomNameModule::new, p->p.specialNames)
+		;
 
-	private final boolean debug;
-	private final Map<String,Identifier> specialNames;
+	private final Map<String,ResourceLocation> specialNames;
 
-	public CustomNameModule(boolean debug, Map<String, Identifier> specialNames){
-		super(DataComponentTypes.CUSTOM_NAME);
-		this.debug = debug;
+	public CustomNameModule(Map<String, ResourceLocation> specialNames){
+		super(DataComponents.CUSTOM_NAME, ECachePolicy.ALWAYS);
 		this.specialNames = specialNames;
 	}
 
 	@Override
-	public Identifier GetVariantForComponent(Text text){
+	public ResourceLocation GetVariantForComponent(Component text){
 		String name = text.getString();
 		if (specialNames.containsKey(name))
 			return specialNames.get(name);
 		
-		name = this.Transform(name);
-		if (debug)
-			VariantsCitMod.LOGGER.info("[custom_name VCIT] #{} \"{}\" -> `{}`", super.cachedVariants.size(), text.getString(), name);
-		return Identifier.tryParse(name);
-	}
-
-	public String Transform(String name){
-		return Normalizer.normalize(name, Normalizer.Form.NFD)
-			.replace(' ', '_')
-			.toLowerCase()
-			.replaceAll("[^a-zA-Z0-9_.-]", "")
-			;
+		name = IStringTransform.SANITIZE.apply(name);
+		return ResourceLocation.tryParse(name);
 	}
 }

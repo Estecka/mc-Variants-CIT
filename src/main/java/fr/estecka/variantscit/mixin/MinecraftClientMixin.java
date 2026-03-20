@@ -4,10 +4,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ResourcePackProvider;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.repository.RepositorySource;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public class MinecraftClientMixin
 {
 	@ModifyArg(
@@ -15,11 +15,11 @@ public class MinecraftClientMixin
 		index = 0,
 		at = @At(
 			value="INVOKE",
-			target="net/minecraft/resource/ResourcePackManager.<init>([Lnet/minecraft/resource/ResourcePackProvider;)V"
+			target="net/minecraft/server/packs/repository/PackRepository.<init>([Lnet/minecraft/server/packs/repository/RepositorySource;)V"
 		)
 	)
-	private ResourcePackProvider[] AddAssetGenPack(ResourcePackProvider[] original){
-		ResourcePackProvider[] result = new ResourcePackProvider[original.length + 1];
+	private RepositorySource[] AddAssetGenPack(RepositorySource[] original){
+		RepositorySource[] result = new RepositorySource[original.length + 1];
 		for (int i=0; i<original.length; ++i)
 			result[i] = original[i];
 		result[original.length] = register->register.accept(GeneratedResourcePack.PROFILE);
