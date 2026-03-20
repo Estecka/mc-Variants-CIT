@@ -2,38 +2,50 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.api.IVariantManager;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
-import fr.estecka.variantscit.format.properties.IStringProperty;
-import fr.estecka.variantscit.format.properties.TransformableProperty;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
+import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
+import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 
 public class MultiComponentFormatModule
-extends ASimpleMultiComponentCachingModule
+implements ISimpleCitModule
 {
-	static public final MapCodec<MultiComponentFormatModule> CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final Codec<TransformableExtractor<IDataExtractor>> SANITIZED_MONOSTRING_DECODER = IDataExtractor.MONOSTRING_DECODER.xmap(
+		inner -> new TransformableExtractor<>(inner, IStringTransform.SANITIZE, Optional.empty()),
+		TransformableExtractor::inner
+	);
+
+	static public final MapCodec<MultiComponentFormatModule> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			Codec.BOOL.fieldOf("debug").orElse(false).forGetter(mod -> mod.debug),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
-			Codecs.strictUnboundedMap(Substitution.VARNAME_CODEC, IStringProperty.CODEC).fieldOf("variables").forGetter(m->m.varGetters)
+			ExtraCodecs.strictUnboundedMap(
+				Substitution.VARNAME_CODEC,
+				CodecUtil.WithAlternative(VCitRegistries.ITEM_PROPERTIES.codec, SANITIZED_MONOSTRING_DECODER)
+			).fieldOf("variables").forGetter(m->m.varGetters)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
 
 	private final Substitution format;
-	private final Map<String, IStringProperty> varGetters;
+	private final Map<String, IDataExtractor> varGetters;
 
-	public MultiComponentFormatModule(boolean debug, Substitution format, Map<String,IStringProperty> variables){
-		super(debug, variables.values().stream());
+	public MultiComponentFormatModule(Substitution format, Map<String,IDataExtractor> variables){
 		this.format = format;
 		this.varGetters = Map.copyOf(variables);
 
@@ -41,16 +53,21 @@ extends ASimpleMultiComponentCachingModule
 	}
 
 	@Override
-	public Identifier RecomputeItemVariant(ItemStack stack){
+	public CacheKeySet GetCacheKeys() {
+		return CacheKeySet.Of(varGetters.values().stream().map(IDataExtractor::GetCacheKey));
+	}
+
+	@Override
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.ALWAYS;
+	}
+
+	@Override
+	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
 		Map<String,String> variables = new HashMap<>();
 
-		if (debug)
-			VariantsCitMod.LOGGER.info("[component_format] {}", this.format);
-
 		for (var entry : this.varGetters.entrySet()){
-			String value = entry.getValue().GetPropertyString(stack);
-			if (debug)
-				VariantsCitMod.LOGGER.info("\t${{}} -> {}", entry.getKey(), value);
+			String value = IDataContainer.NullableAsString(entry.getValue().Extract(stack));
 			if (value == null)
 				return null;
 
@@ -58,29 +75,27 @@ extends ASimpleMultiComponentCachingModule
 		}
 
 		String rawId = this.format.Substitute(variables);
-		if (debug)
-			VariantsCitMod.LOGGER.info("\t= {}", rawId);
 		variables.clear();
-		Identifier id = Identifier.tryParse(rawId);
-		return id;
+		ResourceLocation variantId = ResourceLocation.tryParse(rawId);
+		return variantId;
 	}
 
 	@Override
-	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantManager library, CommandLogger logger) {
+	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		boolean failure = false;
 		Map<String,String> variables = new HashMap<>();
 
 		logger.Info("Format: \"{}\"", CommandLogger.PackData(this.format));
 		for (var entry : varGetters.entrySet()){
-			String raw = TransformableProperty.GetRaw(entry.getValue()).GetPropertyString(stack);
-			String transformed = entry.getValue().GetPropertyString(stack);
+			IDataContainer raw = TransformableExtractor.Unwrap(entry.getValue()).Extract(stack);
+			IDataContainer transformed = entry.getValue().Extract(stack);
 
 			logger.Info("${{}}:", CommandLogger.PackData(entry.getKey()));
 			logger.Info("- Raw data: {}", CommandLogger.ItemData(raw, "Missing or invalid"));
 			logger.Info("- Transformed: {}", CommandLogger.ItemData(transformed));
 
 			failure |= (transformed == null);
-			variables.put(entry.getKey(), transformed);
+			variables.put(entry.getKey(), IDataContainer.NullableAsString(transformed));
 		}
 
 		if (failure)
@@ -88,6 +103,6 @@ extends ASimpleMultiComponentCachingModule
 		else
 			logger.Info("Formatted variant: {}", CommandLogger.ItemData(this.format.Substitute(variables)));
 
-		return this.RecomputeItemModel(stack, library);
+		return this.GetItemModel(stack, library);
 	}
 }

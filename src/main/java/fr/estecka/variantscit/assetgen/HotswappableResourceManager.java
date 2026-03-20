@@ -1,8 +1,8 @@
 package fr.estecka.variantscit.assetgen;
 
 import java.util.function.Supplier;
+import net.minecraft.server.packs.resources.ResourceManager;
 import fr.estecka.variantscit.mixin.ReloadableResourceManagerImplMixin;
-import net.minecraft.resource.ResourceManager;
 
 /**
  * See {@linkplain ReloadableResourceManagerImplMixin}

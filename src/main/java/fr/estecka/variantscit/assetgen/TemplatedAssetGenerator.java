@@ -4,13 +4,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
-import net.minecraft.util.Identifier;
 
 public record TemplatedAssetGenerator(
 	EAssetGenPass pass,
@@ -41,7 +41,7 @@ implements IAssetGenerator
 	}
 
 	@Override
-	public IAssetGenerator.Result AcceptAsset(EAssetGenPass pass, Identifier inputId) {
+	public IAssetGenerator.Result AcceptAsset(EAssetGenPass pass, ResourceLocation inputId) {
 		IAssetGenerator.Result result = new Result();
 		Matcher inputMatcher = inputRegex.matcher(inputId.getPath());
 		if (pass != this.pass || !inputMatcher.matches())
@@ -50,8 +50,8 @@ implements IAssetGenerator
 		Optional<String> outPath = SubstitutePath(inputMatcher, outputSubst);
 		Optional<String> radPath = SubstitutePath(inputMatcher, radicalSubst.orElse(outputSubst));
 		if (outPath.isPresent() && radPath.isPresent()){
-			Identifier outputId  = inputId.withPath(outPath.get());
-			Identifier radicalId = inputId.withPath(radPath.get());
+			ResourceLocation outputId  = inputId.withPath(outPath.get());
+			ResourceLocation radicalId = inputId.withPath(radPath.get());
 
 			result.putIfAbsent(
 				outputId,
@@ -82,7 +82,7 @@ implements IAssetGenerator
 			);
 			return Optional.empty();
 		}
-		if (!Identifier.isPathValid(stringResult)){
+		if (!ResourceLocation.isValidPath(stringResult)){
 			VariantsCitMod.LOGGER.error(
 				"Asset Generator resulted in invalid identifier path: {}:{}\n- Regex: {}\n- Substitution: {}",
 				stringResult,

@@ -9,10 +9,7 @@
 		"FeatureRendererMixin$Horse",
 		"FeatureRendererMixin$Llama",
 		"FeatureRendererMixin$Wolf",
-		"ItemModelTypesMixin",
 		"ItemModelManagerMixin",
-		"ReferencedModelsCollectorMixin",
-		"ReferencedModelsCollectorMixin$ResolverImplMixin",
 		"ReloadableResourceManagerImplMixin",
 		"MinecraftClientMixin"
 	],

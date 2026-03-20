@@ -239,3 +239,27 @@ Since v2.5:
 - Fixed the `fishing_rod` assetGen preset.
 ### 3.16.2
 - Fixed asset-baking failing in prod.
+
+# v5
+- Migrated to Mojmap
+- Reimplemented caches at the global level, instead of inside each module's implementation.
+- `walkthrough` and `summary` commands now display the raw data used by a module.
+- Modules using similar components may now be grouped into the same caches.
+- Removed the deprecated fields `caseSensitive` and `nbtKey` from component_data.
+- Removed the deprecated syntax of `nbtPath`.
+- Removed the deprecated module types: `custom_data`, `entity_data`, `bucket_entity_data` and `block_entity_data`.
+- Removed the `debug` parameters from various modules.
+- Removed the `itemsFromModels` option.
+- Renaming module `context` to `hook`. The old name is marked as deprecated.
+- Added `precondition` option to modules
+- Added module types: `group`, `predicate`
+- Transforms are now able to handle data types other than strings.
+- Added string transform: `equals`
+- Added number transforms: `equals`, `smaller_than`, `smaller_or_equal`, `greater_than`, `greater_or_equal`
+- Added transform equivalents of the `expect` field.
+- Removed `expect` values: `auto`, `primitive`.
+- `expect` now defaults to accepting every data type.
+- Added a `multiline_handling` option for regex. Changed the default to return the first matching line only.
+- All VCIT registries now default to the `variants-cit` namespace.
+- Changed `sanitize` to `sanitize_auto`'s behaviour. Added `sanitize_legacy`.
+- Changed `custom_name`'s flavour of sanitize.
