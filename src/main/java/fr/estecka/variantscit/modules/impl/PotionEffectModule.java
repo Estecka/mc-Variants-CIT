@@ -1,21 +1,14 @@
 package fr.estecka.variantscit.modules.impl;
 
-import fr.estecka.variantscit.api.ISimpleCitModule;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
+import net.minecraft.core.component.DataComponents;
 
 public class PotionEffectModule
-implements ISimpleCitModule
 {
-	@Override
-	public Identifier GetItemVariant(ItemStack stack){
-		PotionContentsComponent potion = stack.get(DataComponentTypes.POTION_CONTENTS);
-
-		if (potion == null || !potion.hasEffects())
-			return null;
-
-		return potion.getEffects().iterator().next().getEffectType().getKey().get().getValue();
-	}
+	static public final IVariantCitModule UNIT = ASimpleMonoComponentModule.Of(
+		DataComponents.POTION_CONTENTS,
+		potion -> potion.hasEffects() ?
+			potion.getAllEffects().iterator().next().getEffect().unwrapKey().get().location() :
+			null
+	);
 }

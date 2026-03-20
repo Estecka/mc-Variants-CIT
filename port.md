@@ -10,8 +10,8 @@ Initial Release
 - `JsonUnbakedModel::deserialize(String)` was removed. The `(Reader)` overload sill exists.
 - (Yarn?) `ModelLoader` moved to `ModelBaker`, multiple internals renammed.
 
-# 1.21.5
-- `NbtCompound::getXXXX` methods now return optionals instead of nullables. A new overload with fallback can be used to avoid Optional instanciations.
+## 1.21.5
+- `NbtCompound::getXXXX` methods now return optionals instead of nullables. A new overload with fallback can be used to avoid Optional instantiations.
 - `NbtElement::asString` no longer works on non-string, and is now wrapped in an optional.
 - The structures of Goat Horn and Music Disc components have changed, now using Lazy Registry Entries.
 - `Text` components are no longer stored in stringified form.

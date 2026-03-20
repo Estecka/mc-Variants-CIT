@@ -7,26 +7,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
+import fr.estecka.variantscit.modules.PreconditionModule;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import fr.estecka.variantscit.collections.TriMap;
 
 
 public final class ModuleLoader
 {
 	static public class Result {
-		public final Map<Item, IBakedModule> itemModules  = new HashMap<>();
-		public final Map<Item, IBakedModule> equipModules = new HashMap<>();
-		public final Map<Identifier, MetaModule> allModules = new HashMap<>();
+		/** Sorted by hook, target, and priority. */
+		public final TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new TriMap<>();
+
+		public final Map<ResourceLocation, MetaModule> uniqueModules = new HashMap<>();
 		public final VariantAggregator variantAggregator;
 
-		private Result(Map<Identifier,ModuleDefinition> modules){
+		private Result(Map<ResourceLocation,ModuleDefinition> modules){
 			this.variantAggregator = new VariantAggregator(modules);
 		}
 	}
@@ -36,15 +38,15 @@ public final class ModuleLoader
 		final ModuleLoader.Result result;
 		final List<MetaModule> metamodules = new ArrayList<>();
 
-		Map<Identifier, Resource> resources = new HashMap<>();
-		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
+		Map<ResourceLocation, Resource> resources = new HashMap<>();
+		Map<ResourceLocation, ModuleDefinition> definitions = new HashMap<>();
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variant-cits/item", ".json"));
 		ObsoletePathWarning(resources);
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/item", ".json"));
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/modules", ".json"));
 		for (var entry : resources.entrySet())
 		{
-			Identifier moduleId = entry.getKey();
+			ResourceLocation moduleId = entry.getKey();
 			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
 				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
@@ -52,8 +54,8 @@ public final class ModuleLoader
 			}
 
 			ModuleDefinition definition = optDefinition.getOrThrow();
-			if (definition.contexts().isEmpty()){
-				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no context: {}", moduleId);
+			if (definition.hooks().isEmpty()){
+				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no hook: {}", moduleId);
 				continue;
 			}
 			if (ItemsFromModule(moduleId, definition).isEmpty()){
@@ -71,24 +73,27 @@ public final class ModuleLoader
 
 		for (var entry : definitions.entrySet())
 		{
-			Identifier moduleId = entry.getKey();
+			ResourceLocation moduleId = entry.getKey();
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
+			var baked = EModuleHook.MapOf(
+				ctx -> result.variantAggregator.GetLibrary(ctx, definition)
+					.map(definition.parameters()::Bake)
+					.map(module -> definition.precondition().isPresent() ? new PreconditionModule(definition.precondition().get(), module) : module)
+					.orElse(null)
+			);
+
 			MetaModule meta = new MetaModule(
 				moduleId,
 				definition.priority(),
 				targets,
 				definition.modelPrefix(),
-				result.variantAggregator.GetLibrary(EModuleContext.ITEM_MODEL, definition).map(definition.parameters()::Bake),
-				result.variantAggregator.GetLibrary(EModuleContext.EQUIPPABLE, definition).map(definition.parameters()::Bake)
+				baked
 			);
 
-			result.allModules.put(moduleId, meta);
+			result.uniqueModules.put(moduleId, meta);
 			metamodules.add(meta);
 		}
-
-		// Sort highest priorities first.
-		metamodules.sort((a,b) -> -Integer.compare(a.priority(), b.priority()));
 
 		if (!result.variantAggregator.conflictingModelPrefixes.isEmpty()){
 			String message = "Some modules with identical model prefixes have conflicting model parents, "
@@ -100,14 +105,22 @@ public final class ModuleLoader
 			VariantsCitMod.LOGGER.error(message);
 		}
 
-		BakeModules(result, metamodules);
+		for (MetaModule meta : metamodules)
+		for (Item item : meta.targets())
+		for (var baked : meta.bakedModules().entrySet())
+		{
+			result.sortedModules.computeIfAbsent(baked.getKey(), item, (Integer)meta.priority(), ArrayList::new)
+				.add(baked.getValue())
+				;
+		}
+
 		return result;
 	}
 
-	static private void ObsoletePathWarning(Map<Identifier, Resource> resources){
+	static private void ObsoletePathWarning(Map<ResourceLocation, Resource> resources){
 		if (!resources.isEmpty()){
 			String names = "";
-			for (Identifier id : resources.keySet()) {
+			for (ResourceLocation id : resources.keySet()) {
 				names += ' ';
 				names += id.toString();
 			}
@@ -120,17 +133,17 @@ public final class ModuleLoader
 /* # Target Item Baking                                                       */
 /******************************************************************************/
 
-	static private Set<Item> ItemsFromModule(Identifier moduleId, ModuleDefinition module){
+	static private Set<Item> ItemsFromModule(ResourceLocation moduleId, ModuleDefinition module){
 		return module.targets()
 			.map(ModuleLoader::ItemsFromTarget)
 			.orElseGet(()->ItemsFromModuleId(moduleId))
 			;
 	}
 
-	static private Set<Item> ItemsFromTarget(List<Identifier> targets){
+	static private Set<Item> ItemsFromTarget(List<ResourceLocation> targets){
 		Set<Item> result = new HashSet<>();
 		targets.stream()
-			.map(id->Registries.ITEM.getEntry(id))
+			.map(id->BuiltInRegistries.ITEM.get(id))
 			.filter(Optional::isPresent)
 			.map(opt->opt.get().value())
 			.forEach(result::add)
@@ -138,46 +151,10 @@ public final class ModuleLoader
 		return result;
 	}
 
-	static private Set<Item> ItemsFromModuleId(Identifier moduleId){
-		if (Registries.ITEM.containsId(moduleId))
-			return Set.of(Registries.ITEM.getEntry(moduleId).get().value());
+	static private Set<Item> ItemsFromModuleId(ResourceLocation moduleId){
+		if (BuiltInRegistries.ITEM.containsKey(moduleId))
+			return Set.of(BuiltInRegistries.ITEM.get(moduleId).get().value());
 		else
 			return Set.of();
 	}
-
-
-/******************************************************************************/
-/* # Module Baking                                                            */
-/******************************************************************************/
-
-	static public void BakeModules(ModuleLoader.Result result, List<MetaModule> modules){
-		Map<Item, List<IBakedModule>> itemModules  = new HashMap<>();
-		Map<Item, List<IBakedModule>> equipModules = new HashMap<>();
-	
-		for (MetaModule meta : modules)
-		{
-			if (meta.itemModule ().isPresent()) BakeModuleContext(meta, meta.itemModule ().get(), itemModules );
-			if (meta.equipModule().isPresent()) BakeModuleContext(meta, meta.equipModule().get(), equipModules);
-		}
-
-		BakeItem(result.itemModules,  itemModules );
-		BakeItem(result.equipModules, equipModules);
-	}
-
-	static private void BakeModuleContext(MetaModule meta, IBakedModule bakedModule, Map<Item, List<IBakedModule>> output){
-		for (Item itemType : meta.targets()){
-			output.computeIfAbsent(itemType, __->new ArrayList<>()).add(bakedModule);
-		}
-	}
-
-	static private void BakeItem(Map<Item, IBakedModule> result, Map<Item, List<IBakedModule>> moduleListPerItem){
-		for (var entry : moduleListPerItem.entrySet()){
-			result.put(
-				entry.getKey(),
-				IBakedModule.OfList( entry.getValue() )
-			);
-		}
-	}
-
-
 }

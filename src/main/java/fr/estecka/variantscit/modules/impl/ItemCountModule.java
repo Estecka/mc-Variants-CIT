@@ -1,27 +1,30 @@
 package fr.estecka.variantscit.modules.impl;
 
-import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.itemdata.extractors.impl.ItemCountProperty;
+import fr.estecka.variantscit.modules.cache.CacheKeySet;
+import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.modules.libraries.ILinearCitModule;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
-import fr.estecka.variantscit.modules.libraries.LinearLibrary.ILinearCitModule;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
-public record ItemCountModule(String namespace)
+public record ItemCountModule()
 implements ILinearCitModule
 {
-	static public final MapCodec<ItemCountModule> CODEC = CodecUtil.IDENTIFIER_NAMESPACE
-		.optionalFieldOf("namespace", "minecraft")
-		.xmap(ItemCountModule::new, ItemCountModule::GetNamespace)
-		;
+	static public final ItemCountModule UNIT = new ItemCountModule();
 
 	@Override
-	public String GetNamespace() {
-		return namespace;
+	public CacheKeySet GetCacheKeys() {
+		return CacheKeySet.Of(ItemCountProperty.UNIT);
 	}
 
 	@Override
-	public Identifier GetItemModel(ItemStack stack, ILinearLibrary library){
+	public ECachePolicy GetCachePolicy() {
+		return ECachePolicy.AVOID;
+	}
+
+	@Override
+	public ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library){
 		return library.GetOrLesser(stack.getCount());
 	}
 }
