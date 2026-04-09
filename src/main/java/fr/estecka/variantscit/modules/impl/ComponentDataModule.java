@@ -13,6 +13,7 @@ import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
+import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 
 
 public class ComponentDataModule<P extends IDataExtractor>
@@ -45,9 +46,9 @@ implements ISimpleCitModule
 	@Override
 	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		IDataContainer raw = TransformableExtractor.Unwrap(this.property).Extract(stack);
-		IDataContainer transformed = property.Extract(stack);
-
 		logger.Info("Raw data: {}",    CommandLogger.ItemData(raw, "Missing or invalid"));
+
+		IDataContainer transformed = LogTransform.WithLogger(logger, ()->property.Extract(stack));
 		logger.Info("Transformed: {}", CommandLogger.ItemData(transformed));
 
 		return this.GetItemModel(stack, library);

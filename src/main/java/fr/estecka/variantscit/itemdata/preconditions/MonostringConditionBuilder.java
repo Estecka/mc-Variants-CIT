@@ -60,7 +60,7 @@ public abstract class MonostringConditionBuilder
 			DataResult<IDataExtractor> extractor = CodecUtil.ParseString(IDataExtractor.MONOSTRING_DECODER, key).map(Function.identity());
 			if (transform.isError())
 				result = transform.map(_0->null);
-			if (extractor.isError())
+			else if (extractor.isError())
 				result = extractor.map(_0->null);
 			else
 				result = DataResult.success(new TransformableExtractor<IDataExtractor>(extractor.getOrThrow(), transform.getOrThrow(), Optional.empty()));

@@ -21,6 +21,7 @@ import fr.estecka.variantscit.modules.impl.*;
 import fr.estecka.variantscit.modules.libraries.*;
 import fr.estecka.variantscit.reload.IUnbakedModule;
 
+
 public final class VCitRegistries
 {
 	static public final DecodableRegistry<IUnbakedModule> MODULES =
@@ -41,7 +42,7 @@ public final class VCitRegistries
 	static public final DecodableRegistry<IDataTransform> TRANSFORMS = 
 		new DecodableRegistry
 			.Builder<IDataTransform>("function")
-			.WithDefault(VariantsCitMod.Identifier("auto"))
+			.WithDefault(VariantsCitMod.Identifier("auto_detect_function"))
 			.WithWrapper(OptionalTransform::CodecOf)
 			.Build()
 			;
@@ -54,7 +55,10 @@ public final class VCitRegistries
 			.Build()
 			;
 
-	static {
+	static
+	{
+		// ## Modules
+
 		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_data"), ComponentDataModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_format"), MultiComponentFormatModule.MAPCODEC);
@@ -84,6 +88,9 @@ public final class VCitRegistries
 		RegisterRemoved("custom_data",        "component_data");
 		RegisterRemoved("entity_data",        "component_data");
 
+
+		// ## Properties
+
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(VariantsCitMod.Identifier("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
 		ITEM_PROPERTIES.RegisterMap(VariantsCitMod.Identifier("item_component"), ItemComponentProperty.MAP_CODEC);
@@ -91,8 +98,13 @@ public final class VCitRegistries
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_type"), ItemTypeProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("painting_variant"), PaintingVariantProperty.UNIT);
 
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("noop"),               IStringTransform.NOOP);
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("null"),               IStringTransform.NULL);
+
+		// ## Transforms
+
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("noop"), IDataTransform.NOOP);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("null"), IStringTransform.NULL);
+		TRANSFORMS.Register    (VariantsCitMod.Identifier("log"),  LogTransform.MAPCODEC, new LogTransform());
+
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("lowercase"),          (IStringTransform)String::toLowerCase);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("discard_path"),       (IStringTransform)IStringTransform::DiscardPath);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("discard_namespace"),  (IStringTransform)IStringTransform::DiscardNamespace);
@@ -102,9 +114,14 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_legacy"),    IStringTransform.SANITIZE_LEGACY);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      IStringTransform.SANITIZE);
 		TRANSFORMS.Deprecate   (VariantsCitMod.Identifier("sanitize_auto"),      "Transform name `sanitize_auto` is deprecated. Use `sanitize` instead.");
+
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("test"),                TestTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("matches_any"),         MatchesTransform.MATCHANY_MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("matches_all"),         MatchesTransform.MATCHALL_MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("successive"),          SuccessiveTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("alternative"),         AlternativeTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("foreach"),             ForeachTransform.MAPCODEC);
+
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist"),           FilterlistTransform.MAPCODEC_BLACKLIST);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("charset_remap"),       CharRemapTransform.MAPCODEC);
@@ -117,16 +134,22 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("smaller_or_equals"),   NumberCompareTransform.MAPCODEC_GREAT_OR_EQ);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("greater_or_equals"),   NumberCompareTransform.MAPCODEC_SMALL_OR_EQ);
 
+		TRANSFORMS.RegisterMap (VariantsCitMod.Identifier("nbt_path"),            NbtPath.MAPCODEC);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_identifier"),      DataConversions::StricIdentifier);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_number"),          DataConversions::StrictNumber);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text"),       DataConversions::StrictRichText);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text_array"), DataConversions::StrictRichTextArray);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_string"),          DataConversions::StrictString);
 
-		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("auto"), CodecUtil.MapWithAlternatives(
+
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("auto_detect_function"), CodecUtil.MapWithAlternatives(
 			RegexTransform.MAPCODEC,
+			LogTransform.ANONYMOUS_MAPCODEC,
+			NbtPath.MAPCODEC,
 			FilterlistTransform.MAPCODEC_BLACKLIST,
 			FilterlistTransform.MAPCODEC_WHITELIST,
+			MatchesTransform.MATCHANY_MAPCODEC,
+			MatchesTransform.MATCHALL_MAPCODEC,
 			StringCompareTransform.MAPCODEC,
 			NumberCompareTransform.MAPCODEC_EQUAL,
 			NumberCompareTransform.MAPCODEC_GREATER,
@@ -135,10 +158,14 @@ public final class VCitRegistries
 			NumberCompareTransform.MAPCODEC_SMALL_OR_EQ
 		));
 
+
+		// ## Preconditions
+
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_all"), ConditionList.MATCHALL_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_any"), ConditionList.MATCHANY_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("transform"),   ITEM_PROPERTIES.mapCodec);
 	}
+
 
 	static public void RegisterBakedModule(Identifier id, MapCodec<? extends IUnbakedModule> mapcodec){
 		MODULES.RegisterMap(id, mapcodec);

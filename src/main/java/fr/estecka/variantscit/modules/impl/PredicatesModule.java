@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
+import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
@@ -102,7 +103,7 @@ implements ISimpleCitModule
 		int i = 0;
 
 		for (PredicatedVariant v : variants) {
-			boolean matched = v.precondition.Matches(stack);
+			boolean matched = LogTransform.WithLogger(logger, ()->v.precondition.Matches(stack));
 			logger.Info(" [{}] {}: {}",
 				i++,
 				CommandLogger.PackData(v.variantId),
