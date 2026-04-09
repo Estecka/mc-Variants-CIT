@@ -3,6 +3,7 @@
 	"package": "fr.estecka.variantscit.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"ClientWorldAccessor",
 		"FeatureRendererMixin$Armor",
 		"FeatureRendererMixin$Cape",
 		"FeatureRendererMixin$Elytra",

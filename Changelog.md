@@ -241,6 +241,7 @@ Since v2.5:
 - Fixed asset-baking failing in prod.
 
 # v5
+## 5.0
 - Migrated to Mojmap
 - Reimplemented caches at the global level, instead of inside each module's implementation.
 - `walkthrough` and `summary` commands now display the raw data used by a module.
@@ -263,3 +264,9 @@ Since v2.5:
 - All VCIT registries now default to the `variants-cit` namespace.
 - Changed `sanitize` to `sanitize_auto`'s behaviour. Added `sanitize_legacy`.
 - Changed `custom_name`'s flavour of sanitize.
+## 5.1
+- Walkthrough may now target other players and items on the ground.
+- Added transforms: `log`, `nbt_path`, `foreach`, `matches_any`, `matches_all`
+- `test` tansform's field is being renamed to `test`. Its function type is now optional
+- Fixed `equals` transform not accepting strings when using its canonical form.
+- Fixed a crash when failing to parse a simplified precondition.

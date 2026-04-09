@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules;
 
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
+import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +34,7 @@ implements IBakedModule
 
 	@Override
 	public ResourceLocation Walkthrough(CommandLogger logger, ItemStack stack) {
-		if (precondition.Matches(stack)){
+		if (LogTransform.WithLogger(logger, ()->precondition.Matches(stack))){
 			logger.Info("Precondition matched.");
 			return subModule.Walkthrough(logger, stack);
 		}
