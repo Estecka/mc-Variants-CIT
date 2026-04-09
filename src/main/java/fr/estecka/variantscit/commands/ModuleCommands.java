@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.reload.EModuleHook;
@@ -16,6 +17,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -38,17 +42,23 @@ extends CommandUtil
 
 	static public final String HOOK_ARG    = "hook";
 	static public final String MODULE_ARG  = "module id";
-	
+
 	static public void	Register(){
 		ClientCommandRegistrationCallback.EVENT.register(ID, ModuleCommands::RegisterWith);
 	}
 
 	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess){
+		var walkthrough = literal("walkthrough").executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetSelf)))
+			.then(literal("self")          .executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetSelf))))
+			.then(literal("nearest_item")  .executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetGroundItem))))
+			.then(literal("nearest_player").executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetPlayer))))
+			;
+
 		var module = argument(MODULE_ARG, id())
 			.suggests(ModuleCommands::ModuleAutofill)
 			.then(literal("dump").executes(c->Execute(c, ModuleCommands::Dump)))
 			.then(literal("summary").executes(c->Execute(c, ModuleCommands::Summary)))
-			.then(literal("walkthrough").executes(c->Execute(c, ModuleCommands::Walkthrough)))
+			.then(walkthrough)
 			;
 
 		var hook = literal("module")
@@ -88,6 +98,10 @@ extends CommandUtil
 		int Execute(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module) throws CommandSyntaxException;
 	}
 
+	static private IModuleCommand Walkthrough(IClientEntitySelector target){
+		return (c,l,m)->Walkthrough(c,l,m, target);
+	}
+
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
 		EModuleHook moduleContext = getModuleHook(context, HOOK_ARG);
 		ResourceLocation moduleId = context.getArgument(MODULE_ARG, ResourceLocation.class);
@@ -117,13 +131,26 @@ extends CommandUtil
 		return 0;
 	}
 
-	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, CommandLogger logger, IBakedModule module){
-		ItemStack stack = cmdCtx.getSource().getPlayer().getMainHandItem();
+	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, CommandLogger logger, IBakedModule module, IClientEntitySelector target){
+		ItemStack stack;
+		String itemSource;
+		Entity targetEntity = target.get();
+		if (targetEntity instanceof ItemEntity groundItem){
+			stack = groundItem.getItem();
+			itemSource = "ground";
+		}
+		else if (targetEntity instanceof Player player){
+			stack = player.getMainHandItem();
+			itemSource = "main-hand";
+		}
+		else
+			return Error(cmdCtx, "No elligible entity could be found.");
 
 		logger.Info("--------");
-		logger.Info("Testing {} module {} on main-hand item: {} ({})",
+		logger.Info("Testing {} module {} on {} item: {} ({})",
 			CommandLogger.PackData(logger.moduleHook()),
 			CommandLogger.PackData(logger.metamodule().id()).withStyle(ChatFormatting.UNDERLINE),
+			itemSource,
 			CommandLogger.ItemData(stack.getHoverName()).withStyle(ChatFormatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getItem())
 		);

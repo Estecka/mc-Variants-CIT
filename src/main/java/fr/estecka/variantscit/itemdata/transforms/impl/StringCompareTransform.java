@@ -14,7 +14,7 @@ implements IDataTransform
 		.xmap(StringCompareTransform::new, StringCompareTransform::targetValue)
 		;
 
-	static public final MapCodec<StringCompareTransform> MAPCODEC = LITERAL_CODEC.fieldOf("value");
+	static public final MapCodec<StringCompareTransform> MAPCODEC = LITERAL_CODEC.fieldOf("equals");
 
 	@Override
 	public IDataContainer LooseTypedTransform(IDataContainer inputContainer) {

@@ -1,4 +1,5 @@
 package fr.estecka.variantscit.commands;
+import java.util.Optional;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -19,5 +20,14 @@ public class CommandUtil
 	static protected int Success(CommandContext<FabricClientCommandSource> context, String message){
 		context.getSource().sendFeedback(Component.literal(message));
 		return 1;
+	}
+
+	static protected <T> Optional<T> GetOptionalArgument(CommandContext<?> context, String arumentName, Class<T> clazz){
+		try {
+			return Optional.of(context.getArgument(arumentName, clazz));
+		}
+		catch(IllegalArgumentException e){
+			return Optional.empty();
+		}
 	}
 }

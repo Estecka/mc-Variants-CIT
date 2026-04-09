@@ -22,6 +22,7 @@ import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
+import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 
 public class MultiComponentFormatModule
 implements ISimpleCitModule
@@ -87,11 +88,12 @@ implements ISimpleCitModule
 
 		logger.Info("Format: \"{}\"", CommandLogger.PackData(this.format));
 		for (var entry : varGetters.entrySet()){
-			IDataContainer raw = TransformableExtractor.Unwrap(entry.getValue()).Extract(stack);
-			IDataContainer transformed = entry.getValue().Extract(stack);
-
 			logger.Info("${{}}:", CommandLogger.PackData(entry.getKey()));
+
+			IDataContainer raw = TransformableExtractor.Unwrap(entry.getValue()).Extract(stack);
 			logger.Info("- Raw data: {}", CommandLogger.ItemData(raw, "Missing or invalid"));
+
+			IDataContainer transformed = LogTransform.WithLogger(logger, ()->entry.getValue().Extract(stack));
 			logger.Info("- Transformed: {}", CommandLogger.ItemData(transformed));
 
 			failure |= (transformed == null);

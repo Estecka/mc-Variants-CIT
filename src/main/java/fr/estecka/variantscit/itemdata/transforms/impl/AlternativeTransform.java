@@ -7,6 +7,7 @@ import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 
 
+// TODO: Deprecate and replace with an implementation of ForeachTransform
 public record AlternativeTransform(List<IDataTransform> alternatives)
 implements IDataTransform
 {
