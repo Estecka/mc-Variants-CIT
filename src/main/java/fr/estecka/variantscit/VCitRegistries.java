@@ -93,6 +93,7 @@ public final class VCitRegistries
 
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(VariantsCitMod.Identifier("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
+		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("display_name"), DisplayNameProperty.UNIT);
 		ITEM_PROPERTIES.RegisterMap(VariantsCitMod.Identifier("item_component"), ItemComponentProperty.MAP_CODEC);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_count"), ItemCountProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_type"), ItemTypeProperty.UNIT);
@@ -135,10 +136,12 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("greater_or_equals"),   NumberCompareTransform.MAPCODEC_SMALL_OR_EQ);
 
 		TRANSFORMS.RegisterMap (VariantsCitMod.Identifier("nbt_path"),            NbtPath.MAPCODEC);
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_identifier"),      DataConversions::StricIdentifier);
+		TRANSFORMS.Register    (VariantsCitMod.Identifier("get_identifier"),      DataConversions.GET_IDENTIFIER_MAPCODEC, DataConversions::StricIdentifier);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_nbt"),             DataConversions::StrictNbt);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_number"),          DataConversions::StrictNumber);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text"),       DataConversions::StrictRichText);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text_array"), DataConversions::StrictRichTextArray);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_snbt"),            DataConversions::StrictSnbt);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_string"),          DataConversions::StrictString);
 
 
