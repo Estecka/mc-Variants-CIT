@@ -50,10 +50,14 @@ public final class CodecUtil
 /* # Base Types                                                               */
 /******************************************************************************/
 
-	static public DataResult<Identifier> VCitIdentifier(String input){
+	static public DataResult<Identifier> NamespacedIdentifier(String defaultNamespace, String input){
 		if (!input.contains(":"))
-			input = VariantsCitMod.MODID + ":" + input;
+			input = defaultNamespace + ":" + input;
 		return Identifier.read(input);
+	}
+
+	static public DataResult<Identifier> VCitIdentifier(String input){
+		return NamespacedIdentifier(VariantsCitMod.MODID, input);
 	}
 
 	static public DataResult<Pattern> ParseRegex(String regex){

@@ -366,3 +366,8 @@ Since v3.5:
 - `test` tansform's field is being renamed to `test`. Its function type is now optional
 - Fixed `equals` transform not accepting strings when using its canonical form.
 - Fixed a crash when failing to parse a simplified precondition.
+## 5.2
+- Added item property: `display_name`.
+- Added transform: `get_nbt`, `get_snbt`.
+- Transform `get_identifier` now takes a `defaultNamespace` parameter.
+- Module `component_format` now takes a global transform.
