@@ -14,6 +14,7 @@ import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.impl.AxolotlVariantProperty;
 import fr.estecka.variantscit.itemdata.extractors.impl.EntityAgeMapProperty;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.modules.IBakedModule;
 
 public record AxolotlBucketModule(String adultSuffix, String babySuffix)
@@ -60,10 +61,10 @@ implements IUnbakedModule
 		variables.put("variant", AxolotlVariantProperty.UNIT);
 		variables.put("age", new EntityAgeMapProperty(adult, baby));
 
-		return new MultiComponentFormatModule(agedFormat, variables);
+		return new MultiComponentFormatModule(agedFormat, variables, IDataTransform.NOOP);
 	}
 
 	static private MultiComponentFormatModule CreateAgeInvariantModule(String suffix){
-		return new MultiComponentFormatModule(Substitution.Parse("${variant}"+suffix).getOrThrow(), ageInvariantVariables);
+		return new MultiComponentFormatModule(Substitution.Parse("${variant}"+suffix).getOrThrow(), ageInvariantVariables, IDataTransform.NOOP);
 	}
 }

@@ -19,9 +19,13 @@ import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
+import fr.estecka.variantscit.itemdata.transforms.DataConversions;
+import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
+import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 
 public class MultiComponentFormatModule
@@ -38,16 +42,19 @@ implements ISimpleCitModule
 			ExtraCodecs.strictUnboundedMap(
 				Substitution.VARNAME_CODEC,
 				CodecUtil.WithAlternative(VCitRegistries.ITEM_PROPERTIES.codec, SANITIZED_MONOSTRING_DECODER)
-			).fieldOf("variables").forGetter(m->m.varGetters)
+			).fieldOf("variables").forGetter(m->m.varGetters),
+			SuccessiveTransform.CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(m->m.transform)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
 
 	private final Substitution format;
+	private final IDataTransform transform;
 	private final Map<String, IDataExtractor> varGetters;
 
-	public MultiComponentFormatModule(Substitution format, Map<String,IDataExtractor> variables){
+	public MultiComponentFormatModule(Substitution format, Map<String,IDataExtractor> variables, IDataTransform transform){
 		this.format = format;
+		this.transform = transform;
 		this.varGetters = Map.copyOf(variables);
 
 		this.format.MatchWarning(variables.keySet());
@@ -75,10 +82,16 @@ implements ISimpleCitModule
 			variables.put(entry.getKey(), value);
 		}
 
-		String rawId = this.format.Substitute(variables);
+		IDataContainer result = this.transform.LooseTypedTransform(RawDataContainer.OfNullable(this.format.Substitute(variables)));
 		variables.clear();
-		ResourceLocation variantId = ResourceLocation.tryParse(rawId);
-		return variantId;
+		if (result == null)
+			return null;
+
+		result = DataConversions.StricIdentifier(result);
+		if (result == null)
+			return null;
+		else
+			return (ResourceLocation)result.value();
 	}
 
 	@Override
@@ -102,8 +115,15 @@ implements ISimpleCitModule
 
 		if (failure)
 			logger.Info("Some data could not be processed.");
-		else
-			logger.Info("Formatted variant: {}", CommandLogger.ItemData(this.format.Substitute(variables)));
+
+		String substResult = this.format.Substitute(variables);
+		logger.Info("Format result: {}", CommandLogger.ItemData(substResult));
+
+		if (this.transform != IDataTransform.NOOP){
+			var r = LogTransform.WithLogger(logger, ()->this.transform.LooseTypedTransform(RawDataContainer.OfNullable(substResult)));
+			logger.Info("Transformed format: {}", CommandLogger.ItemData(r));
+		}
+
 
 		return this.GetItemModel(stack, library);
 	}
