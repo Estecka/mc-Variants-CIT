@@ -6,6 +6,7 @@ import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
@@ -34,61 +35,90 @@ public final class DataConversions
 		.xmap(AlternativeTransform::Wrap, AlternativeTransform::Unwrap)
 		;
 
+	static public final MapCodec<IDataTransform> GET_IDENTIFIER_MAPCODEC = CodecUtil.IDENTIFIER_NAMESPACE
+		.optionalFieldOf("defaultNamespace", "minecraft")
+		.xmap(
+			namespace -> (data)->StricIdentifier(data, namespace),
+			CodecUtil.NoGetter("get_identifier")
+		)
+		;
+
 
 /******************************************************************************/
 /* # Strict Casts                                                             */
 /******************************************************************************/
 
-static public IDataContainer StricIdentifier(IDataContainer input) {
-	if (input.value() instanceof ResourceLocation)
-		return input;
-	if (input.value() instanceof String string)
-		return RawDataContainer.OfNullable(ResourceLocation.tryParse(string));
-	if (input.asNbt() instanceof StringTag nbt)
-		return RawDataContainer.OfNullable(ResourceLocation.tryParse(nbt.value()));
-	return null;
-}
+	static public IDataContainer StricIdentifier(IDataContainer input) {
+		return StricIdentifier(input, ResourceLocation.DEFAULT_NAMESPACE);
+	}
 
-static public IDataContainer StrictString(IDataContainer input) {
-	if (input.value() instanceof String)
-		return input;
-	if (input.value() instanceof ResourceLocation id)
-		return RawDataContainer.OfNullable(id.toString());
-	if (input.asNbt() instanceof StringTag nbt)
-		return RawDataContainer.OfNullable(nbt.value());
-	return null;
-}
-
-static public IDataContainer StrictNumber(IDataContainer input) {
-	if (input.value() instanceof Number)
-		return input;
-	if (input.asNbt() instanceof NumericTag nbt)
-		return RawDataContainer.OfNullable(nbt.asNumber());
-
-	return null;
-}
-
-static public IDataContainer StrictRichText(IDataContainer input) {
-	if (input.value() instanceof Component)
-		return input;
-	
-	var nbt = input.asNbt();
-	if (nbt != null)
-		return RawDataContainer.OfNullable(NbtToText(nbt));
-	else
+	static public IDataContainer StricIdentifier(IDataContainer input, String defaultNamespace) {
+		if (input.value() instanceof ResourceLocation)
+			return input;
+		if (input.value() instanceof String string)
+			return RawDataContainer.OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, string).mapOrElse(o->o, o->null));
+		if (input.asNbt() instanceof StringTag nbt)
+			return RawDataContainer.OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, nbt.value()).mapOrElse(o->o, o->null));
 		return null;
-}
+	}
 
-static public IDataContainer StrictRichTextArray(IDataContainer input) {
-	if (input.value() instanceof ItemLore)
-		return input;
-	
-	var nbt = input.asNbt();
-	if (nbt != null)
-		return RawDataContainer.OfNullable(NbtToTextArray(nbt));
-	else
+	static public IDataContainer StrictString(IDataContainer input) {
+		if (input.value() instanceof String)
+			return input;
+		if (input.value() instanceof ResourceLocation id)
+			return RawDataContainer.OfNullable(id.toString());
+		if (input.asNbt() instanceof StringTag nbt)
+			return RawDataContainer.OfNullable(nbt.value());
 		return null;
-}
+	}
+
+	static public IDataContainer StrictNumber(IDataContainer input) {
+		if (input.value() instanceof Number)
+			return input;
+		if (input.asNbt() instanceof NumericTag nbt)
+			return RawDataContainer.OfNullable(nbt.asNumber());
+
+		return null;
+	}
+
+	static public IDataContainer StrictRichText(IDataContainer input) {
+		if (input.value() instanceof Component)
+			return input;
+		
+		var nbt = input.asNbt();
+		if (nbt != null)
+			return RawDataContainer.OfNullable(NbtToText(nbt));
+		else
+			return null;
+	}
+
+	static public IDataContainer StrictRichTextArray(IDataContainer input) {
+		if (input.value() instanceof ItemLore)
+			return input;
+		
+		var nbt = input.asNbt();
+		if (nbt != null)
+			return RawDataContainer.OfNullable(NbtToTextArray(nbt));
+		else
+			return null;
+	}
+
+	static public IDataContainer StrictNbt(IDataContainer input) {
+		if (input.value() instanceof Tag)
+			return input;
+		
+		return RawDataContainer.OfNullable(input.asNbt());
+	}
+
+	static public IDataContainer StrictSnbt(IDataContainer input) {
+		input = StrictNbt(input);
+		if (input == null)
+			return null;
+
+		Tag nbt = (Tag)input.value();
+		String snbt = nbt.toString();
+		return RawDataContainer.OfNullable(snbt);
+	}
 
 
 /******************************************************************************/
@@ -119,13 +149,12 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 
 	static public Number AggressiveNumber(IDataContainer data){
 		Number result = null;
+
 		result = SoftCastToNumber(data.value());
 		if (result != null)
 			return result;
-
-		result =  SoftCastToNumber(data.asNbt());
-
-		return result;
+		else
+			return SoftCastToNumber(data.asNbt());
 	}
 
 
@@ -165,6 +194,7 @@ static public IDataContainer StrictRichTextArray(IDataContainer input) {
 		return value instanceof Tag nbt ? nbt :
 		       value instanceof String string ? StringTag.valueOf(string) :
 		       value instanceof Number number ? DoubleTag.valueOf(number.doubleValue()) :
+		       value instanceof Component text ? ComponentSerialization.CODEC.encodeStart(NbtOps.INSTANCE, text).mapOrElse(o->o, o->null) :
 		       null
 		       ;
 	};
