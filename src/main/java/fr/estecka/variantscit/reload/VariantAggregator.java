@@ -30,6 +30,7 @@ public class VariantAggregator
 	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, VariantLibrary> trims = new IdentityHashMap<>();
 
 	public final Map<ResourceLocation, GeneratedAsset> generatedAssets = new HashMap<>();
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
@@ -57,6 +58,7 @@ public class VariantAggregator
 	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
 		return switch (hook){
 			default -> throw new AssertionError("Invalid hook");
+			case TRIM_PATTERN -> this.trims;
 			case EQUIPPABLE -> this.equippable;
 			case ITEM_MODEL -> this.item_model;
 		};
@@ -70,6 +72,7 @@ public class VariantAggregator
 		var genPack = GeneratedResourcePack.INSTANCE.Reset();
 
 		// Asset generation passes
+		GatherType(EAssetType.TRIM_TEXTURE,  manager.Get());
 		GatherType(EAssetType.EQUIP_TEXTURE, manager.Get());
 		GatherType(EAssetType.ITEM_TEXTURE,  manager.Get());
 		UpdateGeneratedPack(genPack, manager);
@@ -95,6 +98,7 @@ public class VariantAggregator
 	private void ApplyModelToAll(EAssetType assetType, ResourceLocation shortId){
 		EAssetGenPass generatorPass = switch (assetType){
 			default -> null;
+			case EAssetType.TRIM_TEXTURE  -> EAssetGenPass.TRIMS;
 			case EAssetType.EQUIP_TEXTURE -> EAssetGenPass.EQUIPMENTS;
 			case EAssetType.ITEM_TEXTURE  -> EAssetGenPass.BAKED_MODELS;
 			case EAssetType.BAKED_MODEL   -> EAssetGenPass.ITEM_STATES;

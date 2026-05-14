@@ -13,8 +13,8 @@ public enum EAssetType
 	EQUIP_TEXTURE (EModuleHook.EQUIPPABLE,   false, "textures/entity/equipment", ".png"),
 	EQUIPMENT     (EModuleHook.EQUIPPABLE,   true , "equipment"                , ".json"),
 
-	TRIM_TEXTURE  (EModuleHook.TRIM_PATTERN, false, "textures/trims/entity/",     ".png"),
-	TRIM_MODEL    (EModuleHook.TRIM_PATTERN, true , "variants-cit/trim_pattern/", ".json"),
+	TRIM_TEXTURE  (EModuleHook.TRIM_PATTERN, false, "textures/trims/entity",     ".png"),
+	TRIM_MODEL    (EModuleHook.TRIM_PATTERN, true , "variants-cit/trim_pattern", ".json"),
 	;
 
 	public final EModuleHook hook;

@@ -21,12 +21,8 @@ import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimSp
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.EquipmentAssetManager;
-import net.minecraft.client.resources.model.EquipmentClientInfo;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.EquipmentAsset;
-import net.minecraft.world.item.equipment.trim.ArmorTrim;
 
 
 @Unique
@@ -37,7 +33,7 @@ public class EquipmentLayerRendererMixin
 
 	private TextureAtlas textureAtlas;
 
-	@Inject(method="<init>", at=@At("HEAD"))
+	@Inject(method="<init>", at=@At("TAIL"))
 	private void getAtlas(EquipmentAssetManager manager, TextureAtlas atlas, CallbackInfo ci){
 		this.textureAtlas = atlas;
 	}
@@ -54,11 +50,7 @@ public class EquipmentLayerRendererMixin
 		Function<?,?> memoizer,
 		Object memoizerKey,
 		Operation<Object> original,
-		@Local(argsOnly=true) ItemStack stack,
-		@Local(argsOnly=true) EquipmentClientInfo.LayerType layerType,
-		@Local(argsOnly=true) ArmorTrim armorTrim,
-		// This equipement should already have been modified by vcit at this time.
-		@Local(argsOnly=true) ResourceKey<EquipmentAsset> equipment
+		@Local(argsOnly=true) ItemStack stack
 	){
 		if (memoizer != this.trimSpriteLookup || !(memoizerKey instanceof TrimSpriteKey trimSpriteKey))
 			throw new RuntimeException("Bad mixin injection point for variants-cit's trim_pattern hook.");
@@ -78,7 +70,7 @@ public class EquipmentLayerRendererMixin
 	}
 
 	@Mixin(TrimSpriteKey.class)
-	public abstract class TrimSpriteKeyMixin
+	static public abstract class TrimSpriteKeyMixin
 	implements ITrimSpriteKeyDuck
 	{
 		static private TrimPatternOverlay trimOverride = null;
