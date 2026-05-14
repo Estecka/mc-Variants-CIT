@@ -275,3 +275,9 @@ Since v2.5:
 - Added transform: `get_nbt`, `get_snbt`.
 - Transform `get_identifier` now takes a `defaultNamespace` parameter.
 - Module `component_format` now takes a global transform.
+
+## 5.3
+### TODO
+- Empty prefix restriction
+- Trim pattern hook
+- Player head preset
