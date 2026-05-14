@@ -80,6 +80,7 @@ public class VariantAggregator
 		UpdateGeneratedPack(genPack, manager);
 
 		// Populate variant libraries
+		GatherType(EAssetType.TRIM_MODEL,    manager.Get());
 		GatherType(EAssetType.ITEM_STATE,    manager.Get());
 		GatherType(EAssetType.EQUIPMENT,     manager.Get());
 	}

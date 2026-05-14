@@ -120,7 +120,7 @@ public record CommandLogger(
 	}
 
 	private MutableComponent LayeredAssetFilename(ResourceLocation variantId, EAssetType assetType){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}{}/{}{}{}",
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.directory,
 			ItemData("<layer name>"),
