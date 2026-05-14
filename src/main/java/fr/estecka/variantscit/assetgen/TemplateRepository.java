@@ -14,6 +14,11 @@ import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 
+/**
+ * TODO: Maybe reimplement using ReloadableRepository.
+ * This will need to override the reload method with createTemplate, since this
+ * is not codec based.
+ */
 public class TemplateRepository
 {
 	static private final String DIRECTORY = "variants-cit/templates";

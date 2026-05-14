@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import com.llamalad7.mixinextras.sugar.Local;
 import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.trims.TrimPatternOverlay;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
@@ -61,6 +62,9 @@ public class ReloadableResourceManagerImplMixin
 		GeneratorPresets.ReloadPresets(original);
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(hotswap);
 		VariantsCitMod.OnResourceReload(result);
+
+		// TODO: This could use the vanilla reload pipeline.
+		TrimPatternOverlay.REPOSITORY.Reload(original);
 
 		return hotswap.Get();
 	}
