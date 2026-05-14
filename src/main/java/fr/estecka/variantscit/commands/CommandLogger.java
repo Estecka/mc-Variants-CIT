@@ -119,14 +119,14 @@ public record CommandLogger(
 		);
 	}
 
-	private MutableComponent EquipTextureFilename(ResourceLocation variantId){
+	private MutableComponent LayeredAssetFilename(ResourceLocation variantId, EAssetType assetType){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
-			"textures/entity/equipment/",
+			assetType.directory,
 			ItemData("<layer name>"),
 			modelPrefix,
 			ItemData(variantId.getPath()),
-			".png"
+			assetType.suffix
 		);
 	}
 
@@ -142,9 +142,13 @@ public record CommandLogger(
 			default:
 				Error("Error: unknown hook");
 				break;
+			case TRIM_PATTERN:
+				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.TRIM_MODEL)));
+				Info(bullet.copy().append(LayeredAssetFilename(variantId, EAssetType.TRIM_TEXTURE)));
+				break;
 			case EQUIPPABLE:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));
-				Info(bullet.copy().append(EquipTextureFilename(variantId)));
+				Info(bullet.copy().append(LayeredAssetFilename(variantId, EAssetType.EQUIP_TEXTURE)));
 				break;
 			case ITEM_MODEL:
 				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));

@@ -6,12 +6,15 @@ import org.jetbrains.annotations.Nullable;
 
 public enum EAssetType
 {
-	ITEM_TEXTURE  (EModuleHook.ITEM_MODEL, false, "textures/item", ".png"),
-	BAKED_MODEL   (EModuleHook.ITEM_MODEL, false, "models/item"  , ".json"),
-	ITEM_STATE    (EModuleHook.ITEM_MODEL, true , "items"        , ".json"),
+	ITEM_TEXTURE  (EModuleHook.ITEM_MODEL,   false, "textures/item", ".png"),
+	BAKED_MODEL   (EModuleHook.ITEM_MODEL,   false, "models/item"  , ".json"),
+	ITEM_STATE    (EModuleHook.ITEM_MODEL,   true , "items"        , ".json"),
 
-	EQUIP_TEXTURE (EModuleHook.EQUIPPABLE, false, "textures/entity/equipment", ".png"),
-	EQUIPMENT     (EModuleHook.EQUIPPABLE, true , "equipment"                , ".json"),
+	EQUIP_TEXTURE (EModuleHook.EQUIPPABLE,   false, "textures/entity/equipment", ".png"),
+	EQUIPMENT     (EModuleHook.EQUIPPABLE,   true , "equipment"                , ".json"),
+
+	TRIM_TEXTURE  (EModuleHook.TRIM_PATTERN, false, "textures/trims/entity/",     ".png"),
+	TRIM_MODEL    (EModuleHook.TRIM_PATTERN, true , "variants-cit/trim_pattern/", ".json"),
 	;
 
 	public final EModuleHook hook;
