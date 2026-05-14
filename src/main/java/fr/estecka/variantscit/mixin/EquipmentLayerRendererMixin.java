@@ -1,0 +1,115 @@
+package fr.estecka.variantscit.mixin;
+
+import java.util.function.Function;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.reload.EModuleHook;
+import fr.estecka.variantscit.trims.ITrimSpriteKeyDuck;
+import fr.estecka.variantscit.trims.TrimPatternOverlay;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimSpriteKey;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.EquipmentAssetManager;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
+
+
+@Unique
+@Mixin(EquipmentLayerRenderer.class)
+public class EquipmentLayerRendererMixin
+{
+	@Shadow private @Final Function<?,?> trimSpriteLookup;
+
+	private TextureAtlas textureAtlas;
+
+	@Inject(method="<init>", at=@At("HEAD"))
+	private void getAtlas(EquipmentAssetManager manager, TextureAtlas atlas, CallbackInfo ci){
+		this.textureAtlas = atlas;
+	}
+
+	@WrapOperation(
+		method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/resources/ResourceLocation;)V",
+		at = @At(
+			ordinal = 1,
+			value = "INVOKE",
+			target = "java/util/function/Function.apply(Ljava/lang/Object;)Ljava/lang/Object;"
+		)
+	)
+	private Object GetTrimSprite(
+		Function<?,?> memoizer,
+		Object memoizerKey,
+		Operation<Object> original,
+		@Local(argsOnly=true) ItemStack stack,
+		@Local(argsOnly=true) EquipmentClientInfo.LayerType layerType,
+		@Local(argsOnly=true) ArmorTrim armorTrim,
+		// This equipement should already have been modified by vcit at this time.
+		@Local(argsOnly=true) ResourceKey<EquipmentAsset> equipment
+	){
+		if (memoizer != this.trimSpriteLookup || !(memoizerKey instanceof TrimSpriteKey trimSpriteKey))
+			throw new RuntimeException("Bad mixin injection point for variants-cit's trim_pattern hook.");
+
+		ResourceLocation overlayId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.TRIM_PATTERN, stack);
+		TrimPatternOverlay trimOverlay = TrimPatternOverlay.REPOSITORY.Get(overlayId);
+
+		if (trimOverlay == null)
+			return original.call(memoizer, memoizerKey);
+		else {
+			// TODO: memoize ?
+			ResourceLocation textureId = ITrimSpriteKeyDuck.GetTextureId(trimSpriteKey, trimOverlay);
+			TextureAtlasSprite result = textureAtlas.getSprite(textureId);
+			return result;
+		}
+
+	}
+
+	@Mixin(TrimSpriteKey.class)
+	public abstract class TrimSpriteKeyMixin
+	implements ITrimSpriteKeyDuck
+	{
+		static private TrimPatternOverlay trimOverride = null;
+
+		@Shadow abstract ResourceLocation textureId();
+
+		@Override
+		public ResourceLocation vcit$textureId(TrimPatternOverlay overlay) {
+			ResourceLocation result;
+			try {
+				trimOverride = overlay;
+				result = this.textureId();
+			}
+			finally {
+				trimOverride = null;
+			}
+			return result;
+		}
+
+		@ModifyExpressionValue(
+			method = "textureId",
+			at = @At(
+				value = "INVOKE",
+				target = "net/minecraft/world/item/equipment/trim/TrimPattern.assetId()Lnet/minecraft/resources/ResourceLocation;"
+			)
+		)
+		public ResourceLocation overrideTextureId(ResourceLocation original){
+			if (trimOverride != null)
+				return trimOverride.assetId();
+			else
+				return original;
+		}
+	}
+}

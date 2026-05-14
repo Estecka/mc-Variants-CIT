@@ -2,8 +2,9 @@ package fr.estecka.variantscit;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -27,11 +28,12 @@ public class ReloadableRepository<T>
 		this.suffix = "."+extension;
 	}
 
-	public DataResult<T> Get(ResourceLocation id){
-		T result = entries.get(id);
-		return (result != null) ?
-			DataResult.success(result) :
-			DataResult.error(()->"No such template: "+id.toString());
+	public @Nullable T Get(ResourceLocation id){
+		return entries.get(id);
+	}
+
+	public Optional<T> GetOptional(ResourceLocation id){
+		return Optional.ofNullable(entries.get(id));
 	}
 
 	public void Reload(ResourceManager manager)
