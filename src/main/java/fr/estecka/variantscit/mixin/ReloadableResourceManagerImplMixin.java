@@ -64,7 +64,7 @@ public class ReloadableResourceManagerImplMixin
 		VariantsCitMod.OnResourceReload(result);
 
 		// TODO: This could use the vanilla reload pipeline.
-		TrimPatternOverlay.REPOSITORY.Reload(original);
+		TrimPatternOverlay.REPOSITORY.Reload(hotswap.Get());
 
 		return hotswap.Get();
 	}
