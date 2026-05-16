@@ -86,7 +86,7 @@ public class VariantAggregator
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
-		Set<ResourceLocation> resources = manager.listResources(assetType.directory, id->id.getPath().endsWith(assetType.suffix)).keySet();
+		Set<ResourceLocation> resources = manager.listResources(assetType.packDirectory, id->id.getPath().endsWith(assetType.suffix)).keySet();
 
 		Stream<ResourceLocation> shortIds = resources.stream().map(id->assetType.GetShortId(id).get());
 		GatherIds(assetType, shortIds);

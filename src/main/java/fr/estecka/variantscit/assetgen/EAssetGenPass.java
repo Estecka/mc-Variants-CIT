@@ -28,7 +28,7 @@ implements StringRepresentable
 
 	public Optional<ResourceLocation> GetShortInputId(ResourceLocation resourceId){
 		String path = resourceId.getPath();
-		if (!path.startsWith(input.directory+"/") || !path.endsWith(input.suffix))
+		if (!path.startsWith(input.packDirectory+"/") || !path.endsWith(input.suffix))
 			return Optional.empty();
 
 		return Optional.of(resourceId.withPath(
@@ -37,7 +37,7 @@ implements StringRepresentable
 	}
 
 	public ResourceLocation GetOutputResourceId(ResourceLocation shortAssetId){
-		return shortAssetId.withPath(path -> output.directory+"/"+path+output.suffix);
+		return shortAssetId.withPath(path -> output.packDirectory+"/"+path+output.suffix);
 	}
 
 	@Override

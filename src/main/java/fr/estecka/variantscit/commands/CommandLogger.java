@@ -112,7 +112,7 @@ public record CommandLogger(
 	private MutableComponent AssetFilename(ResourceLocation variantId, EAssetType assetType){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
-			assetType.directory,
+			assetType.packDirectory,
 			modelPrefix,
 			ItemData(variantId.getPath()),
 			assetType.suffix
@@ -122,7 +122,7 @@ public record CommandLogger(
 	private MutableComponent LayeredAssetFilename(ResourceLocation variantId, EAssetType assetType){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
-			assetType.directory,
+			assetType.packDirectory,
 			ItemData("<layer name>"),
 			modelPrefix,
 			ItemData(variantId.getPath()),
