@@ -1,0 +1,11 @@
+[
+	{
+		"pass": "models_from_textures",
+		"template": "models/parent",
+		"variables": { "modelParent": "variants-cit:item/player_head" }
+	},
+	{
+		"pass": "items_from_models",
+		"template": "items/stateless"
+	}
+]

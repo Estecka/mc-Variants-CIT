@@ -278,8 +278,9 @@ Since v2.5:
 
 ## 5.3
 - Trim pattern hook
+- Added assetGen presets: `item_model/player_head`, `item_model/handheld_rod`
 ### TODO
-- Player head preset
 - Empty prefix restriction
 - Custom path/namespace validation for asset libraries
 - Special models as variant IDs
+- Fix error on walkthrough non-existent module
