@@ -277,7 +277,9 @@ Since v2.5:
 - Module `component_format` now takes a global transform.
 
 ## 5.3
-### TODO
-- Empty prefix restriction
 - Trim pattern hook
+### TODO
 - Player head preset
+- Empty prefix restriction
+- Custom path/namespace validation for asset libraries
+- Special models as variant IDs
