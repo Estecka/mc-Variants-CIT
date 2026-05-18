@@ -112,7 +112,7 @@ extends CommandUtil
 		if (module == null)
 			return Error(context, "No hook "+hook+" for module "+moduleId);
 
-		CommandLogger logger = new CommandLogger(context, hook, meta, meta.modelPrefix());
+		CommandLogger logger = new CommandLogger(context, hook, meta, meta.modelPrefix().modelPrefix());
 		return command.Execute(context, logger, module);
 	}
 

@@ -142,18 +142,12 @@ public class VariantAggregator
 		if (library.specialModels().containsValue(shortId))
 			accepted = true;
 
-		if (shortId.getPath().startsWith(module.modelPrefix())){
-			ResourceLocation variantId = ResourceLocation.fromNamespaceAndPath(
-				shortId.getNamespace(),
-				shortId.getPath().substring(module.modelPrefix().length())
-			);
+		Optional<ResourceLocation> variantId = module.modelPrefix().AcceptsAsset(shortId);
 
-			if (module.parameters().AcceptsVariant(variantId)){
-				accepted = true;
-				if (isFundamental)
-					library.variantModels().put(variantId, shortId);
-			}
-
+		if (variantId.isPresent() && module.parameters().AcceptsVariant(variantId.get())){
+			accepted = true;
+			if (isFundamental)
+				library.variantModels().put(variantId.get(), shortId);
 		}
 
 		return accepted;
@@ -166,8 +160,8 @@ public class VariantAggregator
 		manager.Refresh();
 	}
 
-	private void OnGeneratedResource(ResourceLocation resourceId, String modelPrefix, IoSupplier<InputStream> resource){
-		int priority = modelPrefix.length();
+	private void OnGeneratedResource(ResourceLocation resourceId, LibraryDefinition modelPrefix, IoSupplier<InputStream> resource){
+		int priority = modelPrefix.modelPrefix().length();
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)

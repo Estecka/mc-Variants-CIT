@@ -39,8 +39,9 @@ public final class CodecUtil
 
 	static public final Codec<ResourceLocation> VCIT_IDENTIFIER = Codec.STRING.comapFlatMap(CodecUtil::VCitIdentifier, ResourceLocation::toString);
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->ResourceLocation.isValidPath(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
+	static public final Codec<String> LEGACY_ITEM_PATH = IDENTIFIER_PATH.validate(CodecUtil::UnItemify);
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->ResourceLocation.isValidNamespace(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
-	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(string->string.isEmpty() ? DataResult.error(()->"String cannot be empty") : DataResult.success(string));
+	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(CodecUtil.NonEmptyString("<unspecified> string"));
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 	static public final Codec<Tag> NBT_ELEMENT = Codec.PASSTHROUGH.xmap( dyn->dyn.convert(NbtOps.INSTANCE).getValue(), nbt->new Dynamic<>(NbtOps.INSTANCE, nbt.copy()) );
@@ -78,6 +79,31 @@ public final class CodecUtil
 				DataResult.success(units.entrySet().stream().filter(entry->obj.equals(entry.getValue())).map(Entry::getKey).findFirst().get()) :
 				DataResult.error(()->"Unknown unit")
 		);
+	}
+
+	static public String UnItemifyRaw(String modelPrefix){
+		if (modelPrefix.startsWith("item/")){
+			modelPrefix = modelPrefix.substring("item/".length());
+		}
+		return modelPrefix;
+	}
+
+	static public DataResult<String> UnItemify(String original){
+		return DataResult.success(UnItemifyRaw(original));
+	}
+
+	static public DataResult<ResourceLocation> UnItemify(ResourceLocation original){
+		return DataResult.success(ResourceLocation.fromNamespaceAndPath(original.getNamespace(), UnItemifyRaw(original.getPath())));
+	}
+
+	static public DataResult<String> NonEmptyString(String string, String stringName){
+		return string.isEmpty() ?
+			DataResult.error(()->stringName+" cannot be empty.") :
+			DataResult.success(string);
+	}
+
+	static public Function<String,DataResult<String>> NonEmptyString(String stringName){
+		return string -> NonEmptyString(string, stringName);
 	}
 
 

@@ -6,7 +6,6 @@ import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
@@ -22,7 +21,7 @@ public record ModuleDefinition(
 	Optional<List<ResourceLocation>> targets,
 	Optional<IItemPrecondition> precondition,
 	int priority,
-	String modelPrefix,
+	LibraryDefinition modelPrefix,
 	Optional<ResourceLocation> modelParent,
 	Optional<IAssetGenerator> assetGen,
 	Optional<ResourceLocation> fallbackModel,
@@ -37,31 +36,12 @@ public record ModuleDefinition(
 			CodecUtil.OneOrMany(ResourceLocation.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
-			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
-			ResourceLocation.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
+			LibraryDefinition.MAP_CODEC.forGetter(ModuleDefinition::modelPrefix),
+			ResourceLocation.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::modelParent),
 			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen),
-			ResourceLocation.CODEC.validate(ModuleDefinition::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
-			Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC.validate(ModuleDefinition::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,ResourceLocation>of()).forGetter(ModuleDefinition::specialModels)
+			ResourceLocation.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
+			Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC.validate(CodecUtil::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,ResourceLocation>of()).forGetter(ModuleDefinition::specialModels)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);
-
-	static private String UnItemify(String modelPrefix){
-		if (modelPrefix.startsWith("item/")){
-			// VariantsCitMod.LOGGER.warn("Stripped leading \"item/\" from model path: \"{}\"", modelPrefix);
-			modelPrefix = modelPrefix.substring("item/".length());
-		}
-		return modelPrefix;
-	}
-
-	static private DataResult<ResourceLocation> UnItemify(ResourceLocation original){
-		return DataResult.success(ResourceLocation.fromNamespaceAndPath(original.getNamespace(), UnItemify(original.getPath())));
-	}
-
-	static public DataResult<String> ValidatePath(String path){
-		if (ResourceLocation.isValidPath(path))
-			return DataResult.success(UnItemify(path));
-		else
-			return DataResult.error(()->"Invalid character in path: "+path);
-	}
 }

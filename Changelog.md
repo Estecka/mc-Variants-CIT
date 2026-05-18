@@ -277,10 +277,13 @@ Since v2.5:
 - Module `component_format` now takes a global transform.
 
 ## 5.3
-- Trim pattern hook
+- Added hook: `trim_pattern`
 - Added assetGen presets: `item_model/player_head`, `item_model/handheld_rod`
+- Empty `modelPrefix`es are now strictly forbidden.
+- Added `assetLibrary` block, allowing custom variantId validation.
 - Fixed command error on non-existent module
 ### TODO
-- Empty prefix restriction
-- Custom path/namespace validation for asset libraries
+- Arbitrary variant/model mappings
 - Special models as variant IDs
+- Display predicates status in summary ?
+- Namespace option for custom_name ?
