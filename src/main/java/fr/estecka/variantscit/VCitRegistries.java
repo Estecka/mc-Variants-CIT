@@ -109,12 +109,12 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("lowercase"),          (IStringTransform)String::toLowerCase);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("discard_path"),       (IStringTransform)IStringTransform::DiscardPath);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("discard_namespace"),  (IStringTransform)IStringTransform::DiscardNamespace);
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize"),           IStringTransform.SANITIZE);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize"),           IStringTransform.SANITIZE_AUTO);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_legacy"),    IStringTransform.SANITIZE_LEGACY);
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      IStringTransform.SANITIZE);
-		TRANSFORMS.Deprecate   (VariantsCitMod.Identifier("sanitize_auto"),      "Transform name `sanitize_auto` is deprecated. Use `sanitize` instead.");
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("sanitize_auto"),      IStringTransform.SANITIZE_AUTO);
+		// TRANSFORMS.Deprecate   (VariantsCitMod.Identifier("sanitize_auto"),      "Transform name `sanitize_auto` is deprecated. Use `sanitize` instead.");
 
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("test"),                TestTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("matches_any"),         MatchesTransform.MATCHANY_MAPCODEC);
