@@ -130,6 +130,7 @@ public record CommandLogger(
 		);
 	}
 
+	// FIXME: Fix for harmapped libraries
 	public void PrintVariantIdTip(ResourceLocation variantId){
 		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
 			PackData(modelPrefix),

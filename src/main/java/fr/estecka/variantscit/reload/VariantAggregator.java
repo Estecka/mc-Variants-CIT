@@ -41,16 +41,16 @@ public class VariantAggregator
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
 			for (EModuleHook hook : module.hooks())
-				GetLibraryMap(hook).put(module, EmptyLibrary(module));
+				GetLibraryMap(hook).put(module, InitialLibrary(module));
 
 			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
 		}
 	}
 
-	static private VariantLibrary EmptyLibrary(ModuleDefinition module) {
+	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
 		return new VariantLibrary(
 			module.fallbackModel().orElse(null),
-			new HashMap<>(),
+			new HashMap<>(module.modelPrefix().hardcoded()),
 			module.specialModels()
 		);
 	}
@@ -142,12 +142,13 @@ public class VariantAggregator
 		if (library.specialModels().containsValue(shortId))
 			accepted = true;
 
-		Optional<ResourceLocation> variantId = module.modelPrefix().AcceptsAsset(shortId);
-
-		if (variantId.isPresent() && module.parameters().AcceptsVariant(variantId.get())){
+		Set<ResourceLocation> variants = module.modelPrefix().GetVariantIds(shortId);
+		for (ResourceLocation variantId : variants)
+		if  (module.parameters().AcceptsVariant(variantId))
+		{
 			accepted = true;
 			if (isFundamental)
-				library.variantModels().put(variantId.get(), shortId);
+				library.variantModels().put(variantId, shortId);
 		}
 
 		return accepted;

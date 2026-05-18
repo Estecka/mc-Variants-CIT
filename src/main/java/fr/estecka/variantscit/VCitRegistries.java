@@ -103,7 +103,7 @@ public final class VCitRegistries
 		// ## Transforms
 
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("noop"), IDataTransform.NOOP);
-		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("null"), IStringTransform.NULL);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("null"), IDataTransform.NULL);
 		TRANSFORMS.Register    (VariantsCitMod.Identifier("log"),  LogTransform.MAPCODEC, new LogTransform());
 
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("lowercase"),          (IStringTransform)String::toLowerCase);

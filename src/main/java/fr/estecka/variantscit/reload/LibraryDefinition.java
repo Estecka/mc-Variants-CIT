@@ -1,8 +1,10 @@
 package fr.estecka.variantscit.reload;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
@@ -22,7 +24,8 @@ import net.minecraft.util.ExtraCodecs;
 public record LibraryDefinition(
 	String modelPrefix,
 	IDataTransform namespacePredicate,
-	IDataTransform pathPredicate
+	IDataTransform pathPredicate,
+	Map<ResourceLocation,ResourceLocation> hardcoded
 )
 {
 	static private final Codec<IDataTransform> TRANSFORM_CODEC = CodecUtil.WithAlternatives(
@@ -42,17 +45,22 @@ public record LibraryDefinition(
 		.group(
 			PREFIX_CODEC.forGetter(LibraryDefinition::modelPrefix),
 			TRANSFORM_CODEC.optionalFieldOf("namespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
-			IDataTransform.CODEC.optionalFieldOf("pathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate)
-			// ExtraCodecs.strictUnboundedMap(ResourceLocation.CODEC, ResourceLocation.CODEC).fieldOf("hardcoded").forGetter(LibraryDefinition::hardcoded)
+			IDataTransform.CODEC.optionalFieldOf("variantPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
+			ExtraCodecs.strictUnboundedMap(ResourceLocation.CODEC, ResourceLocation.CODEC).fieldOf("hardcoded").forGetter(LibraryDefinition::hardcoded)
 		)
 		.apply(builder, LibraryDefinition::new)
 	);
 
-	static public final MapCodec<LibraryDefinition> LEGACY_MAPCODEC = CodecUtil.LEGACY_ITEM_PATH
+	static public final Codec<LibraryDefinition> ARRAY_CODEC = ResourceLocation.CODEC
+		.listOf()
+		.xmap(LibraryDefinition::FromArray, CodecUtil.NoGetter("Library Array form"))
+		;
+
+	static public final MapCodec<LibraryDefinition> ROOT_MAPCODEC = CodecUtil.LEGACY_ITEM_PATH
 		.validate(CodecUtil.NonEmptyString("Model Prefix"))
 		.fieldOf("modelPrefix")
 		.xmap(
-			prefix -> new LibraryDefinition(prefix, IDataTransform.NOOP, IDataTransform.NOOP),
+			prefix -> new LibraryDefinition(prefix, IDataTransform.NOOP, IDataTransform.NOOP, Map.of()),
 			LibraryDefinition::modelPrefix
 		)
 		;
@@ -68,9 +76,10 @@ public record LibraryDefinition(
 	);
 	*/
 
-	static public final MapCodec<LibraryDefinition> MAP_CODEC = CodecUtil.MapWithAlternative(
+	static public final MapCodec<LibraryDefinition> MAP_CODEC = CodecUtil.MapWithAlternatives(
 		ADVANCED_MAPCODEC.fieldOf("assetLibrary"),
-		LEGACY_MAPCODEC
+		ARRAY_CODEC.fieldOf("assetLibrary"),
+		ROOT_MAPCODEC
 	);
 
 
@@ -78,6 +87,12 @@ public record LibraryDefinition(
 /* Codec Util                                                                 */
 /******************************************************************************/
 
+	static private LibraryDefinition FromArray(List<ResourceLocation> list){
+		Map<ResourceLocation,ResourceLocation> hardcoded = new HashMap<>();
+		for (ResourceLocation id : list)
+			hardcoded.put(id, id);
+		return new LibraryDefinition("__noprefix__", IDataTransform.NULL, IDataTransform.NULL, hardcoded);
+	}
 
 	/*
 	static private LibraryDefinition CreateLegacy(String modelPrefix, Optional<ResourceLocation> fallback, Map<String,ResourceLocation> special){
@@ -107,15 +122,24 @@ public record LibraryDefinition(
 /* Asset Aggregation                                                          */
 /******************************************************************************/
 
-	public Optional<ResourceLocation> AcceptsAsset(ResourceLocation assetId){
-		if (!assetId.getPath().startsWith(modelPrefix))
-			return Optional.empty();
+	/**
+	 * @return If the library accepts this assets, returns any variant ID it is
+	 * associated with. Ohterwise, returns an empty set.
+	 */
+	public Set<ResourceLocation> GetVariantIds(ResourceLocation assetId){
+		Set<ResourceLocation> result = new HashSet<>();
+		if (assetId.getPath().startsWith(modelPrefix)){
+			ResourceLocation variantId = assetId.withPath(path->path.substring(modelPrefix.length()));
+			if (!this.hardcoded.containsKey(variantId) && this.AcceptsVariant(variantId))
+				result.add(variantId);
+		}
 
-		ResourceLocation variantId = assetId.withPath(path->path.substring(modelPrefix.length()));
-		if (this.AcceptsVariant(variantId))
-			return Optional.of(variantId);
-		else
-			return Optional.empty();
+		for (var entry : hardcoded.entrySet()) {
+			if (entry.getValue().equals(assetId))
+				result.add(entry.getKey());
+		}
+
+		return result;
 	}
 
 	public boolean AcceptsVariant(ResourceLocation variantId){
