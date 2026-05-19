@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -56,25 +57,17 @@ public record LibraryDefinition(
 		.xmap(LibraryDefinition::FromArray, CodecUtil.NoGetter("Library Array form"))
 		;
 
-	static public final MapCodec<LibraryDefinition> ROOT_MAPCODEC = CodecUtil.LEGACY_ITEM_PATH
-		.validate(CodecUtil.NonEmptyString("Model Prefix"))
-		.fieldOf("modelPrefix")
-		.xmap(
-			prefix -> new LibraryDefinition(prefix, IDataTransform.NOOP, IDataTransform.NOOP, Map.of()),
-			LibraryDefinition::modelPrefix
-		)
-		;
-
-	/*
-	static public final MapCodec<LibraryDefinition> LEGACY_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static public final MapCodec<LibraryDefinition> ROOT_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			CodecUtil.IDENTIFIER_PATH.validate(LibraryDefinition::UnItemify).fieldOf("modelPrefix").forGetter(LibraryDefinition::modelPrefix),
-			ResourceLocation.CODEC.validate(LibraryDefinition::UnItemify).optionalFieldOf("fallback").forGetter(CodecUtil.NoGetter("Legacy Fallback")),
-			Codec.unboundedMap(CodecUtil.IDENTIFIER_PATH, ResourceLocation.CODEC.validate(LibraryDefinition::UnItemify)).optionalFieldOf("special", Map.<String,ResourceLocation>of()).forGetter(CodecUtil.NoGetter("Legacy Special"))
+			CodecUtil.LEGACY_ITEM_PATH.validate(CodecUtil.NonEmptyString("Model Prefix")).fieldOf("modelPrefix").forGetter(LibraryDefinition::modelPrefix),
+			ResourceLocation.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(CodecUtil.NoGetter("Legacy Fallback")),
+			Codec.unboundedMap(
+				CodecUtil.IDENTIFIER_PATH.flatXmap(path -> ResourceLocation.read("variants-cit:special/"+path), CodecUtil.NoGetter("Legacy Special")),
+				ResourceLocation.CODEC.validate(CodecUtil::UnItemify)
+			).optionalFieldOf("special", Map.of()).forGetter(CodecUtil.NoGetter("Legacy Special"))
 		)
-		.apply(builder, LibraryDefinition::CreateLegacy)
+		.apply(builder, LibraryDefinition::FromLegacy)
 	);
-	*/
 
 	static public final MapCodec<LibraryDefinition> MAP_CODEC = CodecUtil.MapWithAlternatives(
 		ADVANCED_MAPCODEC.fieldOf("assetLibrary"),
@@ -84,7 +77,7 @@ public record LibraryDefinition(
 
 
 /******************************************************************************/
-/* Codec Util                                                                 */
+/* Constructors                                                               */
 /******************************************************************************/
 
 	static private LibraryDefinition FromArray(List<ResourceLocation> list){
@@ -94,19 +87,11 @@ public record LibraryDefinition(
 		return new LibraryDefinition("__noprefix__", IDataTransform.NULL, IDataTransform.NULL, hardcoded);
 	}
 
-	/*
-	static private LibraryDefinition CreateLegacy(String modelPrefix, Optional<ResourceLocation> fallback, Map<String,ResourceLocation> special){
-		Map<ResourceLocation,ResourceLocation> hardcoded = new HashMap<>();
+	static private LibraryDefinition FromLegacy(String modelPrefix, Optional<ResourceLocation> fallback, Map<ResourceLocation,ResourceLocation> special){
+		Map<ResourceLocation,ResourceLocation> hardcoded = new HashMap<>(special);
 
 		if (fallback.isPresent())
 			hardcoded.put(VariantsCitMod.Identifier("fallback"), fallback.get());
-
-		for (var entry : special.entrySet()) {
-			hardcoded.put(
-				VariantsCitMod.Identifier(entry.getKey()).withPath(p->"special/"+p),
-				entry.getValue()
-			);
-		}
 
 		return new LibraryDefinition(
 			modelPrefix,
@@ -115,7 +100,6 @@ public record LibraryDefinition(
 			Map.copyOf(hardcoded)
 		);
 	}
-	*/
 
 
 /******************************************************************************/

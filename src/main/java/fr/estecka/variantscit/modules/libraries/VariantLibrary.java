@@ -4,31 +4,39 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 
-public record VariantLibrary(
-	@Nullable ResourceLocation fallbackModel,
-	Map<ResourceLocation, ResourceLocation> variantModels,
-	Map<String, ResourceLocation> specialModels
-)
+public class VariantLibrary
 implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 {
+	protected final ResourceLocation fallbackModel;
+	protected final Map<ResourceLocation,ResourceLocation> variantModels;
+
+	public VariantLibrary(Map<ResourceLocation,ResourceLocation> models){
+		this.fallbackModel = models.get(FALLBACK_VARIANT_ID);
+		this.variantModels = models;
+	}
+
+	public ResourceLocation fallbackModel() { return this.fallbackModel; }
+	public Map<ResourceLocation,ResourceLocation> variantModels() { return this.variantModels; }
+
 	@Override
-	public boolean HasVariantModel(ResourceLocation variant){
-		return this.variantModels.containsKey(variant);
+	public boolean HasVariantModel(ResourceLocation variantId){
+		return this.variantModels.containsKey(variantId);
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetVariantModel(ResourceLocation variant){
-		if (variant == null)
+	public @Nullable ResourceLocation GetVariantModel(ResourceLocation variantId){
+		if (variantId == null)
 			return null;
 		else
-			return this.variantModels.getOrDefault(variant, this.fallbackModel);
+			return this.variantModels.getOrDefault(variantId, this.fallbackModel);
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetSpecialModel(String key){
-		return this.specialModels.get(key);
+	public @Nullable ResourceLocation GetVariantModelStrict(ResourceLocation variantId){
+		return this.variantModels.get(variantId);
 	}
 
 	public int GetVariantCount(){
@@ -36,28 +44,25 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	}
 
 	public boolean isEmpty(){
-		return this.variantModels.isEmpty()
-		    && this.specialModels.isEmpty()
-		    && this.fallbackModel == null
-		    ;
+		return this.variantModels.isEmpty();
 	}
 
 	public VariantLibrary GetSubLibrary(String subPrefix){
 		Map<ResourceLocation,ResourceLocation> subVariants = new HashMap<>();
 		for (var entry : this.variantModels.entrySet())
-		if  (entry.getKey().getPath().startsWith(subPrefix))
 		{
-			subVariants.put(
-				entry.getKey().withPath(path->path.substring(subPrefix.length())),
-				entry.getValue()
-			);
+			if (entry.getKey().getNamespace().equals(VariantsCitMod.MODID))
+				subVariants.put(entry.getKey(), entry.getValue());
+			else if (entry.getKey().getPath().startsWith(subPrefix))
+			{
+				subVariants.put(
+					entry.getKey().withPath(path->path.substring(subPrefix.length())),
+					entry.getValue()
+				);
+			}
 		}
 
-		return new VariantLibrary(
-			this.fallbackModel,
-			Map.copyOf(subVariants),
-			this.specialModels
-		);
+		return new VariantLibrary(Map.copyOf(subVariants));
 	}
 
 
@@ -110,10 +115,9 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 		}
 
 		@Override
-		public @Nullable ResourceLocation GetSpecialModel(String key) {
-			ResourceLocation r = VariantLibrary.this.GetSpecialModel(key);
-			this.OnTriedSpecial(key, r != null);
-			return r;
+		public @Nullable ResourceLocation GetVariantModelStrict(ResourceLocation variantId) {
+			this.HasVariantModel(variantId);
+			return VariantLibrary.this.GetVariantModelStrict(variantId);
 		}
 
 		@Override

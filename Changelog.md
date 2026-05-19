@@ -278,12 +278,12 @@ Since v2.5:
 
 ## 5.3
 - Added hook: `trim_pattern`
-- Added assetGen presets: `item_model/player_head`, `item_model/handheld_rod`
-- Empty `modelPrefix`es are now strictly forbidden.
-- Added `assetLibrary` block, allowing custom variantId validation.
+- Added assetGen presets: `item_model/player_head`, `item_model/handheld_rod`, `trim_pattern/humanoid`
+- Empty `modelPrefix`es are now strictly forbidden unless explicitely waived.
+- Added `assetLibrary` block, allowing custom variantId validation and mappings.
+- Special and fallback models are now represented by special variant IDs.
 - Fixed command error on non-existent module
 ### TODO
-- Arbitrary variant/model mappings
-- Special models as variant IDs
+- Update walkthrough tip for hard-mapped variants
 - Display predicates status in summary ?
 - Namespace option for custom_name ?

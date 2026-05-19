@@ -18,6 +18,8 @@ extends AMonoComponentModule<CustomData>
 {
 	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
 
+	static public final ResourceLocation INVALID_PAINTING = IVariantLibrary.SpecialVariantId("invalid");
+
 	public PaintingVariantModule(){
 		super(DataComponents.ENTITY_DATA, ECachePolicy.ALWAYS);
 	}
@@ -40,11 +42,11 @@ extends AMonoComponentModule<CustomData>
 
 		ResourceLocation variantId = ResourceLocation.tryParse(rawVariant);
 		if (variantId == null)
-			return models.GetSpecialModel("invalid");
+			return models.GetVariantModelStrict(variantId);
 
 		var registry = GetPaintingRegistry();
 		if (registry.isPresent() && !registry.get().containsKey(variantId))
-			return models.GetSpecialModel("invalid");
+			return models.GetVariantModelStrict(variantId);
 
 		return models.GetVariantModel(variantId);
 	}

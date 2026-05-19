@@ -48,11 +48,7 @@ public class VariantAggregator
 	}
 
 	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		return new VariantLibrary(
-			module.fallbackModel().orElse(null),
-			new HashMap<>(module.modelPrefix().hardcoded()),
-			module.specialModels()
-		);
+		return new VariantLibrary(new HashMap<>(module.modelPrefix().hardcoded()));
 	}
 
 	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
@@ -135,12 +131,6 @@ public class VariantAggregator
 	 */
 	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation shortId){
 		boolean accepted = false;
-
-		if (shortId.equals(library.fallbackModel()))
-			accepted = true;
-
-		if (library.specialModels().containsValue(shortId))
-			accepted = true;
 
 		Set<ResourceLocation> variants = module.modelPrefix().GetVariantIds(shortId);
 		for (ResourceLocation variantId : variants)
