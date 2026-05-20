@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.commands;
 
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
@@ -16,7 +17,7 @@ public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
 	EModuleHook moduleHook,
 	MetaModule metamodule,
-	String modelPrefix
+	Optional<String> modelPrefix
 )
 {
 
@@ -25,7 +26,7 @@ public record CommandLogger(
 			commandContext,
 			moduleHook,
 			metamodule,
-			modelPrefix + subPrefix
+			modelPrefix.map(prefix -> prefix + subPrefix)
 		);
 	}
 
@@ -113,7 +114,7 @@ public record CommandLogger(
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.packDirectory,
-			modelPrefix,
+			modelPrefix.orElse(""),
 			ItemData(variantId.getPath()),
 			assetType.suffix
 		);
@@ -124,7 +125,7 @@ public record CommandLogger(
 			ItemData(variantId.getNamespace()),
 			assetType.packDirectory,
 			ItemData("<layer name>"),
-			modelPrefix,
+			modelPrefix.orElse(""),
 			ItemData(variantId.getPath()),
 			assetType.suffix
 		);
@@ -133,7 +134,7 @@ public record CommandLogger(
 	// FIXME: Fix for harmapped libraries
 	public void PrintVariantIdTip(ResourceLocation variantId){
 		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
-			PackData(modelPrefix),
+			modelPrefix.map(CommandLogger::PackData).orElse(ItemData(null)),
 			ItemData(variantId)
 		);
 

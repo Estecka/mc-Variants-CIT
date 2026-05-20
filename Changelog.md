@@ -287,3 +287,5 @@ Since v2.5:
 - Update walkthrough tip for hard-mapped variants
 - Display predicates status in summary ?
 - Namespace option for custom_name ?
+- Detect missing models from the hardcoded list.
+- Order the result of the `dump` command

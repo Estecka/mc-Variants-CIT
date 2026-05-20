@@ -48,7 +48,7 @@ public class VariantAggregator
 	}
 
 	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		return new VariantLibrary(new HashMap<>(module.modelPrefix().hardcoded()));
+		return new VariantLibrary(new HashMap<>(module.modelPrefix().hardcodedList()));
 	}
 
 	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
@@ -152,7 +152,7 @@ public class VariantAggregator
 	}
 
 	private void OnGeneratedResource(ResourceLocation resourceId, LibraryDefinition modelPrefix, IoSupplier<InputStream> resource){
-		int priority = modelPrefix.modelPrefix().length();
+		int priority = modelPrefix.modelPrefix().map(String::length).orElse(0);
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)
