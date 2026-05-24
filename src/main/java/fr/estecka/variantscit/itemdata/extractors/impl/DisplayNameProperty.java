@@ -4,6 +4,7 @@ import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 public record DisplayNameProperty()
@@ -23,7 +24,7 @@ implements IDataExtractor, ICacheKey
 
 	@Override
 	public IDataContainer Extract(ItemStack stack) {
-		return RawDataContainer.OfNullable(stack.getHoverName());
+		return RawDataContainer.<Component>OfNullable(stack.getHoverName());
 	}
 
 	@Override

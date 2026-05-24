@@ -34,7 +34,7 @@ implements IDataExtractor, ICacheKey
 
 	@Override
 	public IDataContainer Extract(ItemStack stack) {
-		return RawDataContainer.OfNullable(stack.getCount());
+		return RawDataContainer.<Integer>OfNullable(stack.getCount());
 	}
 
 	@Override
