@@ -277,4 +277,4 @@ Since v2.5:
 - Transform `get_identifier` now takes a `defaultNamespace` parameter.
 - Module `component_format` now takes a global transform.
 ### 5.2.1
-- Fixed `get_number` transform returning an unusable Optional.
+- Fixed `get_number` transform converting NBT to Optionals.
