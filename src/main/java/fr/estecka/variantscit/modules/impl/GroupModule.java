@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
@@ -14,7 +15,6 @@ import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
-import fr.estecka.variantscit.reload.ModuleDefinition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -37,7 +37,7 @@ implements IBakedModule
 		// TODO: Reduce code duplication with ModuleDefinition
 		static public final Codec<SubModuleDefinition> CODEC = RecordCodecBuilder.create(builder->
 			builder.group(
-				Codec.STRING.validate(ModuleDefinition::ValidatePath).optionalFieldOf("modelPrefix").forGetter(SubModuleDefinition::modelPrefix),
+				CodecUtil.LEGACY_ITEM_PATH.optionalFieldOf("modelPrefix").forGetter(SubModuleDefinition::modelPrefix),
 				IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(SubModuleDefinition::precondition),
 				VCitRegistries.MODULES.mapCodec.forGetter(SubModuleDefinition::parameters)
 			)

@@ -6,7 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.reload.EModuleHook;
@@ -25,12 +24,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
-import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
-import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
-import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
-import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
+// import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
+// import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
+// import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
+// import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
+// import static com.mojang.brigadier.arguments.StringArgumentType.getString;
+// import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHook;
@@ -103,15 +102,17 @@ extends CommandUtil
 	}
 
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
-		EModuleHook moduleContext = getModuleHook(context, HOOK_ARG);
+		EModuleHook hook = getModuleHook(context, HOOK_ARG);
 		ResourceLocation moduleId = context.getArgument(MODULE_ARG, ResourceLocation.class);
 		MetaModule meta = VariantsCitMod.GetModules().GetMeta(moduleId);
-		IBakedModule module = meta.bakedModules().get(moduleContext);
+		if (meta == null)
+			return Error(context, "No such module: "+moduleId);
 
+		IBakedModule module = meta.bakedModules().get(hook);
 		if (module == null)
-			return Error(context, "No such module: "+moduleContext+" "+moduleId);
+			return Error(context, "No hook "+hook+" for module "+moduleId);
 
-		CommandLogger logger = new CommandLogger(context, moduleContext, meta, meta.modelPrefix());
+		CommandLogger logger = new CommandLogger(context, hook, meta, meta.modelPrefix());
 		return command.Execute(context, logger, module);
 	}
 

@@ -74,13 +74,26 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	public void Dump(CommandLogger logger){
 		if (this.variantModels.isEmpty())
 			logger.Info("This module does not have any variant.");
-		else for (var entry : this.variantModels.entrySet())
+		else for (var entry : this.SortedEntries())
 		{
 			logger.Info("{} -> {} ",
 				CommandLogger.ItemData(entry.getKey()),
 				CommandLogger.PackData(entry.getValue())
 			);
 		}
+	}
+
+	private Iterable<Map.Entry<ResourceLocation,ResourceLocation>> SortedEntries(){
+		return this.variantModels.entrySet()
+			.stream()
+			.sorted((a,b)->{
+				int r = a.getKey().getNamespace().compareTo(b.getKey().getNamespace());
+				if (r == 0)
+					r = a.getKey().getPath().compareTo(b.getKey().getPath());
+				return r;
+			})
+			.toList()
+			;
 	}
 
 	@Override
