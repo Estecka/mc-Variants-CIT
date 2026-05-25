@@ -365,7 +365,13 @@ Since v3.5:
 - Fixed `equals` transform not accepting strings when using its canonical form.
 - Fixed a crash when failing to parse a simplified precondition.
 ## 5.2
+### 5.2.0
 - Added item property: `display_name`.
 - Added transform: `get_nbt`, `get_snbt`.
 - Transform `get_identifier` now takes a `defaultNamespace` parameter.
 - Module `component_format` now takes a global transform.
+### 5.2.1
+- Fixed `get_number` transform converting NBT to Optionals.
+- Fixed command error on non-existent module
+- The output of `dump` is now sorted by variant-ID.
+- Modules are now banned from having an empty model prefix.

@@ -62,8 +62,6 @@ public final class ModuleLoader
 				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
 				continue;
 			}
-			if (definition.modelPrefix().isEmpty())
-				VariantsCitMod.LOGGER.error("VCIT module `{}` has an empty model prefix. This can lead to unexpected behaviours and performance loss.", moduleId);
 
 			definitions.put(moduleId, definition);
 		}
