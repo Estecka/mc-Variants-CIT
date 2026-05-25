@@ -44,7 +44,7 @@ implements IDataTransform
 	public IDataContainer LooseTypedTransform(IDataContainer input) {
 		Tag nbt = input.asNbt();
 		if (nbt != null)
-			return RawDataContainer.OfNullable(this.Resolve(nbt));
+			return RawDataContainer.<Tag>OfNullable(this.Resolve(nbt));
 		else
 			return null;
 	}

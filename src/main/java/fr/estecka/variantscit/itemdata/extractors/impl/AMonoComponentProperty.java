@@ -21,7 +21,7 @@ implements IDataExtractor
 	@Override
 	public IDataContainer Extract(ItemStack stack) {
 		I component = source.GetReference(stack);
-		return RawDataContainer.OfNullable((component!=null) ? GetPropertyValue(component) : null);
+		return RawDataContainer.<O>OfNullable((component!=null) ? GetPropertyValue(component) : null);
 	}
 
 	@Override
