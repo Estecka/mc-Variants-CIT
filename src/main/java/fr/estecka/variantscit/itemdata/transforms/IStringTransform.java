@@ -36,7 +36,7 @@ extends IDataTransform, Function<String,String>
 		if (input == null)
 			return null;
 
-		return RawDataContainer.OfNullable(this.apply(input));
+		return RawDataContainer.<String>OfNullable(this.apply(input));
 	}
 
 	static public IStringTransform Sanitize(String charset){

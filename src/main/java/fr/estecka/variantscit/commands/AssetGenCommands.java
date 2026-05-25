@@ -32,12 +32,12 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
-import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
-import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
-import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
-import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
-import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
+// import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
+// import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
+// import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
+// import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
+// import static com.mojang.brigadier.arguments.StringArgumentType.getString;
+// import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.arguments.IdentifierArgument.id;
 
 public class AssetGenCommands

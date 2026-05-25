@@ -29,6 +29,14 @@ public record ModuleDefinition(
 	Map<String,Identifier> specialModels
 )
 {
+	static private final MapCodec<String> PREFIX_CODEC = CodecUtil.MapWithAlternative(
+		CodecUtil.LEGACY_ITEM_PATH.fieldOf("modelPrefix").validate(CodecUtil.NonEmptyString("Model Prefix")),
+		Codec.BOOL.fieldOf("forceAllowEmptyPrefix").flatXmap(
+			allowed -> allowed ? DataResult.success("") : DataResult.error(()->"Model Prefix cannot be empty."),
+			prefix -> DataResult.success(prefix.isEmpty())
+		)
+	);
+
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
@@ -37,31 +45,12 @@ public record ModuleDefinition(
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
-			Codec.STRING.validate(ModuleDefinition::ValidatePath).fieldOf("modelPrefix").forGetter(ModuleDefinition::modelPrefix),
-			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::fallbackModel),
+			PREFIX_CODEC.forGetter(ModuleDefinition::modelPrefix),
+			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::modelParent),
 			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen),
-			Identifier.CODEC.validate(ModuleDefinition::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
-			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(ModuleDefinition::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
+			Identifier.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
+			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(CodecUtil::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);
-
-	static private String UnItemify(String modelPrefix){
-		if (modelPrefix.startsWith("item/")){
-			// VariantsCitMod.LOGGER.warn("Stripped leading \"item/\" from model path: \"{}\"", modelPrefix);
-			modelPrefix = modelPrefix.substring("item/".length());
-		}
-		return modelPrefix;
-	}
-
-	static private DataResult<Identifier> UnItemify(Identifier original){
-		return DataResult.success(Identifier.fromNamespaceAndPath(original.getNamespace(), UnItemify(original.getPath())));
-	}
-
-	static public DataResult<String> ValidatePath(String path){
-		if (Identifier.isValidPath(path))
-			return DataResult.success(UnItemify(path));
-		else
-			return DataResult.error(()->"Invalid character in path: "+path);
-	}
 }
