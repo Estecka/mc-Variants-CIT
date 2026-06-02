@@ -115,3 +115,7 @@
 - Modules can now be loaded from `variants-cit/modules/`.
 ### 2.17.1
 - Fixed resource reload crash when using some modules.
+### 2.17.2
+- Fixed `sanitize_auto` producing different results with Iris Shaders installed.
+- Fixed `sanitize_path`, `sanitize_auto` and `sanitize_legacy` incorrectly removing hyphens '`-`' from identifiers.
+- Added `sanitize_legacy` as an alias to `sanitize`.

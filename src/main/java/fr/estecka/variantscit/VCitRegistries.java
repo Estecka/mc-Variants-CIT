@@ -25,7 +25,8 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("lowercase"),          String::toLowerCase);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("discard_path"),       IStringTransform::DiscardPath);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("discard_namespace"),  IStringTransform::DiscardNamespace);
-		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize"),           IStringTransform.SANITIZE);
+		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize"),           IStringTransform.SANITIZE_LEGACY);
+		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_legacy"),    IStringTransform.SANITIZE_LEGACY);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_path"),      IStringTransform.SANITIZE_PATH);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_namespace"), IStringTransform.SANITIZE_NAMESPACE);
 		TRANSFORMS.RegisterUnit(Identifier.ofVanilla("sanitize_auto"),      IStringTransform::AutoSanitize);
