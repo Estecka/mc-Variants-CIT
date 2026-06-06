@@ -16,9 +16,9 @@ extends IDataTransform, Function<String,String>
 	static public final IStringTransform NOOP               = o->o;
 	static public final IStringTransform NULL               = o->null;
 	static public final IStringTransform SANITIZE           = IStringTransform::AutoSanitize;
-	static public final IStringTransform SANITIZE_PATH      = Sanitize("[^a-zA-Z0-9_.-/]");
+	static public final IStringTransform SANITIZE_PATH      = Sanitize("[^a-zA-Z0-9_./-]");
 	static public final IStringTransform SANITIZE_NAMESPACE = Sanitize("[^a-zA-Z0-9_.-]");
-	static public final IStringTransform SANITIZE_LEGACY    = Sanitize("[^a-zA-Z0-9_.-/:]");
+	static public final IStringTransform SANITIZE_LEGACY    = Sanitize("[^a-zA-Z0-9_./:-]");
 	static public final IStringTransform LOWERCASE          = String::toLowerCase;
 
 	@Deprecated
@@ -58,6 +58,8 @@ extends IDataTransform, Function<String,String>
 	}
 
 	static public String AutoSanitize(String input){
+		input = SANITIZE_LEGACY.apply(input);
+
 		if (Identifier.tryParse(input) != null)
 			return input;
 		else
