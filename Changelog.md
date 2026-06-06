@@ -281,3 +281,9 @@ Since v2.5:
 - Fixed command error on non-existent module
 - The output of `dump` is now sorted by variant-ID.
 - Modules are now banned from having an empty model prefix.
+## 5.3
+- Fixed `expect` crashing when `nbtPath` returns null.
+- Fixed `sanitize_auto` producing different results with Iris Shaders installed.
+- Fixed `sanitize_path`, `sanitize_auto` and `sanitize_legacy` incorrectly removing hyphens '`-`' from identifiers.
+- Fixed custom trident displaying incorrectly on shelves.
+- Added assetGen presets: `item_model/spear`, `item_model/player_head`, `item_model/handheld_rod`
