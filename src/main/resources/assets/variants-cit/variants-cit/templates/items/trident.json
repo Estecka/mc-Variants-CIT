@@ -4,7 +4,7 @@
 		"property": "display_context",
 		"cases": 
 		[{
-			"when": [ "gui", "ground", "fixed" ],
+			"when": [ "gui", "ground", "fixed", "on_shelf" ],
 			"model": { "type":"model", "model":"${INPUT_ID}" }
 		}],
 		"fallback":

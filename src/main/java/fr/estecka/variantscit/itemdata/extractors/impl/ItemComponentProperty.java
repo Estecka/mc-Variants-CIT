@@ -60,7 +60,10 @@ implements IDataExtractor
 		if (this.nbtPath.isPresent())
 			result = nbtPath.get().LooseTypedTransform(result);
 
-		return expectedType.LooseTypedTransform(result);
+		if (result != null)
+			result = expectedType.LooseTypedTransform(result);
+
+		return result;
 	}
 
 	static private DataResult<ItemComponentProperty<?>> MonostringParse(String input){
