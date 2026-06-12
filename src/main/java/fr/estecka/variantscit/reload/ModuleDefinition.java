@@ -23,9 +23,7 @@ public record ModuleDefinition(
 	int priority,
 	LibraryDefinition libraryDefinition,
 	Optional<ResourceLocation> modelParent,
-	Optional<IAssetGenerator> assetGen,
-	Optional<ResourceLocation> fallbackModel,
-	Map<String,ResourceLocation> specialModels
+	Optional<IAssetGenerator> assetGen
 )
 {
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
@@ -38,9 +36,7 @@ public record ModuleDefinition(
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			LibraryDefinition.MAP_CODEC.forGetter(ModuleDefinition::libraryDefinition),
 			ResourceLocation.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::modelParent),
-			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen),
-			ResourceLocation.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
-			Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC.validate(CodecUtil::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,ResourceLocation>of()).forGetter(ModuleDefinition::specialModels)
+			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);
