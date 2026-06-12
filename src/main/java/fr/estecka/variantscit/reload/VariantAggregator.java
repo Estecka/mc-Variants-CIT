@@ -49,7 +49,7 @@ public class VariantAggregator
 	}
 
 	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		var fallbackModel = module.modelPrefix().GetModelId(IVariantLibrary.FALLBACK_VARIANT_ID);
+		var fallbackModel = module.libraryDefinition().GetModelId(IVariantLibrary.FALLBACK_VARIANT_ID);
 		return new VariantLibrary(fallbackModel);
 	}
 
@@ -86,7 +86,7 @@ public class VariantAggregator
 	private void GatherType(EAssetType assetType, ResourceManager manager){
 		Set<ResourceLocation> resources = manager.listResources(assetType.packDirectory, id->id.getPath().endsWith(assetType.suffix)).keySet();
 
-		Stream<ResourceLocation> modelIds = resources.stream().map(id->assetType.GetShortId(id).get());
+		Stream<ResourceLocation> modelIds = resources.stream().map(id->assetType.GetModelId(id).get());
 		GatherIds(assetType, modelIds);
 	}
 
@@ -119,7 +119,7 @@ public class VariantAggregator
 				if  (this.ApplyModelToModule(false, module, library, e.getValue().radical()))
 				{
 					ResourceLocation resourceId = generatorPass.GetOutputResourceId(e.getKey());
-					this.OnGeneratedResource(resourceId, module.modelPrefix(), e.getValue().resource());
+					this.OnGeneratedResource(resourceId, module.libraryDefinition(), e.getValue().resource());
 				}
 			}
 
@@ -134,7 +134,7 @@ public class VariantAggregator
 	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation modelId){
 		boolean accepted = false;
 
-		Set<ResourceLocation> variants = module.modelPrefix().GetVariantIds(modelId);
+		Set<ResourceLocation> variants = module.libraryDefinition().GetVariantIds(modelId);
 		for (ResourceLocation variantId : variants)
 		if  (module.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID))
 		{

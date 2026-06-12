@@ -133,7 +133,7 @@ public record CommandLogger(
 		if (subPrefix.isPresent())
 			variantId = variantId.withPrefix(subPrefix.get());
 
-		ResourceLocation modelId = metamodule.modelPrefix().GetModelId(variantId);
+		ResourceLocation modelId = metamodule.libraryDefinition().GetModelId(variantId);
 		if (modelId == null)
 		{
 			Info(ChatFormatting.GOLD, 

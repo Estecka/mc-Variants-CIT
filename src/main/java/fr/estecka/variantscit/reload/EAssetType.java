@@ -36,7 +36,7 @@ public enum EAssetType
 		this.identifierPrefix = prefix.isEmpty() ? prefix  : prefix+'/';
 	}
 
-	public Optional<ResourceLocation> GetShortId(ResourceLocation resourceId){
+	public Optional<ResourceLocation> GetModelId(ResourceLocation resourceId){
 		String path = resourceId.getPath();
 		if (!path.startsWith(packDirectory+"/") || !path.endsWith(suffix))
 			return Optional.empty();
