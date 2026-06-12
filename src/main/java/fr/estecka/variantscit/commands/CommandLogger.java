@@ -17,7 +17,7 @@ public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
 	EModuleHook moduleHook,
 	MetaModule metamodule,
-	Optional<String> modelPrefix
+	Optional<String> subPrefix
 )
 {
 
@@ -26,7 +26,7 @@ public record CommandLogger(
 			commandContext,
 			moduleHook,
 			metamodule,
-			modelPrefix.map(prefix -> prefix + subPrefix)
+			this.subPrefix.map(prefix -> prefix + subPrefix)
 		);
 	}
 
@@ -110,34 +110,54 @@ public record CommandLogger(
 		return TextOf(variant).withStyle(ChatFormatting.YELLOW);
 	}
 
-	private MutableComponent AssetFilename(ResourceLocation variantId, EAssetType assetType){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
-			ItemData(variantId.getNamespace()),
+	static private MutableComponent AssetFilename(ResourceLocation modelId, EAssetType assetType){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}",
+			ItemData(modelId.getNamespace()),
 			assetType.packDirectory,
-			modelPrefix.orElse(""),
-			ItemData(variantId.getPath()),
+			ItemData(modelId.getPath()),
 			assetType.suffix
 		);
 	}
 
-	private MutableComponent LayeredAssetFilename(ResourceLocation variantId, EAssetType assetType){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}{}",
-			ItemData(variantId.getNamespace()),
+	static private MutableComponent LayeredAssetFilename(ResourceLocation modelId, EAssetType assetType){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}",
+			ItemData(modelId.getNamespace()),
 			assetType.packDirectory,
 			ItemData("<layer name>"),
-			modelPrefix.orElse(""),
-			ItemData(variantId.getPath()),
+			ItemData(modelId.getPath()),
 			assetType.suffix
 		);
 	}
 
-	// FIXME: Fix for harmapped libraries
 	public void PrintVariantIdTip(ResourceLocation variantId){
-		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
-			modelPrefix.map(CommandLogger::PackData).orElse(ItemData(null)),
-			ItemData(variantId)
-		);
+		if (subPrefix.isPresent())
+			variantId = variantId.withPrefix(subPrefix.get());
 
+		ResourceLocation modelId = metamodule.modelPrefix().GetModelId(variantId);
+		if (modelId == null)
+		{
+			Info(ChatFormatting.GOLD, 
+				"[WARN] The variant ID {} is not supported by this module. "
+				+ "It may have been filtered out by the `modelNamespace` or `modelPathes` options, "
+				+ " or some other parameters from the module's type.",
+				ItemData(variantId)
+			);
+		}
+		else
+		{
+			Info(ChatFormatting.GRAY,
+				"[TIP] The variant ID {} is bound to the model ID {}, "
+				+ "it may be supported by providing one of these files:",
+				ItemData(variantId),
+				PackData(modelId)
+			);
+	
+			PrintFileNamesTip(modelId);
+		}
+
+	}
+
+	public void PrintFileNamesTip(ResourceLocation modelId){
 		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
 		switch (this.moduleHook)
 		{
@@ -145,17 +165,17 @@ public record CommandLogger(
 				Error("Error: unknown hook");
 				break;
 			case TRIM_PATTERN:
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.TRIM_MODEL)));
-				Info(bullet.copy().append(LayeredAssetFilename(variantId, EAssetType.TRIM_TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.TRIM_MODEL)));
+				Info(bullet.copy().append(LayeredAssetFilename(modelId, EAssetType.TRIM_TEXTURE)));
 				break;
 			case EQUIPPABLE:
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));
-				Info(bullet.copy().append(LayeredAssetFilename(variantId, EAssetType.EQUIP_TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.EQUIPMENT)));
+				Info(bullet.copy().append(LayeredAssetFilename(modelId, EAssetType.EQUIP_TEXTURE)));
 				break;
 			case ITEM_MODEL:
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.BAKED_MODEL)));
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.ITEM_STATE)));
+				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.BAKED_MODEL)));
+				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.ITEM_TEXTURE)));
 				break;
 		}
 	}

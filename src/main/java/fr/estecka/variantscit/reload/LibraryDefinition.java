@@ -100,8 +100,8 @@ public record LibraryDefinition(
 /******************************************************************************/
 
 	/**
-	 * @return If the library accepts this assets, returns any variant ID it is
-	 * associated with. Ohterwise, returns an empty set.
+	 * @return If the library  accepts this assets, returns any variant ID it is
+	 * associated with. Otherwise, returns an empty set.
 	 */
 	public Set<ResourceLocation> GetVariantIds(ResourceLocation assetId){
 		Set<ResourceLocation> result = new HashSet<>();
@@ -123,5 +123,16 @@ public record LibraryDefinition(
 		return IDataTransform.Test(namespacePredicate, variantId.getNamespace())
 		    && IDataTransform.Test(pathPredicate, variantId.getPath())
 		    ;
+	}
+
+	public ResourceLocation GetModelId(ResourceLocation variantId){
+		if (!this.AcceptsVariant(variantId))
+			return null;
+
+		ResourceLocation modelId = this.hardcodedList.get(variantId);
+		if (modelId == null && modelPrefix.isPresent() && this.AcceptsVariant(variantId))
+			modelId = variantId.withPrefix(this.modelPrefix.get());
+
+		return modelId;
 	}
 }
