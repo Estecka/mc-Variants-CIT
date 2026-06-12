@@ -56,9 +56,9 @@ public final class DataConversions
 		if (input.value() instanceof ResourceLocation)
 			return input;
 		if (input.value() instanceof String string)
-			return RawDataContainer.OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, string).mapOrElse(o->o, o->null));
+			return RawDataContainer.<ResourceLocation>OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, string).mapOrElse(o->o, o->null));
 		if (input.asNbt() instanceof StringTag nbt)
-			return RawDataContainer.OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, nbt.getAsString()).mapOrElse(o->o, o->null));
+			return RawDataContainer.<ResourceLocation>OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, nbt.getAsString()).mapOrElse(o->o, o->null));
 		return null;
 	}
 
@@ -66,9 +66,9 @@ public final class DataConversions
 		if (input.value() instanceof String)
 			return input;
 		if (input.value() instanceof ResourceLocation id)
-			return RawDataContainer.OfNullable(id.toString());
+			return RawDataContainer.<String>OfNullable(id.toString());
 		if (input.asNbt() instanceof StringTag nbt)
-			return RawDataContainer.OfNullable(nbt.getAsString());
+			return RawDataContainer.<String>OfNullable(nbt.getAsString());
 		return null;
 	}
 
@@ -76,7 +76,7 @@ public final class DataConversions
 		if (input.value() instanceof Number)
 			return input;
 		if (input.asNbt() instanceof NumericTag nbt)
-			return RawDataContainer.OfNullable(nbt.getAsNumber());
+			return RawDataContainer.<Number>OfNullable(nbt.getAsNumber());
 		return null;
 	}
 
@@ -86,7 +86,7 @@ public final class DataConversions
 		
 		var nbt = input.asNbt();
 		if (nbt != null)
-			return RawDataContainer.OfNullable(NbtToText(nbt));
+			return RawDataContainer.<Component>OfNullable(NbtToText(nbt));
 		else
 			return null;
 	}
@@ -97,7 +97,7 @@ public final class DataConversions
 		
 		var nbt = input.asNbt();
 		if (nbt != null)
-			return RawDataContainer.OfNullable(NbtToTextArray(nbt));
+			return RawDataContainer.<List<Component>>OfNullable(NbtToTextArray(nbt));
 		else
 			return null;
 	}
@@ -106,7 +106,7 @@ public final class DataConversions
 		if (input.value() instanceof Tag)
 			return input;
 		
-		return RawDataContainer.OfNullable(input.asNbt());
+		return RawDataContainer.<Tag>OfNullable(input.asNbt());
 	}
 
 	static public IDataContainer StrictSnbt(IDataContainer input) {
@@ -116,7 +116,7 @@ public final class DataConversions
 
 		Tag nbt = (Tag)input.value();
 		String snbt = nbt.getAsString();
-		return RawDataContainer.OfNullable(snbt);
+		return RawDataContainer.<String>OfNullable(snbt);
 	}
 
 

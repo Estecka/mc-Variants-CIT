@@ -1,0 +1,20 @@
+[
+	{
+		"pass": "models_from_textures",
+		"inputPath": "(.*)_in_hand",
+		"outputPath": "$1_in_hand",
+		"radicalPath": "$1",
+		"template": "models/parent",
+		"variables": { "modelParent": "item/spear_in_hand" }
+	},
+	{
+		"pass": "models_from_textures",
+		"inputPath": "(?!.*(_in_hand)).*",
+		"template": "models/item/handheld"
+	},
+	{
+		"pass": "items_from_models",
+		"inputPath": "(?!.*(_in_hand)).*",
+		"template": "items/spear"
+	}
+]

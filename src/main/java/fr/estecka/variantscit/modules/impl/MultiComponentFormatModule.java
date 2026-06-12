@@ -82,7 +82,7 @@ implements ISimpleCitModule
 			variables.put(entry.getKey(), value);
 		}
 
-		IDataContainer result = this.transform.LooseTypedTransform(RawDataContainer.OfNullable(this.format.Substitute(variables)));
+		IDataContainer result = this.transform.LooseTypedTransform(RawDataContainer.<String>OfNullable(this.format.Substitute(variables)));
 		variables.clear();
 		if (result == null)
 			return null;
@@ -120,7 +120,7 @@ implements ISimpleCitModule
 		logger.Info("Format result: {}", CommandLogger.ItemData(substResult));
 
 		if (this.transform != IDataTransform.NOOP){
-			var r = LogTransform.WithLogger(logger, ()->this.transform.LooseTypedTransform(RawDataContainer.OfNullable(substResult)));
+			var r = LogTransform.WithLogger(logger, ()->this.transform.LooseTypedTransform(RawDataContainer.<String>OfNullable(substResult)));
 			logger.Info("Transformed format: {}", CommandLogger.ItemData(r));
 		}
 

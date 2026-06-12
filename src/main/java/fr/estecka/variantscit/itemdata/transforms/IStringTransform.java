@@ -16,9 +16,9 @@ extends IDataTransform, Function<String,String>
 	static public final IStringTransform NOOP               = o->o;
 	static public final IStringTransform NULL               = o->null;
 	static public final IStringTransform SANITIZE_AUTO      = IStringTransform::AutoSanitize;
-	static public final IStringTransform SANITIZE_PATH      = Sanitize("[^a-zA-Z0-9_.-/]");
+	static public final IStringTransform SANITIZE_PATH      = Sanitize("[^a-zA-Z0-9_./-]");
 	static public final IStringTransform SANITIZE_NAMESPACE = Sanitize("[^a-zA-Z0-9_.-]");
-	static public final IStringTransform SANITIZE_LEGACY    = Sanitize("[^a-zA-Z0-9_.-/:]");
+	static public final IStringTransform SANITIZE_LEGACY    = Sanitize("[^a-zA-Z0-9_./:-]");
 	static public final IStringTransform LOWERCASE          = String::toLowerCase;
 
 	@Deprecated
@@ -36,7 +36,7 @@ extends IDataTransform, Function<String,String>
 		if (input == null)
 			return null;
 
-		return RawDataContainer.OfNullable(this.apply(input));
+		return RawDataContainer.<String>OfNullable(this.apply(input));
 	}
 
 	static public IStringTransform Sanitize(String charset){
@@ -57,7 +57,13 @@ extends IDataTransform, Function<String,String>
 		return (split < 0) ? "" : s.substring(0, split);
 	}
 
+	/**
+	 * @implNote  the call  to  sanitize_legacy  ensures  the behaviour  remains
+	 * consistent even with mods that allow for more lenient identifiers.
+	 */
 	static public String AutoSanitize(String input){
+		input = SANITIZE_LEGACY.apply(input);
+
 		if (ResourceLocation.tryParse(input) != null)
 			return input;
 		else

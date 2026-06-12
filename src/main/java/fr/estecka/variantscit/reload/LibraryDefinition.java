@@ -32,7 +32,7 @@ public record LibraryDefinition(
 	);
 
 	static private final MapCodec<Optional<String>> PREFIX_CODEC = CodecUtil.MapWithAlternative(
-		CodecUtil.LEGACY_ITEM_PATH.optionalFieldOf("modelPrefix").validate(opt -> (opt.isEmpty() || !opt.get().isEmpty()) ? DataResult.success(opt) : DataResult.error(()->"Model Prefix cannot be empty")),
+		CodecUtil.LEGACY_ITEM_PATH.validate(CodecUtil.NonEmptyString("Model Prefix")).optionalFieldOf("modelPrefix"),
 		Codec.BOOL.fieldOf("forceAllowEmptyPrefix").flatXmap(
 			allowed -> allowed ? DataResult.success(Optional.of("")) : DataResult.error(()->"Model Prefix cannot be empty."),
 			prefix -> DataResult.success(prefix.isPresent() && prefix.get().isEmpty())

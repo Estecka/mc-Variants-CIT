@@ -1,0 +1,13 @@
+{
+	"model": {
+		"type": "minecraft:select",
+		"property": "minecraft:display_context",
+		"cases":
+		[{
+			"when": [ "gui", "ground", "fixed" ],
+			"model": { "type":"model", "model":"${INPUT_ID}" }
+		}],
+		"fallback":  { "type":"model", "model":"${INPUT_ID}_in_hand" }
+	},
+	"swap_animation_scale": 1.95
+}
