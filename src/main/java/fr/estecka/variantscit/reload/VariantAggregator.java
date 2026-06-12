@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
@@ -48,7 +49,8 @@ public class VariantAggregator
 	}
 
 	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		return new VariantLibrary(new HashMap<>(module.modelPrefix().hardcodedList()));
+		var fallbackModel = module.modelPrefix().GetModelId(IVariantLibrary.FALLBACK_VARIANT_ID);
+		return new VariantLibrary(fallbackModel);
 	}
 
 	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
@@ -84,15 +86,15 @@ public class VariantAggregator
 	private void GatherType(EAssetType assetType, ResourceManager manager){
 		Set<ResourceLocation> resources = manager.listResources(assetType.packDirectory, id->id.getPath().endsWith(assetType.suffix)).keySet();
 
-		Stream<ResourceLocation> shortIds = resources.stream().map(id->assetType.GetShortId(id).get());
-		GatherIds(assetType, shortIds);
+		Stream<ResourceLocation> modelIds = resources.stream().map(id->assetType.GetShortId(id).get());
+		GatherIds(assetType, modelIds);
 	}
 
 	private void GatherIds(EAssetType assetType, Stream<ResourceLocation> assets){
-		assets.forEach(shortId -> ApplyModelToAll(assetType, shortId));
+		assets.forEach(modelId -> ApplyModelToAll(assetType, modelId));
 	}
 
-	private void ApplyModelToAll(EAssetType assetType, ResourceLocation shortId){
+	private void ApplyModelToAll(EAssetType assetType, ResourceLocation modelId){
 		EAssetGenPass generatorPass = switch (assetType){
 			default -> null;
 			case EAssetType.TRIM_TEXTURE  -> EAssetGenPass.TRIMS;
@@ -107,11 +109,11 @@ public class VariantAggregator
 			VariantLibrary library = entry.getValue();
 			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
 
-			this.ApplyModelToModule(assetType.isFundamental, module, library, shortId);
+			this.ApplyModelToModule(assetType.isFundamental, module, library, modelId);
 
 			if (generatorPass != null){
 				IAssetGenerator generator = this.assetGenerators.get(module);
-				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, shortId);
+				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, modelId);
 
 				for (var e : generatedResources.entrySet())
 				if  (this.ApplyModelToModule(false, module, library, e.getValue().radical()))
@@ -129,16 +131,16 @@ public class VariantAggregator
 	 * @return Whether the provided ID asset can be added to this library.
 	 * @param isFundamental If true, add the asset to the library on success.
 	 */
-	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation shortId){
+	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation modelId){
 		boolean accepted = false;
 
-		Set<ResourceLocation> variants = module.modelPrefix().GetVariantIds(shortId);
+		Set<ResourceLocation> variants = module.modelPrefix().GetVariantIds(modelId);
 		for (ResourceLocation variantId : variants)
-		if  (module.parameters().AcceptsVariant(variantId))
+		if  (module.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID))
 		{
 			accepted = true;
 			if (isFundamental)
-				library.variantModels().put(variantId, shortId);
+				library.variantModels().put(variantId, modelId);
 		}
 
 		return accepted;

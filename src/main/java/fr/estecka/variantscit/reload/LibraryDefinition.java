@@ -61,8 +61,8 @@ public record LibraryDefinition(
 	static public final MapCodec<LibraryDefinition> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			PREFIX_CODEC.forGetter(LibraryDefinition::modelPrefix),
-			TRANSFORM_CODEC.optionalFieldOf("namespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
-			IDataTransform.CODEC.optionalFieldOf("variantPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
+			TRANSFORM_CODEC.optionalFieldOf("modelNamespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
+			IDataTransform.CODEC.optionalFieldOf("modelPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
 			HARDCODED_CODEC.forGetter(LibraryDefinition::hardcodedList)
 		)
 		.apply(builder, LibraryDefinition::new)
@@ -105,7 +105,7 @@ public record LibraryDefinition(
 	 */
 	public Set<ResourceLocation> GetVariantIds(ResourceLocation assetId){
 		Set<ResourceLocation> result = new HashSet<>();
-		if (modelPrefix.isPresent() && assetId.getPath().startsWith(modelPrefix.get())){
+		if (modelPrefix.isPresent() && !assetId.getNamespace().equals(VariantsCitMod.MODID) && assetId.getPath().startsWith(modelPrefix.get())){
 			ResourceLocation variantId = assetId.withPath(path->path.substring(modelPrefix.get().length()));
 			if (!this.hardcodedList.containsKey(variantId) && this.AcceptsVariant(variantId))
 				result.add(variantId);

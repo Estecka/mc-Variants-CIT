@@ -17,6 +17,10 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 		this.fallbackModel = models.get(FALLBACK_VARIANT_ID);
 		this.variantModels = models;
 	}
+	public VariantLibrary(ResourceLocation fallbackModels){
+		this.fallbackModel = fallbackModels;
+		this.variantModels = new HashMap<>();
+	}
 
 	public ResourceLocation fallbackModel() { return this.fallbackModel; }
 	public Map<ResourceLocation,ResourceLocation> variantModels() { return this.variantModels; }

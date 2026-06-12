@@ -137,9 +137,8 @@ public record CommandLogger(
 		if (modelId == null)
 		{
 			Info(ChatFormatting.GOLD, 
-				"[WARN] The variant ID {} is not supported by this module. "
-				+ "It may have been filtered out by the `modelNamespace` or `modelPathes` options, "
-				+ " or some other parameters from the module's type.",
+				"[WARN] The variant ID {} is not supported by this module, "
+				+ "because it was filtered out by the `modelNamespace` or `modelPathes` options.",
 				ItemData(variantId)
 			);
 		}
@@ -149,7 +148,7 @@ public record CommandLogger(
 				"[TIP] The variant ID {} is bound to the model ID {}, "
 				+ "it may be supported by providing one of these files:",
 				ItemData(variantId),
-				PackData(modelId)
+				ItemData(modelId)
 			);
 	
 			PrintFileNamesTip(modelId);
