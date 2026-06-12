@@ -287,10 +287,7 @@ Since v2.5:
 - Fixed `sanitize_path`, `sanitize_auto` and `sanitize_legacy` incorrectly removing hyphens '`-`' from identifiers.
 - Fixed custom trident displaying incorrectly on shelves.
 - Added assetGen presets: `item_model/spear`, `item_model/player_head`, `item_model/handheld_rod`
-
 ## 5.4
 - Added hook: `trim_pattern`
-- Added assetGen presets: `item_model/player_head`, `item_model/handheld_rod`, `trim_pattern/humanoid`
-- Empty `modelPrefix`es are now strictly forbidden unless explicitely waived.
 - Added `modelNamespace`, `modelPathes` and `modelList` options.
 - Special and fallback models are now represented by special variant IDs.
