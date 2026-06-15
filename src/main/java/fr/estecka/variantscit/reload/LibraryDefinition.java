@@ -26,15 +26,15 @@ public record LibraryDefinition(
 	Map<ResourceLocation,ResourceLocation> hardcodedList
 )
 {
-	static private final Codec<IDataTransform> TRANSFORM_CODEC = CodecUtil.WithAlternatives(
+	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = CodecUtil.WithAlternatives(
 		StringCompareTransform.LITERAL_CODEC,
 		SuccessiveTransform.CODEC
 	);
 
 	static private final MapCodec<Optional<String>> PREFIX_CODEC = CodecUtil.MapWithAlternative(
 		CodecUtil.LEGACY_ITEM_PATH.validate(CodecUtil.NonEmptyString("Model Prefix")).optionalFieldOf("modelPrefix"),
-		Codec.BOOL.fieldOf("forceAllowEmptyPrefix").flatXmap(
-			allowed -> allowed ? DataResult.success(Optional.of("")) : DataResult.error(()->"Model Prefix cannot be empty."),
+		Codec.BOOL.fieldOf("forceAllowEmptyPrefix").orElse(false).flatXmap(
+			allowed -> allowed ? DataResult.success(Optional.of("")) : DataResult.error(()->"No waiver for empty Model Prefix."),
 			prefix -> DataResult.success(prefix.isPresent() && prefix.get().isEmpty())
 		)
 	);
@@ -49,7 +49,7 @@ public record LibraryDefinition(
 		ResourceLocation.CODEC.listOf().xmap(LibraryDefinition::FromArray, map->List.copyOf(map.keySet()))
 	);
 
-	static private final MapCodec<Map<ResourceLocation,ResourceLocation>> HARDCODED_CODEC = RecordCodecBuilder.<Map<ResourceLocation,ResourceLocation>>mapCodec(builder->builder
+	static private final MapCodec<Map<ResourceLocation,ResourceLocation>> HARDCODED_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			ResourceLocation.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(CodecUtil.NoGetter("Legacy Fallback")),
 			LEGACY_SPECIAL_CODEC.optionalFieldOf("special", Map.of()).forGetter(CodecUtil.NoGetter("Legacy Special")),
@@ -61,7 +61,7 @@ public record LibraryDefinition(
 	static public final MapCodec<LibraryDefinition> MAP_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
 			PREFIX_CODEC.forGetter(LibraryDefinition::modelPrefix),
-			TRANSFORM_CODEC.optionalFieldOf("modelNamespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
+			NAMESPACE_TRANSFORM_CODEC.optionalFieldOf("modelNamespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
 			IDataTransform.CODEC.optionalFieldOf("modelPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
 			HARDCODED_CODEC.forGetter(LibraryDefinition::hardcodedList)
 		)
@@ -100,8 +100,8 @@ public record LibraryDefinition(
 /******************************************************************************/
 
 	/**
-	 * @return If the library  accepts this assets, returns any variant ID it is
-	 * associated with. Otherwise, returns an empty set.
+	 * @return If the library  accepts this assets, returns  every variant ID it
+	 * is associated with. Otherwise, returns an empty set.
 	 */
 	public Set<ResourceLocation> GetVariantIds(ResourceLocation assetId){
 		Set<ResourceLocation> result = new HashSet<>();

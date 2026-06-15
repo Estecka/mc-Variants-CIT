@@ -18,7 +18,7 @@ public class ReloadableRepository<T>
 	private final String suffix;
 
 	/**
-	 * @param codec The codec use to parse resources.
+	 * @param codec The codec used to parse resources.
 	 * @param directory The directory containing the resources, EXCLUDING the trailing slash.
 	 * @param extension The file extension, EXCLUDING the dot.
 	 */

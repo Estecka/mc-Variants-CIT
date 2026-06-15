@@ -29,6 +29,7 @@ public class VariantAggregator
 
 	private final Map<ModuleDefinition, ResourceLocation> moduleIds = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
+	// TODO: combine fields into a single Bimap
 	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> trims = new IdentityHashMap<>();
@@ -153,8 +154,8 @@ public class VariantAggregator
 		manager.Refresh();
 	}
 
-	private void OnGeneratedResource(ResourceLocation resourceId, LibraryDefinition modelPrefix, IoSupplier<InputStream> resource){
-		int priority = modelPrefix.modelPrefix().map(String::length).orElse(0);
+	private void OnGeneratedResource(ResourceLocation resourceId, LibraryDefinition libDefinition, IoSupplier<InputStream> resource){
+		int priority = libDefinition.modelPrefix().map(String::length).orElse(0);
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)

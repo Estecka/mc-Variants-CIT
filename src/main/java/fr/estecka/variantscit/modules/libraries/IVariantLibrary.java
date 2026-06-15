@@ -23,5 +23,9 @@ public interface IVariantLibrary
 	 * model was provided for this variant, or null if the variant is null.
 	 */
 	public abstract @Nullable ResourceLocation GetVariantModel(ResourceLocation variantId);
+
+	/**
+	 * @return The model bound to this variant ID, if any, or null otherwise.
+	 */
 	public abstract @Nullable ResourceLocation GetVariantModelStrict(ResourceLocation variantId);
 }
