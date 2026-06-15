@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.commands;
 
-import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
@@ -17,7 +16,7 @@ public record CommandLogger(
 	CommandContext<FabricClientCommandSource> commandContext,
 	EModuleHook moduleHook,
 	MetaModule metamodule,
-	Optional<String> subPrefix
+	String subPrefix
 )
 {
 
@@ -26,7 +25,7 @@ public record CommandLogger(
 			commandContext,
 			moduleHook,
 			metamodule,
-			this.subPrefix.map(prefix -> prefix + subPrefix)
+			this.subPrefix + subPrefix
 		);
 	}
 
@@ -130,8 +129,7 @@ public record CommandLogger(
 	}
 
 	public void PrintVariantIdTip(ResourceLocation variantId){
-		if (subPrefix.isPresent())
-			variantId = variantId.withPrefix(subPrefix.get());
+		variantId = variantId.withPrefix(subPrefix);
 
 		ResourceLocation modelId = metamodule.libraryDefinition().GetModelId(variantId);
 		if (modelId == null)

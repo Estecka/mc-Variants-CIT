@@ -20,7 +20,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -113,7 +112,7 @@ extends CommandUtil
 		if (module == null)
 			return Error(context, "No hook "+hook+" for module "+moduleId);
 
-		CommandLogger logger = new CommandLogger(context, hook, meta, Optional.empty());
+		CommandLogger logger = new CommandLogger(context, hook, meta, "");
 		return command.Execute(context, logger, module);
 	}
 
