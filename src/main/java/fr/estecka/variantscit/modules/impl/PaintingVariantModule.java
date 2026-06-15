@@ -42,11 +42,11 @@ extends AMonoComponentModule<CustomData>
 
 		ResourceLocation variantId = ResourceLocation.tryParse(rawVariant);
 		if (variantId == null)
-			return models.GetVariantModelStrict(variantId);
+			return models.GetVariantModelStrict(INVALID_PAINTING);
 
 		var registry = GetPaintingRegistry();
 		if (registry.isPresent() && !registry.get().containsKey(variantId))
-			return models.GetVariantModelStrict(variantId);
+			return models.GetVariantModelStrict(INVALID_PAINTING);
 
 		return models.GetVariantModel(variantId);
 	}
