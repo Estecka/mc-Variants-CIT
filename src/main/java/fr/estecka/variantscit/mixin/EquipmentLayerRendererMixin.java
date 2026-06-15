@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.mixin;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +17,7 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.trims.ITrimSpriteKeyDuck;
 import fr.estecka.variantscit.trims.TrimPatternOverlay;
+import net.minecraft.Util;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimSpriteKey;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -29,13 +31,14 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(EquipmentLayerRenderer.class)
 public class EquipmentLayerRendererMixin
 {
-	@Shadow private @Final Function<?,?> trimSpriteLookup;
-
-	private TextureAtlas textureAtlas;
+	@Shadow private @Final Function<TrimSpriteKey,TextureAtlasSprite> trimSpriteLookup;
+	@Unique private BiFunction<TrimSpriteKey, TrimPatternOverlay, TextureAtlasSprite> trimSpriteOverlayLookup;
 
 	@Inject(method="<init>", at=@At("TAIL"))
 	private void getAtlas(EquipmentAssetManager manager, TextureAtlas atlas, CallbackInfo ci){
-		this.textureAtlas = atlas;
+		this.trimSpriteOverlayLookup = Util.memoize(
+			(trimSpriteKey, override) -> atlas.getSprite(ITrimSpriteKeyDuck.GetTextureId(trimSpriteKey, override))
+		);
 	}
 
 	@WrapOperation(
@@ -60,12 +63,8 @@ public class EquipmentLayerRendererMixin
 
 		if (trimOverlay == null)
 			return original.call(memoizer, memoizerKey);
-		else {
-			// TODO: memoize ?
-			ResourceLocation textureId = ITrimSpriteKeyDuck.GetTextureId(trimSpriteKey, trimOverlay);
-			TextureAtlasSprite result = textureAtlas.getSprite(textureId);
-			return result;
-		}
+		else 
+			return trimSpriteOverlayLookup.apply(trimSpriteKey, trimOverlay);
 
 	}
 
