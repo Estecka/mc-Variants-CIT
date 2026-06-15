@@ -49,7 +49,7 @@ public class VariantAggregator
 	}
 
 	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		var fallbackModel = module.libraryDefinition().GetModelId(IVariantLibrary.FALLBACK_VARIANT_ID);
+		var fallbackModel = module.libraryDefinition().hardcodedList().get(IVariantLibrary.FALLBACK_VARIANT_ID);
 		return new VariantLibrary(fallbackModel);
 	}
 

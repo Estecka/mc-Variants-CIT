@@ -130,7 +130,7 @@ public record LibraryDefinition(
 		if (modelId != null)
 			return modelId;
 
-		if (modelPrefix.isPresent() && this.AcceptsVariant(variantId))
+		if (modelPrefix.isPresent() && this.AcceptsVariant(variantId) && !variantId.getNamespace().equals(VariantsCitMod.MODID))
 			return variantId.withPrefix(this.modelPrefix.get());
 
 		else
