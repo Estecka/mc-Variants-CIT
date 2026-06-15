@@ -126,13 +126,14 @@ public record LibraryDefinition(
 	}
 
 	public ResourceLocation GetModelId(ResourceLocation variantId){
-		if (!this.AcceptsVariant(variantId))
-			return null;
-
 		ResourceLocation modelId = this.hardcodedList.get(variantId);
-		if (modelId == null && modelPrefix.isPresent() && this.AcceptsVariant(variantId))
-			modelId = variantId.withPrefix(this.modelPrefix.get());
+		if (modelId != null)
+			return modelId;
 
-		return modelId;
+		if (modelPrefix.isPresent() && this.AcceptsVariant(variantId))
+			return variantId.withPrefix(this.modelPrefix.get());
+
+		else
+			return null;
 	}
 }
