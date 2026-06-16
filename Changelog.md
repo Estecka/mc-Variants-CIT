@@ -291,3 +291,4 @@ Since v2.5:
 - Added hook: `trim_pattern`
 - Added `modelNamespace`, `modelPathes` and `modelList` options.
 - Special and fallback models are now represented by special variant IDs.
+- Asset generator's inputPath now defaults to `"^.*$"`
