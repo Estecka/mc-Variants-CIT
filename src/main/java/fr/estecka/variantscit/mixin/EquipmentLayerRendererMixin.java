@@ -13,9 +13,9 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import fr.estecka.variantscit.MixinGlobals;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
-import fr.estecka.variantscit.trims.ITrimSpriteKeyDuck;
 import fr.estecka.variantscit.trims.TrimPatternOverlay;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
@@ -37,7 +37,7 @@ public class EquipmentLayerRendererMixin
 	@Inject(method="<init>", at=@At("TAIL"))
 	private void getAtlas(EquipmentAssetManager manager, TextureAtlas atlas, CallbackInfo ci){
 		this.trimSpriteOverlayLookup = Util.memoize(
-			(trimSpriteKey, override) -> atlas.getSprite(ITrimSpriteKeyDuck.GetTextureId(trimSpriteKey, override))
+			(trimSpriteKey, override) -> ComputeSprite(atlas, trimSpriteKey, override)
 		);
 	}
 
@@ -68,27 +68,23 @@ public class EquipmentLayerRendererMixin
 
 	}
 
-	@Mixin(TrimSpriteKey.class)
-	static public abstract class TrimSpriteKeyMixin
-	implements ITrimSpriteKeyDuck
-	{
-		static private TrimPatternOverlay trimOverride = null;
-
-		@Shadow abstract ResourceLocation textureId();
-
-		@Override
-		public ResourceLocation vcit$textureId(TrimPatternOverlay overlay) {
-			ResourceLocation result;
-			try {
-				trimOverride = overlay;
-				result = this.textureId();
-			}
-			finally {
-				trimOverride = null;
-			}
-			return result;
+	static private TextureAtlasSprite ComputeSprite(TextureAtlas atlas, TrimSpriteKey trimSpriteKey, TrimPatternOverlay overlay){
+		ResourceLocation spriteId;
+		try {
+			MixinGlobals.trimOverride = overlay;
+			spriteId = trimSpriteKey.textureId();
+		}
+		finally {
+			MixinGlobals.trimOverride = null;
 		}
 
+		return atlas.getSprite(spriteId);
+
+	}
+
+	@Mixin(TrimSpriteKey.class)
+	static public abstract class TrimSpriteKeyMixin
+	{
 		@ModifyExpressionValue(
 			method = "textureId",
 			at = @At(
@@ -97,8 +93,8 @@ public class EquipmentLayerRendererMixin
 			)
 		)
 		public ResourceLocation overrideTextureId(ResourceLocation original){
-			if (trimOverride != null)
-				return trimOverride.assetId();
+			if (MixinGlobals.trimOverride != null)
+				return MixinGlobals.trimOverride.assetId();
 			else
 				return original;
 		}
