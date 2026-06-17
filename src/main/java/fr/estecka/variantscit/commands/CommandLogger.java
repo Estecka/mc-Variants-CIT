@@ -30,6 +30,7 @@ public record CommandLogger(
 		);
 	}
 
+
 /******************************************************************************/
 /* # Generic logging                                                          */
 /******************************************************************************/
@@ -67,6 +68,7 @@ public record CommandLogger(
 		return TextFormat(ChatFormatting.RESET, format, args);
 	}
 
+
 	public void Info(ChatFormatting formatting, String format, Object... args){
 		this.Info(TextFormat(formatting, format, args));
 	}
@@ -83,6 +85,15 @@ public record CommandLogger(
 		commandContext.getSource().sendFeedback(message);
 	}
 
+
+	public void Error(ChatFormatting formatting, String format, Object... args){
+		this.Error(TextFormat(formatting, format, args));
+	}
+
+	public void Error(String format, Object... args){
+		this.Error(TextFormat(ChatFormatting.RESET, format, args));
+	}
+
 	public void Error(String message){
 		this.Error(Component.literal(message));
 	}
@@ -90,6 +101,7 @@ public record CommandLogger(
 	public void Error(Component message){
 		commandContext.getSource().sendError(message);
 	}
+
 
 /******************************************************************************/
 /* # Preformatted                                                             */

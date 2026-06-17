@@ -3,6 +3,7 @@ package fr.estecka.variantscit.modules;
 import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 
@@ -16,6 +17,16 @@ extends ICacheKey.Cacheable
 			return modules.get(0);
 		else
 			return new ModuleList(modules);
+	}
+
+	default IBakedModule Crawl(CommandLogger logger, ItemStack stack){
+		ResourceLocation moduleId = VariantsCitMod.GetModules().GetId(this);
+		if (moduleId != null)
+			logger.Info("Testing named module: {}", CommandLogger.ItemData(moduleId));
+		else
+			logger.Error("Testing unidentified module: {}", Integer.toHexString(System.identityHashCode(this)));
+
+		return this.GetModelForItem(stack) != null ? this : null;
 	}
 
 	/**
