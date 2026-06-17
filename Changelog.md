@@ -292,3 +292,4 @@ Since v2.5:
 - Added `modelNamespace`, `modelPathes` and `modelList` options.
 - Special and fallback models are now represented by special variant IDs.
 - Asset generator's inputPath now defaults to `"^.*$"`
+- Added `crawl` command
