@@ -120,7 +120,8 @@ public record LibraryDefinition(
 	}
 
 	public boolean AcceptsVariant(ResourceLocation variantId){
-		return IDataTransform.Test(namespacePredicate, variantId.getNamespace())
+		return !variantId.getNamespace().equals(VariantsCitMod.MODID)
+		    && IDataTransform.Test(namespacePredicate, variantId.getNamespace())
 		    && IDataTransform.Test(pathPredicate, variantId.getPath())
 		    ;
 	}
@@ -130,7 +131,7 @@ public record LibraryDefinition(
 		if (modelId != null)
 			return modelId;
 
-		if (modelPrefix.isPresent() && this.AcceptsVariant(variantId) && !variantId.getNamespace().equals(VariantsCitMod.MODID))
+		if (modelPrefix.isPresent() && this.AcceptsVariant(variantId))
 			return variantId.withPrefix(this.modelPrefix.get());
 
 		else
