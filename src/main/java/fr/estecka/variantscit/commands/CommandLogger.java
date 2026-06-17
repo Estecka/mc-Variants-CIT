@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.reload.EAssetType;
 import fr.estecka.variantscit.reload.EModuleHook;
+import fr.estecka.variantscit.reload.LibraryDefinition;
 import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
@@ -109,52 +110,68 @@ public record CommandLogger(
 		return TextOf(variant).withStyle(ChatFormatting.YELLOW);
 	}
 
-	static private MutableComponent AssetFilename(ResourceLocation modelId, EAssetType assetType){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}",
-			ItemData(modelId.getNamespace()),
+	static private MutableComponent AssetFilename(String modelPrefix, ResourceLocation variantId, EAssetType assetType){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
+			ItemData(variantId.getNamespace()),
 			assetType.packDirectory,
-			ItemData(modelId.getPath()),
+			PackData(modelPrefix),
+			ItemData(variantId.getPath()),
 			assetType.suffix
 		);
 	}
 
-	static private MutableComponent LayeredAssetFilename(ResourceLocation modelId, EAssetType assetType){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}",
-			ItemData(modelId.getNamespace()),
+	static private MutableComponent LayeredAssetFilename(String modelPrefix, ResourceLocation variantId, EAssetType assetType){
+		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}{}",
+			ItemData(variantId.getNamespace()),
 			assetType.packDirectory,
 			ItemData("<layer name>"),
-			ItemData(modelId.getPath()),
+			PackData(modelPrefix),
+			ItemData(variantId.getPath()),
 			assetType.suffix
 		);
 	}
 
 	public void PrintVariantIdTip(ResourceLocation variantId){
+		final LibraryDefinition libDef = metamodule.libraryDefinition();
 		variantId = variantId.withPrefix(subPrefix);
 
-		ResourceLocation modelId = metamodule.libraryDefinition().GetModelId(variantId);
+		ResourceLocation modelId = libDef.GetModelId(variantId);
 		if (modelId == null)
 		{
 			Info(ChatFormatting.GOLD, 
-				"[WARN] The variant ID {} is not supported by this module, "
-				+ "because it was filtered out by the `modelNamespace` or `modelPathes` options.",
+				"[WARN] The variant ID {} is not supported by this module. "
+				+ "It is not listed in the hardcoded `modelList`, "
+				+ "and an automatic binding could not be found, "
+				+ "either because the module has no `modelPrefix`, "
+				+ "or because the variant ID was filtered out by the options `modelNamespace` and `modelPathes`.",
 				ItemData(variantId)
 			);
 		}
-		else
+		else if (libDef.hardcodedList().containsKey(variantId) || !libDef.modelPrefix().isPresent())
 		{
 			Info(ChatFormatting.GRAY,
-				"[TIP] The variant ID {} is bound to the model ID {}, "
+				"[TIP] The variant ID {} is hardwired to the model ID {}, "
 				+ "it may be supported by providing one of these files:",
 				ItemData(variantId),
 				ItemData(modelId)
 			);
 	
-			PrintFileNamesTip(modelId);
+			PrintFileNamesTip("", modelId);
+		}
+		else {
+			Info(ChatFormatting.GRAY,
+				"[TIP] The model prefix is \"{}\", "
+				+ "the variant ID {} may be supported by providing one of these files:",
+				PackData(libDef.modelPrefix().get()),
+				ItemData(variantId)
+			);
+	
+			PrintFileNamesTip(libDef.modelPrefix().get(), variantId);
 		}
 
 	}
 
-	public void PrintFileNamesTip(ResourceLocation modelId){
+	public void PrintFileNamesTip(String modelPrefix, ResourceLocation variantId){
 		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
 		switch (this.moduleHook)
 		{
@@ -162,17 +179,17 @@ public record CommandLogger(
 				Error("Error: unknown hook");
 				break;
 			case TRIM_PATTERN:
-				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.TRIM_MODEL)));
-				Info(bullet.copy().append(LayeredAssetFilename(modelId, EAssetType.TRIM_TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(modelPrefix, variantId, EAssetType.TRIM_MODEL)));
+				Info(bullet.copy().append(LayeredAssetFilename(modelPrefix, variantId, EAssetType.TRIM_TEXTURE)));
 				break;
 			case EQUIPPABLE:
-				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.EQUIPMENT)));
-				Info(bullet.copy().append(LayeredAssetFilename(modelId, EAssetType.EQUIP_TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(modelPrefix, variantId, EAssetType.EQUIPMENT)));
+				Info(bullet.copy().append(LayeredAssetFilename(modelPrefix, variantId, EAssetType.EQUIP_TEXTURE)));
 				break;
 			case ITEM_MODEL:
-				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.ITEM_STATE)));
-				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.BAKED_MODEL)));
-				Info(bullet.copy().append(AssetFilename(modelId, EAssetType.ITEM_TEXTURE)));
+				Info(bullet.copy().append(AssetFilename(modelPrefix, variantId, EAssetType.ITEM_STATE)));
+				Info(bullet.copy().append(AssetFilename(modelPrefix, variantId, EAssetType.BAKED_MODEL)));
+				Info(bullet.copy().append(AssetFilename(modelPrefix, variantId, EAssetType.ITEM_TEXTURE)));
 				break;
 		}
 	}
