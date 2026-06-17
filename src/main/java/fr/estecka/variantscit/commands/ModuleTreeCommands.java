@@ -64,9 +64,7 @@ extends CommandUtil
 
 	static private int Crawl(CommandContext<FabricClientCommandSource> context, IClientEntitySelector target) throws CommandSyntaxException {
 		EModuleHook hook = getModuleHook(context, HOOK_ARG);
-
-		// FIXME Needs a different class
-		CommandLogger logger = null;
+		final CommandLogger logger = new CommandLogger(context);
 
 		ItemStack stack;
 		String itemSource;
@@ -84,7 +82,7 @@ extends CommandUtil
 
 		logger.Info("--------");
 		logger.Info("Looking for the {} module that applied to {} item: {} ({})",
-			CommandLogger.PackData(logger.moduleHook()),
+			hook,
 			itemSource,
 			CommandLogger.ItemData(stack.getHoverName()).withStyle(ChatFormatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getItem())

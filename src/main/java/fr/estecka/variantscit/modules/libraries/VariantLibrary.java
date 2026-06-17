@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 
 public class VariantLibrary
 implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
@@ -106,7 +107,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	}
 
 	@Override
-	public Snitch<IVariantLibrary> CreateSnitch(CommandLogger logger) {
+	public Snitch<IVariantLibrary> CreateSnitch(WalktroughLogger logger) {
 		return new SnitchingLibrary(logger);
 	}
 
@@ -114,7 +115,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	extends IDebuggableLibrary.Snitch<IVariantLibrary>
 	implements IVariantLibrary
 	{
-		public SnitchingLibrary (CommandLogger logger){
+		public SnitchingLibrary (WalktroughLogger logger){
 			super(logger);
 		}
 
