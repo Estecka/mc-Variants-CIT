@@ -81,8 +81,8 @@ extends CommandUtil
 			return Error(context, "No elligible entity could be found.");
 
 		logger.Info("--------");
-		logger.Info("Looking for the {} module that applied to {} item: {} ({})",
-			hook,
+		logger.Info("Looking for the {} module that applies to {} item: {} ({})",
+			CommandLogger.PackData(hook),
 			itemSource,
 			CommandLogger.ItemData(stack.getHoverName()).withStyle(ChatFormatting.UNDERLINE),
 			CommandLogger.ItemData(stack.getItem())
@@ -96,13 +96,14 @@ extends CommandUtil
 		}
 		else
 		{
-			IBakedModule r = module.Crawl(logger, stack);
-			if (r == null){
+			IBakedModule result = module.Crawl(logger, stack);
+			logger.Info("----");
+			if (result == null){
 				logger.Error("No module could apply to this item.");
 				return -1;
 			}
 
-			ResourceLocation moduleId = VariantsCitMod.GetModules().GetId(module);
+			ResourceLocation moduleId = VariantsCitMod.GetModules().GetId(result);
 			if (moduleId == null){
 				logger.Error("A module applied, but it could not be identified. This is a bug.");
 				return -1;

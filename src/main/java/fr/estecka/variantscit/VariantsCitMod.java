@@ -6,6 +6,7 @@ import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.CacheCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
+import fr.estecka.variantscit.commands.ModuleTreeCommands;
 
 
 public class VariantsCitMod
@@ -30,6 +31,7 @@ implements ClientModInitializer
 		ModuleCommands.Register();
 		AssetGenCommands.Register();
 		CacheCommands.Register();
+		ModuleTreeCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){

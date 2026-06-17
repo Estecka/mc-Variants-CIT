@@ -23,7 +23,7 @@ extends ICacheKey.Cacheable
 	default IBakedModule Crawl(CommandLogger logger, ItemStack stack){
 		ResourceLocation moduleId = VariantsCitMod.GetModules().GetId(this);
 		if (moduleId != null)
-			logger.Info("Testing named module: {}", CommandLogger.ItemData(moduleId));
+			logger.Info("Testing named module: {}", CommandLogger.PackData(moduleId));
 		else
 			logger.Error("Testing unidentified module: {}", Integer.toHexString(System.identityHashCode(this)));
 
