@@ -290,6 +290,7 @@ Since v2.5:
 ## 5.4
 - Added hook: `trim_pattern`
 - Added `modelNamespace`, `modelPathes` and `modelList` options.
+- Added assetGen preset: `item_model/shield_no_pattern`.
 - Special and fallback models are now represented by special variant IDs.
 - Asset generator's inputPath now defaults to `"^.*$"`
 - Added `crawl` command
