@@ -21,7 +21,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +35,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 // import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 // import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 // import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-// import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
+// import static net.minecraft.commands.arguments.IdentifierArgument.id;
 import static net.minecraft.commands.arguments.item.ItemArgument.item;
 import static net.minecraft.commands.arguments.item.ItemArgument.getItem;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
@@ -45,7 +45,7 @@ import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHo
 public class ModuleTreeCommands
 extends CommandUtil
 {
-	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "moduletree");
+	static public final Identifier ID = Identifier.fromNamespaceAndPath(VariantsCitMod.MODID, "moduletree");
 	static public final String HOOK_ARG = "hook";
 	static public final String ITEM_ARG = "item id";
 
@@ -143,7 +143,7 @@ extends CommandUtil
 		if (module instanceof ModuleList)
 			return "<list>";
 
-		ResourceLocation id = VariantsCitMod.GetModules().GetId(module);
+		Identifier id = VariantsCitMod.GetModules().GetId(module);
 		if (id != null)
 			return id.toString();
 		else
@@ -237,7 +237,7 @@ extends CommandUtil
 				return -1;
 			}
 
-			ResourceLocation moduleId = VariantsCitMod.GetModules().GetId(result);
+			Identifier moduleId = VariantsCitMod.GetModules().GetId(result);
 			if (moduleId == null){
 				logger.Error("A module applied, but it could not be identified. This is a bug.");
 				return -1;

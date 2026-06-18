@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
@@ -22,15 +22,15 @@ public class DecodableRegistry<T>
 {
 	public interface IMapWrapper<T> extends Function<MapCodec<? extends T>, MapDecoder<? extends T>> {}
 
-	private final Map<ResourceLocation, T> units = new HashMap<>();
-	private final Map<ResourceLocation, MapDecoder<? extends T>> mapCodecs = new HashMap<>();
+	private final Map<Identifier, T> units = new HashMap<>();
+	private final Map<Identifier, MapDecoder<? extends T>> mapCodecs = new HashMap<>();
 
 	private final String typeKey;
 	private final IMapWrapper<T> mapWrapper;
 
-	// private final Codec<ResourceLocation> typeCodec;
-	private final MapDecoder<ResourceLocation> typeMapCodec;
-	private final Map<ResourceLocation,String> deprecationWarnings = new HashMap<>();
+	// private final Codec<Identifier> typeCodec;
+	private final MapDecoder<Identifier> typeMapCodec;
+	private final Map<Identifier,String> deprecationWarnings = new HashMap<>();
 
 	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
 	public final Codec<T>    unitCodec;
@@ -38,17 +38,17 @@ public class DecodableRegistry<T>
 
 	static public class Builder<T> {
 		private final @NotNull String keyname;
-		private @NotNull Codec<ResourceLocation> keyCodec = CodecUtil.VCIT_IDENTIFIER;
-		private ResourceLocation defaultKey = null;
+		private @NotNull Codec<Identifier> keyCodec = CodecUtil.VCIT_IDENTIFIER;
+		private Identifier defaultKey = null;
 		private IMapWrapper<T> wrapper = c->c;
 
 		public Builder(String keyname){
 			this.keyname = keyname;
 		}
 
-		public Builder<T> WithKeyCodec(Codec<ResourceLocation> value){ this.keyCodec = value;   return this; }
+		public Builder<T> WithKeyCodec(Codec<Identifier> value){ this.keyCodec = value;   return this; }
 		public Builder<T> WithWrapper (IMapWrapper<T> value)         { this.wrapper = value;    return this; }
-		public Builder<T> WithDefault (ResourceLocation value)       { this.defaultKey = value; return this; }
+		public Builder<T> WithDefault (Identifier value)       { this.defaultKey = value; return this; }
 
 		public DecodableRegistry<T> Build(){
 			return new DecodableRegistry<>(keyname, keyCodec, defaultKey, wrapper);
@@ -60,7 +60,7 @@ public class DecodableRegistry<T>
 		this(typeKey, CodecUtil.VCIT_IDENTIFIER, null, c->c);
 	}
 
-	public DecodableRegistry(String typeKey, Codec<ResourceLocation> typeCodec, @Nullable ResourceLocation defaultId, IMapWrapper<T> mapWrapper){
+	public DecodableRegistry(String typeKey, Codec<Identifier> typeCodec, @Nullable Identifier defaultId, IMapWrapper<T> mapWrapper){
 		this.typeKey = typeKey;
 		this.mapWrapper = mapWrapper;
 
@@ -74,32 +74,32 @@ public class DecodableRegistry<T>
 		this.codec     = CodecUtil.WithAlternative(this.unitCodec, this.mapCodec.codec());
 	}
 
-	public void RegisterUnit(ResourceLocation key, T unit){
+	public void RegisterUnit(Identifier key, T unit){
 		this.Register(key, MapCodec.unit(unit), unit);
 	}
 
-	public void RegisterMap(ResourceLocation key, MapCodec<? extends T> mapCodec){
+	public void RegisterMap(Identifier key, MapCodec<? extends T> mapCodec){
 		AssertUnique(key);
 		this.mapCodecs.put(key, mapWrapper.apply(mapCodec));
 	}
 
-	public <U extends T> void Register(ResourceLocation key, MapCodec<U> mapCodec, U unit){
+	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
 		AssertUnique(key);
 		this.RegisterMap(key, mapCodec);
 		this.units.put(key, unit);
 	}
 
-	public MapDecoder<? extends T> GetDecoder(ResourceLocation type){
+	public MapDecoder<? extends T> GetDecoder(Identifier type){
 		return this.mapCodecs.get(type);
 	}
 
-	private void AssertUnique(ResourceLocation key){
+	private void AssertUnique(Identifier key){
 		if (this.units.containsKey(key) || this.mapCodecs.containsKey(key)){
 			throw new IllegalStateException("Duplicate registration for entry:"+key.toString());
 		}
 	}
 
-	public void Deprecate(ResourceLocation id, String message){
+	public void Deprecate(Identifier id, String message){
 		this.deprecationWarnings.put(id, message);
 	}
 
@@ -120,7 +120,7 @@ public class DecodableRegistry<T>
 			if (!typeResult.isSuccess())
 				return typeResult.map(_0->null);
 	
-			ResourceLocation type = typeResult.getOrThrow();
+			Identifier type = typeResult.getOrThrow();
 			MapDecoder<? extends T> codec = mapCodecs.get(type);
 			if (codec == null)
 				return DataResult.error(()->"Unknown key: "+type);

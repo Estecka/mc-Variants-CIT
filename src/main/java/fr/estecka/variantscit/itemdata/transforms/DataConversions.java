@@ -18,7 +18,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.ItemLore;
 
 public final class DataConversions
@@ -49,23 +49,23 @@ public final class DataConversions
 /******************************************************************************/
 
 	static public IDataContainer StricIdentifier(IDataContainer input) {
-		return StricIdentifier(input, ResourceLocation.DEFAULT_NAMESPACE);
+		return StricIdentifier(input, Identifier.DEFAULT_NAMESPACE);
 	}
 
 	static public IDataContainer StricIdentifier(IDataContainer input, String defaultNamespace) {
-		if (input.value() instanceof ResourceLocation)
+		if (input.value() instanceof Identifier)
 			return input;
 		if (input.value() instanceof String string)
-			return RawDataContainer.<ResourceLocation>OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, string).mapOrElse(o->o, o->null));
+			return RawDataContainer.<Identifier>OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, string).mapOrElse(o->o, o->null));
 		if (input.asNbt() instanceof StringTag nbt)
-			return RawDataContainer.<ResourceLocation>OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, nbt.getAsString()).mapOrElse(o->o, o->null));
+			return RawDataContainer.<Identifier>OfNullable(CodecUtil.NamespacedIdentifier(defaultNamespace, nbt.getAsString()).mapOrElse(o->o, o->null));
 		return null;
 	}
 
 	static public IDataContainer StrictString(IDataContainer input) {
 		if (input.value() instanceof String)
 			return input;
-		if (input.value() instanceof ResourceLocation id)
+		if (input.value() instanceof Identifier id)
 			return RawDataContainer.<String>OfNullable(id.toString());
 		if (input.asNbt() instanceof StringTag nbt)
 			return RawDataContainer.<String>OfNullable(nbt.getAsString());
@@ -166,7 +166,7 @@ public final class DataConversions
 		       value instanceof StringTag nbt ? nbt.getAsString() :
 		       value instanceof Number number ? number.toString() :
 		       value instanceof NumericTag nbt ? nbt.getAsNumber().toString() :
-		       value instanceof ResourceLocation id ? id.toString() :
+		       value instanceof Identifier id ? id.toString() :
 		       value instanceof Component id ? id.getString() :
 		       value instanceof ItemLore lore ? TextArrayToString(lore.lines()) :
 		       null
@@ -174,10 +174,10 @@ public final class DataConversions
 	};
 
 	@Deprecated
-	static public @Nullable ResourceLocation SoftCastToId(@Nullable Object value){
-		return value instanceof ResourceLocation id ? id :
-		       value instanceof String string ? ResourceLocation.tryParse(string) :
-		       value instanceof StringTag nbt ? ResourceLocation.tryParse(nbt.getAsString()) :
+	static public @Nullable Identifier SoftCastToId(@Nullable Object value){
+		return value instanceof Identifier id ? id :
+		       value instanceof String string ? Identifier.tryParse(string) :
+		       value instanceof StringTag nbt ? Identifier.tryParse(nbt.getAsString()) :
 		       null
 		       ;
 	};

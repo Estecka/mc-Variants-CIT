@@ -2,7 +2,7 @@ package fr.estecka.variantscit.modules.libraries;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
@@ -11,28 +11,28 @@ import fr.estecka.variantscit.commands.WalktroughLogger;
 public class VariantLibrary
 implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 {
-	protected final ResourceLocation fallbackModel;
-	protected final Map<ResourceLocation,ResourceLocation> variantModels;
+	protected final Identifier fallbackModel;
+	protected final Map<Identifier,Identifier> variantModels;
 
-	public VariantLibrary(Map<ResourceLocation,ResourceLocation> models){
+	public VariantLibrary(Map<Identifier,Identifier> models){
 		this.fallbackModel = models.get(FALLBACK_VARIANT_ID);
 		this.variantModels = models;
 	}
-	public VariantLibrary(ResourceLocation fallbackModels){
+	public VariantLibrary(Identifier fallbackModels){
 		this.fallbackModel = fallbackModels;
 		this.variantModels = new HashMap<>();
 	}
 
-	public ResourceLocation fallbackModel() { return this.fallbackModel; }
-	public Map<ResourceLocation,ResourceLocation> variantModels() { return this.variantModels; }
+	public Identifier fallbackModel() { return this.fallbackModel; }
+	public Map<Identifier,Identifier> variantModels() { return this.variantModels; }
 
 	@Override
-	public boolean HasVariantModel(ResourceLocation variantId){
+	public boolean HasVariantModel(Identifier variantId){
 		return this.variantModels.containsKey(variantId);
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetVariantModel(ResourceLocation variantId){
+	public @Nullable Identifier GetVariantModel(Identifier variantId){
 		if (variantId == null)
 			return null;
 		else
@@ -40,7 +40,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetVariantModelStrict(ResourceLocation variantId){
+	public @Nullable Identifier GetVariantModelStrict(Identifier variantId){
 		return this.variantModels.get(variantId);
 	}
 
@@ -53,7 +53,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 	}
 
 	public VariantLibrary GetSubLibrary(String subPrefix){
-		Map<ResourceLocation,ResourceLocation> subVariants = new HashMap<>();
+		Map<Identifier,Identifier> subVariants = new HashMap<>();
 		for (var entry : this.variantModels.entrySet())
 		{
 			if (entry.getKey().getNamespace().equals(VariantsCitMod.MODID))
@@ -93,7 +93,7 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 		}
 	}
 
-	private Iterable<Map.Entry<ResourceLocation,ResourceLocation>> SortedEntries(){
+	private Iterable<Map.Entry<Identifier,Identifier>> SortedEntries(){
 		return this.variantModels.entrySet()
 			.stream()
 			.sorted((a,b)->{
@@ -120,26 +120,26 @@ implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 		}
 
 		@Override
-		public boolean HasVariantModel(@Nullable ResourceLocation variantId) {
+		public boolean HasVariantModel(@Nullable Identifier variantId) {
 			boolean r = VariantLibrary.this.HasVariantModel(variantId);
 			this.OnTriedVariant(variantId, r);
 			return r;
 		}
 
 		@Override
-		public @Nullable ResourceLocation GetVariantModel(ResourceLocation variantId) {
+		public @Nullable Identifier GetVariantModel(Identifier variantId) {
 			this.HasVariantModel(variantId);
 			return VariantLibrary.this.GetVariantModel(variantId);
 		}
 
 		@Override
-		public @Nullable ResourceLocation GetVariantModelStrict(ResourceLocation variantId) {
+		public @Nullable Identifier GetVariantModelStrict(Identifier variantId) {
 			this.HasVariantModel(variantId);
 			return VariantLibrary.this.GetVariantModelStrict(variantId);
 		}
 
 		@Override
-		protected void OnTriedVariant(ResourceLocation variantId, boolean exists) {
+		protected void OnTriedVariant(Identifier variantId, boolean exists) {
 			logger.Info("Tested variant ID: {}", CommandLogger.ItemData(variantId));
 			super.OnTriedVariant(variantId, exists);
 		}

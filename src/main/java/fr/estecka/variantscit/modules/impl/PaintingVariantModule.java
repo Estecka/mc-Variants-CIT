@@ -5,8 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import fr.estecka.variantscit.itemdata.extractors.impl.PaintingVariantProperty;
@@ -18,7 +18,7 @@ extends AMonoComponentModule<CustomData>
 {
 	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
 
-	static public final ResourceLocation INVALID_PAINTING = IVariantLibrary.SpecialVariantId("invalid");
+	static public final Identifier INVALID_PAINTING = IVariantLibrary.SpecialVariantId("invalid");
 
 	public PaintingVariantModule(){
 		super(DataComponents.ENTITY_DATA, ECachePolicy.ALWAYS);
@@ -32,7 +32,7 @@ extends AMonoComponentModule<CustomData>
 			return Optional.empty();
 	}
 
-	public ResourceLocation GetModelForComponent(CustomData component, IVariantLibrary models){
+	public Identifier GetModelForComponent(CustomData component, IVariantLibrary models){
 		if (component == null)
 			return null;
 
@@ -40,7 +40,7 @@ extends AMonoComponentModule<CustomData>
 		if (rawVariant == null)
 			return null;
 
-		ResourceLocation variantId = ResourceLocation.tryParse(rawVariant);
+		Identifier variantId = Identifier.tryParse(rawVariant);
 		if (variantId == null)
 			return models.GetVariantModelStrict(INVALID_PAINTING);
 

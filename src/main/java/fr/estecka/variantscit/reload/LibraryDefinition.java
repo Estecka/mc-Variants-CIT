@@ -16,14 +16,14 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 
 public record LibraryDefinition(
 	Optional<String> modelPrefix,
 	IDataTransform namespacePredicate,
 	IDataTransform pathPredicate,
-	Map<ResourceLocation,ResourceLocation> hardcodedList
+	Map<Identifier,Identifier> hardcodedList
 )
 {
 	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = CodecUtil.WithAlternatives(
@@ -39,19 +39,19 @@ public record LibraryDefinition(
 		)
 	);
 
-	static private final Codec<Map<ResourceLocation,ResourceLocation>> LEGACY_SPECIAL_CODEC = Codec.unboundedMap(
-		CodecUtil.IDENTIFIER_PATH.flatXmap(path -> ResourceLocation.read("variants-cit:special/"+path), CodecUtil.NoGetter("Legacy Special")),
-		ResourceLocation.CODEC.validate(CodecUtil::UnItemify)
+	static private final Codec<Map<Identifier,Identifier>> LEGACY_SPECIAL_CODEC = Codec.unboundedMap(
+		CodecUtil.IDENTIFIER_PATH.flatXmap(path -> Identifier.read("variants-cit:special/"+path), CodecUtil.NoGetter("Legacy Special")),
+		Identifier.CODEC.validate(CodecUtil::UnItemify)
 	);
 
-	static private final Codec<Map<ResourceLocation,ResourceLocation>> MODELLIST_CODEC = CodecUtil.WithAlternatives(
-		Codec.unboundedMap(ResourceLocation.CODEC, ResourceLocation.CODEC),
-		ResourceLocation.CODEC.listOf().xmap(LibraryDefinition::FromArray, map->List.copyOf(map.keySet()))
+	static private final Codec<Map<Identifier,Identifier>> MODELLIST_CODEC = CodecUtil.WithAlternatives(
+		Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC),
+		Identifier.CODEC.listOf().xmap(LibraryDefinition::FromArray, map->List.copyOf(map.keySet()))
 	);
 
-	static private final MapCodec<Map<ResourceLocation,ResourceLocation>> HARDCODED_CODEC = RecordCodecBuilder.mapCodec(builder->builder
+	static private final MapCodec<Map<Identifier,Identifier>> HARDCODED_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			ResourceLocation.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(CodecUtil.NoGetter("Legacy Fallback")),
+			Identifier.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(CodecUtil.NoGetter("Legacy Fallback")),
 			LEGACY_SPECIAL_CODEC.optionalFieldOf("special", Map.of()).forGetter(CodecUtil.NoGetter("Legacy Special")),
 			MODELLIST_CODEC.optionalFieldOf("modelList", Map.of()).forGetter(Function.identity())
 		)
@@ -73,17 +73,17 @@ public record LibraryDefinition(
 /* ModelList Constructors                                                     */
 /******************************************************************************/
 
-	static private Map<ResourceLocation,ResourceLocation> FromArray(List<ResourceLocation> list){
-		Map<ResourceLocation,ResourceLocation> hardcoded = new HashMap<>();
-		for (ResourceLocation id : list)
+	static private Map<Identifier,Identifier> FromArray(List<Identifier> list){
+		Map<Identifier,Identifier> hardcoded = new HashMap<>();
+		for (Identifier id : list)
 			hardcoded.put(id, id);
 		return hardcoded;
 	}
 
-	static private Map<ResourceLocation,ResourceLocation> LegacyHardcoded(
-		Optional<ResourceLocation> fallback,
-		Map<ResourceLocation,ResourceLocation> special,
-		Map<ResourceLocation,ResourceLocation> hardcoded
+	static private Map<Identifier,Identifier> LegacyHardcoded(
+		Optional<Identifier> fallback,
+		Map<Identifier,Identifier> special,
+		Map<Identifier,Identifier> hardcoded
 	){
 		hardcoded = new HashMap<>(hardcoded);
 		hardcoded.putAll(special);
@@ -103,10 +103,10 @@ public record LibraryDefinition(
 	 * @return If the library  accepts this assets, returns  every variant ID it
 	 * is associated with. Otherwise, returns an empty set.
 	 */
-	public Set<ResourceLocation> GetVariantIds(ResourceLocation assetId){
-		Set<ResourceLocation> result = new HashSet<>();
+	public Set<Identifier> GetVariantIds(Identifier assetId){
+		Set<Identifier> result = new HashSet<>();
 		if (modelPrefix.isPresent() && !assetId.getNamespace().equals(VariantsCitMod.MODID) && assetId.getPath().startsWith(modelPrefix.get())){
-			ResourceLocation variantId = assetId.withPath(path->path.substring(modelPrefix.get().length()));
+			Identifier variantId = assetId.withPath(path->path.substring(modelPrefix.get().length()));
 			if (!this.hardcodedList.containsKey(variantId) && this.AcceptsVariant(variantId))
 				result.add(variantId);
 		}
@@ -119,15 +119,15 @@ public record LibraryDefinition(
 		return result;
 	}
 
-	public boolean AcceptsVariant(ResourceLocation variantId){
+	public boolean AcceptsVariant(Identifier variantId){
 		return !variantId.getNamespace().equals(VariantsCitMod.MODID)
 		    && IDataTransform.Test(namespacePredicate, variantId.getNamespace())
 		    && IDataTransform.Test(pathPredicate, variantId.getPath())
 		    ;
 	}
 
-	public ResourceLocation GetModelId(ResourceLocation variantId){
-		ResourceLocation modelId = this.hardcodedList.get(variantId);
+	public Identifier GetModelId(Identifier variantId){
+		Identifier modelId = this.hardcodedList.get(variantId);
 		if (modelId != null)
 			return modelId;
 

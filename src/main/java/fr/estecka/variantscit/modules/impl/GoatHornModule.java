@@ -8,6 +8,6 @@ public class GoatHornModule
 {
 	static public final IVariantCitModule UNIT = ASimpleMonoComponentModule.Of(
 		DataComponents.INSTRUMENT,
-		component -> component.unwrapKey().get().location()
+		component -> component.unwrapKey().get().identifier()
 	);
 }

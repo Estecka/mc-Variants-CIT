@@ -1,7 +1,7 @@
 package fr.estecka.variantscit;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleTreeCommands;
@@ -17,8 +17,8 @@ implements ClientModInitializer
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
 	static private ModuleRepository MODULES = new ModuleRepository();
 
-	static public ResourceLocation Identifier(String path){
-		return ResourceLocation.fromNamespaceAndPath(MODID, path);
+	static public Identifier Identifier(String path){
+		return Identifier.fromNamespaceAndPath(MODID, path);
 	}
 
 	static public ModuleRepository GetModules(){

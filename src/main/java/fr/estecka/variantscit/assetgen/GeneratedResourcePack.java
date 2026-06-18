@@ -14,7 +14,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.BuiltInMetadata;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
@@ -55,7 +55,7 @@ implements PackResources
 
 	static public final Pack PROFILE = new Pack(PACK_INFO, FACTORY, METADATA, POSITION);
 
-	private Map<ResourceLocation, IoSupplier<InputStream>> resources;
+	private Map<Identifier, IoSupplier<InputStream>> resources;
 	{
 		this.Reset();
 	}
@@ -64,7 +64,7 @@ implements PackResources
 	 * Clears the pack  and returns  a mutable map  that can be used  to add new
 	 * assets to the pack.
 	 */
-	public Map<ResourceLocation, IoSupplier<InputStream>> Reset(){
+	public Map<Identifier, IoSupplier<InputStream>> Reset(){
 		this.resources = new IdentityHashMap<>();
 		return this.resources;
 	}
@@ -72,7 +72,7 @@ implements PackResources
 	/**
 	 * @return An immutable copy of the pack's content.
 	 */
-	public Map<ResourceLocation, IoSupplier<InputStream>> GetAll(){
+	public Map<Identifier, IoSupplier<InputStream>> GetAll(){
 		return Map.copyOf(this.resources);
 	}
 
@@ -104,7 +104,7 @@ implements PackResources
 	}
 
 	@Override
-	public @Nullable IoSupplier<@NotNull InputStream> getResource(PackType type, ResourceLocation resourceId) {
+	public @Nullable IoSupplier<@NotNull InputStream> getResource(PackType type, Identifier resourceId) {
 		if (type != PackType.CLIENT_RESOURCES)
 			return null;
 
@@ -117,7 +117,7 @@ implements PackResources
 			return;
 
 		for (var entry : this.resources.entrySet()){
-			ResourceLocation id = entry.getKey();
+			Identifier id = entry.getKey();
 			IoSupplier<InputStream> supplier = entry.getValue();
 
 			if (id.getNamespace().equals(namespace) && id.getPath().startsWith(prefix)){
@@ -129,7 +129,7 @@ implements PackResources
 	@Override
 	public Set<String> getNamespaces(PackType type) {
 		var result = new HashSet<String>();
-		for (ResourceLocation id : this.resources.keySet())
+		for (Identifier id : this.resources.keySet())
 			result.add(id.getNamespace());
 		return result;
 	}

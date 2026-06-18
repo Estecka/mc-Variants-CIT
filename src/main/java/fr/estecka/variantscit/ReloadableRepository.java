@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 public class ReloadableRepository<T>
 {
-	private final Map<ResourceLocation, T> entries = new HashMap<>();
+	private final Map<Identifier, T> entries = new HashMap<>();
 	public final Codec<T> UNIT_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, entries);
 
 	private final Codec<T> resourceCodec;
@@ -28,11 +28,11 @@ public class ReloadableRepository<T>
 		this.suffix = "."+extension;
 	}
 
-	public @Nullable T Get(ResourceLocation id){
+	public @Nullable T Get(Identifier id){
 		return entries.get(id);
 	}
 
-	public Optional<T> GetOptional(ResourceLocation id){
+	public Optional<T> GetOptional(Identifier id){
 		return Optional.ofNullable(entries.get(id));
 	}
 
