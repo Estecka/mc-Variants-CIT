@@ -4,6 +4,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.function.Function;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
@@ -58,6 +59,12 @@ implements IBakedModule, IModuleWrapper
 			entry = this.CreateEntry(hash, stack, variant);
 		}
 		return entry.variant;
+	}
+
+	@Override
+	public IBakedModule Crawl(CommandLogger logger, ItemStack stack) {
+		logger.Info("Testing cache module: {}", Integer.toHexString(System.identityHashCode(this)));
+		return this.inner.Crawl(logger, stack);
 	}
 
 	public ResourceLocation ComputeIfAbsent(ItemStack stack, Function<ItemStack,ResourceLocation> computer){
