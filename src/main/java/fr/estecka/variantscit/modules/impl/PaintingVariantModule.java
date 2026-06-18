@@ -18,6 +18,8 @@ extends AMonoComponentModule<Holder<PaintingVariant>>
 {
 	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
 
+	static public final ResourceLocation INVALID_PAINTING = IVariantLibrary.SpecialVariantId("invalid");
+
 	public PaintingVariantModule(){
 		super(DataComponents.PAINTING_VARIANT, ECachePolicy.AVOID);
 	}
@@ -38,7 +40,7 @@ extends AMonoComponentModule<Holder<PaintingVariant>>
 
 		var registry = GetPaintingRegistry();
 		if (registry.isPresent() && !registry.get().containsKey(variantId))
-			return models.GetSpecialModel("invalid");
+			return models.GetVariantModelStrict(INVALID_PAINTING);
 
 		return models.GetVariantModel(variantId);
 	}

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
@@ -28,8 +29,10 @@ public class VariantAggregator
 
 	private final Map<ModuleDefinition, ResourceLocation> moduleIds = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
+	// TODO: combine fields into a single Bimap
 	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
+	private final Map<ModuleDefinition, VariantLibrary> trims = new IdentityHashMap<>();
 
 	public final Map<ResourceLocation, GeneratedAsset> generatedAssets = new HashMap<>();
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
@@ -40,23 +43,21 @@ public class VariantAggregator
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
 			for (EModuleHook hook : module.hooks())
-				GetLibraryMap(hook).put(module, EmptyLibrary(module));
+				GetLibraryMap(hook).put(module, InitialLibrary(module));
 
 			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
 		}
 	}
 
-	static private VariantLibrary EmptyLibrary(ModuleDefinition module) {
-		return new VariantLibrary(
-			module.fallbackModel().orElse(null),
-			new HashMap<>(),
-			module.specialModels()
-		);
+	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
+		var fallbackModel = module.libraryDefinition().hardcodedList().get(IVariantLibrary.FALLBACK_VARIANT_ID);
+		return new VariantLibrary(fallbackModel);
 	}
 
 	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
 		return switch (hook){
 			default -> throw new AssertionError("Invalid hook");
+			case TRIM_PATTERN -> this.trims;
 			case EQUIPPABLE -> this.equippable;
 			case ITEM_MODEL -> this.item_model;
 		};
@@ -70,6 +71,7 @@ public class VariantAggregator
 		var genPack = GeneratedResourcePack.INSTANCE.Reset();
 
 		// Asset generation passes
+		GatherType(EAssetType.TRIM_TEXTURE,  manager.Get());
 		GatherType(EAssetType.EQUIP_TEXTURE, manager.Get());
 		GatherType(EAssetType.ITEM_TEXTURE,  manager.Get());
 		UpdateGeneratedPack(genPack, manager);
@@ -77,24 +79,26 @@ public class VariantAggregator
 		UpdateGeneratedPack(genPack, manager);
 
 		// Populate variant libraries
+		GatherType(EAssetType.TRIM_MODEL,    manager.Get());
 		GatherType(EAssetType.ITEM_STATE,    manager.Get());
 		GatherType(EAssetType.EQUIPMENT,     manager.Get());
 	}
 
 	private void GatherType(EAssetType assetType, ResourceManager manager){
-		Set<ResourceLocation> resources = manager.listResources(assetType.directory, id->id.getPath().endsWith(assetType.suffix)).keySet();
+		Set<ResourceLocation> resources = manager.listResources(assetType.packDirectory, id->id.getPath().endsWith(assetType.suffix)).keySet();
 
-		Stream<ResourceLocation> shortIds = resources.stream().map(id->assetType.GetShortId(id).get());
-		GatherIds(assetType, shortIds);
+		Stream<ResourceLocation> modelIds = resources.stream().map(id->assetType.GetModelId(id).get());
+		GatherIds(assetType, modelIds);
 	}
 
 	private void GatherIds(EAssetType assetType, Stream<ResourceLocation> assets){
-		assets.forEach(shortId -> ApplyModelToAll(assetType, shortId));
+		assets.forEach(modelId -> ApplyModelToAll(assetType, modelId));
 	}
 
-	private void ApplyModelToAll(EAssetType assetType, ResourceLocation shortId){
+	private void ApplyModelToAll(EAssetType assetType, ResourceLocation modelId){
 		EAssetGenPass generatorPass = switch (assetType){
 			default -> null;
+			case EAssetType.TRIM_TEXTURE  -> EAssetGenPass.TRIMS;
 			case EAssetType.EQUIP_TEXTURE -> EAssetGenPass.EQUIPMENTS;
 			case EAssetType.ITEM_TEXTURE  -> EAssetGenPass.BAKED_MODELS;
 			case EAssetType.BAKED_MODEL   -> EAssetGenPass.ITEM_STATES;
@@ -106,17 +110,17 @@ public class VariantAggregator
 			VariantLibrary library = entry.getValue();
 			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
 
-			this.ApplyModelToModule(assetType.isFundamental, module, library, shortId);
+			this.ApplyModelToModule(assetType.isFundamental, module, library, modelId);
 
 			if (generatorPass != null){
 				IAssetGenerator generator = this.assetGenerators.get(module);
-				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, shortId);
+				IAssetGenerator.Result generatedResources = generator.AcceptAsset(generatorPass, modelId);
 
 				for (var e : generatedResources.entrySet())
 				if  (this.ApplyModelToModule(false, module, library, e.getValue().radical()))
 				{
 					ResourceLocation resourceId = generatorPass.GetOutputResourceId(e.getKey());
-					this.OnGeneratedResource(resourceId, module.modelPrefix(), e.getValue().resource());
+					this.OnGeneratedResource(resourceId, module.libraryDefinition(), e.getValue().resource());
 				}
 			}
 
@@ -128,27 +132,16 @@ public class VariantAggregator
 	 * @return Whether the provided ID asset can be added to this library.
 	 * @param isFundamental If true, add the asset to the library on success.
 	 */
-	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation shortId){
+	private boolean ApplyModelToModule(boolean isFundamental, ModuleDefinition module, VariantLibrary library, ResourceLocation modelId){
 		boolean accepted = false;
 
-		if (shortId.equals(library.fallbackModel()))
+		Set<ResourceLocation> variants = module.libraryDefinition().GetVariantIds(modelId);
+		for (ResourceLocation variantId : variants)
+		if  (module.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID))
+		{
 			accepted = true;
-
-		if (library.specialModels().containsValue(shortId))
-			accepted = true;
-
-		if (shortId.getPath().startsWith(module.modelPrefix())){
-			ResourceLocation variantId = ResourceLocation.fromNamespaceAndPath(
-				shortId.getNamespace(),
-				shortId.getPath().substring(module.modelPrefix().length())
-			);
-
-			if (module.parameters().AcceptsVariant(variantId)){
-				accepted = true;
-				if (isFundamental)
-					library.variantModels().put(variantId, shortId);
-			}
-
+			if (isFundamental)
+				library.variantModels().put(variantId, modelId);
 		}
 
 		return accepted;
@@ -161,8 +154,8 @@ public class VariantAggregator
 		manager.Refresh();
 	}
 
-	private void OnGeneratedResource(ResourceLocation resourceId, String modelPrefix, IoSupplier<InputStream> resource){
-		int priority = modelPrefix.length();
+	private void OnGeneratedResource(ResourceLocation resourceId, LibraryDefinition libDefinition, IoSupplier<InputStream> resource){
+		int priority = libDefinition.modelPrefix().map(String::length).orElse(0);
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)

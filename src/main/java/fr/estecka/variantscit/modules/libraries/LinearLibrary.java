@@ -3,6 +3,7 @@ package fr.estecka.variantscit.modules.libraries;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.resources.ResourceLocation;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 
 
 public class LinearLibrary
@@ -66,7 +67,7 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 	}
 
 	@Override
-	public Snitch<ILinearLibrary> CreateSnitch(CommandLogger logger) {
+	public Snitch<ILinearLibrary> CreateSnitch(WalktroughLogger logger) {
 		return new SnitchingLinearLibrary(logger);
 	}
 
@@ -75,7 +76,7 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 	implements ILinearLibrary
 	{
 
-		public SnitchingLinearLibrary(CommandLogger logger){
+		public SnitchingLinearLibrary(WalktroughLogger logger){
 			super(logger);
 		}
 
