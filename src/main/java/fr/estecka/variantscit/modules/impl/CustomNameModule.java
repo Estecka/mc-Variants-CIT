@@ -31,7 +31,7 @@ extends ASimpleMonoComponentModule<Component>
 		if (specialNames.containsKey(name))
 			return specialNames.get(name);
 		
-		name = IStringTransform.SANITIZE.apply(name);
+		name = IStringTransform.SANITIZE_AUTO.apply(name);
 		return ResourceLocation.tryParse(name);
 	}
 }

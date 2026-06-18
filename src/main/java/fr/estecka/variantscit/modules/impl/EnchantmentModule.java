@@ -21,6 +21,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 public class EnchantmentModule
 extends AMonoComponentModule<ItemEnchantments>
 {
+	static public final ResourceLocation MULTI_ENCHANTS = IVariantLibrary.SpecialVariantId("multi");
+
 	static public final MapCodec<EnchantmentModule> CreateCodec(DataComponentType<ItemEnchantments> targetComponent){
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
@@ -52,8 +54,9 @@ extends AMonoComponentModule<ItemEnchantments>
 		if (enchants == null || enchants.isEmpty() || !this.MatchesPrecondition(enchants))
 			return null;
 
-		if (enchants.size() > precondition.size()+1 && null != library.GetSpecialModel("multi"))
-			return library.GetSpecialModel("multi");
+		ResourceLocation multiModel = library.GetVariantModelStrict(MULTI_ENCHANTS);
+		if (enchants.size() > precondition.size()+1 && multiModel!=null)
+			return multiModel;
 
 		Entry<Holder<Enchantment>> bestFit = GetBestEnchant(enchants, library);
 		if (bestFit == null)

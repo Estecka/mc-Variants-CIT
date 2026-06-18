@@ -1,0 +1,217 @@
+{
+	"meta": {
+		"format_version": "4.10",
+		"model_format": "java_block",
+		"box_uv": true
+	},
+	"name": "shield",
+	"parent": "",
+	"java_block_version": "1.21.6",
+	"ambientocclusion": true,
+	"front_gui_light": false,
+	"visible_box": [1, 1, 0],
+	"variable_placeholders": "",
+	"variable_placeholder_buttons": [],
+	"unhandled_root_fields": {},
+	"resolution": {
+		"width": 64,
+		"height": 64
+	},
+	"elements": [
+		{
+			"name": "shield",
+			"box_uv": false,
+			"rescale": false,
+			"locked": false,
+			"light_emission": 0,
+			"render_order": "default",
+			"allow_mirror_modeling": true,
+			"from": [-6, -11, 1],
+			"to": [6, 11, 2],
+			"autouv": 0,
+			"color": 9,
+			"origin": [0, 0, -4],
+			"faces": {
+				"north": {
+					"uv": [14, 1, 26, 23],
+					"texture": 0
+				},
+				"east": {
+					"uv": [13, 1, 14, 23],
+					"texture": 0
+				},
+				"south": {
+					"uv": [1, 1, 13, 23],
+					"texture": 0
+				},
+				"west": {
+					"uv": [0, 1, 1, 23],
+					"texture": 0
+				},
+				"up": {
+					"uv": [13, 1, 1, 0],
+					"rotation": 180,
+					"texture": 0
+				},
+				"down": {
+					"uv": [25, 0, 13, 1],
+					"rotation": 180,
+					"texture": 0
+				}
+			},
+			"type": "cube",
+			"uuid": "e4a0e1d3-d49e-cb4e-335e-dc25ce53b4aa"
+		},
+		{
+			"name": "handle",
+			"box_uv": false,
+			"rescale": false,
+			"locked": false,
+			"light_emission": 0,
+			"render_order": "default",
+			"allow_mirror_modeling": true,
+			"from": [-1, -3, -5],
+			"to": [1, 3, 1],
+			"autouv": 0,
+			"color": 9,
+			"origin": [0, 0, -4],
+			"uv_offset": [26, 0],
+			"faces": {
+				"north": {
+					"uv": [40, 6, 42, 12],
+					"texture": 0
+				},
+				"east": {
+					"uv": [34, 6, 40, 12],
+					"texture": 0
+				},
+				"south": {
+					"uv": [32, 6, 34, 12],
+					"texture": 0
+				},
+				"west": {
+					"uv": [26, 6, 32, 12],
+					"texture": 0
+				},
+				"up": {
+					"uv": [34, 6, 32, 0],
+					"rotation": 180,
+					"texture": 0
+				},
+				"down": {
+					"uv": [36, 0, 34, 6],
+					"rotation": 180,
+					"texture": 0
+				}
+			},
+			"type": "cube",
+			"uuid": "18abc94c-185d-83b2-8d17-d1208d1c5ca3"
+		}
+	],
+	"outliner": [
+		{
+			"name": "Shield",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"uuid": "d30e8358-1609-403d-13bc-81abcb69b723",
+			"export": true,
+			"mirror_uv": false,
+			"isOpen": true,
+			"locked": false,
+			"visibility": true,
+			"autouv": 0,
+			"selected": false,
+			"children": ["18abc94c-185d-83b2-8d17-d1208d1c5ca3", "e4a0e1d3-d49e-cb4e-335e-dc25ce53b4aa"]
+		}
+	],
+	"textures": [
+		{
+			"name": "shield_base_nopattern.png",
+			"folder": "entity/shield",
+			"namespace": "minecraft",
+			"id": "layer0",
+			"group": "",
+			"width": 64,
+			"height": 64,
+			"uv_width": 64,
+			"uv_height": 64,
+			"particle": true,
+			"use_as_default": false,
+			"layers_enabled": false,
+			"sync_to_project": "",
+			"render_mode": "default",
+			"render_sides": "auto",
+			"pbr_channel": "color",
+			"frame_time": 1,
+			"frame_order_type": "loop",
+			"frame_order": "",
+			"frame_interpolate": false,
+			"visible": true,
+			"internal": false,
+			"saved": true,
+			"uuid": "afe2dedf-26de-d615-feae-a3d10cc1ec70",
+			"relative_path": "../../.minecraft/26.1/assets/minecraft/textures/entity/shield/shield_base_nopattern.png"
+		},
+		{
+			"name": "bbshield.png",
+			"folder": "item",
+			"namespace": "variants-cit",
+			"id": "0",
+			"group": "",
+			"width": 64,
+			"height": 64,
+			"uv_width": 64,
+			"uv_height": 64,
+			"particle": false,
+			"use_as_default": false,
+			"layers_enabled": false,
+			"sync_to_project": "",
+			"render_mode": "default",
+			"render_sides": "auto",
+			"pbr_channel": "color",
+			"frame_time": 1,
+			"frame_order_type": "loop",
+			"frame_order": "",
+			"frame_interpolate": false,
+			"visible": true,
+			"internal": false,
+			"saved": true,
+			"uuid": "dd40e4c2-d5ae-75f0-81e9-bd8759a6b90f",
+			"relative_path": "../src/main/resources/assets/variants-cit/textures/item/bbshield.png"
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 90, 0],
+			"translation": [10, 6, -4]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 90, 0],
+			"translation": [10, 6, 12]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -180, 5],
+			"translation": [-10, 1.75, -10],
+			"scale": [1.25, 1.25, 1.25]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -180, 5],
+			"translation": [10, 0, -10],
+			"scale": [1.25, 1.25, 1.25]
+		},
+		"ground": {
+			"translation": [2, 4, 2],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [15, -25, -5],
+			"translation": [2, 3, 0],
+			"scale": [0.65, 0.65, 0.65]
+		},
+		"fixed": {
+			"rotation": [0, -180, 0],
+			"translation": [-4.5, 4.5, -5],
+			"scale": [0.55, 0.55, 0.55]
+		}
+	}
+}

@@ -37,6 +37,7 @@ implements ArgumentType<EModuleHook>
 		return switch (literal) {
 			case "item_model" -> EModuleHook.ITEM_MODEL;
 			case "equippable" -> EModuleHook.EQUIPPABLE;
+			case "trim_pattern" -> EModuleHook.TRIM_PATTERN;
 			default -> throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.literalIncorrect().createWithContext(reader, literal);
 		};
 	}

@@ -1,0 +1,19 @@
+[
+	{
+		"pass": "models_from_textures",
+		"template": "models/parent",
+		"variables": { "modelParent": "variants-cit:item/shield" }
+	},
+	{
+		"pass": "models_from_textures",
+		"outputPath": "$0_blocking",
+		"radicalPath": "$0",
+		"template": "models/parent",
+		"variables": { "modelParent": "variants-cit:item/shield_blocking" }
+	},
+	{
+		"pass": "items_from_models",
+		"inputPath": "(?!.*(_blocking)).*",
+		"template": "items/shield"
+	}
+]

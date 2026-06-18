@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +38,16 @@ implements IBakedModule, IModuleWrapper
 	public ResourceLocation GetModelForItem(ItemStack stack) {
 		for (IBakedModule m : this){
 			ResourceLocation result = m.GetModelForItem(stack);
+			if (result != null) return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IBakedModule Crawl(CommandLogger logger, ItemStack stack) {
+		logger.Info("Testing list module: {}", Integer.toHexString(System.identityHashCode(this)));
+		for (IBakedModule m : this){
+			IBakedModule result = m.Crawl(logger, stack);
 			if (result != null) return result;
 		}
 		return null;
