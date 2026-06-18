@@ -19,6 +19,8 @@ repositories {
 }
 
 loom {
+	accessWidenerPath = file("src/main/resources/variants-cit.accesswidener")
+
 	runs {
 		client {
 			configName "Client"

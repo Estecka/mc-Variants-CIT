@@ -17,11 +17,16 @@ import fr.estecka.variantscit.modules.cache.ICacheKey;
 import fr.estecka.variantscit.reload.EModuleHook;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
 // import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
@@ -37,28 +42,38 @@ import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHook;
 
 
-public class CacheCommands
+public class ModuleTreeCommands
 extends CommandUtil
 {
-	static public final Identifier ID = Identifier.fromNamespaceAndPath(VariantsCitMod.MODID, "cache");
+	static public final Identifier ID = Identifier.fromNamespaceAndPath(VariantsCitMod.MODID, "moduletree");
 	static public final String HOOK_ARG = "hook";
 	static public final String ITEM_ARG = "item id";
 
 	static public void	Register(){
-		ClientCommandRegistrationCallback.EVENT.register(ID, CacheCommands::RegisterWith);
+		ClientCommandRegistrationCallback.EVENT.register(ID, ModuleTreeCommands::RegisterWith);
 	}
 
 	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess){
-		var cachetree = literal("cachetree")
+		var crawl = literal("crawl")       .executes(c->Crawl(c, IClientEntitySelector::GetSelf))
+			.then(literal("self")          .executes(c->Crawl(c, IClientEntitySelector::GetSelf)))
+			.then(literal("nearest_item")  .executes(c->Crawl(c, IClientEntitySelector::GetGroundItem)))
+			.then(literal("nearest_player").executes(c->Crawl(c, IClientEntitySelector::GetPlayer)))
+			;
+
+		var print = literal("print-all")
+			.then(argument(ITEM_ARG, item(registryAccess))
+				.suggests(ModuleTreeCommands::ItemAutofill)
+				.executes(ModuleTreeCommands::PrintTree)
+			);
+
+		var moduletree = literal("moduletree")
 			.then(argument(HOOK_ARG, moduleHook())
-				.then(argument(ITEM_ARG, item(registryAccess))
-					.suggests(CacheCommands::ItemAutofill)
-					.executes(CacheCommands::PrintTree)
-				)
+				.then(print)
+				.then(crawl)
 			);
 
 		var root = literal(VariantsCitMod.MODID)
-			.then(cachetree)
+			.then(moduletree)
 			;
 
 		dispatcher.register(root);
@@ -81,6 +96,10 @@ extends CommandUtil
 /******************************************************************************/
 /* # Command Handlers                                                         */
 /******************************************************************************/
+
+	/*************/
+	/* ## Print  */
+	/*************/
 
 	static private int PrintTree(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
 		EModuleHook hook = getModuleHook(context, HOOK_ARG);
@@ -171,5 +190,63 @@ extends CommandUtil
 
 		public String toString(){ return result.toString(); }
 		
+	}
+
+	/*************/
+	/* ## Crawl  */
+	/*************/
+
+	static private int Crawl(CommandContext<FabricClientCommandSource> context, IClientEntitySelector target) throws CommandSyntaxException {
+		EModuleHook hook = getModuleHook(context, HOOK_ARG);
+		final CommandLogger logger = new CommandLogger(context);
+
+		ItemStack stack;
+		String itemSource;
+		Entity targetEntity = target.get();
+		if (targetEntity instanceof ItemEntity groundItem){
+			stack = groundItem.getItem();
+			itemSource = "ground";
+		}
+		else if (targetEntity instanceof Player player){
+			stack = player.getMainHandItem();
+			itemSource = "main-hand";
+		}
+		else
+			return Error(context, "No elligible entity could be found.");
+
+		logger.Info("--------");
+		logger.Info("Looking for the {} module that applies to {} item: {} ({})",
+			CommandLogger.PackData(hook),
+			itemSource,
+			CommandLogger.ItemData(stack.getHoverName()).withStyle(ChatFormatting.UNDERLINE),
+			CommandLogger.ItemData(stack.getItem())
+		);
+		logger.Info("----");
+
+		IBakedModule module = VariantsCitMod.GetModules().GetArchModule(hook, stack.getItem());
+		if (module == null){
+			logger.Error("No module exist for this item on this hook.");
+			return -1;
+		}
+		else
+		{
+			IBakedModule result = module.Crawl(logger, stack);
+			logger.Info("----");
+			if (result == null){
+				logger.Error("No module could apply to this item.");
+				return -1;
+			}
+
+			Identifier moduleId = VariantsCitMod.GetModules().GetId(result);
+			if (moduleId == null){
+				logger.Error("A module applied, but it could not be identified. This is a bug.");
+				return -1;
+			}
+			else
+			{
+				logger.Info("The module {} applied to the item.", CommandLogger.PackData(moduleId));
+				return 1;
+			}
+		}
 	}
 }

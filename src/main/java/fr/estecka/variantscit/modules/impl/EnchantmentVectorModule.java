@@ -26,6 +26,7 @@ import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
@@ -492,7 +493,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		var enchants = stack.get(componentType);
 		if (enchants == null || enchants.isEmpty()){
 			logger.Info("The item has no enchantment.");

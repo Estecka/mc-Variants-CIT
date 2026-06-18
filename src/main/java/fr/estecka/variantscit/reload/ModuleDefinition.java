@@ -6,7 +6,6 @@ import java.util.Optional;
 import net.minecraft.resources.Identifier;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
@@ -22,21 +21,11 @@ public record ModuleDefinition(
 	Optional<List<Identifier>> targets,
 	Optional<IItemPrecondition> precondition,
 	int priority,
-	String modelPrefix,
+	LibraryDefinition libraryDefinition,
 	Optional<Identifier> modelParent,
-	Optional<IAssetGenerator> assetGen,
-	Optional<Identifier> fallbackModel,
-	Map<String,Identifier> specialModels
+	Optional<IAssetGenerator> assetGen
 )
 {
-	static private final MapCodec<String> PREFIX_CODEC = CodecUtil.MapWithAlternative(
-		CodecUtil.LEGACY_ITEM_PATH.fieldOf("modelPrefix").validate(CodecUtil.NonEmptyString("Model Prefix")),
-		Codec.BOOL.fieldOf("forceAllowEmptyPrefix").flatXmap(
-			allowed -> allowed ? DataResult.success("") : DataResult.error(()->"Model Prefix cannot be empty."),
-			prefix -> DataResult.success(prefix.isEmpty())
-		)
-	);
-
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
@@ -45,11 +34,9 @@ public record ModuleDefinition(
 			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
 			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
-			PREFIX_CODEC.forGetter(ModuleDefinition::modelPrefix),
+			LibraryDefinition.MAP_CODEC.forGetter(ModuleDefinition::libraryDefinition),
 			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::modelParent),
-			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen),
-			Identifier.CODEC.validate(CodecUtil::UnItemify).optionalFieldOf("fallback").forGetter(ModuleDefinition::fallbackModel),
-			Codec.unboundedMap(Codec.STRING, Identifier.CODEC.validate(CodecUtil::UnItemify)).optionalFieldOf("special", ImmutableMap.<String,Identifier>of()).forGetter(ModuleDefinition::specialModels)
+			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);

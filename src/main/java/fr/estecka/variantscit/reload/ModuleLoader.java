@@ -85,7 +85,7 @@ public final class ModuleLoader
 				moduleId,
 				definition.priority(),
 				targets,
-				definition.modelPrefix(),
+				definition.libraryDefinition(),
 				baked
 			);
 

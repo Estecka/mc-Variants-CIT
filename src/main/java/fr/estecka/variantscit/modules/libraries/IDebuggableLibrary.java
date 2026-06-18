@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules.libraries;
 
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -11,7 +12,7 @@ public interface IDebuggableLibrary<LIB>
 {
 	public void Summary(CommandLogger logger);
 	public void Dump(CommandLogger logger);
-	public Snitch<LIB> CreateSnitch(CommandLogger logger);
+	public Snitch<LIB> CreateSnitch(WalktroughLogger logger);
 
 	public default LIB GetLibrary(){
 		// Unsafe
@@ -22,11 +23,11 @@ public interface IDebuggableLibrary<LIB>
 	 * Implementations MUST be of type LIB.
 	 */
 	public abstract class Snitch<LIB> {
-		protected final CommandLogger logger;
+		protected final WalktroughLogger logger;
 		private @Nullable Identifier mainVariant = null;
 		private boolean foundModel = false;
 
-		protected Snitch(CommandLogger logger){
+		protected Snitch(WalktroughLogger logger){
 			this.logger = logger;
 		}
 

@@ -2,9 +2,16 @@ package fr.estecka.variantscit.modules.libraries;
 
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
+import fr.estecka.variantscit.VariantsCitMod;
 
 public interface IVariantLibrary
 {
+	static public Identifier FALLBACK_VARIANT_ID = VariantsCitMod.Identifier("fallback");
+
+	static public Identifier SpecialVariantId(String specialName){
+		return VariantsCitMod.Identifier("special/"+specialName);
+	}
+
 	/**
 	 * @return  Whether this variant  has it's own model, ignoring  the fallback
 	 * model.
@@ -18,7 +25,7 @@ public interface IVariantLibrary
 	public abstract @Nullable Identifier GetVariantModel(Identifier variantId);
 
 	/**
-	 * @return The special model that was provided for this key.
+	 * @return The model bound to this variant ID, if any, or null otherwise.
 	 */
-	public abstract @Nullable Identifier GetSpecialModel(String key);
+	public abstract @Nullable Identifier GetVariantModelStrict(Identifier variantId);
 }

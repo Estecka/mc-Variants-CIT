@@ -4,7 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.resources.Identifier;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.commands.AssetGenCommands;
-import fr.estecka.variantscit.commands.CacheCommands;
+import fr.estecka.variantscit.commands.ModuleTreeCommands;
 import fr.estecka.variantscit.commands.ModuleCommands;
 
 
@@ -29,7 +29,7 @@ implements ClientModInitializer
 	public void onInitializeClient(){
 		ModuleCommands.Register();
 		AssetGenCommands.Register();
-		CacheCommands.Register();
+		ModuleTreeCommands.Register();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){

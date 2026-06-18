@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules.libraries;
 
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
@@ -47,7 +48,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		Snitch<L> snitch = this.debug.CreateSnitch(logger);
 		Identifier result = this.logic.Walkthrough(stack, snitch.GetLibrary(), logger);
 		snitch.PrintConclusion();

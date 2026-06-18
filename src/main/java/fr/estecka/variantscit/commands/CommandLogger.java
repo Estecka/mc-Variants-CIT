@@ -3,30 +3,18 @@ package fr.estecka.variantscit.commands;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
-import fr.estecka.variantscit.reload.EAssetType;
-import fr.estecka.variantscit.reload.EModuleHook;
-import fr.estecka.variantscit.reload.MetaModule;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
 
-public record CommandLogger(
-	CommandContext<FabricClientCommandSource> commandContext,
-	EModuleHook moduleHook,
-	MetaModule metamodule,
-	String modelPrefix
-)
+
+public class CommandLogger
 {
+	public final CommandContext<FabricClientCommandSource> commandContext;
 
-	public CommandLogger WithSubPrefix(String subPrefix){
-		return new CommandLogger(
-			commandContext,
-			moduleHook,
-			metamodule,
-			modelPrefix + subPrefix
-		);
+	public CommandLogger(CommandContext<FabricClientCommandSource> commandContext){
+		this.commandContext = commandContext;
 	}
 
 /******************************************************************************/
@@ -66,6 +54,7 @@ public record CommandLogger(
 		return TextFormat(ChatFormatting.RESET, format, args);
 	}
 
+
 	public void Info(ChatFormatting formatting, String format, Object... args){
 		this.Info(TextFormat(formatting, format, args));
 	}
@@ -82,6 +71,15 @@ public record CommandLogger(
 		commandContext.getSource().sendFeedback(message);
 	}
 
+
+	public void Error(ChatFormatting formatting, String format, Object... args){
+		this.Error(TextFormat(formatting, format, args));
+	}
+
+	public void Error(String format, Object... args){
+		this.Error(TextFormat(ChatFormatting.RESET, format, args));
+	}
+
 	public void Error(String message){
 		this.Error(Component.literal(message));
 	}
@@ -89,6 +87,7 @@ public record CommandLogger(
 	public void Error(Component message){
 		commandContext.getSource().sendError(message);
 	}
+
 
 /******************************************************************************/
 /* # Preformatted                                                             */
@@ -107,50 +106,5 @@ public record CommandLogger(
 
 	static public MutableComponent PackData(Object variant){
 		return TextOf(variant).withStyle(ChatFormatting.YELLOW);
-	}
-
-	private MutableComponent AssetFilename(Identifier variantId, EAssetType assetType){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
-			ItemData(variantId.getNamespace()),
-			assetType.directory,
-			modelPrefix,
-			ItemData(variantId.getPath()),
-			assetType.suffix
-		);
-	}
-
-	private MutableComponent EquipTextureFilename(Identifier variantId){
-		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}{}/{}{}{}",
-			ItemData(variantId.getNamespace()),
-			"textures/entity/equipment/",
-			ItemData("<layer name>"),
-			modelPrefix,
-			ItemData(variantId.getPath()),
-			".png"
-		);
-	}
-
-	public void PrintVariantIdTip(Identifier variantId){
-		Info(ChatFormatting.GRAY, "[TIP] The model prefix is \"{}\", the variant ID {} may be supported by providing one of these files:",
-			PackData(modelPrefix),
-			ItemData(variantId)
-		);
-
-		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
-		switch (this.moduleHook)
-		{
-			default:
-				Error("Error: unknown hook");
-				break;
-			case EQUIPPABLE:
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.EQUIPMENT)));
-				Info(bullet.copy().append(EquipTextureFilename(variantId)));
-				break;
-			case ITEM_MODEL:
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_STATE)));
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.BAKED_MODEL)));
-				Info(bullet.copy().append(AssetFilename(variantId, EAssetType.ITEM_TEXTURE)));
-				break;
-		}
 	}
 }

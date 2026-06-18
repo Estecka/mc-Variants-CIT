@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.PreconditionModule;
@@ -140,7 +141,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		for (int i=0; i<submodules.length; ++i) {
 			logger.Info("### Submodule [{}]", i);
 			Identifier r = submodules[i].Walkthrough(logger.WithSubPrefix(subPrefixes[i]), stack);

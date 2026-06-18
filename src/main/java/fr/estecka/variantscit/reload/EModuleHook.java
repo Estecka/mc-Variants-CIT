@@ -12,6 +12,7 @@ implements StringRepresentable
 {
 	ITEM_MODEL("item_model"),
 	EQUIPPABLE("equippable"),
+	TRIM_PATTERN("trim_pattern"),
 	;
 
 	static public final Codec<EModuleHook> CODEC = StringRepresentable.fromEnum(EModuleHook::values);

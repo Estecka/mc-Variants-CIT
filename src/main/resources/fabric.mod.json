@@ -23,6 +23,7 @@
 	"mixins": [
 		{ "environment": "client", "config": "variants-cit.mixins.json" }
 	],
+	"accessWidener" : "variants-cit.accesswidener",
 	"depends": {
 		"minecraft": "^26",
 		"fabricloader": ">=0.18.4",

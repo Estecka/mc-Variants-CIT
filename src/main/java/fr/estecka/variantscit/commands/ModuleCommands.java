@@ -94,7 +94,7 @@ extends CommandUtil
 	@FunctionalInterface
 	static private interface IModuleCommand
 	{
-		int Execute(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module) throws CommandSyntaxException;
+		int Execute(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, IBakedModule module) throws CommandSyntaxException;
 	}
 
 	static private IModuleCommand Walkthrough(IClientEntitySelector target){
@@ -112,16 +112,16 @@ extends CommandUtil
 		if (module == null)
 			return Error(context, "No hook "+hook+" for module "+moduleId);
 
-		CommandLogger logger = new CommandLogger(context, hook, meta, meta.modelPrefix());
+		WalktroughLogger logger = new WalktroughLogger(context, hook, meta, "");
 		return command.Execute(context, logger, module);
 	}
 
-	static private int Dump(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module){
+	static private int Dump(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, IBakedModule module){
 		module.Dump(logger);
 		return 0;
 	}
 
-	static private int Summary(CommandContext<FabricClientCommandSource> context, CommandLogger logger, IBakedModule module){
+	static private int Summary(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, IBakedModule module){
 		module.Summary(logger);
 		logger.Info("Data used by this module:");
 		for (ICacheKey key : module.GetCacheKeys())
@@ -132,7 +132,7 @@ extends CommandUtil
 		return 0;
 	}
 
-	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, CommandLogger logger, IBakedModule module, IClientEntitySelector target){
+	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, WalktroughLogger logger, IBakedModule module, IClientEntitySelector target){
 		ItemStack stack;
 		String itemSource;
 		Entity targetEntity = target.get();

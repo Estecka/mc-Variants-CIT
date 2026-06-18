@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.modules;
 
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
@@ -33,7 +34,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public Identifier Walkthrough(CommandLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		if (LogTransform.WithLogger(logger, ()->precondition.Matches(stack))){
 			logger.Info("Precondition matched.");
 			return subModule.Walkthrough(logger, stack);

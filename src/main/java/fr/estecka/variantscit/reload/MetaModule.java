@@ -14,6 +14,6 @@ public record MetaModule (
 	Identifier id,
 	int priority,
 	Set<Item> targets,
-	String modelPrefix,
+	LibraryDefinition libraryDefinition,
 	Map<EModuleHook, IBakedModule> bakedModules
 ){}
