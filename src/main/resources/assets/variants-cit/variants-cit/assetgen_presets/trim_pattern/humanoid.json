@@ -1,0 +1,8 @@
+[
+	{
+		"pass": "trims_from_textures",
+		"inputPath": "humanoid(_leggings)?/(.*)",
+		"outputPath": "$2",
+		"template": "trim_pattern/asset_id"
+	}
+]

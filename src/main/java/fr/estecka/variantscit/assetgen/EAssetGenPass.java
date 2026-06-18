@@ -9,6 +9,7 @@ import fr.estecka.variantscit.reload.EAssetType;
 public enum EAssetGenPass
 implements StringRepresentable
 {
+	TRIMS       ("trims_from_textures",      EAssetType.TRIM_TEXTURE,  EAssetType.TRIM_MODEL ),
 	EQUIPMENTS  ("equipments_from_textures", EAssetType.EQUIP_TEXTURE, EAssetType.EQUIPMENT  ),
 	BAKED_MODELS("models_from_textures",     EAssetType.ITEM_TEXTURE,  EAssetType.BAKED_MODEL),
 	ITEM_STATES ("items_from_models",        EAssetType.BAKED_MODEL,   EAssetType.ITEM_STATE ),
@@ -27,7 +28,7 @@ implements StringRepresentable
 
 	public Optional<ResourceLocation> GetShortInputId(ResourceLocation resourceId){
 		String path = resourceId.getPath();
-		if (!path.startsWith(input.directory+"/") || !path.endsWith(input.suffix))
+		if (!path.startsWith(input.packDirectory+"/") || !path.endsWith(input.suffix))
 			return Optional.empty();
 
 		return Optional.of(resourceId.withPath(
@@ -36,7 +37,7 @@ implements StringRepresentable
 	}
 
 	public ResourceLocation GetOutputResourceId(ResourceLocation shortAssetId){
-		return shortAssetId.withPath(path -> output.directory+"/"+path+output.suffix);
+		return shortAssetId.withPath(path -> output.packDirectory+"/"+path+output.suffix);
 	}
 
 	@Override

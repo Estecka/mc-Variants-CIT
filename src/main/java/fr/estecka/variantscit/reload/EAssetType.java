@@ -2,16 +2,18 @@ package fr.estecka.variantscit.reload;
 
 import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 public enum EAssetType
 {
-	ITEM_TEXTURE  (EModuleHook.ITEM_MODEL, false, "textures/item", ".png"),
-	BAKED_MODEL   (EModuleHook.ITEM_MODEL, false, "models/item"  , ".json"),
-	ITEM_STATE    (EModuleHook.ITEM_MODEL, true , "items"        , ".json"),
+	ITEM_TEXTURE  (EModuleHook.ITEM_MODEL,   false, "textures", "item", ".png"),
+	BAKED_MODEL   (EModuleHook.ITEM_MODEL,   false, "models",   "item", ".json"),
+	ITEM_STATE    (EModuleHook.ITEM_MODEL,   true , "items",    ""     , ".json"),
 
-	EQUIP_TEXTURE (EModuleHook.EQUIPPABLE, false, "textures/entity/equipment", ".png"),
-	EQUIPMENT     (EModuleHook.EQUIPPABLE, true , "equipment"                , ".json"),
+	EQUIP_TEXTURE (EModuleHook.EQUIPPABLE,   false, "textures",  "entity/equipment", ".png"),
+	EQUIPMENT     (EModuleHook.EQUIPPABLE,   true , "equipment", ""                 , ".json"),
+
+	TRIM_TEXTURE  (EModuleHook.TRIM_PATTERN, false, "textures",                  "trims/entity",     ".png"),
+	TRIM_MODEL    (EModuleHook.TRIM_PATTERN, true , "variants-cit/trim_pattern", "",                 ".json"),
 	;
 
 	public final EModuleHook hook;
@@ -22,38 +24,33 @@ public enum EAssetType
 	 * equivalent fundamental asset somewhere down the line.
 	 */
 	public final boolean isFundamental;
-	public final @Nullable String vanillaPrefix;
-	public final String directory;
+	public final String packDirectory;
+	public final String identifierPrefix;
 	public final String suffix;
 
-	private EAssetType(EModuleHook hook, boolean isFundamental, String directory, String suffix){
+	private EAssetType(EModuleHook hook, boolean isFundamental, String rootDir, String prefix, String suffix){
 		this.hook = hook;
 		this.isFundamental = isFundamental;
-		this.directory = directory;
 		this.suffix = suffix;
-
-		int subDir = directory.indexOf("/");
-		if (subDir >= 0)
-			this.vanillaPrefix = directory.substring(subDir + 1);
-		else
-			this.vanillaPrefix = null;
+		this.packDirectory    = prefix.isEmpty() ? rootDir : rootDir+'/'+prefix;
+		this.identifierPrefix = prefix.isEmpty() ? prefix  : prefix+'/';
 	}
 
-	public Optional<ResourceLocation> GetShortId(ResourceLocation resourceId){
+	public Optional<ResourceLocation> GetModelId(ResourceLocation resourceId){
 		String path = resourceId.getPath();
-		if (!path.startsWith(directory+"/") || !path.endsWith(suffix))
+		if (!path.startsWith(packDirectory+"/") || !path.endsWith(suffix))
 			return Optional.empty();
 		else
 			return Optional.of(resourceId.withPath(path.substring(
-				directory.length() + 1,
+				packDirectory.length() + 1,
 				path.length() - suffix.length()
 			)));
 	}
 
 	public ResourceLocation GetVanillaId(ResourceLocation shortId){
-		if (vanillaPrefix == null)
+		if (identifierPrefix == null)
 			return shortId;
 		else
-			return shortId.withPath(path -> vanillaPrefix+"/"+path);
+			return shortId.withPath(path -> identifierPrefix+path);
 	}
 }
