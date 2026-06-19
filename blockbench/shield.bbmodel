@@ -8,7 +8,7 @@
 	"parent": "",
 	"java_block_version": "1.21.6",
 	"ambientocclusion": true,
-	"front_gui_light": false,
+	"front_gui_light": true,
 	"visible_box": [1, 1, 0],
 	"variable_placeholders": "",
 	"variable_placeholder_buttons": [],
