@@ -382,8 +382,12 @@ Since v3.5:
 - Fixed custom trident displaying incorrectly on shelves.
 - Added assetGen presets: `item_model/spear`, `item_model/player_head`, `item_model/handheld_rod`
 ## 5.4
+### 5.4.0
 - Added hook: `trim_pattern`
 - Added `modelNamespace`, `modelPathes` and `modelList` options.
+- Added assetGen preset: `item_model/shield_no_pattern`.
 - Special and fallback models are now represented by special variant IDs.
 - Asset generator's inputPath now defaults to `"^.*$"`
 - Added `crawl` command
+### 5.4.1
+- Fixed gui lighting on custom shields
