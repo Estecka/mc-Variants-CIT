@@ -230,7 +230,7 @@ extends CommandUtil
 		}
 		else
 		{
-			IBakedModule result = module.Crawl(logger, stack);
+			IBakedModule result = module.Crawl(logger, stack, false);
 			logger.Info("----");
 			if (result == null){
 				logger.Error("No module could apply to this item.");

@@ -44,13 +44,19 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	@Override
-	public IBakedModule Crawl(CommandLogger logger, ItemStack stack) {
-		logger.Info("Testing list module: {}", Integer.toHexString(System.identityHashCode(this)));
+	public IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip) {
+		IBakedModule result = null;
+
+		// logger.Info("Entering list module: {}", Integer.toHexString(System.identityHashCode(this)));
 		for (IBakedModule m : this){
-			IBakedModule result = m.Crawl(logger, stack);
-			if (result != null) return result;
+			IBakedModule r = m.Crawl(logger, stack, skip);
+			if (!skip && r != null){
+				result = r;
+				skip = true;
+			};
 		}
-		return null;
+
+		return result;
 	}
 
 	@Override
