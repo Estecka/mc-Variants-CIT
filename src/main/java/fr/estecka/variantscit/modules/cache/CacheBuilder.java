@@ -33,7 +33,7 @@ public abstract class CacheBuilder
 		modules.entrySet().stream()
 			.sorted(Comparator.comparing(Map.Entry::getKey))
 			.forEach(e->{
-				list.addAll(BuildPriorityGroup(e.getValue()));
+				list.addAll(0, BuildPriorityGroup(e.getValue()));
 			});
 
 		return list.UnwrapIfSingle();

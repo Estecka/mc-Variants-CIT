@@ -393,3 +393,7 @@ Since v3.5:
 - Added `crawl` command
 ### 5.4.1
 - Fixed gui lighting on custom shields
+### 5.4.2
+- Fixed priority working in reverse order.
+- Crawl will explicitely list all skipped modules.
+- Crawl will no longer list internal module types.
