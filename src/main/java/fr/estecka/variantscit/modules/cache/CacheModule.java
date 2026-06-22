@@ -62,9 +62,9 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	@Override
-	public IBakedModule Crawl(CommandLogger logger, ItemStack stack) {
-		logger.Info("Testing cache module: {}", Integer.toHexString(System.identityHashCode(this)));
-		return this.inner.Crawl(logger, stack);
+	public IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip) {
+		// logger.Info("Entering cache module: {}", Integer.toHexString(System.identityHashCode(this)));
+		return this.inner.Crawl(logger, stack, skip);
 	}
 
 	public ResourceLocation ComputeIfAbsent(ItemStack stack, Function<ItemStack,ResourceLocation> computer){

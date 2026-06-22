@@ -1,10 +1,8 @@
 package fr.estecka.variantscit.reload;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
-import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

@@ -1,6 +1,8 @@
 package fr.estecka.variantscit.modules;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.VariantsCitMod;
@@ -20,14 +22,36 @@ extends ICacheKey.Cacheable
 			return new ModuleList(modules);
 	}
 
-	default IBakedModule Crawl(CommandLogger logger, ItemStack stack){
+	default IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip){
+		boolean success = this.GetModelForItem(stack) != null;
 		ResourceLocation moduleId = VariantsCitMod.GetModules().GetId(this);
-		if (moduleId != null)
-			logger.Info("Testing named module: {}", CommandLogger.PackData(moduleId));
-		else
-			logger.Error("Testing unidentified module: {}", Integer.toHexString(System.identityHashCode(this)));
 
-		return this.GetModelForItem(stack) != null ? this : null;
+		String action;
+		ChatFormatting format;
+		Component successMarker = success ?
+			Component.literal("O").withStyle(ChatFormatting.GREEN) :
+			Component.literal("X").withStyle(ChatFormatting.RED)
+			;
+
+		if (skip){
+			action = "Skipped";
+			format = ChatFormatting.GRAY;
+		}
+		else if (success){
+			action = "Applied";
+			format = ChatFormatting.WHITE;
+		}
+		else {
+			action = "Tested";
+			format = ChatFormatting.GRAY;
+		}
+
+		if (moduleId != null)
+			logger.Info(format, "[{}] {}: {}", successMarker, action, CommandLogger.PackData(moduleId));
+		else
+			logger.Error("[{}] {} unidentified module: {}", successMarker, action, Integer.toHexString(System.identityHashCode(this)));
+
+		return success ? this : null;
 	}
 
 	/**
