@@ -46,5 +46,6 @@ public final class VCitRegistries
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("identifier"),      INbtInput::Identifier);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text"),       INbtInput::RichText);
 		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("rich_text_array"), INbtInput::RichTextArray);
+		NBT_INPUTS.RegisterUnit(Identifier.ofVanilla("snbt"),            INbtInput::Snbt);
 	}
 }

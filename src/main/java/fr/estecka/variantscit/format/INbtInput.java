@@ -44,6 +44,7 @@ extends Function<NbtElement,String>
 			return new Group(group);
 	}
 
+	static public String Snbt(NbtElement nbt){ return nbt.asString(); }
 	static public String String (NbtElement nbt) { return nbt instanceof NbtString string ? string.asString() : null; }
 	static public String Number (NbtElement nbt) { return nbt instanceof AbstractNbtNumber number ? number.numberValue().toString() : null; }
 	static public String Identifier (NbtElement nbt) {

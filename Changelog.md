@@ -119,3 +119,5 @@
 - Fixed `sanitize_auto` producing different results with Iris Shaders installed.
 - Fixed `sanitize_path`, `sanitize_auto` and `sanitize_legacy` incorrectly removing hyphens '`-`' from identifiers.
 - Added `sanitize_legacy` as an alias to `sanitize`.
+## 2.18
+- Added `snbt` data type
