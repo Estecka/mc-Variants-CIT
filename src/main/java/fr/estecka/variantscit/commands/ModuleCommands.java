@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
@@ -104,9 +105,12 @@ extends CommandUtil
 	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
 		EModuleHook hook = getModuleHook(context, HOOK_ARG);
 		Identifier moduleId = context.getArgument(MODULE_ARG, Identifier.class);
-		MetaModule meta = VariantsCitMod.GetModules().GetMeta(moduleId);
-		if (meta == null)
-			return Error(context, "No such module: "+moduleId);
+		MetaModule meta;
+		DataResult<MetaModule> optMeta = VariantsCitMod.GetModules().GetMeta(moduleId);
+		if (optMeta.isError())
+			return Error(context, optMeta.error().get().message());
+		else
+			meta = optMeta.getOrThrow();
 
 		IBakedModule module = meta.bakedModules().get(hook);
 		if (module == null)
