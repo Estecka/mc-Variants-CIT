@@ -28,7 +28,8 @@ public final class DataConversions
 		"identifier",      DataConversions::StricIdentifier,
 		"number",          DataConversions::StrictNumber,
 		"rich_text",       DataConversions::StrictRichText,
-		"rich_text_array", DataConversions::StrictRichTextArray
+		"rich_text_array", DataConversions::StrictRichTextArray,
+		"snbt",            DataConversions::StrictSnbt
 	));
 
 	static public final Codec<IDataTransform> EXPECT_GROUP_CODEC = CodecUtil.OneOrMany(EXPECT_UNIT_CODEC)
@@ -135,6 +136,10 @@ public final class DataConversions
 		Tag nbt = data.asNbt();
 		if (nbt == null)
 			return null;
+
+		result = SoftCastToString(nbt);
+		if (result != null)
+			return result;
 
 		result = SoftCastToString(NbtToText(nbt));
 		if (result != null)
