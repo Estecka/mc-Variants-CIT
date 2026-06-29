@@ -395,3 +395,7 @@ Since v3.5:
 - Fixed priority working in reverse order.
 - Crawl will explicitely list all skipped modules.
 - Crawl will no longer list internal module types.
+## 5.5
+- Fixed some number-like components not automatically casting to string.
+- Command `module` shows the errors of modules that failed to load.
+- Added `expect` value: `snbt`
