@@ -26,16 +26,22 @@ public final class ModuleLoader
 		public final TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new TriMap<>();
 
 		public final Map<ResourceLocation, MetaModule> uniqueModules = new HashMap<>();
+		public final Map<ResourceLocation, String> moduleErrors;
 		public final VariantAggregator variantAggregator;
 
-		private Result(Map<ResourceLocation,ModuleDefinition> modules){
+		private Result(
+			Map<ResourceLocation,ModuleDefinition> modules,
+			Map<ResourceLocation,String> errors
+		){
 			this.variantAggregator = new VariantAggregator(modules);
+			this.moduleErrors = errors;
 		}
 	}
 
 	static public ModuleLoader.Result ReloadModules(HotswappableResourceManager manager)
 	{
 		final ModuleLoader.Result result;
+		final Map<ResourceLocation, String> errors = new HashMap<>();
 		final List<MetaModule> metamodules = new ArrayList<>();
 
 		Map<ResourceLocation, Resource> resources = new HashMap<>();
@@ -49,24 +55,30 @@ public final class ModuleLoader
 			ResourceLocation moduleId = entry.getKey();
 			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
-				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, optDefinition.error().get().message());
+				String errormMsg = optDefinition.error().get().message();
+				VariantsCitMod.LOGGER.error("Error in VCIT module {}: {}", moduleId, errormMsg);
+				errors.put(moduleId, errormMsg);
 				continue;
 			}
 
 			ModuleDefinition definition = optDefinition.getOrThrow();
 			if (definition.hooks().isEmpty()){
-				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no hook: {}", moduleId);
+				String errorMsg = "Skipped VCIT module with no hook: " + moduleId;
+				VariantsCitMod.LOGGER.warn("{}", errorMsg);
+				errors.put(moduleId, errorMsg);
 				continue;
 			}
 			if (ItemsFromModule(moduleId, definition).isEmpty()){
-				VariantsCitMod.LOGGER.warn("Skipped VCIT module with no valid item: {}", moduleId);
+				String errorMsg = "Skipped VCIT module with no valid item: " + moduleId;
+				VariantsCitMod.LOGGER.warn("{}", errorMsg);
+				errors.put(moduleId, errorMsg);
 				continue;
 			}
 
 			definitions.put(moduleId, definition);
 		}
 
-		result = new Result(definitions);
+		result = new Result(definitions, errors);
 		result.variantAggregator.GatherAll(manager);
 
 		for (var entry : definitions.entrySet())
