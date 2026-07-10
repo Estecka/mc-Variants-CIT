@@ -302,6 +302,9 @@ Since v2.5:
 - Crawl will explicitely list all skipped modules.
 - Crawl will no longer list internal module types.
 ## 5.5
+### 5.5.0
 - Fixed some number-like components not automatically casting to string.
 - Command `module` shows the errors of modules that failed to load.
 - Added `expect` value: `snbt`
+### 5.5.1
+- Fixed crash when using components with no codecs.

@@ -24,7 +24,11 @@ implements IDataContainer
 
 	@Override
 	public Tag asNbt() {
-		return CodecUtil.GetComponentNbt(value, type.codec());
+		var codec = type.codec();
+		if (codec != null)
+			return CodecUtil.GetComponentNbt(value, type.codec());
+		else
+			return IDataContainer.super.asNbt();
 	}
 
 	@Override
