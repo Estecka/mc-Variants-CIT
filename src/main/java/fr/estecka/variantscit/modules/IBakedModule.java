@@ -14,6 +14,11 @@ public interface IBakedModule
 extends ICacheKey.Cacheable
 {
 	Identifier GetModelForItem(ItemStack stack);
+	void Summary(CommandLogger logger);
+	// TODO: Remove, use library in metadata instead
+	@Deprecated
+	void Dump(CommandLogger logger);
+	Identifier Walkthrough(WalktroughLogger logger, ItemStack stack);
 
 	static public IBakedModule OfList(List<? extends IBakedModule> modules){
 		if (modules.size() == 1)
@@ -42,7 +47,7 @@ extends ICacheKey.Cacheable
 			format = ChatFormatting.WHITE;
 		}
 		else {
-			action = "Tested";
+			action = "Failed";
 			format = ChatFormatting.GRAY;
 		}
 
@@ -52,21 +57,5 @@ extends ICacheKey.Cacheable
 			logger.Error("[{}] {} unidentified module: {}", successMarker, action, Integer.toHexString(System.identityHashCode(this)));
 
 		return success ? this : null;
-	}
-
-	/**
-	 * TODO: remove default implementations.
-	 */
-	default void Summary(CommandLogger logger){
-		logger.Error("This module type does not support `summary`. Please report this issue.");
-	}
-
-	default void Dump(CommandLogger logger){
-		logger.Error("This module type does not support `dump`. Please report this issue.");
-	}
-
-	default Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
-		logger.Error("This module type does not support `walkthrough`. Please report this issue.");
-		return this.GetModelForItem(stack);
 	}
 }

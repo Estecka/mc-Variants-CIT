@@ -12,4 +12,8 @@ public interface IUnbakedModule
 	public default boolean AcceptsVariant(Identifier variantId){
 		return true;
 	}
+
+	public default boolean AcceptsIntrinsic(Identifier modelId){
+		return false;
+	}
 }

@@ -12,6 +12,10 @@ public interface IVariantLibrary
 		return VariantsCitMod.Identifier("special/"+specialName);
 	}
 
+	static public Identifier IntrinsicVariantId(Identifier modelId){
+		return VariantsCitMod.Identifier("intrinsic/"+modelId.getNamespace()+"/"+modelId.getPath());
+	}
+
 	/**
 	 * @return  Whether this variant  has it's own model, ignoring  the fallback
 	 * model.

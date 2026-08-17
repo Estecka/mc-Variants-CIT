@@ -171,9 +171,20 @@ extends CommandUtil
 			logger.Error("[ERR] This module does not declare any data or component.");
 		logger.Info("----");
 
-		Identifier modelId = module.Walkthrough(logger, stack);
-		if (modelId != null){
-			logger.Info("The module returned the model: {}", CommandLogger.PackData(modelId));
+		Identifier liveModelId = module.GetModelForItem(stack);
+		Identifier walkthroughModelId = module.Walkthrough(logger, stack);
+		if (liveModelId != walkthroughModelId){
+			logger.Error(
+				"Walkthrough did not return the same model ID "
+				+ "as a live run of the module. Please report this issue."
+				+ "\nWalkthrough: {}"
+				+ "\nLive run: {}",
+				walkthroughModelId,
+				liveModelId
+			);
+		}
+		if (liveModelId != null){
+			logger.Info("The module returned the model: {}", CommandLogger.PackData(liveModelId));
 		}
 		else
 			logger.Info("The module failed to apply to the item.");

@@ -127,6 +127,9 @@ public class VariantAggregator
 		boolean accepted = false;
 
 		Set<Identifier> variants = module.libraryDefinition().GetVariantIds(modelId);
+		if (module.parameters().AcceptsIntrinsic(modelId))
+			variants.add(IVariantLibrary.IntrinsicVariantId(modelId));
+
 		for (Identifier variantId : variants)
 		if  (module.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID))
 		{

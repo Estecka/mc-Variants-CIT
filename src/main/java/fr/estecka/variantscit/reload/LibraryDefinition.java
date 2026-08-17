@@ -47,7 +47,9 @@ public record LibraryDefinition(
 	static private final Codec<Map<Identifier,Identifier>> MODELLIST_CODEC = CodecUtil.WithAlternatives(
 		Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC),
 		Identifier.CODEC.listOf().xmap(LibraryDefinition::FromArray, map->List.copyOf(map.keySet()))
-	);
+	)
+	.validate(LibraryDefinition::DisallowIntrinsic)
+	;
 
 	static private final MapCodec<Map<Identifier,Identifier>> HARDCODED_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -92,6 +94,15 @@ public record LibraryDefinition(
 			hardcoded.put(VariantsCitMod.Identifier("fallback"), fallback.get());
 
 		return Map.copyOf(hardcoded);
+	}
+
+	static private DataResult<Map<Identifier,Identifier>> DisallowIntrinsic(Map<Identifier,Identifier> hardcodedList){
+		for (Identifier variantId : hardcodedList.keySet()){
+			if (variantId.getNamespace().equals(VariantsCitMod.MODID) && variantId.getPath().startsWith("intrinsic/"))
+				return DataResult.error(()->"Hardcoded model list may not override intrinsic models.");
+		}
+
+		return DataResult.success(hardcodedList);
 	}
 
 

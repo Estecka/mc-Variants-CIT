@@ -76,7 +76,7 @@ public final class VCitRegistries
 		RegisterSimpleModule(VariantsCitMod.Identifier("painting_variant"), PaintingVariantModule.UNIT);
 		RegisterSimpleModule(VariantsCitMod.Identifier("potion_effect"), PotionEffectModule.UNIT);
 		RegisterSimpleModule(VariantsCitMod.Identifier("potion_type"), PotionTypeModule.UNIT);
-		RegisterBakedModule (VariantsCitMod.Identifier("predicates"), PredicatesModule.Unbaked.MAPCODEC);
+		RegisterBakedModule (VariantsCitMod.Identifier("predicates"), PredicatesModule.Parameters.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantment"),  EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
 		RegisterSimpleModule(VariantsCitMod.Identifier("stored_enchantments"), EnchantmentModule.CreateCodec(DataComponents.STORED_ENCHANTMENTS));
 		MODULES.Deprecate   (VariantsCitMod.Identifier("stored_enchantments"), "Module name `stored_enchantments` (plural) is deprecated. use `stored_enchantment` (singular) instead.");

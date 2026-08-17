@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -83,5 +84,21 @@ implements IBakedModule, IModuleWrapper
 	@Override
 	public ECachePolicy GetCachePolicy() {
 		return ECachePolicy.UNWRAP;
+	}
+
+	@Override
+	public void Dump(CommandLogger logger) {
+		logger.Error("List modules cannot be debbuged. Please report this issue.");
+	}
+
+	@Override
+	public void Summary(CommandLogger logger) {
+		logger.Error("List modules cannot be debbuged. Please report this issue.");
+	}
+	
+	@Override
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
+		logger.Error("List modules cannot be debbuged. Please report this issue.");
+		return null;
 	}
 }

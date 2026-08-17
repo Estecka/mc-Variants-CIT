@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.function.Function;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
@@ -46,6 +47,21 @@ implements IBakedModule, IModuleWrapper
 	@Override
 	public ECachePolicy GetCachePolicy() {
 		return ECachePolicy.UNWRAP;
+	}
+
+
+	@Override
+	public void Summary(CommandLogger logger) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+	}
+	@Override
+	public void Dump(CommandLogger logger) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+	}
+	@Override
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+		return null;
 	}
 
 	@Override
