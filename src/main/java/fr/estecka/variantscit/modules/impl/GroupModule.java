@@ -16,7 +16,7 @@ import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public record GroupModule(
@@ -74,9 +74,9 @@ implements IBakedModule
 		}
 
 		@Override
-		public boolean AcceptsVariant(ResourceLocation variantId) {
+		public boolean AcceptsVariant(Identifier variantId) {
 			for (SubModuleDefinition m : submodules) {
-				ResourceLocation subVariant = variantId;
+				Identifier subVariant = variantId;
 				if (m.modelPrefix.isPresent()){
 					if (!subVariant.getPath().startsWith(m.modelPrefix.get()))
 						continue;
@@ -107,9 +107,9 @@ implements IBakedModule
 /******************************************************************************/
 
 	@Override
-	public ResourceLocation GetModelForItem(ItemStack stack) {
+	public Identifier GetModelForItem(ItemStack stack) {
 		for (IBakedModule m : submodules) {
-			ResourceLocation result = m.GetModelForItem(stack);
+			Identifier result = m.GetModelForItem(stack);
 			if (result != null) return result;
 		}
 
@@ -141,10 +141,10 @@ implements IBakedModule
 	}
 
 	@Override
-	public ResourceLocation Walkthrough(WalktroughLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		for (int i=0; i<submodules.length; ++i) {
 			logger.Info("### Submodule [{}]", i);
-			ResourceLocation r = submodules[i].Walkthrough(logger.WithSubPrefix(subPrefixes[i]), stack);
+			Identifier r = submodules[i].Walkthrough(logger.WithSubPrefix(subPrefixes[i]), stack);
 			logger.Info("-");
 			if (r != null) break;
 		}

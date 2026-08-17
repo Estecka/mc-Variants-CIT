@@ -3,14 +3,14 @@ package fr.estecka.variantscit.assetgen;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.CodecUtil;
 
 public interface IAssetGenerator
 {
-	Result AcceptAsset(EAssetGenPass pass, ResourceLocation assetId);
+	Result AcceptAsset(EAssetGenPass pass, Identifier assetId);
 
 	// public default Identifier GetRadical(Identifier assetId){
 	// 	return assetId;
@@ -26,7 +26,7 @@ public interface IAssetGenerator
 	implements IAssetGenerator
 	{
 		@Override
-		public Result AcceptAsset(EAssetGenPass pass, ResourceLocation assetId) {
+		public Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
 			Result result = new Result();
 			for (IAssetGenerator generator : subGenerators)
 				result.PutAllIfAbsent(generator.AcceptAsset(pass, assetId));
@@ -55,12 +55,12 @@ public interface IAssetGenerator
 	}
 
 	static public record ParentedResource(
-		ResourceLocation radical,
+		Identifier radical,
 		IoSupplier<InputStream> resource
 	) {}
 
 	static public class Result
-	extends HashMap<ResourceLocation,ParentedResource>
+	extends HashMap<Identifier,ParentedResource>
 	{
 		public void PutAllIfAbsent(Result behind){
 			for (var entry : behind.entrySet())

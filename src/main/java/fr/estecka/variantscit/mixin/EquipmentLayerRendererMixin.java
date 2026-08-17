@@ -17,13 +17,13 @@ import fr.estecka.variantscit.MixinGlobals;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.trims.TrimPatternOverlay;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimSpriteKey;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.EquipmentAssetManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 
@@ -42,7 +42,7 @@ public class EquipmentLayerRendererMixin
 	}
 
 	@WrapOperation(
-		method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/resources/ResourceLocation;)V",
+		method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/resources/Identifier;)V",
 		at = @At(
 			ordinal = 1,
 			value = "INVOKE",
@@ -58,7 +58,7 @@ public class EquipmentLayerRendererMixin
 		if (memoizer != this.trimSpriteLookup || !(memoizerKey instanceof TrimSpriteKey trimSpriteKey))
 			throw new RuntimeException("Bad mixin injection point for variants-cit's trim_pattern hook.");
 
-		ResourceLocation overlayId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.TRIM_PATTERN, stack);
+		Identifier overlayId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.TRIM_PATTERN, stack);
 		TrimPatternOverlay trimOverlay = TrimPatternOverlay.REPOSITORY.Get(overlayId);
 
 		if (trimOverlay == null)
@@ -69,7 +69,7 @@ public class EquipmentLayerRendererMixin
 	}
 
 	static private TextureAtlasSprite ComputeSprite(TextureAtlas atlas, TrimSpriteKey trimSpriteKey, TrimPatternOverlay overlay){
-		ResourceLocation spriteId;
+		Identifier spriteId;
 		try {
 			MixinGlobals.trimOverride = overlay;
 			spriteId = trimSpriteKey.textureId();
@@ -89,10 +89,10 @@ public class EquipmentLayerRendererMixin
 			method = "textureId",
 			at = @At(
 				value = "INVOKE",
-				target = "net/minecraft/world/item/equipment/trim/TrimPattern.assetId()Lnet/minecraft/resources/ResourceLocation;"
+				target = "net/minecraft/world/item/equipment/trim/TrimPattern.assetId()Lnet/minecraft/resources/Identifier;"
 			)
 		)
-		public ResourceLocation overrideTextureId(ResourceLocation original){
+		public Identifier overrideTextureId(Identifier original){
 			if (MixinGlobals.trimOverride != null)
 				return MixinGlobals.trimOverride.assetId();
 			else

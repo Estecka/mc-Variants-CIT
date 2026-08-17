@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.itemdata.extractors.impl;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.CustomData;
 
 public class PaintingVariantProperty
@@ -18,9 +18,9 @@ extends AMonoComponentProperty<CustomData,String>
 		return component.copyTag().getString("variant");
 	}
 
-	public ResourceLocation GetPropertyId(CustomData component){
+	public Identifier GetPropertyId(CustomData component){
 		String rawVariant = GetPropertyValue(component);
-		return (rawVariant!=null) ?  ResourceLocation.tryParse(rawVariant) : null;
+		return (rawVariant!=null) ?  Identifier.tryParse(rawVariant) : null;
 	}
 	
 }

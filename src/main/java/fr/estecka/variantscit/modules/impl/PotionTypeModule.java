@@ -9,6 +9,6 @@ public class PotionTypeModule
 		DataComponents.POTION_CONTENTS,
 		potion -> potion.potion().isEmpty() ? 
 			null :
-			potion.potion().get().unwrapKey().get().location()
+			potion.potion().get().unwrapKey().get().identifier()
 	);
 }

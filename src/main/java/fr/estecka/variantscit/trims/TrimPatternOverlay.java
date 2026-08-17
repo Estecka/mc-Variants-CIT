@@ -5,18 +5,18 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.ReloadableRepository;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * @implNote decal is currently not suppported. It's listed here as a placeholder.
  */
 public record TrimPatternOverlay(
-	ResourceLocation assetId,
+	Identifier assetId,
 	Optional<Boolean> isDecal
 ) {
 	static public final MapCodec<TrimPatternOverlay> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
-			ResourceLocation.CODEC.fieldOf("asset_id").forGetter(TrimPatternOverlay::assetId),
+			Identifier.CODEC.fieldOf("asset_id").forGetter(TrimPatternOverlay::assetId),
 			Codec.BOOL.optionalFieldOf("decal").forGetter(TrimPatternOverlay::isDecal)
 		)
 		.apply(builder, TrimPatternOverlay::new)

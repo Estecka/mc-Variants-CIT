@@ -3,7 +3,7 @@ package fr.estecka.variantscit.assetgen;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.CodecUtil;
@@ -15,7 +15,7 @@ public final class GeneratorPresets
 	static private final String DIRECTORY = "variants-cit/assetgen_presets";
 	static private final String EXTENSION = ".json";
 
-	static private final Map<ResourceLocation, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
+	static private final Map<Identifier, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
 	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, BAKED_PRESETS);
 
 	static public void ReloadPresets(ResourceManager manager){

@@ -3,7 +3,7 @@ package fr.estecka.variantscit.modules.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +71,7 @@ implements ISimpleCitModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetItemVariant(ItemStack stack) {
+	public @Nullable Identifier GetItemVariant(ItemStack stack) {
 		Map<String,String> variables = new HashMap<>();
 
 		for (var entry : this.varGetters.entrySet()){
@@ -91,11 +91,11 @@ implements ISimpleCitModule
 		if (result == null)
 			return null;
 		else
-			return (ResourceLocation)result.value();
+			return (Identifier)result.value();
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		boolean failure = false;
 		Map<String,String> variables = new HashMap<>();
 

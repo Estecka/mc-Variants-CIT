@@ -12,16 +12,16 @@ import fr.estecka.variantscit.modules.cache.CacheBuilder;
 import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.MetaModule;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public final class ModuleRepository
 {
 	private final BiMap<EModuleHook, Item, IBakedModule> archModules;
-	private final Map<ResourceLocation, MetaModule> metadata;
-	private final Map<ResourceLocation, String> moduleErrors;
-	private final IdentityHashMap<IBakedModule, ResourceLocation> moduleToId;
+	private final Map<Identifier, MetaModule> metadata;
+	private final Map<Identifier, String> moduleErrors;
+	private final IdentityHashMap<IBakedModule, Identifier> moduleToId;
 
 	ModuleRepository(){
 		this.archModules = new BiMap<>();
@@ -36,7 +36,7 @@ public final class ModuleRepository
 		this.moduleErrors = Map.copyOf(result.moduleErrors);
 		this.moduleToId = new IdentityHashMap<>();
 
-		for (ResourceLocation id : metadata.keySet())
+		for (Identifier id : metadata.keySet())
 		for (IBakedModule module : metadata.get(id).bakedModules().values())
 		{
 			moduleToId.put(module, id);
@@ -47,7 +47,7 @@ public final class ModuleRepository
 		return this.archModules.get(hook, item);
 	}
 
-	public @Nullable ResourceLocation GetModelForItem(EModuleHook hook, ItemStack stack) {
+	public @Nullable Identifier GetModelForItem(EModuleHook hook, ItemStack stack) {
 		@Nullable IBakedModule module = GetArchModule(hook, stack.getItem());
 		if (module == null)
 			return null;
@@ -59,7 +59,7 @@ public final class ModuleRepository
 		return Set.copyOf(archModules.getOrDefault(hook, Map.of()).keySet());
 	}
 
-	public Stream<ResourceLocation> GetAvailableModules(EModuleHook hook){
+	public Stream<Identifier> GetAvailableModules(EModuleHook hook){
 		var errors = moduleErrors.entrySet().stream();
 		var valid = metadata.entrySet().stream()
 			.filter(meta -> meta.getValue().bakedModules().get(hook) != null)
@@ -70,11 +70,11 @@ public final class ModuleRepository
 			;
 	}
 
-	public ResourceLocation GetId(IBakedModule module){
+	public Identifier GetId(IBakedModule module){
 		return this.moduleToId.get(module);
 	}
 
-	public DataResult<MetaModule> GetMeta(ResourceLocation id){
+	public DataResult<MetaModule> GetMeta(Identifier id){
 		var r = this.metadata.get(id);
 		if (r != null)
 			return DataResult.success(r);

@@ -15,7 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.PackRepository;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -38,12 +38,12 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 // import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 // import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 // import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
+import static net.minecraft.commands.arguments.IdentifierArgument.id;
 
 public class AssetGenCommands
 extends CommandUtil
 {
-	static public final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VariantsCitMod.MODID, "assetgen");
+	static public final Identifier ID = Identifier.fromNamespaceAndPath(VariantsCitMod.MODID, "assetgen");
 	static public final String BAKED_PACK_DIR = "VCIT Baked AssetGen";
 	static public final String ASSET_ARG = "asset id";
 
@@ -87,7 +87,7 @@ extends CommandUtil
 /******************************************************************************/
 
 	static private int AssetPeek(CommandContext<FabricClientCommandSource> context) throws CommandSyntaxException {
-		ResourceLocation id = context.getArgument(ASSET_ARG, ResourceLocation.class);
+		Identifier id = context.getArgument(ASSET_ARG, Identifier.class);
 		FilledTemplate resource = (FilledTemplate)GeneratedResourcePack.INSTANCE.GetAll().get(id);
 
 		if (resource == null)
@@ -141,7 +141,7 @@ extends CommandUtil
 		// Assets
 		context.getSource().sendFeedback(Component.literal("Writing assets..."));
 		for (var entry : GeneratedResourcePack.INSTANCE.GetAll().entrySet()){
-			ResourceLocation id = entry.getKey();
+			Identifier id = entry.getKey();
 			String assetPath = "assets/"+id.getNamespace()+"/"+id.getPath();
 			Path assetDst = dst.resolve(assetPath);
 			filesToKeep.add(assetDst);

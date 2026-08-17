@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.reload.IUnbakedModule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record LinearModuleBaker<T extends ILinearCitModule>(
 	String namespace,
@@ -15,7 +15,7 @@ implements IUnbakedModule
 	static public <T extends ILinearCitModule> MapCodec<LinearModuleBaker<T>> Of(MapCodec<T> moduleCodec){
 		return RecordCodecBuilder.<LinearModuleBaker<T>>mapCodec(builder->
 			builder.group(
-				CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", ResourceLocation.DEFAULT_NAMESPACE).forGetter(LinearModuleBaker::namespace),
+				CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", Identifier.DEFAULT_NAMESPACE).forGetter(LinearModuleBaker::namespace),
 				moduleCodec.forGetter(LinearModuleBaker::parameters)
 			)
 			.apply(builder, LinearModuleBaker::new)
@@ -32,7 +32,7 @@ implements IUnbakedModule
 	};
 
 	@Override
-	public boolean AcceptsVariant(ResourceLocation variantId) {
+	public boolean AcceptsVariant(Identifier variantId) {
 		if (!variantId.getNamespace().equals(namespace))
 			return false;
 		
