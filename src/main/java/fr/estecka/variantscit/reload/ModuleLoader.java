@@ -41,7 +41,7 @@ public final class ModuleLoader
 	static public ModuleLoader.Result ReloadModules(HotswappableResourceManager manager)
 	{
 		final ModuleLoader.Result result;
-		final Map<ResourceLocation, String> errors = new HashMap<>();
+		final Map<Identifier, String> errors = new HashMap<>();
 		final List<MetaModule> metamodules = new ArrayList<>();
 
 		Map<Identifier, Resource> resources = new HashMap<>();

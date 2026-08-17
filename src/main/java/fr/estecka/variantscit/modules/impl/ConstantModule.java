@@ -13,12 +13,12 @@ import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public record ConstantModule(
 	ECachePolicy cachePolicy,
-	Optional<ResourceLocation> modelId
+	Optional<Identifier> modelId
 )
 implements IBakedModule, IUnbakedModule
 {
@@ -30,7 +30,7 @@ implements IBakedModule, IUnbakedModule
 	static public final MapCodec<ConstantModule> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			POLICY_CODEC.optionalFieldOf("cachePolicy", ECachePolicy.AVOID).forGetter(ConstantModule::cachePolicy),
-			ResourceLocation.CODEC.optionalFieldOf("modelId").forGetter(ConstantModule::modelId)
+			Identifier.CODEC.optionalFieldOf("modelId").forGetter(ConstantModule::modelId)
 		)
 		.apply(builder, ConstantModule::new)
 	);
@@ -43,7 +43,7 @@ implements IBakedModule, IUnbakedModule
 	}
 
 	@Override
-	public boolean AcceptsVariant(ResourceLocation variantId) {
+	public boolean AcceptsVariant(Identifier variantId) {
 		return variantId.equals(this.modelId.orElse(null));
 	}
 
@@ -62,7 +62,7 @@ implements IBakedModule, IUnbakedModule
 	// ## Rendering
 
 	@Override
-	public ResourceLocation GetModelForItem(ItemStack stack) {
+	public Identifier GetModelForItem(ItemStack stack) {
 		return this.modelId.orElse(null);
 	}
 
@@ -75,7 +75,7 @@ implements IBakedModule, IUnbakedModule
 	}
 	
 	@Override
-	public ResourceLocation Walkthrough(WalktroughLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		this.Dump(logger);
 		return this.GetModelForItem(stack);
 	}
