@@ -306,5 +306,6 @@ Since v2.5:
 - Fixed some number-like components not automatically casting to string.
 - Command `module` shows the errors of modules that failed to load.
 - Added `expect` value: `snbt`
-### 5.5.1
+### 5.6.0
 - Fixed crash when using components with no codecs.
+- Module `predicates` is now capable of operating without `modelPrefix` or `modelList`.
