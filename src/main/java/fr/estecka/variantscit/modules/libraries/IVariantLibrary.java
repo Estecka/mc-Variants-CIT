@@ -16,6 +16,12 @@ public interface IVariantLibrary
 		return VariantsCitMod.Identifier("intrinsic/"+modelId.getNamespace()+"/"+modelId.getPath());
 	}
 
+	static public boolean IsVariantIntrinsic(Identifier variantId){
+		return variantId.getNamespace().equals(VariantsCitMod.MODID)
+		    && variantId.getPath().startsWith("intrinsic/")
+		    ;
+	}
+
 	/**
 	 * @return  Whether this variant  has it's own model, ignoring  the fallback
 	 * model.

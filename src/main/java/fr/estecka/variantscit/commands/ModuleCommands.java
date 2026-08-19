@@ -228,23 +228,32 @@ extends CommandUtil
 		Identifier foundModelId = library.GetVariantModelStrict(variantId);
 		boolean isHardCoded = libDefinition.hardcodedList().containsKey(variantId);
 		boolean isPrefixCompatible = libDefinition.AcceptsVariant(variantId);
-		boolean isRejected = meta.parameters().AcceptsVariant(variantId);
-		boolean isMissing = isPrefixCompatible && !isRejected && foundModelId==null;
-		// boolean isIntrinsic = IVariantLibrary.IsVariantIntrinsic(variantId);
+		boolean isRejected = !meta.parameters().AcceptsVariant(variantId);
+		boolean isMissing = !isRejected && definedModelId!=null && foundModelId==null;
+		boolean isIntrinsic = IVariantLibrary.IsVariantIntrinsic(variantId);
 		
+		logger.Info("--------");
 		logger.Info("Looking for variant-ID {} in the {} module {}",
 			CommandLogger.ItemData(variantId),
 			logger.moduleHook,
 			CommandLogger.PackData(meta.id())
 		);
-		logger.Info("--------");
+		logger.Info("----");
 
-		// if (isIntrinsic)
-		// 	logger.Info("This variant is intrinsic to this module's type or parameters.");
-		if (isHardCoded)
+		if (isIntrinsic) // FIXME: will apply to every posible intrincic variants
+			logger.Info("This variant is intrinsic to this module's type or parameters.");
+		else if (isHardCoded)
 			logger.Info("This variant was hardwired to the model-ID {}", CommandLogger.PackData(definedModelId));
-		else if (libDefinition.modelPrefix().isPresent())
-			logger.Info("This variant could be combined with the modelPrefix, and leads to the model");
+		else if (isPrefixCompatible && libDefinition.modelPrefix().isPresent()){
+			logger.Info(
+				"This variant was combined with the modelPrefix, and leads to the model-ID: {}",
+				CommandLogger.PackData(variantId.withPrefix(libDefinition.modelPrefix().get()))
+			);
+		}
+		else
+			logger.Info("This variant was not found in this module's definition.");
+
+		logger.Info("--");
 
 		if (foundModelId != null){
 			logger.Info(ChatFormatting.GREEN, "The variant was found, and is bound to the model ID: {}");
@@ -274,7 +283,7 @@ extends CommandUtil
 		else if (!isHardCoded && !isPrefixCompatible && libDefinition.modelPrefix().isPresent()){
 			logger.Info(ChatFormatting.GOLD,
 				"The variant-ID {} was rejected because it does no match this module's"
-				+ "modeNamespace or modelPathes options.",
+				+ "modelNamespace or modelPathes options.",
 				CommandLogger.ItemData(variantId)
 			);
 		}
@@ -285,9 +294,10 @@ extends CommandUtil
 			logger.Error("This variant is not present in this module, but I'm unsure as to why.");
 		}
 
+		
 		if (definedModelId != null) {
-			logger.Info("The model-ID {} may correspond to any of those files:", foundModelId);
-			logger.PrintPlainModelTip(foundModelId);
+			logger.Info("--");
+			logger.PrintPlainModelTip(definedModelId);
 		}
 
 		return 0;
@@ -316,14 +326,15 @@ extends CommandUtil
 				missingVariants.add(variantId);
 		}
 
+		logger.Info("--------");
 		logger.Info("Looking for Model ID {} in the {} module {}",
 			CommandLogger.PackData(modelId),
 			logger.moduleHook,
 			CommandLogger.PackData(meta.id())
 		);
-		logger.Info("--------");
+		logger.Info("----");
 
-		logger.Info("This model was requested to be bound to {} variant-ID.", definedVariants.size());
+		logger.Info("This model was bound to {} variants out of {} requested.", foundvariants.size(), definedVariants.size());
 		if (isIntrinsic)
 			logger.Info("This model is intrinsic to this module type, or was defined in the module's parameters.");
 		if (matchesPrefix) // TODO: indicate when those are rejected
@@ -333,28 +344,28 @@ extends CommandUtil
 
 		logger.Info("--");
 
-		if (rejectedVariants.size() > 0){
-			logger.Info(
-				"The following variant-IDs were rejected, because they are "
-				+ "incompatible with this module's type or parameters:"
-			);
-			for (Identifier id : rejectedVariants)
-				logger.Info("- {}", id);
-		}
-
 		if (foundvariants.size() > 0){
 			logger.Info(ChatFormatting.GREEN, 
-				"This model was collected by this module, and bound to these "
-				+ "variant-IDs:"
+				"This model was collected by this module, and bound to the "
+				+ "following variant-IDs:"
 			);
 			for (Identifier id : foundvariants)
-				logger.Info("- {}", id);
+				logger.Info(" - {}", CommandLogger.ItemData(id));
 		}
 		else if (missingVariants.size() <= 0){
 			logger.Info(ChatFormatting.GOLD, 
 				"This model was not collected by this module, "
 				+ "because it wasn't bound to any elligible variant-ID."
 			);
+		}
+
+		if (rejectedVariants.size() > 0){
+			logger.Info(
+				"The following variant-IDs were rejected, because they are "
+				+ "incompatible with this module's type or parameters:"
+			);
+			for (Identifier id : rejectedVariants)
+				logger.Info(" - {}", CommandLogger.ItemData(id));
 		}
 
 		if (missingVariants.size() > 0 ){
@@ -371,11 +382,11 @@ extends CommandUtil
 				);
 
 			for (Identifier id : missingVariants) {
-				logger.Info("- {}", id);
+				logger.Info(" - {}", CommandLogger.ItemData(id));
 			}
 		}
 
-		logger.Info("The model-ID {} may correspond to any of the following files:", modelId);
+		logger.Info("--");
 		logger.PrintPlainModelTip(modelId);
 		return 0;
 	}
