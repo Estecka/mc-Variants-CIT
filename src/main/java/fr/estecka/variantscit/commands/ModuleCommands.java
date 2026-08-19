@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -49,23 +50,37 @@ extends CommandUtil
 	static public final String HOOK_ARG    = "hook";
 	static public final String MODULE_ARG  = "module id";
 	static public final String VARIANT_ID_ARG  = "variant-id";
-	static public final String MODEL_ID_ARG    = "model id";
+	static public final String MODEL_ID_ARG    = "model-id";
 
 	static public void	Register(){
 		ClientCommandRegistrationCallback.EVENT.register(ID, ModuleCommands::RegisterWith);
 	}
 
 	static public void	RegisterWith(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess){
-		var walkthrough = literal("walkthrough").executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetSelf)))
-			.then(literal("self")          .executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetSelf))))
-			.then(literal("nearest_item")  .executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetGroundItem))))
-			.then(literal("nearest_player").executes(c->Execute(c, Walkthrough(IClientEntitySelector::GetPlayer))))
+		var walkthrough = literal("walkthrough").executes(Walkthrough(IClientEntitySelector::GetSelf))
+			.then(literal("self")          .executes(Walkthrough(IClientEntitySelector::GetSelf)))
+			.then(literal("nearest_item")  .executes(Walkthrough(IClientEntitySelector::GetGroundItem)))
+			.then(literal("nearest_player").executes(Walkthrough(IClientEntitySelector::GetPlayer)))
 			;
+
+		var variantId = literal("variant-id")
+			.then(argument(VARIANT_ID_ARG, id())
+				.suggests(ModuleCommands::VariantIdAutofill)
+				.executes((IModuleCommand)ModuleCommands::VariantId)
+			);
+
+		var modelId = literal("model-id")
+			.then(argument(MODEL_ID_ARG, id())
+				.suggests(ModuleCommands::ModelIdAutofill)
+				.executes((IModuleCommand)ModuleCommands::ModelId)
+			);
 
 		var module = argument(MODULE_ARG, id())
 			.suggests(ModuleCommands::ModuleAutofill)
-			.then(literal("dump").executes(c->Execute(c, ModuleCommands::Dump)))
-			.then(literal("summary").executes(c->Execute(c, ModuleCommands::Summary)))
+			.then(literal("dump").executes((IModuleCommand)ModuleCommands::Dump))
+			.then(literal("summary").executes((IModuleCommand)ModuleCommands::Summary))
+			.then(variantId)
+			.then(modelId)
 			.then(walkthrough)
 			;
 
@@ -160,36 +175,41 @@ extends CommandUtil
 
 	@FunctionalInterface
 	static private interface IModuleCommand
+	extends Command<FabricClientCommandSource>
 	{
-		int Execute(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, IBakedModule module) throws CommandSyntaxException;
+		int run(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, MetaModule meta) throws CommandSyntaxException;
+
+		default int run(CommandContext<FabricClientCommandSource> context)
+		throws CommandSyntaxException
+		{
+			EModuleHook hook = getModuleHook(context, HOOK_ARG);
+			MetaModule meta;
+			DataResult<MetaModule> optMeta = GetMeta(context);
+			if (optMeta.isError())
+				return Error(context, optMeta.error().get().message());
+			else
+				meta = optMeta.getOrThrow();
+	
+			IBakedModule module = meta.bakedModules().get(hook);
+			Objects.requireNonNull(module);
+	
+			WalktroughLogger logger = new WalktroughLogger(context, hook, meta, "");
+			return this.run(context, logger, meta);
+		}
 	}
 
 	static private IModuleCommand Walkthrough(IClientEntitySelector target){
 		return (c,l,m)->Walkthrough(c,l,m, target);
 	}
 
-	static private int Execute(CommandContext<FabricClientCommandSource> context, IModuleCommand command) throws CommandSyntaxException {
-		EModuleHook hook = getModuleHook(context, HOOK_ARG);
-		MetaModule meta;
-		DataResult<MetaModule> optMeta = GetMeta(context);
-		if (optMeta.isError())
-			return Error(context, optMeta.error().get().message());
-		else
-			meta = optMeta.getOrThrow();
-
-		IBakedModule module = meta.bakedModules().get(hook);
-		Objects.requireNonNull(module);
-
-		WalktroughLogger logger = new WalktroughLogger(context, hook, meta, "");
-		return command.Execute(context, logger, module);
-	}
-
-	static private int Dump(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, IBakedModule module){
+	static private int Dump(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, MetaModule meta){
+		final IBakedModule module = GetBaked(context).getOrThrow();
 		module.Dump(logger);
 		return 0;
 	}
 
-	static private int Summary(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, IBakedModule module){
+	static private int Summary(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, MetaModule meta){
+		final IBakedModule module = GetBaked(context).getOrThrow();
 		module.Summary(logger);
 		logger.Info("Data used by this module:");
 		for (ICacheKey key : module.GetCacheKeys())
@@ -360,7 +380,8 @@ extends CommandUtil
 		return 0;
 	}
 
-	static private int Walkthrough(CommandContext<FabricClientCommandSource> cmdCtx, WalktroughLogger logger, IBakedModule module, IClientEntitySelector target){
+	static private int Walkthrough(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, MetaModule meta, IClientEntitySelector target){
+		final IBakedModule module = GetBaked(context).getOrThrow();
 		ItemStack stack;
 		String itemSource;
 		Entity targetEntity = target.get();
@@ -373,7 +394,7 @@ extends CommandUtil
 			itemSource = "main-hand";
 		}
 		else
-			return Error(cmdCtx, "No elligible entity could be found.");
+			return Error(context, "No elligible entity could be found.");
 
 		logger.Info("--------");
 		logger.Info("Testing {} module {} on {} item: {} ({})",
