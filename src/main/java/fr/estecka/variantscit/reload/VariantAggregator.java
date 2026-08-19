@@ -43,15 +43,10 @@ public class VariantAggregator
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
 			for (EModuleHook hook : module.hooks())
-				this.variantLibraries.put(hook, module, InitialLibrary(module));
+				this.variantLibraries.put(hook, module, module.libraryDefinition().CreateInitialLibrary());
 
 			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
 		}
-	}
-
-	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		var fallbackModel = module.libraryDefinition().hardcodedList().get(IVariantLibrary.FALLBACK_VARIANT_ID);
-		return new VariantLibrary(fallbackModel);
 	}
 
 	public Optional<VariantLibrary> GetLibrary(EModuleHook hook, ModuleDefinition module){

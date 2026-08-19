@@ -16,6 +16,8 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import net.minecraft.resources.Identifier;
 
 
@@ -75,6 +77,7 @@ public record LibraryDefinition(
 /* ModelList Constructors                                                     */
 /******************************************************************************/
 
+	// TODO: Forbid intrinsic model redefinition.
 	static private Map<Identifier,Identifier> FromArray(List<Identifier> list){
 		Map<Identifier,Identifier> hardcoded = new HashMap<>();
 		for (Identifier id : list)
@@ -109,6 +112,15 @@ public record LibraryDefinition(
 /******************************************************************************/
 /* Asset Aggregation                                                          */
 /******************************************************************************/
+
+	/**
+	 * @return  A near-empty library  meant to  be later populated  during asset
+	 * aggregation.
+	 */
+	public VariantLibrary CreateInitialLibrary() {
+		var fallbackModel = this.hardcodedList.get(IVariantLibrary.FALLBACK_VARIANT_ID);
+		return new VariantLibrary(fallbackModel);
+	}
 
 	/**
 	 * @return If the library  accepts this assets, returns  every variant ID it

@@ -87,9 +87,13 @@ public final class ModuleLoader
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
 			var baked = EModuleHook.MapOf(
-				ctx -> result.variantAggregator.GetLibrary(ctx, definition)
+				hook -> result.variantAggregator.GetLibrary(hook, definition)
 					.map(definition.parameters()::Bake)
 					.map(module -> definition.precondition().isPresent() ? new PreconditionModule(definition.precondition().get(), module) : module)
+					.orElse(null)
+			);
+			var libraries = EModuleHook.MapOf(
+				hook -> result.variantAggregator.GetLibrary(hook, definition)
 					.orElse(null)
 			);
 
@@ -97,7 +101,9 @@ public final class ModuleLoader
 				moduleId,
 				definition.priority(),
 				targets,
+				definition.parameters(),
 				definition.libraryDefinition(),
+				libraries,
 				baked
 			);
 
