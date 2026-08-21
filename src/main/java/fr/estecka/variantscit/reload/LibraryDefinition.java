@@ -18,6 +18,7 @@ import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
+import fr.estecka.variantscit.util.VariantUtil;
 import net.minecraft.resources.Identifier;
 
 
@@ -77,7 +78,6 @@ public record LibraryDefinition(
 /* ModelList Constructors                                                     */
 /******************************************************************************/
 
-	// TODO: Forbid intrinsic model redefinition.
 	static private Map<Identifier,Identifier> FromArray(List<Identifier> list){
 		Map<Identifier,Identifier> hardcoded = new HashMap<>();
 		for (Identifier id : list)
@@ -101,7 +101,7 @@ public record LibraryDefinition(
 
 	static private DataResult<Map<Identifier,Identifier>> DisallowIntrinsic(Map<Identifier,Identifier> hardcodedList){
 		for (Identifier variantId : hardcodedList.keySet()){
-			if (variantId.getNamespace().equals(VariantsCitMod.MODID) && variantId.getPath().startsWith("intrinsic/"))
+			if (VariantUtil.IsVariantIntrinsic(variantId))
 				return DataResult.error(()->"Hardcoded model list may not override intrinsic models.");
 		}
 

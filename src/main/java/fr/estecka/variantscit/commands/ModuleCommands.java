@@ -10,11 +10,11 @@ import com.mojang.serialization.DataResult;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
-import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.EModuleHook;
 import fr.estecka.variantscit.reload.LibraryDefinition;
 import fr.estecka.variantscit.reload.MetaModule;
+import fr.estecka.variantscit.util.VariantUtil;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -147,7 +148,10 @@ extends CommandUtil
 				meta.libraryDefinition().hardcodedList().keySet(),
 				builder
 			);
-			// TODO: Add intrinsic models from the unbaked module
+			SharedSuggestionProvider.suggestResource(
+				meta.parameters().GetIntrinsicModels().stream().map(VariantUtil::IntrinsicVariantId),
+				builder
+			);
 		});
 		return builder.buildFuture();
 	}
@@ -164,7 +168,10 @@ extends CommandUtil
 				meta.libraryDefinition().hardcodedList().values(),
 				builder
 			);
-			// TODO: Add intrinsic models from the unbaked module
+			SharedSuggestionProvider.suggestResource(
+				meta.parameters().GetIntrinsicModels(),
+				builder
+			);
 		});
 		return builder.buildFuture();
 	}
@@ -226,21 +233,24 @@ extends CommandUtil
 		final Identifier variantId = context.getArgument(VARIANT_ID_ARG, Identifier.class);
 		Identifier definedModelId = libDefinition.GetModelId(variantId);
 		Identifier foundModelId = library.GetVariantModelStrict(variantId);
+		Optional<Identifier> intrinsicModelId = VariantUtil.GetIntrinsicModelId(variantId);
 		boolean isHardCoded = libDefinition.hardcodedList().containsKey(variantId);
 		boolean isPrefixCompatible = libDefinition.AcceptsVariant(variantId);
 		boolean isRejected = !meta.parameters().AcceptsVariant(variantId);
 		boolean isMissing = !isRejected && definedModelId!=null && foundModelId==null;
-		boolean isIntrinsic = IVariantLibrary.IsVariantIntrinsic(variantId);
-		
+		boolean isIntrinsic = intrinsicModelId.map(meta.parameters()::AcceptsIntrinsic).orElse(false);
+		if (isIntrinsic)
+			definedModelId = intrinsicModelId.get();
+
 		logger.Info("--------");
 		logger.Info("Looking for variant-ID {} in the {} module {}",
 			CommandLogger.ItemData(variantId),
-			logger.moduleHook,
+			CommandLogger.PackData(logger.moduleHook),
 			CommandLogger.PackData(meta.id())
 		);
 		logger.Info("----");
 
-		if (isIntrinsic) // FIXME: will apply to every posible intrincic variants
+		if (isIntrinsic)
 			logger.Info("This variant is intrinsic to this module's type or parameters.");
 		else if (isHardCoded)
 			logger.Info("This variant was hardwired to the model-ID {}", CommandLogger.PackData(definedModelId));
@@ -256,8 +266,8 @@ extends CommandUtil
 		logger.Info("--");
 
 		if (foundModelId != null){
-			logger.Info(ChatFormatting.GREEN, "The variant was found, and is bound to the model ID: {}");
-			if (foundModelId != definedModelId){
+			logger.Info(ChatFormatting.GREEN, "The variant was found, and is bound to the model ID: {}", CommandLogger.PackData(foundModelId));
+			if (!foundModelId.equals(definedModelId)){
 				logger.Error(
 					"The effective model-ID is different from the "
 					+ "requested one. Please report this issue."
@@ -315,7 +325,7 @@ extends CommandUtil
 		Set<Identifier> missingVariants = new HashSet<>();
 
 		if (isIntrinsic)
-			definedVariants.add(IVariantLibrary.IntrinsicVariantId(modelId));
+			definedVariants.add(VariantUtil.IntrinsicVariantId(modelId));
 
 		for (Identifier variantId : definedVariants){
 			if (library.HasVariantModel(variantId))
@@ -329,7 +339,7 @@ extends CommandUtil
 		logger.Info("--------");
 		logger.Info("Looking for Model ID {} in the {} module {}",
 			CommandLogger.PackData(modelId),
-			logger.moduleHook,
+			CommandLogger.PackData(logger.moduleHook),
 			CommandLogger.PackData(meta.id())
 		);
 		logger.Info("----");

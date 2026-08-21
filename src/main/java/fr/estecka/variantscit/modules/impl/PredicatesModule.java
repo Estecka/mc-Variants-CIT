@@ -1,6 +1,9 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +21,7 @@ import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
+import fr.estecka.variantscit.util.VariantUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -48,7 +52,7 @@ implements IBakedModule
 		}
 
 		static public ModelReference Intrinsic(Identifier modelId){
-			return new ModelReference(true, true, IVariantLibrary.IntrinsicVariantId(modelId), modelId);
+			return new ModelReference(true, true, VariantUtil.IntrinsicVariantId(modelId), modelId);
 		}
 
 		public ModelReference Resolve(IVariantLibrary library){
@@ -113,6 +117,16 @@ implements IBakedModule
 				if (p.model.variantId.equals(variantId))
 					return true;
 			return false;
+		}
+
+		@Override
+		public Set<Identifier> GetIntrinsicModels() {
+			return predicates.stream()
+				.filter(p -> p.model.isIntrinsic)
+				.map(p -> p.model.modelId)
+				.distinct()
+				.collect(Collectors.toSet())
+				;
 		}
 
 		@Override
