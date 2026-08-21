@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.trims;
+package fr.estecka.variantscit.hooks;
 
 import java.util.Optional;
 import com.mojang.serialization.Codec;

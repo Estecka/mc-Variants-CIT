@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.hooks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
 
 public class EquippableCache

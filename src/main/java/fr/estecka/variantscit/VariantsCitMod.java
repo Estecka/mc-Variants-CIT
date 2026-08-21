@@ -5,6 +5,7 @@ import net.minecraft.resources.Identifier;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleTreeCommands;
+import fr.estecka.variantscit.hooks.EquippableCache;
 import fr.estecka.variantscit.commands.ModuleCommands;
 
 
