@@ -16,7 +16,7 @@ import fr.estecka.variantscit.modules.PreconditionModule;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import fr.estecka.variantscit.collections.HashMap3;
+import fr.estecka.variantscit.util.collections.HashMap3;
 
 
 public final class ModuleLoader

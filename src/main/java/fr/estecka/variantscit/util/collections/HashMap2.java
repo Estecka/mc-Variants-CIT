@@ -1,23 +1,23 @@
-package fr.estecka.variantscit.collections;
+package fr.estecka.variantscit.util.collections;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class IdentityHashMap2<K1,K0,V>
-extends IdentityHashMap<K1, Map<K0, V>>
+public class HashMap2<K1,K0,V>
+extends HashMap<K1, Map<K0, V>>
 implements Map2<K1,K0,V>
 {
 	private final Supplier<Map<K0,V>> subFactory;
 
-	public IdentityHashMap2(Supplier<Map<K0,V>> subFactory){
+	public HashMap2(Supplier<Map<K0,V>> subFactory){
 		Objects.requireNonNull(subFactory);
 		this.subFactory = subFactory;
 	}
 
-	public IdentityHashMap2(){
-		this(IdentityHashMap::new);
+	public HashMap2(){
+		this(HashMap::new);
 	}
 
 	@Override

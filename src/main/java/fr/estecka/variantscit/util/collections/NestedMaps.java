@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.collections;
+package fr.estecka.variantscit.util.collections;
 
 import java.util.Map;
 import java.util.function.Function;
