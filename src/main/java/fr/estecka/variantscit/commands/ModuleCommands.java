@@ -318,16 +318,19 @@ extends CommandUtil
 		final LibraryDefinition libDefinition = meta.libraryDefinition();
 		final Identifier modelId = context.getArgument(MODEL_ID_ARG, Identifier.class);
 		boolean isIntrinsic = meta.parameters().AcceptsIntrinsic(modelId);
-		boolean matchesPrefix = libDefinition.modelPrefix().map(prefix -> modelId.getPath().startsWith(prefix)).orElse(false);
-		Set<Identifier> definedVariants = meta.libraryDefinition().GetVariantIds(modelId);
+		Optional<Identifier> unprefixedVariant = libDefinition.modelPrefix().flatMap(prefix -> VariantUtil.RemovePrefix(modelId, prefix));
+		Set<Identifier> candidateVariantIds = meta.libraryDefinition().GetVariantIds(modelId);
 		Set<Identifier> foundvariants = new HashSet<>();
 		Set<Identifier> rejectedVariants = new HashSet<>();
 		Set<Identifier> missingVariants = new HashSet<>();
+		boolean hasHardcodedOverride = unprefixedVariant.map(v -> libDefinition.hardcodedList().containsKey(v)).orElse(false);
 
+		if (unprefixedVariant.isPresent() && !hasHardcodedOverride)
+			candidateVariantIds.add(unprefixedVariant.get());
 		if (isIntrinsic)
-			definedVariants.add(VariantUtil.IntrinsicVariantId(modelId));
+			candidateVariantIds.add(VariantUtil.IntrinsicVariantId(modelId));
 
-		for (Identifier variantId : definedVariants){
+		for (Identifier variantId : candidateVariantIds){
 			if (library.HasVariantModel(variantId))
 				foundvariants.add(variantId);
 			else if (!meta.parameters().AcceptsVariant(variantId))
@@ -344,10 +347,10 @@ extends CommandUtil
 		);
 		logger.Info("----");
 
-		logger.Info("This model was bound to {} variants out of {} requested.", foundvariants.size(), definedVariants.size());
+		logger.Info("This model was bound to {} variants out of {} candidates.", foundvariants.size(), candidateVariantIds.size());
 		if (isIntrinsic)
 			logger.Info("This model is intrinsic to this module type, or was defined in the module's parameters.");
-		if (matchesPrefix) // TODO: indicate when those are rejected
+		if (unprefixedVariant.isEmpty())
 			logger.Info("This model matches the model prefix.");
 		if (meta.libraryDefinition().hardcodedList().containsValue(modelId))
 			logger.Info("This model was listed in the hardcoded model list.");

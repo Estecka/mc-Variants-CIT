@@ -36,4 +36,11 @@ public final class VariantUtil
 
 		return Optional.ofNullable(result);
 	}
+
+	static public Optional<Identifier> RemovePrefix(Identifier id, String prefix){
+		if (!id.getPath().startsWith(prefix))
+			return Optional.empty();
+
+		return Optional.of(id.withPath(path -> path.substring(prefix.length())));
+	}
 }
