@@ -2,24 +2,25 @@ package fr.estecka.variantscit.modules.libraries;
 
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.util.VariantUtil;
 
 public interface IVariantLibrary
 {
-	static public Identifier FALLBACK_VARIANT_ID = VariantsCitMod.Identifier("fallback");
+	static public Identifier FALLBACK_VARIANT_ID = VariantUtil.FALLBACK_VARIANT_ID;
 
+	@Deprecated
 	static public Identifier SpecialVariantId(String specialName){
-		return VariantsCitMod.Identifier("special/"+specialName);
+		return VariantUtil.SpecialVariantId(specialName);
 	}
 
+	@Deprecated
 	static public Identifier IntrinsicVariantId(Identifier modelId){
-		return VariantsCitMod.Identifier("intrinsic/"+modelId.getNamespace()+"/"+modelId.getPath());
+		return VariantUtil.IntrinsicVariantId(modelId);
 	}
 
+	@Deprecated
 	static public boolean IsVariantIntrinsic(Identifier variantId){
-		return variantId.getNamespace().equals(VariantsCitMod.MODID)
-		    && variantId.getPath().startsWith("intrinsic/")
-		    ;
+		return VariantUtil.IsVariantIntrinsic(variantId);
 	}
 
 	/**
