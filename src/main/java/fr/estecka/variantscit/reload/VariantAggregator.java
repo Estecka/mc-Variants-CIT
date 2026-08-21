@@ -19,8 +19,8 @@ import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
-import fr.estecka.variantscit.collections.HashBiMap;
-import fr.estecka.variantscit.collections.IBiMap;
+import fr.estecka.variantscit.collections.HashMap2;
+import fr.estecka.variantscit.collections.Map2;
 import fr.estecka.variantscit.collections.NestedMaps;
 
 public class VariantAggregator
@@ -32,7 +32,7 @@ public class VariantAggregator
 
 	private final Map<ModuleDefinition, Identifier> moduleIds = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
-	private final IBiMap<EModuleHook, ModuleDefinition, VariantLibrary> variantLibraries = NestedMaps.Create(HashBiMap::new, IdentityHashMap::new);
+	private final Map2<EModuleHook, ModuleDefinition, VariantLibrary> variantLibraries = NestedMaps.Create(HashMap2::new, IdentityHashMap::new);
 
 	public final Map<Identifier, GeneratedAsset> generatedAssets = new HashMap<>();
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();

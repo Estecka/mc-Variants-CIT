@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class HashTriMap<K2,K1,K0,V>
-extends HashBiMap<K2, K1, Map<K0, V>>
+public class HashMap3<K2,K1,K0,V>
+extends HashMap2<K2, K1, Map<K0, V>>
 {
 	public V get(K2 key2, K1 key1, K0 key0){
 		var submap = this.get(key2, key1);

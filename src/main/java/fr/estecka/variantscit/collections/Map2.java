@@ -3,7 +3,7 @@ package fr.estecka.variantscit.collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public interface IBiMap<K1,K0,V>
+public interface Map2<K1,K0,V>
 extends Map<K1, Map<K0, V>>
 {
 	Map<K0, V> CreateSubMap(K1 key);

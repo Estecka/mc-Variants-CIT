@@ -16,14 +16,14 @@ import fr.estecka.variantscit.modules.PreconditionModule;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import fr.estecka.variantscit.collections.HashTriMap;
+import fr.estecka.variantscit.collections.HashMap3;
 
 
 public final class ModuleLoader
 {
 	static public class Result {
 		/** Sorted by hook, target, and priority. */
-		public final HashTriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new HashTriMap<>();
+		public final HashMap3<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new HashMap3<>();
 
 		public final Map<Identifier, MetaModule> uniqueModules = new HashMap<>();
 		public final Map<Identifier, String> moduleErrors;

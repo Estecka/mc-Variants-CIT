@@ -5,18 +5,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class IdentityBiMap<K1,K0,V>
+public class IdentityHashMap2<K1,K0,V>
 extends IdentityHashMap<K1, Map<K0, V>>
-implements IBiMap<K1,K0,V>
+implements Map2<K1,K0,V>
 {
 	private final Supplier<Map<K0,V>> subFactory;
 
-	public IdentityBiMap(Supplier<Map<K0,V>> subFactory){
+	public IdentityHashMap2(Supplier<Map<K0,V>> subFactory){
 		Objects.requireNonNull(subFactory);
 		this.subFactory = subFactory;
 	}
 
-	public IdentityBiMap(){
+	public IdentityHashMap2(){
 		this(IdentityHashMap::new);
 	}
 
