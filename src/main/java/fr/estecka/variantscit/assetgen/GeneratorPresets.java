@@ -15,6 +15,7 @@ public final class GeneratorPresets
 	static private final String DIRECTORY = "variants-cit/assetgen_presets";
 	static private final String EXTENSION = ".json";
 
+	// TODO: Use ReloadableRepository
 	static private final Map<Identifier, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
 	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, BAKED_PRESETS);
 
