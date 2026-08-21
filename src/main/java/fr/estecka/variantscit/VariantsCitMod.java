@@ -3,6 +3,7 @@ package fr.estecka.variantscit;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.resources.Identifier;
 import fr.estecka.variantscit.reload.ModuleLoader;
+import fr.estecka.variantscit.util.LabelledLogger;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleTreeCommands;
 import fr.estecka.variantscit.hooks.EquippableCache;

@@ -1,16 +1,18 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.util;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.function.BiConsumer;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fr.estecka.variantscit.VariantsCitMod;
 
 public class LabelledLogger
 {
-	public final org.slf4j.Logger logger = LoggerFactory.getLogger(VariantsCitMod.MODID);
+	public final Logger logger = LoggerFactory.getLogger(VariantsCitMod.MODID);
 	private final Stack<Object> labels = new Stack<>();
 
-	public org.slf4j.Logger Unlabelled(){
+	public Logger Unlabelled(){
 		return this.logger;
 	}
 
