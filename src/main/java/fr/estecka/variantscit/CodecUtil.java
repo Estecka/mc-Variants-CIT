@@ -42,7 +42,7 @@ public final class CodecUtil
 	static public final Codec<String> LEGACY_ITEM_PATH = IDENTIFIER_PATH.validate(CodecUtil::UnItemify);
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isValidNamespace(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 	@Deprecated
-	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(CodecUtil.NonEmptyString("<unspecified> string"));
+	static public final Codec<String> NONEMPTY_STRING = CodecUtil.NonEmptyStringCodec("<unspecified>");
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 	static public final Codec<Tag> NBT_ELEMENT = Codec.PASSTHROUGH.xmap( dyn->dyn.convert(NbtOps.INSTANCE).getValue(), nbt->new Dynamic<>(NbtOps.INSTANCE, nbt.copy()) );
@@ -97,14 +97,18 @@ public final class CodecUtil
 		return DataResult.success(Identifier.fromNamespaceAndPath(original.getNamespace(), UnItemifyRaw(original.getPath())));
 	}
 
-	static public DataResult<String> NonEmptyString(String string, String stringName){
+	static public DataResult<String> ValidateNonEmptyString(String string, String stringName){
 		return string.isEmpty() ?
 			DataResult.error(()->stringName+" cannot be empty.") :
 			DataResult.success(string);
 	}
 
 	static public Function<String,DataResult<String>> NonEmptyString(String stringName){
-		return string -> NonEmptyString(string, stringName);
+		return string -> ValidateNonEmptyString(string, stringName);
+	}
+
+	static public Codec<String> NonEmptyStringCodec(String stringName){
+		return Codec.STRING.validate(NonEmptyString(stringName));
 	}
 
 

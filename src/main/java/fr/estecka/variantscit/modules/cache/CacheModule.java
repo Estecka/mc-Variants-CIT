@@ -91,8 +91,10 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	/**
-	 * TODO: As-is, an entry where all registered components are null will never
-	 * expire. This is limited to one entry per cache, so it is negligible.
+	 * @implNote As-is, an entry  where all registered components  are null will
+	 * never  expire. This is limited  to one entry  per cache  though, so it is
+	 * negligible, and such  an entry will probably remain useful for the entire 
+	 * lifetime of the module.
 	 */
 	private CacheEntry CreateEntry(int hash, ItemStack stack, Identifier variant){
 		WeakReference<?>[] weakRefs = new WeakReference[properties.length];

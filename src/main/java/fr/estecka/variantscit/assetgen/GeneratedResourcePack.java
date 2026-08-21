@@ -43,7 +43,7 @@ implements PackResources
 	static private final PackSelectionConfig POSITION = new PackSelectionConfig(true, Position.BOTTOM, true);
 	static private final Metadata METADATA = new Metadata(PACK_DESC, PackCompatibility.COMPATIBLE, FeatureFlagSet.of(), List.of());
 	static private final PackMetadataSection PACK_METADATA = new PackMetadataSection(
-		Component.literal("PackMetadata"), // TODO: Figure out what this does.
+		PACK_DESC,
 		SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES),
 		Optional.empty()
 	);
