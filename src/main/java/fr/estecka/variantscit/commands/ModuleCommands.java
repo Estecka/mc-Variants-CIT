@@ -243,7 +243,7 @@ extends CommandUtil
 		if (isIntrinsic)
 			modelIdCandidate = intrinsicModelId.get();
 
-		boolean isMissing = modelIdFound==null && modelIdCandidate!=null && isCompatibleModule && isCompatiblePrefix;
+		boolean isMissing = modelIdFound==null && modelIdCandidate!=null && isCompatibleModule;
 
 		logger.Info("--------");
 		logger.Info("Looking for variant-ID {} in the {} module {}",
@@ -286,7 +286,7 @@ extends CommandUtil
 				CommandLogger.PackData(modelIdCandidate)
 			);
 		}
-		else if (isCompatibleModule){
+		else if (!isCompatibleModule){
 			logger.Info(ChatFormatting.GOLD,
 				"The variant-ID {} was rejected because it is incompatible with "
 				+ "this module's type or parameters.",
@@ -352,7 +352,7 @@ extends CommandUtil
 
 		logger.Info("This model was bound to {} variants out of {} candidates.", foundvariants.size(), candidateVariantIds.size());
 		if (isIntrinsic)
-			logger.Info("This model is intrinsic to this module type, or was defined in the module's parameters.");
+			logger.Info("This model is intrinsic to this module type or parameters.");
 		if (unprefixedVariant.isPresent())
 			logger.Info("This model matches the model prefix.");
 		if (meta.libraryDefinition().hardcodedList().containsValue(modelId))
