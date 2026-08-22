@@ -220,7 +220,7 @@ extends CommandUtil
 		module.Summary(logger);
 		logger.Info("Data used by this module:");
 		for (ICacheKey key : module.GetCacheKeys())
-			logger.Info(" - {}", CommandLogger.PackData(key.toString()));
+			logger.Info(" • {}", CommandLogger.PackData(key.toString()));
 		if (module.GetCacheKeys().isEmpty())
 			logger.Error("[ERR] This module does not declare any data or component.");
 
@@ -366,7 +366,7 @@ extends CommandUtil
 				+ "following variant-IDs:"
 			);
 			for (Identifier id : foundvariants)
-				logger.Info(" - {}", CommandLogger.ItemData(id));
+				logger.Info(" • {}", CommandLogger.ItemData(id));
 		}
 		else if (missingVariants.size() <= 0){
 			logger.Info(ChatFormatting.GOLD, 
@@ -381,7 +381,7 @@ extends CommandUtil
 				+ "incompatible with this module's type or parameters:"
 			);
 			for (Identifier id : rejectedVariants)
-				logger.Info(" - {}", CommandLogger.ItemData(id));
+				logger.Info(" • {}", CommandLogger.ItemData(id));
 		}
 
 		if (missingVariants.size() > 0 ){
@@ -398,7 +398,7 @@ extends CommandUtil
 				);
 
 			for (Identifier id : missingVariants) {
-				logger.Info(" - {}", CommandLogger.ItemData(id));
+				logger.Info(" • {}", CommandLogger.ItemData(id));
 			}
 		}
 
