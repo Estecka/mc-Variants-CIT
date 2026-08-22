@@ -353,7 +353,7 @@ extends CommandUtil
 		logger.Info("This model was bound to {} variants out of {} candidates.", foundvariants.size(), candidateVariantIds.size());
 		if (isIntrinsic)
 			logger.Info("This model is intrinsic to this module type, or was defined in the module's parameters.");
-		if (unprefixedVariant.isEmpty())
+		if (unprefixedVariant.isPresent())
 			logger.Info("This model matches the model prefix.");
 		if (meta.libraryDefinition().hardcodedList().containsValue(modelId))
 			logger.Info("This model was listed in the hardcoded model list.");
