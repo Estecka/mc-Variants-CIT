@@ -231,16 +231,19 @@ extends CommandUtil
 		final VariantLibrary library = GetLibrary(context).getOrThrow();
 		final LibraryDefinition libDefinition = meta.libraryDefinition();
 		final Identifier variantId = context.getArgument(VARIANT_ID_ARG, Identifier.class);
-		Identifier definedModelId = libDefinition.GetModelId(variantId);
-		Identifier foundModelId = library.GetVariantModelStrict(variantId);
+
 		Optional<Identifier> intrinsicModelId = VariantUtil.GetIntrinsicModelId(variantId);
+		Identifier modelIdCandidate = libDefinition.GetModelId(variantId);
+		Identifier modelIdFound = library.GetVariantModelStrict(variantId);
+
 		boolean isHardCoded = libDefinition.hardcodedList().containsKey(variantId);
-		boolean isPrefixCompatible = libDefinition.AcceptsVariant(variantId);
-		boolean isRejected = !meta.parameters().AcceptsVariant(variantId);
-		boolean isMissing = !isRejected && definedModelId!=null && foundModelId==null;
+		boolean isCompatiblePrefix = libDefinition.AcceptsVariant(variantId);
+		boolean isCompatibleModule = !meta.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID);
 		boolean isIntrinsic = intrinsicModelId.map(meta.parameters()::AcceptsIntrinsic).orElse(false);
 		if (isIntrinsic)
-			definedModelId = intrinsicModelId.get();
+			modelIdCandidate = intrinsicModelId.get();
+
+		boolean isMissing = modelIdFound==null && modelIdCandidate!=null && isCompatibleModule && isCompatiblePrefix;
 
 		logger.Info("--------");
 		logger.Info("Looking for variant-ID {} in the {} module {}",
@@ -253,8 +256,8 @@ extends CommandUtil
 		if (isIntrinsic)
 			logger.Info("This variant is intrinsic to this module's type or parameters.");
 		else if (isHardCoded)
-			logger.Info("This variant was hardwired to the model-ID {}", CommandLogger.PackData(definedModelId));
-		else if (isPrefixCompatible && libDefinition.modelPrefix().isPresent()){
+			logger.Info("This variant was hardwired to the model-ID {}", CommandLogger.PackData(modelIdCandidate));
+		else if (isCompatiblePrefix && libDefinition.modelPrefix().isPresent()){
 			logger.Info(
 				"This variant was combined with the modelPrefix, and leads to the model-ID: {}",
 				CommandLogger.PackData(variantId.withPrefix(libDefinition.modelPrefix().get()))
@@ -265,14 +268,14 @@ extends CommandUtil
 
 		logger.Info("--");
 
-		if (foundModelId != null){
-			logger.Info(ChatFormatting.GREEN, "The variant was found, and is bound to the model ID: {}", CommandLogger.PackData(foundModelId));
-			if (!foundModelId.equals(definedModelId)){
+		if (modelIdFound != null){
+			logger.Info(ChatFormatting.GREEN, "The variant was found, and is bound to the model ID: {}", CommandLogger.PackData(modelIdFound));
+			if (!modelIdFound.equals(modelIdCandidate)){
 				logger.Error(
 					"The effective model-ID is different from the "
 					+ "requested one. Please report this issue."
-					+ "\nDefined model-ID: {}",
-					CommandLogger.PackData(definedModelId)
+					+ "\nRequested model-ID: {}",
+					CommandLogger.PackData(modelIdCandidate)
 				);
 			}
 		}
@@ -280,34 +283,34 @@ extends CommandUtil
 			logger.Info(ChatFormatting.GOLD,
 				"The model-ID {}, appears ot be missing or the module does not "
 				+ "have the necessary assetGen or modelParent options.",
-				CommandLogger.PackData(definedModelId)
+				CommandLogger.PackData(modelIdCandidate)
 			);
 		}
-		else if (isRejected){
+		else if (isCompatibleModule){
 			logger.Info(ChatFormatting.GOLD,
 				"The variant-ID {} was rejected because it is incompatible with "
 				+ "this module's type or parameters.",
 				CommandLogger.ItemData(variantId)
 			);
 		}
-		else if (!isHardCoded && !isPrefixCompatible && libDefinition.modelPrefix().isPresent()){
+		else if (!isHardCoded && !isCompatiblePrefix && libDefinition.modelPrefix().isPresent()){
 			logger.Info(ChatFormatting.GOLD,
 				"The variant-ID {} was rejected because it does no match this module's"
 				+ "modelNamespace or modelPathes options.",
 				CommandLogger.ItemData(variantId)
 			);
 		}
-		else if (definedModelId == null){
-			logger.Info("No model-Id was found for this variant, but I'm unsure as to why.");
+		else if (modelIdCandidate == null){
+			logger.Info("No model-Id was found for this variant, but I'm unsure as to why. Please report this issue.");
 		}
 		else {
-			logger.Error("This variant is not present in this module, but I'm unsure as to why.");
+			logger.Error("This variant is not present in this module, but I'm unsure as to why. Please report this issue.");
 		}
 
 		
-		if (definedModelId != null) {
+		if (modelIdCandidate != null) {
 			logger.Info("--");
-			logger.PrintPlainModelTip(definedModelId);
+			logger.PrintPlainModelTip(modelIdCandidate);
 		}
 
 		return 0;
