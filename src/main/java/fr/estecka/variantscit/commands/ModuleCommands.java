@@ -238,7 +238,7 @@ extends CommandUtil
 
 		boolean isHardCoded = libDefinition.hardcodedList().containsKey(variantId);
 		boolean isCompatiblePrefix = libDefinition.AcceptsVariant(variantId);
-		boolean isCompatibleModule = !meta.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID);
+		boolean isCompatibleModule = meta.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID);
 		boolean isIntrinsic = intrinsicModelId.map(meta.parameters()::AcceptsIntrinsic).orElse(false);
 		if (isIntrinsic)
 			modelIdCandidate = intrinsicModelId.get();
