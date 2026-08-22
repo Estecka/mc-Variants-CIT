@@ -20,6 +20,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -281,7 +282,7 @@ extends CommandUtil
 		}
 		else if (isMissing){
 			logger.Info(ChatFormatting.GOLD,
-				"The model-ID {}, appears ot be missing or the module does not "
+				"The model-ID {} appears ot be missing, or the module does not "
 				+ "have the necessary assetGen or modelParent options.",
 				CommandLogger.PackData(modelIdCandidate)
 			);
@@ -310,7 +311,11 @@ extends CommandUtil
 		
 		if (modelIdCandidate != null) {
 			logger.Info("--");
-			logger.PrintPlainModelTip(modelIdCandidate);
+			logger.Info(ChatFormatting.GRAY,
+				"The model-ID {} may correspond to any of these files:",
+				CommandLogger.ItemData(modelIdCandidate)
+			);
+			logger.PrintFileNamesTip("", modelIdCandidate);
 		}
 
 		return 0;
@@ -320,15 +325,19 @@ extends CommandUtil
 		final VariantLibrary library = GetLibrary(context).getOrThrow();
 		final LibraryDefinition libDefinition = meta.libraryDefinition();
 		final Identifier modelId = context.getArgument(MODEL_ID_ARG, Identifier.class);
-		boolean isIntrinsic = meta.parameters().AcceptsIntrinsic(modelId);
 		Optional<Identifier> unprefixedVariant = libDefinition.modelPrefix().flatMap(prefix -> VariantUtil.RemovePrefix(modelId, prefix));
 		Set<Identifier> candidateVariantIds = meta.libraryDefinition().GetVariantIds(modelId);
 		Set<Identifier> foundvariants = new HashSet<>();
 		Set<Identifier> rejectedVariants = new HashSet<>();
 		Set<Identifier> missingVariants = new HashSet<>();
-		boolean hasHardcodedOverride = unprefixedVariant.map(v -> libDefinition.hardcodedList().containsKey(v)).orElse(false);
 
-		if (unprefixedVariant.isPresent() && !hasHardcodedOverride)
+		boolean isIntrinsic = meta.parameters().AcceptsIntrinsic(modelId);
+		boolean isHardCoded = meta.libraryDefinition().hardcodedList().containsValue(modelId);
+		boolean matchesPrefix = unprefixedVariant.isPresent();
+		boolean isPrefixOverriden = unprefixedVariant.map(variantId -> libDefinition.hardcodedList().containsKey(variantId)).orElse(false);
+		boolean isPrefixCompatible = unprefixedVariant.map(variantId -> libDefinition.AcceptsVariant(variantId)).orElse(false);
+
+		if (unprefixedVariant.isPresent() && !isPrefixOverriden)
 			candidateVariantIds.add(unprefixedVariant.get());
 		if (isIntrinsic)
 			candidateVariantIds.add(VariantUtil.IntrinsicVariantId(modelId));
@@ -349,15 +358,30 @@ extends CommandUtil
 			CommandLogger.PackData(meta.id())
 		);
 		logger.Info("----");
+		{
+			Component yesText = Component.literal("yes").withStyle(ChatFormatting.GREEN);
+			Component noText  = Component.literal("no").withStyle(ChatFormatting.RED);
+			
+			Component intrinsicText = (isIntrinsic) ? yesText : noText;
+			Component hardcodedText = Component
+				.literal(String.valueOf(
+					libDefinition.hardcodedList().values().stream().filter(id->id.equals(modelId)).count()
+				)+" ocurrences")
+				.withStyle(isHardCoded ? ChatFormatting.GREEN : ChatFormatting.RED)
+				;
+			Component prefixText =
+				(!libDefinition.modelPrefix().isPresent()) ? Component.literal("no prefix").withStyle(ChatFormatting.RED) :
+				(!matchesPrefix) ? Component.literal("doesn't match").withStyle(ChatFormatting.RED) :
+				(isPrefixOverriden) ? Component.literal("overriden by modelList").withStyle(ChatFormatting.GOLD) :
+				(!isPrefixCompatible) ? Component.literal("rejected by model filters").withStyle(ChatFormatting.GOLD) :
+				Component.literal("matches").withStyle(ChatFormatting.GREEN)
+				;
 
-		logger.Info("This model was bound to {} variants out of {} candidates.", foundvariants.size(), candidateVariantIds.size());
-		if (isIntrinsic)
-			logger.Info("This model is intrinsic to this module type or parameters.");
-		if (unprefixedVariant.isPresent())
-			logger.Info("This model matches the model prefix.");
-		if (meta.libraryDefinition().hardcodedList().containsValue(modelId))
-			logger.Info("This model was listed in the hardcoded model list.");
-
+			logger.Info("Intrinsic: {}", intrinsicText);
+			logger.Info("Model list: {}", hardcodedText);
+			logger.Info("Model prefix: {}", prefixText);
+			logger.Info("This model was bound to {} variants out of {} candidates.", foundvariants.size(), candidateVariantIds.size());
+		}
 		logger.Info("--");
 
 		if (foundvariants.size() > 0){
@@ -403,7 +427,11 @@ extends CommandUtil
 		}
 
 		logger.Info("--");
-		logger.PrintPlainModelTip(modelId);
+		logger.Info(ChatFormatting.GRAY,
+			"The model-ID {} may correspond to any of these files:",
+			CommandLogger.ItemData(modelId)
+		);
+		logger.PrintFileNamesTip("", modelId);
 		return 0;
 	}
 
