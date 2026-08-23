@@ -20,13 +20,6 @@ extends ICacheKey.Cacheable
 	void Dump(CommandLogger logger);
 	Identifier Walkthrough(WalktroughLogger logger, ItemStack stack);
 
-	static public IBakedModule OfList(List<? extends IBakedModule> modules){
-		if (modules.size() == 1)
-			return modules.get(0);
-		else
-			return new ModuleList(modules);
-	}
-
 	/**
 	 * @return Wether the module has printed any custom information about the variant ID
 	 */

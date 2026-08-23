@@ -3,7 +3,9 @@ package fr.estecka.variantscit.modules;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
@@ -24,6 +26,9 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	public IBakedModule UnwrapIfSingle(){
+		if (this.isEmpty())
+			VariantsCitMod.LOGGER.error("Empty module list {}", ExceptionUtils.getStackTrace(new IllegalArgumentException()));
+
 		if (this.size() == 1)
 			return this.getFirst();
 		else
