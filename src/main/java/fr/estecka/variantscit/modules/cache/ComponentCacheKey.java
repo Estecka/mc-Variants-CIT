@@ -3,7 +3,7 @@ package fr.estecka.variantscit.modules.cache;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.itemdata.containers.ComponentContainer;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import net.minecraft.core.component.DataComponentType;

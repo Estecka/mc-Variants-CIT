@@ -13,7 +13,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.PreconditionModule;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.util.collections.HashMap3;

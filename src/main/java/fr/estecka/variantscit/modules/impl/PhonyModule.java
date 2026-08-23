@@ -7,7 +7,7 @@ import java.util.Set;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;

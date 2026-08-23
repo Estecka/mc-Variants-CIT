@@ -20,6 +20,7 @@ import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.impl.*;
 import fr.estecka.variantscit.modules.libraries.*;
 import fr.estecka.variantscit.reload.IUnbakedModule;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.util.DecodableRegistry;
 
 
