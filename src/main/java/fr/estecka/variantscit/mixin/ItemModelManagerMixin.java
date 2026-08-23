@@ -23,9 +23,9 @@ public class ItemModelManagerMixin
 	{
 		Identifier modelId = null;
 		
-		VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+		VariantsCitMod.LOGGER.labels.push(stack.getItem());
 		modelId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.ITEM_MODEL, stack);
-		VariantsCitMod.LOGGER.PopLabel();
+		VariantsCitMod.LOGGER.labels.pop();
 
 		if (modelId == null)
 			return original.call(stack, type);

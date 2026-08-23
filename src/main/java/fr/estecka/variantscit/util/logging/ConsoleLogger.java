@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 public class ConsoleLogger
 {
 	public final Logger logger;
-	private final LogLabelStack labels = new LogLabelStack();
+	public final LogLabelStack labels = new LogLabelStack();
 
 	public ConsoleLogger(String name){
 		this.logger = LoggerFactory.getLogger(name);
@@ -14,21 +14,6 @@ public class ConsoleLogger
 
 	public Logger Unlabelled(){
 		return this.logger;
-	}
-
-	@Deprecated
-	public void PushLabel(Object tag){
-		labels.push(tag);
-	}
-
-	@Deprecated
-	public void PopLabel(){
-		labels.pop();
-	}
-
-	@Deprecated
-	public void ClearLabels(){
-		labels.clear();
 	}
 
 	public void info (String format, Object... args){ logger.info (labels.AddLabels(format), args); }

@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
@@ -19,6 +18,7 @@ import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.util.VariantUtil;
 import fr.estecka.variantscit.util.collections.HashMap2;
 import fr.estecka.variantscit.util.collections.Map2;
 import fr.estecka.variantscit.util.collections.NestedMaps;
@@ -94,7 +94,7 @@ public class VariantAggregator
 		{
 			ModuleDefinition module = entry.getKey();
 			VariantLibrary library = entry.getValue();
-			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
+			VariantsCitMod.LOGGER.labels.push(moduleIds.get(module));
 
 			this.ApplyModelToModule(assetType.isFundamental, module, library, modelId);
 
@@ -110,7 +110,7 @@ public class VariantAggregator
 				}
 			}
 
-			VariantsCitMod.LOGGER.PopLabel();
+			VariantsCitMod.LOGGER.labels.pop();
 		}
 	}
 
@@ -123,7 +123,7 @@ public class VariantAggregator
 
 		Set<Identifier> variants = module.libraryDefinition().GetVariantIds(modelId);
 		if (module.parameters().AcceptsIntrinsic(modelId))
-			variants.add(IVariantLibrary.IntrinsicVariantId(modelId));
+			variants.add(VariantUtil.IntrinsicVariantId(modelId));
 
 		for (Identifier variantId : variants)
 		if  (module.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID))

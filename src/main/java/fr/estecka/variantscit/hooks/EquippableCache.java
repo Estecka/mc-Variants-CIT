@@ -61,9 +61,9 @@ public class EquippableCache
 			return original;
 		}
 
-		VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+		VariantsCitMod.LOGGER.labels.push(stack.getItem());
 		Identifier assetId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.EQUIPPABLE, stack);
-		VariantsCitMod.LOGGER.PopLabel();
+		VariantsCitMod.LOGGER.labels.pop();
 
 		if (assetId == null)
 			return original;

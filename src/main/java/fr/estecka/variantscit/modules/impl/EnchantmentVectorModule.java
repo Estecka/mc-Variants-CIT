@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules.impl;
 
-import java.security.KeyStore.Entry;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -227,7 +226,7 @@ implements IBakedModule
 	}
 
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, DataComponentType<ItemEnchantments> component){
-		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
+		VariantsCitMod.LOGGER.labels.push("enchantment_vector");
 		this.params = params;
 		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
@@ -273,7 +272,7 @@ implements IBakedModule
 			modelLine.AddEntry(magnitudeGetter.applyAsInt(vector), new VariantEntry(vector, variant.getValue()));
 		}
 
-		VariantsCitMod.LOGGER.PopLabel();
+		VariantsCitMod.LOGGER.labels.pop();
 	}
 
 	static private LinearSnapMap<VariantEntry> OrderedSnapMap(List<ToIntFunction<EnchantVector>> ordering){
