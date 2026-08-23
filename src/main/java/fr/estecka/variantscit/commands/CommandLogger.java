@@ -3,6 +3,7 @@ package fr.estecka.variantscit.commands;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.context.CommandContext;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.util.logging.LogLabelStack;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -12,6 +13,7 @@ import net.minecraft.network.chat.MutableComponent;
 public class CommandLogger
 {
 	public final CommandContext<FabricClientCommandSource> commandContext;
+	public final LogLabelStack labels = new LogLabelStack();
 
 	public CommandLogger(CommandContext<FabricClientCommandSource> commandContext){
 		this.commandContext = commandContext;
@@ -68,7 +70,7 @@ public class CommandLogger
 	}
 
 	public void Info(Component message){
-		commandContext.getSource().sendFeedback(message);
+		commandContext.getSource().sendFeedback(labels.AddLabels(message));
 	}
 
 
@@ -85,7 +87,7 @@ public class CommandLogger
 	}
 
 	public void Error(Component message){
-		commandContext.getSource().sendError(message);
+		commandContext.getSource().sendError(labels.AddLabels(message));
 	}
 
 

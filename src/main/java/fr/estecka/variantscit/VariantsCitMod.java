@@ -3,7 +3,7 @@ package fr.estecka.variantscit;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.resources.Identifier;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import fr.estecka.variantscit.util.LabelledLogger;
+import fr.estecka.variantscit.util.logging.ConsoleLogger;
 import fr.estecka.variantscit.commands.AssetGenCommands;
 import fr.estecka.variantscit.commands.ModuleTreeCommands;
 import fr.estecka.variantscit.hooks.EquippableCache;
@@ -14,7 +14,7 @@ public class VariantsCitMod
 implements ClientModInitializer
 {
 	static public final String MODID = "variants-cit";
-	public static final LabelledLogger LOGGER = new LabelledLogger();
+	public static final ConsoleLogger LOGGER = new ConsoleLogger(MODID);
 
 	static public final EquippableCache EQUIPABLES = new EquippableCache();
 	static private ModuleRepository MODULES = new ModuleRepository();
