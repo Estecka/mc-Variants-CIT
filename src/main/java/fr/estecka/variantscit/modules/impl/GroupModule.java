@@ -7,6 +7,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
+import fr.estecka.variantscit.commands.BufferedCommandLogger;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
@@ -130,9 +131,34 @@ implements IBakedModule
 		int i = 0;
 		for (IBakedModule m : submodules) {
 			logger.Info("### Submodule [{}]", i++);
+			logger.labels.push(i);
 			m.Summary(logger);
+			logger.labels.pop();
 			logger.Info("-");
 		}
+	}
+
+	@Override
+	public boolean VariantIdInfo(CommandLogger logger, Identifier variantId) {
+		BufferedCommandLogger buffer = new BufferedCommandLogger(logger.commandContext);
+		boolean result = false;
+
+		int i = 0;
+		for (IBakedModule m : submodules) {
+			boolean r = m.VariantIdInfo(buffer, variantId);
+			result |= r;
+
+			if (!buffer.IsEmpty()) {
+				logger.Info("### Submodule [{}]", i);
+				logger.labels.push(i);
+				buffer.Flush(logger);
+				logger.labels.pop();
+			}
+
+			++i;
+		}
+
+		return result;
 	}
 
 	@Override
