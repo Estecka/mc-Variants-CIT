@@ -475,7 +475,7 @@ implements IBakedModule
 
 		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
-			logger.Info(" - {}", CommandLogger.ItemData(id));
+			logger.Info(" • {}", CommandLogger.ItemData(id));
 	}
 
 	@Override

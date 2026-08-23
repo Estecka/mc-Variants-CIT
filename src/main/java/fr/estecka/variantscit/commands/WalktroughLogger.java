@@ -115,7 +115,7 @@ extends CommandLogger
 	}
 
 	public void PrintFileNamesTip(String modelPrefix, Identifier variantId){
-		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
+		Component bullet = Component.literal("• ").withStyle(ChatFormatting.GRAY);
 		switch (this.moduleHook)
 		{
 			default:
