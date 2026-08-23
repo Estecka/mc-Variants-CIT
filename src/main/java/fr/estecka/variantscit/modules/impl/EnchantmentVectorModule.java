@@ -503,21 +503,6 @@ implements IBakedModule
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		Identifier[] enchantIds = GetEnchantIds();
-
-		if (this.modelLine.size() <= 0)
-			logger.Info("This module does not have any variant.");
-		else for (var entry : this.modelLine)
-		{
-			logger.Info("{}:", CommandLogger.PackData(entry.value().modelId));
-
-			EnchantVector vector = entry.value().vector;
-			PrintVector(logger, vector, enchantIds, true);
-		}
-	}
-
-	@Override
 	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		var enchants = stack.get(componentType);
 		if (enchants == null || enchants.isEmpty()){

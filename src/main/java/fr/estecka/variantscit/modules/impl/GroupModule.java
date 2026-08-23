@@ -162,11 +162,6 @@ implements IBakedModule
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		commonLibrary.Dump(logger);
-	}
-
-	@Override
 	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		for (int i=0; i<submodules.length; ++i) {
 			logger.Info("### Submodule [{}]", i);

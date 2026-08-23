@@ -309,3 +309,5 @@ Since v2.5:
 ### 5.6.0
 - Fixed crash when using components with no codecs.
 - Module `predicates` is now capable of operating without `modelPrefix` or `modelList`.
+- Added commands `module variant-id` and `module model-id`.
+- Command `module dump` now shows the same output for all module types

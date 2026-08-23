@@ -211,8 +211,8 @@ extends CommandUtil
 	}
 
 	static private int Dump(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, MetaModule meta){
-		final IBakedModule module = GetBaked(context).getOrThrow();
-		module.Dump(logger);
+		final VariantLibrary library = GetLibrary(context).getOrThrow();
+		library.Dump(logger);
 		return 0;
 	}
 

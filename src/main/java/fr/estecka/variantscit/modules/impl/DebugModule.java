@@ -96,17 +96,11 @@ implements IBakedModule
 			for (Identifier modelId : params.intrinsicModels)
 				logger.Info(" • {}", CommandLogger.PackData(modelId));
 		}
-		this.Dump(logger);
 	}
 
 	@Override
 	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		this.Summary(logger);
 		return this.GetModelForItem(stack);
-	}
-	
-	@Override
-	public void Dump(CommandLogger logger) {
-		library.Dump(logger);
 	}
 }

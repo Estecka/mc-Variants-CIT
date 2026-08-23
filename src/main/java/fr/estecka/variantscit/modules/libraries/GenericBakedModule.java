@@ -43,11 +43,6 @@ implements IBakedModule
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		debug.Dump(logger);
-	}
-
-	@Override
 	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		Snitch<L> snitch = this.debug.CreateSnitch(logger);
 		Identifier result = this.logic.Walkthrough(stack, snitch.GetLibrary(), logger);

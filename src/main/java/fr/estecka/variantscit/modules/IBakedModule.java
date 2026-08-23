@@ -1,6 +1,5 @@
 package fr.estecka.variantscit.modules;
 
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,9 +14,6 @@ extends ICacheKey.Cacheable
 {
 	Identifier GetModelForItem(ItemStack stack);
 	void Summary(CommandLogger logger);
-	// TODO: Remove, use library in metadata instead
-	@Deprecated
-	void Dump(CommandLogger logger);
 	Identifier Walkthrough(WalktroughLogger logger, ItemStack stack);
 
 	/**
@@ -25,6 +21,9 @@ extends ICacheKey.Cacheable
 	 */
 	default boolean VariantIdInfo(CommandLogger logger, Identifier variantId){ return false; }
 
+	/**
+	 * @return The identifiable module that applied to the item.
+	 */
 	default IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip){
 		boolean success = this.GetModelForItem(stack) != null;
 		Identifier moduleId = VariantsCitMod.GetModules().GetId(this);

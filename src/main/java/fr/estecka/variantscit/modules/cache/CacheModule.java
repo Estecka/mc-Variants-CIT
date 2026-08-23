@@ -55,10 +55,6 @@ implements IBakedModule, IModuleWrapper
 		logger.Error("Cache modules cannot be debugged. Please report this issue.");
 	}
 	@Override
-	public void Dump(CommandLogger logger) {
-		logger.Error("Cache modules cannot be debugged. Please report this issue.");
-	}
-	@Override
 	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		logger.Error("Cache modules cannot be debugged. Please report this issue.");
 		return null;
@@ -79,7 +75,6 @@ implements IBakedModule, IModuleWrapper
 
 	@Override
 	public IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip) {
-		// logger.Info("Entering cache module: {}", Integer.toHexString(System.identityHashCode(this)));
 		return this.inner.Crawl(logger, stack, skip);
 	}
 

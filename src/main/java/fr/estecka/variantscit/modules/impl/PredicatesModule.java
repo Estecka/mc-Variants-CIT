@@ -190,16 +190,6 @@ implements IBakedModule
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		for (PredicatedModel variant : variants) {
-			logger.Info("{} -> {}",
-				CommandLogger.PackData(variant.model.variantId),
-				CommandLogger.ItemData(variant.model.modelId)
-			);
-		}
-	}
-
-	@Override
 	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		logger.Info("Predicates:");
 

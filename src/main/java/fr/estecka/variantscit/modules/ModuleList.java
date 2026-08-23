@@ -53,7 +53,6 @@ implements IBakedModule, IModuleWrapper
 	public IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip) {
 		IBakedModule result = null;
 
-		// logger.Info("Entering list module: {}", Integer.toHexString(System.identityHashCode(this)));
 		for (IBakedModule m : this){
 			IBakedModule r = m.Crawl(logger, stack, skip);
 			if (!skip && r != null){
@@ -89,11 +88,6 @@ implements IBakedModule, IModuleWrapper
 	@Override
 	public ECachePolicy GetCachePolicy() {
 		return ECachePolicy.UNWRAP;
-	}
-
-	@Override
-	public void Dump(CommandLogger logger) {
-		logger.Error("List modules cannot be debbuged. Please report this issue.");
 	}
 
 	@Override

@@ -46,8 +46,8 @@ implements IBakedModule
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		subModule.Dump(logger);
+	public boolean VariantIdInfo(CommandLogger logger, Identifier variantId) {
+		return subModule.VariantIdInfo(logger, variantId);
 	}
 
 	@Override
