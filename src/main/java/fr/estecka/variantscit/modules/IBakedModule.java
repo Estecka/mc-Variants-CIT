@@ -27,6 +27,11 @@ extends ICacheKey.Cacheable
 			return new ModuleList(modules);
 	}
 
+	/**
+	 * @return Wether the module has printed any custom information about the variant ID
+	 */
+	default boolean VariantIdInfo(CommandLogger logger, Identifier variantId){ return false; }
+
 	default IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip){
 		boolean success = this.GetModelForItem(stack) != null;
 		Identifier moduleId = VariantsCitMod.GetModules().GetId(this);

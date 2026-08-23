@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
+import java.security.KeyStore.Entry;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -475,6 +476,30 @@ implements IBakedModule
 		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
 			logger.Info(" - {}", CommandLogger.ItemData(id));
+	}
+
+	@Override
+	public boolean VariantIdInfo(CommandLogger logger, Identifier variantId) {
+		if (variantId.getNamespace().equals(VariantsCitMod.MODID))
+				return false;
+
+		final Pattern regex = BakeRegex(params);
+		var optMap = VariantId2Map(regex, variantId, params.aliases());
+
+		if (!optMap.isPresent())
+			logger.Info(ChatFormatting.GOLD, "This variant ID does not represent a valid enchantment set.");
+		else {
+			var map = optMap.get();
+			logger.Info("This variant represents the following enchantments:");
+			for (var entry : map.entrySet())
+			if  (entry.getValue() != 0) {
+				logger.Info(" • Lvl {} {}",
+					entry.getValue(),
+					CommandLogger.ItemData(entry.getKey())
+				);
+			}
+		}
+		return true;
 	}
 
 	@Override

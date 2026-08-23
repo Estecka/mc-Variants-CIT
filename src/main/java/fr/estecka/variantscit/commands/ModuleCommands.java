@@ -230,6 +230,7 @@ extends CommandUtil
 
 	static private int VariantId(CommandContext<FabricClientCommandSource> context, WalktroughLogger logger, MetaModule meta){
 		final VariantLibrary library = GetLibrary(context).getOrThrow();
+		final IBakedModule bakedModule = GetBaked(context).getOrThrow();
 		final LibraryDefinition libDefinition = meta.libraryDefinition();
 		final Identifier variantId = context.getArgument(VARIANT_ID_ARG, Identifier.class);
 
@@ -269,6 +270,9 @@ extends CommandUtil
 
 		logger.Info("--");
 
+		if (bakedModule.VariantIdInfo(logger, variantId))
+			logger.Info("--");
+
 		if (modelIdFound != null){
 			logger.Info(ChatFormatting.GREEN, "The variant was found, and is bound to the model ID: {}", CommandLogger.PackData(modelIdFound));
 			if (!modelIdFound.equals(modelIdCandidate)){
@@ -296,8 +300,8 @@ extends CommandUtil
 		}
 		else if (!isHardCoded && !isCompatiblePrefix && libDefinition.modelPrefix().isPresent()){
 			logger.Info(ChatFormatting.GOLD,
-				"The variant-ID {} was rejected because it does no match this module's"
-				+ "modelNamespace or modelPathes options.",
+				"The variant-ID {} was rejected because it does no match this "
+				+ " module's modelNamespace or modelPathes options.",
 				CommandLogger.ItemData(variantId)
 			);
 		}
