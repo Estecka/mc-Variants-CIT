@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.modules.cache;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.CodecUtil;
@@ -16,6 +17,11 @@ implements ICacheKey
 	@SuppressWarnings("unchecked")
 	static public CacheKeySet KeysOf(DataComponentType<?>... types){
 		return CacheKeySet.Of(Stream.of(types).map(ComponentCacheKey::new));
+	}
+
+	@SuppressWarnings("unchecked")
+	static public CacheKeySet KeysOf(Collection<DataComponentType<?>> types){
+		return CacheKeySet.Of(types.stream().map(ComponentCacheKey::new));
 	}
 
 	@Override

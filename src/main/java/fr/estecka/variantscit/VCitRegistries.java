@@ -60,7 +60,7 @@ public final class VCitRegistries
 	{
 		// ## Modules
 
-		RegisterBakedModule (VariantsCitMod.Identifier("debug"), DebugModule.UNBAKED_MAPCODEC);
+		RegisterBakedModule (VariantsCitMod.Identifier("phony"), PhonyModule.UNBAKED_MAPCODEC);
 
 		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_data"), ComponentDataModule.MAPCODEC);
