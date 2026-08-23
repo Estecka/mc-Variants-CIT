@@ -106,7 +106,10 @@ public class CommandLogger
 			return TextOf(variant).withStyle(ChatFormatting.AQUA);
 	}
 
-	static public MutableComponent PackData(Object variant){
-		return TextOf(variant).withStyle(ChatFormatting.YELLOW);
+	static public MutableComponent PackData(Object object){
+		if (object == null)
+			return Component.literal("null").withStyle(ChatFormatting.RED);
+		else
+			return TextOf(object).withStyle(ChatFormatting.YELLOW);
 	}
 }

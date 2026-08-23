@@ -60,11 +60,12 @@ public final class VCitRegistries
 	{
 		// ## Modules
 
+		RegisterBakedModule (VariantsCitMod.Identifier("debug"), DebugModule.UNBAKED_MAPCODEC);
+
 		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_data"), ComponentDataModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_format"), MultiComponentFormatModule.MAPCODEC);
 		RegisterLinearModule(VariantsCitMod.Identifier("component_threshold"), ComponentThresholdModule.MAPCODEC);
-		RegisterBakedModule (VariantsCitMod.Identifier("constant"), ConstantModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("custom_name"), CustomNameModule.MAPCODEC);
 		RegisterLinearModule(VariantsCitMod.Identifier("durability"), DurabilityModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
