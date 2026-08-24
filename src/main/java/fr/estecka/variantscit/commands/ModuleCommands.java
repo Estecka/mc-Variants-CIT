@@ -108,8 +108,8 @@ extends CommandUtil
 		EModuleHook hook = getModuleHook(context, HOOK_ARG);
 		Identifier moduleId = context.getArgument(MODULE_ARG, Identifier.class);
 		DataResult<MetaModule> optMeta = VariantsCitMod.GetModules().GetMeta(moduleId);
-		if (optMeta.isSuccess() && optMeta.getOrThrow().bakedModules().get(hook) != null)
-			return optMeta.mapError(s -> "No hook "+hook+" for module "+moduleId);
+		if (optMeta.isSuccess() && optMeta.getOrThrow().bakedModules().get(hook) == null)
+			return DataResult.error(() -> "No hook "+hook+" for module "+moduleId);
 		else
 			return optMeta;
 	}
