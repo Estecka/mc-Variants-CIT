@@ -14,6 +14,8 @@ extends ICacheKey.Cacheable
 {
 	Identifier GetModelForItem(ItemStack stack);
 	void Summary(CommandLogger logger);
+
+	// TODO: Make sure non snitch-based implementations don't merely return GetModelForItem
 	Identifier Walkthrough(WalktroughLogger logger, ItemStack stack);
 
 	/**

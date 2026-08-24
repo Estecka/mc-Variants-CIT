@@ -44,15 +44,16 @@ import static net.minecraft.commands.arguments.IdentifierArgument.id;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.moduleHook;
 import static fr.estecka.variantscit.commands.ModuleHookArgumentType.getModuleHook;
 
+// TODO: Break down into separate clases
 public class ModuleCommands
 extends CommandUtil
 {
 	static public final Identifier ID = Identifier.fromNamespaceAndPath(VariantsCitMod.MODID, "modules");
 
-	static public final String HOOK_ARG    = "hook";
-	static public final String MODULE_ARG  = "module id";
-	static public final String VARIANT_ID_ARG  = "variant-id";
-	static public final String MODEL_ID_ARG    = "model-id";
+	static public final String HOOK_ARG       = "hook";
+	static public final String MODULE_ARG     = "module id";
+	static public final String VARIANT_ID_ARG = "variant id";
+	static public final String MODEL_ID_ARG   = "model id";
 
 	static public void	Register(){
 		ClientCommandRegistrationCallback.EVENT.register(ID, ModuleCommands::RegisterWith);
@@ -79,7 +80,7 @@ extends CommandUtil
 
 		var module = argument(MODULE_ARG, id())
 			.suggests(ModuleCommands::ModuleAutofill)
-			.then(literal("dump").executes((IModuleCommand)ModuleCommands::Dump))
+			.then(literal("dump"   ).executes((IModuleCommand)ModuleCommands::Dump))
 			.then(literal("summary").executes((IModuleCommand)ModuleCommands::Summary))
 			.then(variantId)
 			.then(modelId)
