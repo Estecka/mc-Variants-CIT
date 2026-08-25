@@ -145,8 +145,7 @@ implements IBakedModule
 
 		int i = 0;
 		for (IBakedModule m : submodules) {
-			boolean r = m.VariantIdInfo(buffer, variantId);
-			result |= r;
+			result |= m.VariantIdInfo(buffer, variantId);
 
 			if (!buffer.IsEmpty()) {
 				logger.Info("### Submodule [{}]", i);

@@ -20,7 +20,7 @@ extends Stack<Object>
 		}
 	}
 
-	public StringBuilder LabelString(){
+	public StringBuilder GetLabelString(){
 		StringBuilder builder = new StringBuilder();
 		for (Object tag : this.labels){
 			builder.append('[');
@@ -39,13 +39,13 @@ extends Stack<Object>
 		if (this.isEmpty())
 			return format;
 		else
-			return LabelString().append(format).toString();
+			return GetLabelString().append(format).toString();
 	}
 
 	public Component AddLabels(Component text){
 		if (this.isEmpty())
 			return text;
-		return Component.literal(LabelString().toString())
+		return Component.literal(GetLabelString().toString())
 			.append(text)
 			.withStyle(text.getStyle())
 			;

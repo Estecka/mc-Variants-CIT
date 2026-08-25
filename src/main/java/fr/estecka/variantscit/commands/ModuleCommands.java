@@ -307,7 +307,7 @@ extends CommandUtil
 			);
 		}
 		else if (modelIdCandidate == null){
-			logger.Info("No model-Id was found for this variant, but I'm unsure as to why. Please report this issue.");
+			logger.Error("No model-Id was found for this variant, but I'm unsure as to why. Please report this issue.");
 		}
 		else {
 			logger.Error("This variant is not present in this module, but I'm unsure as to why. Please report this issue.");

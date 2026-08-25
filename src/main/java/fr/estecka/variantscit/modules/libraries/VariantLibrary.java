@@ -8,6 +8,7 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.commands.WalktroughLogger;
 
+// TODO: Make immutable
 public class VariantLibrary
 implements IVariantLibrary, IDebuggableLibrary<IVariantLibrary>
 {

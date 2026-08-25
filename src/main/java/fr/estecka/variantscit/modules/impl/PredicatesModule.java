@@ -100,15 +100,15 @@ implements IBakedModule
 		}
 	}
 
-	public record Parameters(
+	public record Unbaked(
 		List<PredicatedModel> predicates
 	)
 	implements IUnbakedModule
 	{
-		static public final MapCodec<Parameters> MAPCODEC = PredicatedModel.MAPCODEC.codec()
+		static public final MapCodec<Unbaked> MAPCODEC = PredicatedModel.MAPCODEC.codec()
 			.listOf()
 			.fieldOf("predicates")
-			.xmap(Parameters::new, Parameters::predicates)
+			.xmap(Unbaked::new, Unbaked::predicates)
 			;
 
 		@Override

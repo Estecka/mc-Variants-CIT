@@ -34,7 +34,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
 
-// TODO: Move into util package
+
 public final class CodecUtil
 {
 	static private final Minecraft client = Minecraft.getInstance();

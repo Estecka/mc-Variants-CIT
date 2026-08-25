@@ -27,7 +27,7 @@ implements IBakedModule, IModuleWrapper
 
 	public IBakedModule UnwrapIfSingle(){
 		if (this.isEmpty())
-			VariantsCitMod.LOGGER.error("Empty module list {}", ExceptionUtils.getStackTrace(new IllegalArgumentException()));
+			VariantsCitMod.LOGGER.error("Empty module list {}", ExceptionUtils.getStackTrace(new IllegalStateException()));
 
 		if (this.size() == 1)
 			return this.getFirst();
