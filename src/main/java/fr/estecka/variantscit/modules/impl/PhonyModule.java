@@ -52,9 +52,7 @@ implements IBakedModule,IUnbakedModule
 
 	@Override
 	public boolean AcceptsVariant(Identifier variantId) {
-		return returnedModel.map(id -> id.equals(variantId))
-			.orElse(IDataTransform.Test(acceptedVariant, variantId))
-			;
+		return IDataTransform.Test(acceptedVariant, variantId);
 	}
 
 	@Override
