@@ -2,7 +2,7 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.Optional;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library) {
+	public @Nullable Identifier GetItemModel(ItemStack stack, ILinearLibrary library) {
 		Integer max = stack.get(DataComponents.MAX_DAMAGE);
 		if (max == null)
 			return null;

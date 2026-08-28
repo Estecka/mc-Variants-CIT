@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.modules.impl;
 
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
@@ -32,7 +32,7 @@ implements IVariantCitModule
 	}
 
 	@Override
-	public final ResourceLocation GetItemModel(ItemStack stack, IVariantLibrary models){
+	public final Identifier GetItemModel(ItemStack stack, IVariantLibrary models){
 		T component = stack.get(this.componentType);
 		if (component == null)
 			return null;
@@ -40,5 +40,5 @@ implements IVariantCitModule
 			return this.GetModelForComponent(component, models);
 	}
 
-	public abstract ResourceLocation GetModelForComponent(T component, IVariantLibrary models);
+	public abstract Identifier GetModelForComponent(T component, IVariantLibrary models);
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.world.item.ItemStack;

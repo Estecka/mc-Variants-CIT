@@ -1,11 +1,11 @@
-package fr.estecka.variantscit.collections;
+package fr.estecka.variantscit.util.collections;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class TriMap<K2,K1,K0,V>
-extends BiMap<K2, K1, Map<K0, V>>
+public class HashMap3<K2,K1,K0,V>
+extends HashMap2<K2, K1, Map<K0, V>>
 {
 	public V get(K2 key2, K1 key1, K0 key0){
 		var submap = this.get(key2, key1);

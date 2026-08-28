@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.itemdata.preconditions;
 
 import com.mojang.serialization.Codec;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.cache.ICacheKey;

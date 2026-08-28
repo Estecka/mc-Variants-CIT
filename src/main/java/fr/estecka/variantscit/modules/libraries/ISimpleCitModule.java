@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.modules.libraries;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,10 +13,10 @@ extends IVariantCitModule
 	 * 
 	 * @return The variant's identifier, or null if the item has none.
 	 */
-	public abstract @Nullable ResourceLocation GetItemVariant(ItemStack stack);
+	public abstract @Nullable Identifier GetItemVariant(ItemStack stack);
 
 	@Override
-	public default @Nullable ResourceLocation GetItemModel(ItemStack stack, IVariantLibrary library){
+	public default @Nullable Identifier GetItemModel(ItemStack stack, IVariantLibrary library){
 		return library.GetVariantModel(GetItemVariant(stack));
 	}
 }

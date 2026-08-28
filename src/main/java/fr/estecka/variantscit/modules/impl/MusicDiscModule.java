@@ -7,6 +7,6 @@ public class MusicDiscModule
 {
 	static public final IVariantCitModule UNIT = ASimpleMonoComponentModule.Of(
 		DataComponents.JUKEBOX_PLAYABLE,
-		component -> component.song().key().get().location()
+		component -> component.song().key().get().identifier()
 	);
 }
