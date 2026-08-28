@@ -2,10 +2,10 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
 import fr.estecka.variantscit.modules.libraries.GenericBakedModule;
@@ -33,7 +33,7 @@ implements IUnbakedModule
 
 
 	@Override
-	public boolean AcceptsVariant(ResourceLocation variantId) {
+	public boolean AcceptsVariant(Identifier variantId) {
 		return variantId.getPath().endsWith(adultSuffix)
 			|| variantId.getPath().endsWith(babySuffix)
 			;

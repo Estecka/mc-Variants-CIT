@@ -9,7 +9,7 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemModelResolver.class)
@@ -19,13 +19,13 @@ public class ItemModelManagerMixin
 		method="appendItemLayers(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;I)V",
 		at=@At(value="INVOKE", target="net/minecraft/world/item/ItemStack.get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
 	)
-	private @Nullable Object GetVariantModel(ItemStack stack, DataComponentType<ResourceLocation> type, Operation<ResourceLocation> original)
+	private @Nullable Object GetVariantModel(ItemStack stack, DataComponentType<Identifier> type, Operation<Identifier> original)
 	{
-		ResourceLocation modelId = null;
+		Identifier modelId = null;
 		
-		VariantsCitMod.LOGGER.PushLabel(stack.getItem());
+		VariantsCitMod.LOGGER.labels.push(stack.getItem());
 		modelId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.ITEM_MODEL, stack);
-		VariantsCitMod.LOGGER.PopLabel();
+		VariantsCitMod.LOGGER.labels.pop();
 
 		if (modelId == null)
 			return original.call(stack, type);

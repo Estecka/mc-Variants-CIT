@@ -3,7 +3,7 @@ package fr.estecka.variantscit;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
@@ -20,6 +20,8 @@ import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.impl.*;
 import fr.estecka.variantscit.modules.libraries.*;
 import fr.estecka.variantscit.reload.IUnbakedModule;
+import fr.estecka.variantscit.util.CodecUtil;
+import fr.estecka.variantscit.util.DecodableRegistry;
 
 
 public final class VCitRegistries
@@ -59,11 +61,12 @@ public final class VCitRegistries
 	{
 		// ## Modules
 
+		RegisterBakedModule (VariantsCitMod.Identifier("phony"), PhonyModule.UNBAKED_MAPCODEC);
+
 		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_data"), ComponentDataModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_format"), MultiComponentFormatModule.MAPCODEC);
 		RegisterLinearModule(VariantsCitMod.Identifier("component_threshold"), ComponentThresholdModule.MAPCODEC);
-		RegisterBakedModule (VariantsCitMod.Identifier("constant"), ConstantModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("custom_name"), CustomNameModule.MAPCODEC);
 		RegisterLinearModule(VariantsCitMod.Identifier("durability"), DurabilityModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));
@@ -170,23 +173,23 @@ public final class VCitRegistries
 	}
 
 
-	static public void RegisterBakedModule(ResourceLocation id, MapCodec<? extends IUnbakedModule> mapcodec){
+	static public void RegisterBakedModule(Identifier id, MapCodec<? extends IUnbakedModule> mapcodec){
 		MODULES.RegisterMap(id, mapcodec);
 	}
 
-	static public void RegisterSimpleModule(ResourceLocation id, MapCodec<? extends IVariantCitModule> mapcodec){
+	static public void RegisterSimpleModule(Identifier id, MapCodec<? extends IVariantCitModule> mapcodec){
 		RegisterBakedModule(id, VariantModuleBaker.Of(mapcodec));
 	}
 
-	static public void RegisterSimpleModule(ResourceLocation id, IVariantCitModule unit){
+	static public void RegisterSimpleModule(Identifier id, IVariantCitModule unit){
 		RegisterSimpleModule(id, MapCodec.unit(unit));
 	}
 
-	static public void RegisterLinearModule(ResourceLocation id, MapCodec<? extends ILinearCitModule> mapcodec){
+	static public void RegisterLinearModule(Identifier id, MapCodec<? extends ILinearCitModule> mapcodec){
 		RegisterBakedModule(id, LinearModuleBaker.Of(mapcodec));
 	}
 
-	static public void RegisterLinearModule(ResourceLocation id, ILinearCitModule unit){
+	static public void RegisterLinearModule(Identifier id, ILinearCitModule unit){
 		RegisterLinearModule(id, MapCodec.unit(unit));
 	}
 

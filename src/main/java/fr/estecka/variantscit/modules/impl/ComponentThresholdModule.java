@@ -5,13 +5,13 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
@@ -66,7 +66,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library) {
+	public @Nullable Identifier GetItemModel(ItemStack stack, ILinearLibrary library) {
 		Integer value = this.GetComponentValue(stack);
 		if (value == null)
 			return null;
@@ -75,7 +75,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, ILinearLibrary library, CommandLogger logger) {
+	public @Nullable Identifier Walkthrough(ItemStack stack, ILinearLibrary library, CommandLogger logger) {
 		Integer value = this.GetComponentValue(stack);
 		logger.Info("Raw data: {}", CommandLogger.ItemData(value, "missing or invalid"));
 		if (value == null)

@@ -5,7 +5,7 @@ import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ILinearCitModule;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public record ItemCountModule()
@@ -24,7 +24,7 @@ implements ILinearCitModule
 	}
 
 	@Override
-	public ResourceLocation GetItemModel(ItemStack stack, ILinearLibrary library){
+	public Identifier GetItemModel(ItemStack stack, ILinearLibrary library){
 		return library.GetOrLesser(stack.getCount());
 	}
 }
