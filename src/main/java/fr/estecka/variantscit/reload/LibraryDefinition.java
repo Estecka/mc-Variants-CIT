@@ -11,11 +11,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
+import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.modules.libraries.VariantLibrary;
+import fr.estecka.variantscit.util.VariantUtil;
 import net.minecraft.resources.Identifier;
 
 
@@ -47,7 +50,9 @@ public record LibraryDefinition(
 	static private final Codec<Map<Identifier,Identifier>> MODELLIST_CODEC = CodecUtil.WithAlternatives(
 		Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC),
 		Identifier.CODEC.listOf().xmap(LibraryDefinition::FromArray, map->List.copyOf(map.keySet()))
-	);
+	)
+	.validate(LibraryDefinition::DisallowIntrinsic)
+	;
 
 	static private final MapCodec<Map<Identifier,Identifier>> HARDCODED_CODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
@@ -94,10 +99,28 @@ public record LibraryDefinition(
 		return Map.copyOf(hardcoded);
 	}
 
+	static private DataResult<Map<Identifier,Identifier>> DisallowIntrinsic(Map<Identifier,Identifier> hardcodedList){
+		for (Identifier variantId : hardcodedList.keySet()){
+			if (VariantUtil.IsVariantIntrinsic(variantId))
+				return DataResult.error(()->"Hardcoded model list may not override intrinsic models.");
+		}
+
+		return DataResult.success(hardcodedList);
+	}
+
 
 /******************************************************************************/
 /* Asset Aggregation                                                          */
 /******************************************************************************/
+
+	/**
+	 * @return  A near-empty library  meant to  be later populated  during asset
+	 * aggregation.
+	 */
+	public VariantLibrary CreateInitialLibrary() {
+		var fallbackModel = this.hardcodedList.get(IVariantLibrary.FALLBACK_VARIANT_ID);
+		return new VariantLibrary(fallbackModel);
+	}
 
 	/**
 	 * @return If the library  accepts this assets, returns  every variant ID it

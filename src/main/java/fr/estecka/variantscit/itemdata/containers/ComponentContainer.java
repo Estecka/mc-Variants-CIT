@@ -2,7 +2,7 @@ package fr.estecka.variantscit.itemdata.containers;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.Tag;
@@ -24,7 +24,11 @@ implements IDataContainer
 
 	@Override
 	public Tag asNbt() {
-		return CodecUtil.GetComponentNbt(value, type.codec());
+		var codec = type.codec();
+		if (codec != null)
+			return CodecUtil.GetComponentNbt(value, type.codec());
+		else
+			return IDataContainer.super.asNbt();
 	}
 
 	@Override

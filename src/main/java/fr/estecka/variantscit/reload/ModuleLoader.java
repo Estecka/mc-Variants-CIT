@@ -13,17 +13,17 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.PreconditionModule;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import fr.estecka.variantscit.collections.TriMap;
+import fr.estecka.variantscit.util.collections.HashMap3;
 
 
 public final class ModuleLoader
 {
 	static public class Result {
 		/** Sorted by hook, target, and priority. */
-		public final TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new TriMap<>();
+		public final HashMap3<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new HashMap3<>();
 
 		public final Map<Identifier, MetaModule> uniqueModules = new HashMap<>();
 		public final Map<Identifier, String> moduleErrors;
@@ -87,9 +87,13 @@ public final class ModuleLoader
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
 			var baked = EModuleHook.MapOf(
-				ctx -> result.variantAggregator.GetLibrary(ctx, definition)
+				hook -> result.variantAggregator.GetLibrary(hook, definition)
 					.map(definition.parameters()::Bake)
 					.map(module -> definition.precondition().isPresent() ? new PreconditionModule(definition.precondition().get(), module) : module)
+					.orElse(null)
+			);
+			var libraries = EModuleHook.MapOf(
+				hook -> result.variantAggregator.GetLibrary(hook, definition)
 					.orElse(null)
 			);
 
@@ -97,7 +101,9 @@ public final class ModuleLoader
 				moduleId,
 				definition.priority(),
 				targets,
+				definition.parameters(),
 				definition.libraryDefinition(),
+				libraries,
 				baked
 			);
 

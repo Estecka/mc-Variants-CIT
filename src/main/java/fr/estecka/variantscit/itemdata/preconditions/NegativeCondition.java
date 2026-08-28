@@ -3,7 +3,7 @@ package fr.estecka.variantscit.itemdata.preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.world.item.ItemStack;
 

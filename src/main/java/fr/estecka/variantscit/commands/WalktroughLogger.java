@@ -64,6 +64,16 @@ extends CommandLogger
 		);
 	}
 
+	public void PrintPlainModelTip(Identifier modelId){
+		Info(ChatFormatting.GRAY,
+			"[TIP] The model ID {} may be supported by providing "
+			+ "one of these files:",
+			ItemData(modelId)
+		);
+
+		PrintFileNamesTip("", modelId);
+	}
+
 	public void PrintVariantIdTip(Identifier variantId){
 		final LibraryDefinition libDef = metamodule.libraryDefinition();
 		variantId = variantId.withPrefix(subPrefix);
@@ -105,7 +115,7 @@ extends CommandLogger
 	}
 
 	public void PrintFileNamesTip(String modelPrefix, Identifier variantId){
-		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
+		Component bullet = Component.literal("• ").withStyle(ChatFormatting.GRAY);
 		switch (this.moduleHook)
 		{
 			default:

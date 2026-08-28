@@ -11,6 +11,7 @@ import net.minecraft.resources.Identifier;
 public interface IDebuggableLibrary<LIB>
 {
 	public void Summary(CommandLogger logger);
+	@Deprecated
 	public void Dump(CommandLogger logger);
 	public Snitch<LIB> CreateSnitch(WalktroughLogger logger);
 

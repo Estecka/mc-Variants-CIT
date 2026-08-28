@@ -6,7 +6,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.DataResult;
-import fr.estecka.variantscit.collections.BiMap;
+import fr.estecka.variantscit.util.collections.HashMap2;
+import fr.estecka.variantscit.util.collections.Map2;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheBuilder;
 import fr.estecka.variantscit.reload.EModuleHook;
@@ -18,13 +19,13 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ModuleRepository
 {
-	private final BiMap<EModuleHook, Item, IBakedModule> archModules;
+	private final Map2<EModuleHook, Item, IBakedModule> archModules;
 	private final Map<Identifier, MetaModule> metadata;
 	private final Map<Identifier, String> moduleErrors;
 	private final IdentityHashMap<IBakedModule, Identifier> moduleToId;
 
 	ModuleRepository(){
-		this.archModules = new BiMap<>();
+		this.archModules = new HashMap2<>();
 		this.metadata = Map.of();
 		this.moduleErrors = Map.of();
 		this.moduleToId = new IdentityHashMap<>();

@@ -12,13 +12,14 @@ import net.minecraft.world.level.Level;
 import fr.estecka.variantscit.itemdata.extractors.impl.PaintingVariantProperty;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.util.VariantUtil;
 
 public class PaintingVariantModule
 extends AMonoComponentModule<Holder<PaintingVariant>>
 {
 	static public final PaintingVariantModule UNIT = new PaintingVariantModule();
 
-	static public final Identifier INVALID_PAINTING = IVariantLibrary.SpecialVariantId("invalid");
+	static public final Identifier INVALID_PAINTING = VariantUtil.SpecialVariantId("invalid");
 
 	public PaintingVariantModule(){
 		super(DataComponents.PAINTING_VARIANT, ECachePolicy.AVOID);

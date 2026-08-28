@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.util;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,6 +17,7 @@ import com.mojang.serialization.MapDecoder;
 import com.mojang.serialization.MapEncoder;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
+import fr.estecka.variantscit.VariantsCitMod;
 
 public class DecodableRegistry<T>
 {
@@ -47,7 +48,7 @@ public class DecodableRegistry<T>
 		}
 
 		public Builder<T> WithKeyCodec(Codec<Identifier> value){ this.keyCodec = value;   return this; }
-		public Builder<T> WithWrapper (IMapWrapper<T> value)         { this.wrapper = value;    return this; }
+		public Builder<T> WithWrapper (IMapWrapper<T> value)   { this.wrapper = value;    return this; }
 		public Builder<T> WithDefault (Identifier value)       { this.defaultKey = value; return this; }
 
 		public DecodableRegistry<T> Build(){

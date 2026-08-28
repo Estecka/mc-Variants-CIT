@@ -20,6 +20,8 @@ import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.impl.*;
 import fr.estecka.variantscit.modules.libraries.*;
 import fr.estecka.variantscit.reload.IUnbakedModule;
+import fr.estecka.variantscit.util.CodecUtil;
+import fr.estecka.variantscit.util.DecodableRegistry;
 
 
 public final class VCitRegistries
@@ -59,11 +61,12 @@ public final class VCitRegistries
 	{
 		// ## Modules
 
+		RegisterBakedModule (VariantsCitMod.Identifier("phony"), PhonyModule.UNBAKED_MAPCODEC);
+
 		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_data"), ComponentDataModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("component_format"), MultiComponentFormatModule.MAPCODEC);
 		RegisterLinearModule(VariantsCitMod.Identifier("component_threshold"), ComponentThresholdModule.MAPCODEC);
-		RegisterBakedModule (VariantsCitMod.Identifier("constant"), ConstantModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("custom_name"), CustomNameModule.MAPCODEC);
 		RegisterLinearModule(VariantsCitMod.Identifier("durability"), DurabilityModule.MAPCODEC);
 		RegisterSimpleModule(VariantsCitMod.Identifier("enchantment"), EnchantmentModule.CreateCodec(DataComponents.ENCHANTMENTS));

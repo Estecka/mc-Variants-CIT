@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.util;
 
 import java.util.HashMap;
 import java.util.Map;

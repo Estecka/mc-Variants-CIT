@@ -14,6 +14,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.util.VariantUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
@@ -21,7 +22,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 public class EnchantmentModule
 extends AMonoComponentModule<ItemEnchantments>
 {
-	static public final Identifier MULTI_ENCHANTS = IVariantLibrary.SpecialVariantId("multi");
+	static public final Identifier MULTI_ENCHANTS = VariantUtil.SpecialVariantId("multi");
 
 	static public final MapCodec<EnchantmentModule> CreateCodec(DataComponentType<ItemEnchantments> targetComponent){
 		return RecordCodecBuilder.mapCodec(builder->builder

@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
@@ -19,6 +18,10 @@ import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.util.VariantUtil;
+import fr.estecka.variantscit.util.collections.HashMap2;
+import fr.estecka.variantscit.util.collections.Map2;
+import fr.estecka.variantscit.util.collections.NestedMaps;
 
 public class VariantAggregator
 {
@@ -29,10 +32,7 @@ public class VariantAggregator
 
 	private final Map<ModuleDefinition, Identifier> moduleIds = new IdentityHashMap<>();
 	private final Map<ModuleDefinition, IAssetGenerator> assetGenerators = new IdentityHashMap<>();
-	// TODO: combine fields into a single Bimap
-	private final Map<ModuleDefinition, VariantLibrary> item_model = new IdentityHashMap<>();
-	private final Map<ModuleDefinition, VariantLibrary> equippable = new IdentityHashMap<>();
-	private final Map<ModuleDefinition, VariantLibrary> trims = new IdentityHashMap<>();
+	private final Map2<EModuleHook, ModuleDefinition, VariantLibrary> variantLibraries = NestedMaps.Create(HashMap2::new, IdentityHashMap::new);
 
 	public final Map<Identifier, GeneratedAsset> generatedAssets = new HashMap<>();
 	public final Set<String> conflictingModelPrefixes = new HashSet<>();
@@ -43,28 +43,14 @@ public class VariantAggregator
 			ModuleDefinition module = entry.getValue();
 			this.moduleIds.put(module, entry.getKey());
 			for (EModuleHook hook : module.hooks())
-				GetLibraryMap(hook).put(module, InitialLibrary(module));
+				this.variantLibraries.put(hook, module, module.libraryDefinition().CreateInitialLibrary());
 
 			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
 		}
 	}
 
-	static private VariantLibrary InitialLibrary(ModuleDefinition module) {
-		var fallbackModel = module.libraryDefinition().hardcodedList().get(IVariantLibrary.FALLBACK_VARIANT_ID);
-		return new VariantLibrary(fallbackModel);
-	}
-
-	private Map<ModuleDefinition, VariantLibrary> GetLibraryMap(EModuleHook hook){
-		return switch (hook){
-			default -> throw new AssertionError("Invalid hook");
-			case TRIM_PATTERN -> this.trims;
-			case EQUIPPABLE -> this.equippable;
-			case ITEM_MODEL -> this.item_model;
-		};
-	}
-
 	public Optional<VariantLibrary> GetLibrary(EModuleHook hook, ModuleDefinition module){
-		return Optional.ofNullable(GetLibraryMap(hook).get(module));
+		return Optional.ofNullable(variantLibraries.get(hook, module));
 	}
 
 	public void GatherAll(HotswappableResourceManager manager){
@@ -104,11 +90,11 @@ public class VariantAggregator
 			case EAssetType.BAKED_MODEL   -> EAssetGenPass.ITEM_STATES;
 		};
 
-		for (var entry : GetLibraryMap(assetType.hook).entrySet())
+		for (var entry : variantLibraries.initIfAbsent(assetType.hook).entrySet())
 		{
 			ModuleDefinition module = entry.getKey();
 			VariantLibrary library = entry.getValue();
-			VariantsCitMod.LOGGER.PushLabel(moduleIds.get(module));
+			VariantsCitMod.LOGGER.labels.push(moduleIds.get(module));
 
 			this.ApplyModelToModule(assetType.isFundamental, module, library, modelId);
 
@@ -124,7 +110,7 @@ public class VariantAggregator
 				}
 			}
 
-			VariantsCitMod.LOGGER.PopLabel();
+			VariantsCitMod.LOGGER.labels.pop();
 		}
 	}
 
@@ -136,6 +122,9 @@ public class VariantAggregator
 		boolean accepted = false;
 
 		Set<Identifier> variants = module.libraryDefinition().GetVariantIds(modelId);
+		if (module.parameters().AcceptsIntrinsic(modelId))
+			variants.add(VariantUtil.IntrinsicVariantId(modelId));
+
 		for (Identifier variantId : variants)
 		if  (module.parameters().AcceptsVariant(variantId) || variantId.getNamespace().equals(VariantsCitMod.MODID))
 		{

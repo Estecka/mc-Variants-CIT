@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.function.Function;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
@@ -48,6 +49,17 @@ implements IBakedModule, IModuleWrapper
 		return ECachePolicy.UNWRAP;
 	}
 
+
+	@Override
+	public void Summary(CommandLogger logger) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+	}
+	@Override
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+		return null;
+	}
+
 	@Override
 	public Identifier GetModelForItem(ItemStack stack) {
 		this.ExpungeExpiredEntries();
@@ -63,7 +75,6 @@ implements IBakedModule, IModuleWrapper
 
 	@Override
 	public IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip) {
-		// logger.Info("Entering cache module: {}", Integer.toHexString(System.identityHashCode(this)));
 		return this.inner.Crawl(logger, stack, skip);
 	}
 
@@ -91,8 +102,10 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	/**
-	 * TODO: As-is, an entry where all registered components are null will never
-	 * expire. This is limited to one entry per cache, so it is negligible.
+	 * @implNote As-is, an entry  where all registered components  are null will
+	 * never  expire. This is limited  to one entry  per cache  though, so it is
+	 * negligible, and such  an entry will probably remain useful for the entire 
+	 * lifetime of the module.
 	 */
 	private CacheEntry CreateEntry(int hash, ItemStack stack, Identifier variant){
 		WeakReference<?>[] weakRefs = new WeakReference[properties.length];

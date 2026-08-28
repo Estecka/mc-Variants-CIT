@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import com.llamalad7.mixinextras.sugar.Local;
 import fr.estecka.variantscit.reload.ModuleLoader;
-import fr.estecka.variantscit.trims.TrimPatternOverlay;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.TemplateRepository;
+import fr.estecka.variantscit.hooks.TrimPatternOverlay;
 
 /**
  * The  resource manager  breaks  its packs down  based on  namespace, so VCIT's

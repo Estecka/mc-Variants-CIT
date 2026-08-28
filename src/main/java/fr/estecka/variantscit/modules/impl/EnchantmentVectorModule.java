@@ -20,7 +20,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.modules.libraries.LinearSnapMap;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.reload.IUnbakedModule;
@@ -163,7 +163,7 @@ implements IBakedModule
 		builder.group(
 			Codec.BOOL.optionalFieldOf("optionalLevel", true).forGetter(Parameters::optionalLevel),
 			NORM_CODEC.listOf(1, 4).optionalFieldOf("ordering", DEFAULT_ORDERING).forGetter(Parameters::ordering),
-			CodecUtil.NONEMPTY_STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
+			CodecUtil.NonEmptyStringCodec("enchantSeparator").validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("enchantSeparator", "__").forGetter(Parameters::enchantSeparator),
 			Codec.STRING.validate(EnchantmentVectorModule::ValidateSeparator).optionalFieldOf("levelSeparator").forGetter(Parameters::levelSeparator),
 			Codec.unboundedMap(Identifier.CODEC, Identifier.CODEC).optionalFieldOf("enchantAliases", Map.of()).forGetter(Parameters::aliases),
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace", "minecraft").forGetter(Parameters::namespace)
@@ -226,7 +226,7 @@ implements IBakedModule
 	}
 
 	public EnchantmentVectorModule(VariantLibrary variantLibrary, Parameters params, DataComponentType<ItemEnchantments> component){
-		VariantsCitMod.LOGGER.PushLabel("enchantment_vector");
+		VariantsCitMod.LOGGER.labels.push("enchantment_vector");
 		this.params = params;
 		this.componentType = component;
 		this.fallback = variantLibrary.fallbackModel();
@@ -272,7 +272,7 @@ implements IBakedModule
 			modelLine.AddEntry(magnitudeGetter.applyAsInt(vector), new VariantEntry(vector, variant.getValue()));
 		}
 
-		VariantsCitMod.LOGGER.PopLabel();
+		VariantsCitMod.LOGGER.labels.pop();
 	}
 
 	static private LinearSnapMap<VariantEntry> OrderedSnapMap(List<ToIntFunction<EnchantVector>> ordering){
@@ -474,22 +474,31 @@ implements IBakedModule
 
 		logger.Info("This module has {} variants, spread across {} enchantments:", this.modelLine.size(), this.vectorSpace.indices.size());
 		for (Identifier id : this.vectorSpace.indices.keySet())
-			logger.Info(" - {}", CommandLogger.ItemData(id));
+			logger.Info(" • {}", CommandLogger.ItemData(id));
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		Identifier[] enchantIds = GetEnchantIds();
+	public boolean VariantIdInfo(CommandLogger logger, Identifier variantId) {
+		if (variantId.getNamespace().equals(VariantsCitMod.MODID))
+				return false;
 
-		if (this.modelLine.size() <= 0)
-			logger.Info("This module does not have any variant.");
-		else for (var entry : this.modelLine)
-		{
-			logger.Info("{}:", CommandLogger.PackData(entry.value().modelId));
+		final Pattern regex = BakeRegex(params);
+		var optMap = VariantId2Map(regex, variantId, params.aliases());
 
-			EnchantVector vector = entry.value().vector;
-			PrintVector(logger, vector, enchantIds, true);
+		if (!optMap.isPresent())
+			logger.Info(ChatFormatting.GOLD, "This variant ID does not represent a valid enchantment set.");
+		else {
+			var map = optMap.get();
+			logger.Info("This variant represents the following enchantments:");
+			for (var entry : map.entrySet())
+			if  (entry.getValue() != 0) {
+				logger.Info(" • Lvl {} {}",
+					entry.getValue(),
+					CommandLogger.ItemData(entry.getKey())
+				);
+			}
 		}
+		return true;
 	}
 
 	@Override

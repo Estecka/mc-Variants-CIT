@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.itemdata.containers;
 
 import com.mojang.serialization.Codec;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;

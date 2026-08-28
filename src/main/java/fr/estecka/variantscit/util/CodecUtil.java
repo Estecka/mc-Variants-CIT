@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.util;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,6 +22,7 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,6 +34,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
 
+
 public final class CodecUtil
 {
 	static private final Minecraft client = Minecraft.getInstance();
@@ -41,8 +43,6 @@ public final class CodecUtil
 	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isValidPath(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> LEGACY_ITEM_PATH = IDENTIFIER_PATH.validate(CodecUtil::UnItemify);
 	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isValidNamespace(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
-	@Deprecated
-	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(CodecUtil.NonEmptyString("<unspecified> string"));
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 	static public final Codec<Tag> NBT_ELEMENT = Codec.PASSTHROUGH.xmap( dyn->dyn.convert(NbtOps.INSTANCE).getValue(), nbt->new Dynamic<>(NbtOps.INSTANCE, nbt.copy()) );
@@ -97,14 +97,18 @@ public final class CodecUtil
 		return DataResult.success(Identifier.fromNamespaceAndPath(original.getNamespace(), UnItemifyRaw(original.getPath())));
 	}
 
-	static public DataResult<String> NonEmptyString(String string, String stringName){
+	static public DataResult<String> ValidateNonEmptyString(String string, String stringName){
 		return string.isEmpty() ?
 			DataResult.error(()->stringName+" cannot be empty.") :
 			DataResult.success(string);
 	}
 
 	static public Function<String,DataResult<String>> NonEmptyString(String stringName){
-		return string -> NonEmptyString(string, stringName);
+		return string -> ValidateNonEmptyString(string, stringName);
+	}
+
+	static public Codec<String> NonEmptyStringCodec(String stringName){
+		return Codec.STRING.validate(NonEmptyString(stringName));
 	}
 
 
