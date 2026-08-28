@@ -3,7 +3,7 @@ package fr.estecka.variantscit.modules.libraries;
 import org.jetbrains.annotations.Nullable;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.commands.WalktroughLogger;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Implementations MUST be of type LIB.
@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 public interface IDebuggableLibrary<LIB>
 {
 	public void Summary(CommandLogger logger);
+	@Deprecated
 	public void Dump(CommandLogger logger);
 	public Snitch<LIB> CreateSnitch(WalktroughLogger logger);
 
@@ -24,7 +25,7 @@ public interface IDebuggableLibrary<LIB>
 	 */
 	public abstract class Snitch<LIB> {
 		protected final WalktroughLogger logger;
-		private @Nullable ResourceLocation mainVariant = null;
+		private @Nullable Identifier mainVariant = null;
 		private boolean foundModel = false;
 
 		protected Snitch(WalktroughLogger logger){
@@ -36,7 +37,7 @@ public interface IDebuggableLibrary<LIB>
 			return (LIB)this;
 		}
 
-		protected void OnTriedVariant(ResourceLocation variant, boolean exists){
+		protected void OnTriedVariant(Identifier variant, boolean exists){
 			this.foundModel |= exists;
 			if (this.mainVariant == null)
 				mainVariant = variant;

@@ -6,7 +6,7 @@ import java.util.function.Function;
 import net.minecraft.nbt.CollectionTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -201,7 +201,7 @@ implements IDataTransform
 
 		static private boolean IsCharValid(char c){
 			return ('A' <= c && c <= 'Z')
-			    || (ResourceLocation.isAllowedInResourceLocation(c) && c != '.')
+			    || (Identifier.isAllowedInResourceLocation(c) && c != '.')
 			    ;
 		}
 	}

@@ -1,7 +1,7 @@
 package fr.estecka.variantscit.modules.libraries;
 
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public interface IVariantCitModule
@@ -15,5 +15,5 @@ extends IGenericCitModule<IVariantLibrary>
 	 * models.
 	 * @return The model ID, or null if the vanilla model should be used.
 	 */
-	public abstract @Nullable ResourceLocation GetItemModel(ItemStack stack, IVariantLibrary modelProvider);
+	public abstract @Nullable Identifier GetItemModel(ItemStack stack, IVariantLibrary modelProvider);
 }

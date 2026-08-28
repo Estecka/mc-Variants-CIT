@@ -6,7 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.itemdata.containers.ComponentContainer;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
@@ -19,7 +19,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 
@@ -70,7 +70,7 @@ implements IDataExtractor
 		int pathLocation;
 		for (pathLocation = 0; pathLocation<input.length(); pathLocation++){
 			char c = input.charAt(pathLocation);
-			if (c == '.' || !ResourceLocation.isAllowedInResourceLocation(c))
+			if (c == '.' || !Identifier.isAllowedInResourceLocation(c))
 				break;
 		}
 

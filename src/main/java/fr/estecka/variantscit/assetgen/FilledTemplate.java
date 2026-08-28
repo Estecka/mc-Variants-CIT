@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.format.Substitution;
 
@@ -77,7 +77,7 @@ implements IoSupplier<InputStream>
 /* # Variables Util                                                           */
 /******************************************************************************/
 
-	static public HashMap<String,String> IdVariables(String varname, ResourceLocation identifier){
+	static public HashMap<String,String> IdVariables(String varname, Identifier identifier){
 		HashMap<String,String> variables = new HashMap<>();
 
 		variables.put(varname+"_ID", identifier.toString());

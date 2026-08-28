@@ -5,10 +5,11 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.function.Function;
 import fr.estecka.variantscit.commands.CommandLogger;
+import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -48,14 +49,25 @@ implements IBakedModule, IModuleWrapper
 		return ECachePolicy.UNWRAP;
 	}
 
+
 	@Override
-	public ResourceLocation GetModelForItem(ItemStack stack) {
+	public void Summary(CommandLogger logger) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+	}
+	@Override
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
+		logger.Error("Cache modules cannot be debugged. Please report this issue.");
+		return null;
+	}
+
+	@Override
+	public Identifier GetModelForItem(ItemStack stack) {
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
 		CacheEntry entry = this.hashToVariant.get(hash);
 		if (entry == null) {
-			ResourceLocation variant = inner.GetModelForItem(stack);
+			Identifier variant = inner.GetModelForItem(stack);
 			entry = this.CreateEntry(hash, stack, variant);
 		}
 		return entry.variant;
@@ -63,17 +75,16 @@ implements IBakedModule, IModuleWrapper
 
 	@Override
 	public IBakedModule Crawl(CommandLogger logger, ItemStack stack, boolean skip) {
-		// logger.Info("Entering cache module: {}", Integer.toHexString(System.identityHashCode(this)));
 		return this.inner.Crawl(logger, stack, skip);
 	}
 
-	public ResourceLocation ComputeIfAbsent(ItemStack stack, Function<ItemStack,ResourceLocation> computer){
+	public Identifier ComputeIfAbsent(ItemStack stack, Function<ItemStack,Identifier> computer){
 		this.ExpungeExpiredEntries();
 
 		int hash = this.HashStack(stack);
 		CacheEntry entry = this.hashToVariant.get(hash);
 		if (entry == null) {
-			ResourceLocation variant = computer.apply(stack);
+			Identifier variant = computer.apply(stack);
 			entry = this.CreateEntry(hash, stack, variant);
 		}
 		return entry.variant;
@@ -91,10 +102,12 @@ implements IBakedModule, IModuleWrapper
 	}
 
 	/**
-	 * TODO: As-is, an entry where all registered components are null will never
-	 * expire. This is limited to one entry per cache, so it is negligible.
+	 * @implNote As-is, an entry  where all registered components  are null will
+	 * never  expire. This is limited  to one entry  per cache  though, so it is
+	 * negligible, and such  an entry will probably remain useful for the entire 
+	 * lifetime of the module.
 	 */
-	private CacheEntry CreateEntry(int hash, ItemStack stack, ResourceLocation variant){
+	private CacheEntry CreateEntry(int hash, ItemStack stack, Identifier variant){
 		WeakReference<?>[] weakRefs = new WeakReference[properties.length];
 
 		for (int i=0; i<properties.length; ++i){
@@ -135,6 +148,6 @@ implements IBakedModule, IModuleWrapper
 	 * get garbage collected  before its referee. Otherwise, references will not
 	 * get enqueued, and the cache will never be cleared.
 	 */
-	static private record CacheEntry(ResourceLocation variant, WeakReference<?>[] components)
+	static private record CacheEntry(Identifier variant, WeakReference<?>[] components)
 	{}
 }
