@@ -2,7 +2,7 @@ package fr.estecka.variantscit.itemdata.extractors;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.impl.ItemComponentProperty;

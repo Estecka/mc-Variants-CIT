@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class WalktroughLogger
 extends CommandLogger
@@ -43,7 +43,7 @@ extends CommandLogger
 		);
 	}
 
-	static private MutableComponent AssetFilename(String modelPrefix, ResourceLocation variantId, EAssetType assetType){
+	static private MutableComponent AssetFilename(String modelPrefix, Identifier variantId, EAssetType assetType){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.packDirectory,
@@ -53,7 +53,7 @@ extends CommandLogger
 		);
 	}
 
-	static private MutableComponent LayeredAssetFilename(String modelPrefix, ResourceLocation variantId, EAssetType assetType){
+	static private MutableComponent LayeredAssetFilename(String modelPrefix, Identifier variantId, EAssetType assetType){
 		return TextFormat(ChatFormatting.YELLOW, "/assets/{}/{}/{}/{}{}{}",
 			ItemData(variantId.getNamespace()),
 			assetType.packDirectory,
@@ -64,11 +64,21 @@ extends CommandLogger
 		);
 	}
 
-	public void PrintVariantIdTip(ResourceLocation variantId){
+	public void PrintPlainModelTip(Identifier modelId){
+		Info(ChatFormatting.GRAY,
+			"[TIP] The model ID {} may be supported by providing "
+			+ "one of these files:",
+			ItemData(modelId)
+		);
+
+		PrintFileNamesTip("", modelId);
+	}
+
+	public void PrintVariantIdTip(Identifier variantId){
 		final LibraryDefinition libDef = metamodule.libraryDefinition();
 		variantId = variantId.withPrefix(subPrefix);
 
-		ResourceLocation modelId = libDef.GetModelId(variantId);
+		Identifier modelId = libDef.GetModelId(variantId);
 		if (modelId == null)
 		{
 			Info(ChatFormatting.GOLD, 
@@ -104,8 +114,8 @@ extends CommandLogger
 
 	}
 
-	public void PrintFileNamesTip(String modelPrefix, ResourceLocation variantId){
-		Component bullet = Component.literal("-").withStyle(ChatFormatting.GRAY);
+	public void PrintFileNamesTip(String modelPrefix, Identifier variantId){
+		Component bullet = Component.literal("• ").withStyle(ChatFormatting.GRAY);
 		switch (this.moduleHook)
 		{
 			default:

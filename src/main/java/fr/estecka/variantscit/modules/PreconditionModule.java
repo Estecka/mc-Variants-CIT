@@ -6,7 +6,7 @@ import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public record PreconditionModule(
@@ -16,7 +16,7 @@ public record PreconditionModule(
 implements IBakedModule
 {
 	@Override
-	public ResourceLocation GetModelForItem(ItemStack stack) {
+	public Identifier GetModelForItem(ItemStack stack) {
 		if (precondition.Matches(stack))
 			return subModule.GetModelForItem(stack);
 		else
@@ -34,7 +34,7 @@ implements IBakedModule
 	}
 
 	@Override
-	public ResourceLocation Walkthrough(WalktroughLogger logger, ItemStack stack) {
+	public Identifier Walkthrough(WalktroughLogger logger, ItemStack stack) {
 		if (LogTransform.WithLogger(logger, ()->precondition.Matches(stack))){
 			logger.Info("Precondition matched.");
 			return subModule.Walkthrough(logger, stack);
@@ -46,8 +46,8 @@ implements IBakedModule
 	}
 
 	@Override
-	public void Dump(CommandLogger logger) {
-		subModule.Dump(logger);
+	public boolean VariantIdInfo(CommandLogger logger, Identifier variantId) {
+		return subModule.VariantIdInfo(logger, variantId);
 	}
 
 	@Override

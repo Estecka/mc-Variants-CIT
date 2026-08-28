@@ -1,10 +1,10 @@
 package fr.estecka.variantscit.modules.libraries;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface ILinearLibrary
 {
-	public ResourceLocation GetWithBias (int magnitude, int bias);
-	public ResourceLocation GetOrLesser (int magnitude);
-	public ResourceLocation GetOrGreater(int magnitude);
+	public Identifier GetWithBias (int magnitude, int bias);
+	public Identifier GetOrLesser (int magnitude);
+	public Identifier GetOrGreater(int magnitude);
 }

@@ -8,30 +8,30 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.Item;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.PreconditionModule;
-import fr.estecka.variantscit.CodecUtil;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import fr.estecka.variantscit.collections.TriMap;
+import fr.estecka.variantscit.util.collections.HashMap3;
 
 
 public final class ModuleLoader
 {
 	static public class Result {
 		/** Sorted by hook, target, and priority. */
-		public final TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new TriMap<>();
+		public final HashMap3<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules = new HashMap3<>();
 
-		public final Map<ResourceLocation, MetaModule> uniqueModules = new HashMap<>();
-		public final Map<ResourceLocation, String> moduleErrors;
+		public final Map<Identifier, MetaModule> uniqueModules = new HashMap<>();
+		public final Map<Identifier, String> moduleErrors;
 		public final VariantAggregator variantAggregator;
 
 		private Result(
-			Map<ResourceLocation,ModuleDefinition> modules,
-			Map<ResourceLocation,String> errors
+			Map<Identifier,ModuleDefinition> modules,
+			Map<Identifier,String> errors
 		){
 			this.variantAggregator = new VariantAggregator(modules);
 			this.moduleErrors = errors;
@@ -41,18 +41,18 @@ public final class ModuleLoader
 	static public ModuleLoader.Result ReloadModules(HotswappableResourceManager manager)
 	{
 		final ModuleLoader.Result result;
-		final Map<ResourceLocation, String> errors = new HashMap<>();
+		final Map<Identifier, String> errors = new HashMap<>();
 		final List<MetaModule> metamodules = new ArrayList<>();
 
-		Map<ResourceLocation, Resource> resources = new HashMap<>();
-		Map<ResourceLocation, ModuleDefinition> definitions = new HashMap<>();
+		Map<Identifier, Resource> resources = new HashMap<>();
+		Map<Identifier, ModuleDefinition> definitions = new HashMap<>();
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variant-cits/item", ".json"));
 		ObsoletePathWarning(resources);
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/item", ".json"));
 		resources.putAll(CodecUtil.GetResources(manager.Get(), "variants-cit/modules", ".json"));
 		for (var entry : resources.entrySet())
 		{
-			ResourceLocation moduleId = entry.getKey();
+			Identifier moduleId = entry.getKey();
 			var optDefinition = CodecUtil.ParseResource(entry.getValue(), ModuleDefinition.CODEC);
 			if (optDefinition.isError()){
 				String errormMsg = optDefinition.error().get().message();
@@ -83,13 +83,17 @@ public final class ModuleLoader
 
 		for (var entry : definitions.entrySet())
 		{
-			ResourceLocation moduleId = entry.getKey();
+			Identifier moduleId = entry.getKey();
 			ModuleDefinition definition = entry.getValue();
 			Set<Item> targets = ItemsFromModule(moduleId, definition);
 			var baked = EModuleHook.MapOf(
-				ctx -> result.variantAggregator.GetLibrary(ctx, definition)
+				hook -> result.variantAggregator.GetLibrary(hook, definition)
 					.map(definition.parameters()::Bake)
 					.map(module -> definition.precondition().isPresent() ? new PreconditionModule(definition.precondition().get(), module) : module)
+					.orElse(null)
+			);
+			var libraries = EModuleHook.MapOf(
+				hook -> result.variantAggregator.GetLibrary(hook, definition)
 					.orElse(null)
 			);
 
@@ -97,7 +101,9 @@ public final class ModuleLoader
 				moduleId,
 				definition.priority(),
 				targets,
+				definition.parameters(),
 				definition.libraryDefinition(),
+				libraries,
 				baked
 			);
 
@@ -127,10 +133,10 @@ public final class ModuleLoader
 		return result;
 	}
 
-	static private void ObsoletePathWarning(Map<ResourceLocation, Resource> resources){
+	static private void ObsoletePathWarning(Map<Identifier, Resource> resources){
 		if (!resources.isEmpty()){
 			String names = "";
-			for (ResourceLocation id : resources.keySet()) {
+			for (Identifier id : resources.keySet()) {
 				names += ' ';
 				names += id.toString();
 			}
@@ -143,14 +149,14 @@ public final class ModuleLoader
 /* # Target Item Baking                                                       */
 /******************************************************************************/
 
-	static private Set<Item> ItemsFromModule(ResourceLocation moduleId, ModuleDefinition module){
+	static private Set<Item> ItemsFromModule(Identifier moduleId, ModuleDefinition module){
 		return module.targets()
 			.map(ModuleLoader::ItemsFromTarget)
 			.orElseGet(()->ItemsFromModuleId(moduleId))
 			;
 	}
 
-	static private Set<Item> ItemsFromTarget(List<ResourceLocation> targets){
+	static private Set<Item> ItemsFromTarget(List<Identifier> targets){
 		Set<Item> result = new HashSet<>();
 		targets.stream()
 			.map(id->BuiltInRegistries.ITEM.get(id))
@@ -161,7 +167,7 @@ public final class ModuleLoader
 		return result;
 	}
 
-	static private Set<Item> ItemsFromModuleId(ResourceLocation moduleId){
+	static private Set<Item> ItemsFromModuleId(Identifier moduleId){
 		if (BuiltInRegistries.ITEM.containsKey(moduleId))
 			return Set.of(BuiltInRegistries.ITEM.get(moduleId).get().value());
 		else

@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.hooks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,12 +7,14 @@ import java.util.WeakHashMap;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
+
 
 public class EquippableCache
 {
@@ -20,20 +22,20 @@ public class EquippableCache
 	 * Key 1: Maps original components to a list of their known variations.
 	 * Key 2: Maps variant ID to the modified copy of the component.
 	 */
-	private final WeakHashMap<Equippable, Map<ResourceLocation, Equippable>> cache = new WeakHashMap<>();
+	private final WeakHashMap<Equippable, Map<Identifier, Equippable>> cache = new WeakHashMap<>();
 
 	public void Clear(){
 		this.cache.clear();
 	}
 
-	public Equippable GetWithAssetId(Equippable original, ResourceLocation id){
+	public Equippable GetWithAssetId(Equippable original, Identifier id){
 		return this.cache
 			.computeIfAbsent(original, _0->new HashMap<>())
 			.computeIfAbsent(id, _0->CopyWithAssetId(original, id))
 			;
 	}
 
-	static private Equippable CopyWithAssetId(Equippable original, ResourceLocation id){
+	static private Equippable CopyWithAssetId(Equippable original, Identifier id){
 		return new Equippable(
 			original.slot(),
 			original.equipSound(),
@@ -60,9 +62,9 @@ public class EquippableCache
 			return original;
 		}
 
-		VariantsCitMod.LOGGER.PushLabel(stack.getItem());
-		ResourceLocation assetId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.EQUIPPABLE, stack);
-		VariantsCitMod.LOGGER.PopLabel();
+		VariantsCitMod.LOGGER.labels.push(stack.getItem());
+		Identifier assetId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.EQUIPPABLE, stack);
+		VariantsCitMod.LOGGER.labels.pop();
 
 		if (assetId == null)
 			return original;

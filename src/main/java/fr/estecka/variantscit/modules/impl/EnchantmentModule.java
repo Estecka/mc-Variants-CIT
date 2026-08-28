@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -14,6 +14,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.util.VariantUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
@@ -21,26 +22,26 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 public class EnchantmentModule
 extends AMonoComponentModule<ItemEnchantments>
 {
-	static public final ResourceLocation MULTI_ENCHANTS = IVariantLibrary.SpecialVariantId("multi");
+	static public final Identifier MULTI_ENCHANTS = VariantUtil.SpecialVariantId("multi");
 
 	static public final MapCodec<EnchantmentModule> CreateCodec(DataComponentType<ItemEnchantments> targetComponent){
 		return RecordCodecBuilder.mapCodec(builder->builder
 			.group(
 				// TODO: Figure out how to restrict it to specific classes
 				// Registries.DATA_COMPONENT_TYPE.getCodec().fieldOf("componentType").forGetter(ItemComponentProperty::componentType),
-				Codec.unboundedMap(ResourceLocation.CODEC, Codec.INT).optionalFieldOf("requiredEnchantments", Map.of()).forGetter(o->o.precondition),
+				Codec.unboundedMap(Identifier.CODEC, Codec.INT).optionalFieldOf("requiredEnchantments", Map.of()).forGetter(o->o.precondition),
 				Codec.STRING.optionalFieldOf("levelSeparator").forGetter(o->o.separator)
 			)
 			.apply(builder, (pre,sep)->new EnchantmentModule(targetComponent, pre, sep))
 		);
 	}
 
-	private final Map<ResourceLocation, Integer> precondition;
+	private final Map<Identifier, Integer> precondition;
 	private final Optional<String> separator;
 
 	public EnchantmentModule(
 		DataComponentType<ItemEnchantments> component,
-		Map<ResourceLocation, Integer> precondition,
+		Map<Identifier, Integer> precondition,
 		Optional<String> separator
 	) {
 		super(component, ECachePolicy.ALWAYS);
@@ -49,12 +50,12 @@ extends AMonoComponentModule<ItemEnchantments>
 	}
 
 	@Override
-	public ResourceLocation GetModelForComponent(ItemEnchantments enchants, IVariantLibrary library)
+	public Identifier GetModelForComponent(ItemEnchantments enchants, IVariantLibrary library)
 	{
 		if (enchants == null || enchants.isEmpty() || !this.MatchesPrecondition(enchants))
 			return null;
 
-		ResourceLocation multiModel = library.GetVariantModelStrict(MULTI_ENCHANTS);
+		Identifier multiModel = library.GetVariantModelStrict(MULTI_ENCHANTS);
 		if (enchants.size() > precondition.size()+1 && multiModel!=null)
 			return multiModel;
 
@@ -68,9 +69,9 @@ extends AMonoComponentModule<ItemEnchantments>
 	private boolean MatchesPrecondition(ItemEnchantments component){
 		// Cast the component, so that the keys are plain identifiers, instead
 		// of registry entries.
-		Object2IntOpenHashMap<ResourceLocation> enchants = new Object2IntOpenHashMap<>();
+		Object2IntOpenHashMap<Identifier> enchants = new Object2IntOpenHashMap<>();
 		for (var entry : component.entrySet())
-			enchants.put(entry.getKey().unwrapKey().get().location(), entry.getIntValue());
+			enchants.put(entry.getKey().unwrapKey().get().identifier(), entry.getIntValue());
 
 		for (var condition : this.precondition.entrySet()) {
 			if (enchants.getInt(condition.getKey()) < condition.getValue())
@@ -83,7 +84,7 @@ extends AMonoComponentModule<ItemEnchantments>
 	private @Nullable Entry<Holder<Enchantment>> GetBestEnchant(ItemEnchantments enchants, IVariantLibrary library){
 		Entry<Holder<Enchantment>> bestFit = null;
 		for (var enchant : enchants.entrySet()){
-			if (!this.precondition.containsKey(enchant.getKey().unwrapKey().get().location())
+			if (!this.precondition.containsKey(enchant.getKey().unwrapKey().get().identifier())
 			&&  CompareEnchants(enchant, bestFit, library) > 0
 			){
 				bestFit = enchant;
@@ -114,16 +115,16 @@ extends AMonoComponentModule<ItemEnchantments>
 		return result;
 	}
 
-	private ResourceLocation GetEnchantModel(Entry<Holder<Enchantment>> enchant, IVariantLibrary library){
-		ResourceLocation variantId = enchant.getKey().unwrapKey().get().location();
+	private Identifier GetEnchantModel(Entry<Holder<Enchantment>> enchant, IVariantLibrary library){
+		Identifier variantId = enchant.getKey().unwrapKey().get().identifier();
 
 		if (separator.isPresent()) {
 			int level = enchant.getIntValue();
-			ResourceLocation baseId = variantId.withSuffix(separator.get());
+			Identifier baseId = variantId.withSuffix(separator.get());
 
 			for (int i=level; 0<=i; --i)
 			{
-				ResourceLocation leveledId = baseId.withSuffix(String.valueOf(i));
+				Identifier leveledId = baseId.withSuffix(String.valueOf(i));
 				if (library.HasVariantModel(leveledId)){
 					variantId = leveledId;
 					break;
@@ -139,7 +140,7 @@ extends AMonoComponentModule<ItemEnchantments>
 	}
 
 	@Override
-	public @Nullable ResourceLocation Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
+	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
 		ItemEnchantments enchants = stack.get(this.componentType);
 		if (enchants == null || enchants.isEmpty()){
 			logger.Info("The item does not have any enchantment.");

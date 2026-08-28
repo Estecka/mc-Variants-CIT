@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import fr.estecka.variantscit.collections.BiMap;
-import fr.estecka.variantscit.collections.TriMap;
+import fr.estecka.variantscit.util.collections.HashMap2;
+import fr.estecka.variantscit.util.collections.HashMap3;
+import fr.estecka.variantscit.util.collections.Map2;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.IModuleWrapper;
 import fr.estecka.variantscit.modules.ModuleList;
@@ -14,8 +15,8 @@ import net.minecraft.world.item.Item;
 
 public abstract class CacheBuilder
 {
-	static public BiMap<EModuleHook,Item,IBakedModule> BuildAll(TriMap<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules){
-		BiMap<EModuleHook,Item,IBakedModule> result = new BiMap<>();
+	static public Map2<EModuleHook,Item,IBakedModule> BuildAll(HashMap3<EModuleHook,Item,Integer,List<IBakedModule>> sortedModules){
+		Map2<EModuleHook,Item,IBakedModule> result = new HashMap2<>();
 
 		for (EModuleHook hook : sortedModules.keySet())
 		for (Item item : sortedModules.get(hook).keySet())

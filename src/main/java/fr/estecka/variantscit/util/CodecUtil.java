@@ -1,4 +1,4 @@
-package fr.estecka.variantscit;
+package fr.estecka.variantscit.util;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,27 +22,27 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
+import fr.estecka.variantscit.VariantsCitMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
+
 
 public final class CodecUtil
 {
 	static private final Minecraft client = Minecraft.getInstance();
 
-	static public final Codec<ResourceLocation> VCIT_IDENTIFIER = Codec.STRING.comapFlatMap(CodecUtil::VCitIdentifier, ResourceLocation::toString);
-	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->ResourceLocation.isValidPath(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
+	static public final Codec<Identifier> VCIT_IDENTIFIER = Codec.STRING.comapFlatMap(CodecUtil::VCitIdentifier, Identifier::toString);
+	static public final Codec<String> IDENTIFIER_PATH = Codec.STRING.validate(path->Identifier.isValidPath(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in path: "+path));
 	static public final Codec<String> LEGACY_ITEM_PATH = IDENTIFIER_PATH.validate(CodecUtil::UnItemify);
-	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->ResourceLocation.isValidNamespace(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
-	@Deprecated
-	static public final Codec<String> NONEMPTY_STRING = Codec.STRING.validate(CodecUtil.NonEmptyString("<unspecified> string"));
+	static public final Codec<String> IDENTIFIER_NAMESPACE = Codec.STRING.validate(path->Identifier.isValidNamespace(path) ? DataResult.success(path) : DataResult.error(()->"Invalid character in namespace: "+path));
 	static public final Codec<Character> CHAR = Codec.string(1,1).xmap(s->s.charAt(0), c->String.valueOf(c));
 	static public final Codec<Pattern> REGEX = Codec.STRING.comapFlatMap(CodecUtil::ParseRegex, Pattern::toString);
 	static public final Codec<Tag> NBT_ELEMENT = Codec.PASSTHROUGH.xmap( dyn->dyn.convert(NbtOps.INSTANCE).getValue(), nbt->new Dynamic<>(NbtOps.INSTANCE, nbt.copy()) );
@@ -52,13 +52,13 @@ public final class CodecUtil
 /* # Base Types                                                               */
 /******************************************************************************/
 
-	static public DataResult<ResourceLocation> NamespacedIdentifier(String defaultNamespace, String input){
+	static public DataResult<Identifier> NamespacedIdentifier(String defaultNamespace, String input){
 		if (!input.contains(":"))
 			input = defaultNamespace + ":" + input;
-		return ResourceLocation.read(input);
+		return Identifier.read(input);
 	}
 
-	static public DataResult<ResourceLocation> VCitIdentifier(String input){
+	static public DataResult<Identifier> VCitIdentifier(String input){
 		return NamespacedIdentifier(VariantsCitMod.MODID, input);
 	}
 
@@ -93,18 +93,22 @@ public final class CodecUtil
 		return DataResult.success(UnItemifyRaw(original));
 	}
 
-	static public DataResult<ResourceLocation> UnItemify(ResourceLocation original){
-		return DataResult.success(ResourceLocation.fromNamespaceAndPath(original.getNamespace(), UnItemifyRaw(original.getPath())));
+	static public DataResult<Identifier> UnItemify(Identifier original){
+		return DataResult.success(Identifier.fromNamespaceAndPath(original.getNamespace(), UnItemifyRaw(original.getPath())));
 	}
 
-	static public DataResult<String> NonEmptyString(String string, String stringName){
+	static public DataResult<String> ValidateNonEmptyString(String string, String stringName){
 		return string.isEmpty() ?
 			DataResult.error(()->stringName+" cannot be empty.") :
 			DataResult.success(string);
 	}
 
 	static public Function<String,DataResult<String>> NonEmptyString(String stringName){
-		return string -> NonEmptyString(string, stringName);
+		return string -> ValidateNonEmptyString(string, stringName);
+	}
+
+	static public Codec<String> NonEmptyStringCodec(String stringName){
+		return Codec.STRING.validate(NonEmptyString(stringName));
 	}
 
 
@@ -227,8 +231,8 @@ public final class CodecUtil
 		return codec.parse(NbtOps.INSTANCE, StringTag.valueOf(string));
 	}
 
-	static public String ShortIdString(ResourceLocation id){
-		if (id.getNamespace() == ResourceLocation.DEFAULT_NAMESPACE)
+	static public String ShortIdString(Identifier id){
+		if (id.getNamespace() == Identifier.DEFAULT_NAMESPACE)
 			return id.getPath();
 		else
 			return id.toString();
@@ -236,7 +240,7 @@ public final class CodecUtil
 
 	static public String ShortIdString(DataComponentType<?> componentType){
 		String result = "???";
-		ResourceLocation id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(componentType);
+		Identifier id = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(componentType);
 		if (id != null)
 			result = CodecUtil.ShortIdString(id);
 		return result;
@@ -276,8 +280,8 @@ public final class CodecUtil
 	 * @return The matching  resources, keyed using  an ID that includes neither
 	 * the directory nor the suffix.
 	 */
-	static public Map<ResourceLocation,Resource> GetResources(ResourceManager manager, String directory, String suffix){
-		Map<ResourceLocation, Resource> result = new HashMap<>();
+	static public Map<Identifier,Resource> GetResources(ResourceManager manager, String directory, String suffix){
+		Map<Identifier, Resource> result = new HashMap<>();
 		var resources = manager.listResources(directory, id->id.getPath().endsWith(suffix));
 		for (var e : resources.entrySet())
 			result.put(AssetIdFromResourceId(e.getKey(), directory, suffix), e.getValue());
@@ -285,7 +289,7 @@ public final class CodecUtil
 		return result;
 	}
 
-	static public ResourceLocation AssetIdFromResourceId(ResourceLocation id, String directory, String suffix){
+	static public Identifier AssetIdFromResourceId(Identifier id, String directory, String suffix){
 		return id.withPath(path->path.substring(
 			directory.length() + 1,
 			path.length() - suffix.length()
@@ -308,12 +312,12 @@ public final class CodecUtil
 		return codec.decode(JsonOps.INSTANCE, json).map(Pair::getFirst);
 	}
 
-	static public <T> Map<ResourceLocation, T> ReloadResources(ResourceManager manager, Codec<T> codec, String directory, String suffix){
-		Map<ResourceLocation, T> results = new HashMap<>();
+	static public <T> Map<Identifier, T> ReloadResources(ResourceManager manager, Codec<T> codec, String directory, String suffix){
+		Map<Identifier, T> results = new HashMap<>();
 
-		Map<ResourceLocation, Resource> resources = GetResources(manager, directory, suffix);
+		Map<Identifier, Resource> resources = GetResources(manager, directory, suffix);
 		for (var entry : resources.entrySet()){
-			ResourceLocation id = entry.getKey();
+			Identifier id = entry.getKey();
 			DataResult<T> result = ParseResource(entry.getValue(), codec);
 			if (result.isSuccess())
 				results.put(id, result.getOrThrow());

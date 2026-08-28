@@ -392,6 +392,12 @@ Since v3.5:
 - Crawl will explicitely list all skipped modules.
 - Crawl will no longer list internal module types.
 ## 5.5
+### 5.5.0
 - Fixed some number-like components not automatically casting to string.
 - Command `module` shows the errors of modules that failed to load.
 - Added `expect` value: `snbt`
+### 5.6.0
+- Fixed crash when using components with no codecs.
+- Module `predicates` is now capable of operating without `modelPrefix` or `modelList`.
+- Added commands `module variant-id` and `module model-id`.
+- Command `module dump` now shows the same output for all module types
