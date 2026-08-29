@@ -2,6 +2,7 @@ package fr.estecka.variantscit.itemdata.transforms;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -120,6 +121,22 @@ public final class DataConversions
 		return RawDataContainer.<String>OfNullable(snbt);
 	}
 
+	static public IDataContainer GetRgb(IDataContainer input) {
+		return FormatRgb(ParseColor(input));
+	}
+
+	static public IDataContainer GetArgb(IDataContainer input) {
+		return FormatArgb(ParseColor(input));
+	}
+
+	static public IDataContainer GetRgba(IDataContainer input) {
+		return FormatRgba(ParseColor(input));
+	}
+
+	static public IDataContainer GetHex(IDataContainer input) {
+		return FormatHex(ParseColor(input));
+	}
+
 
 /******************************************************************************/
 /* # Aggressive Conversions                                                   */
@@ -193,6 +210,139 @@ public final class DataConversions
 		       null
 		       ;
 	};
+
+	static private final long DEFAULT_ALPHA = 0xFF000000L;
+
+	static private record ParsedColor(long value, boolean hasAlpha) {}
+
+	static private @Nullable ParsedColor ParseColor(IDataContainer input) {
+		Object value = input.value();
+		if (value instanceof Number number)
+			return ParseNumberColor(number);
+		if (value instanceof String string)
+			return ParseColor(string);
+		return ParseColor(input.asString());
+	}
+
+	static private @Nullable ParsedColor ParseColor(@Nullable String input) {
+		if (input == null)
+			return null;
+
+		input = input.trim();
+		if (input.isEmpty())
+			return null;
+
+		var named = ParseNamedColor(input);
+		if (named != null)
+			return new ParsedColor(DEFAULT_ALPHA | named, false);
+
+		if (input.startsWith("#"))
+			return ParseHexColor(input.substring(1));
+
+		if (input.startsWith("0x") || input.startsWith("0X"))
+			return ParseHexColor(input.substring(2));
+
+		if (input.matches("[0-9]+"))
+			return ParseDecimalColor(input);
+
+		if (input.matches("(?i)[0-9a-f]{6,8}"))
+			return ParseHexColor(input);
+
+		return null;
+	}
+
+	static private @Nullable ParsedColor ParseNumberColor(Number input) {
+		long value = Integer.toUnsignedLong(input.intValue());
+		long raw = value & 0xFFFFFFFFL;
+		boolean hasAlpha = (value > 0xFFFFFFL) || (value < 0);
+		return new ParsedColor(raw, hasAlpha);
+	}
+
+	static private @Nullable ParsedColor ParseDecimalColor(String input) {
+		try {
+			long value = Long.parseLong(input);
+			long raw = value & 0xFFFFFFFFL;
+			boolean hasAlpha = (value > 0xFFFFFFL) || (value < 0);
+			return new ParsedColor(raw, hasAlpha);
+		}
+		catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+
+	static private @Nullable ParsedColor ParseHexColor(String input) {
+		if (input.length() > 8)
+			return null;
+
+		try {
+			long value = Long.parseLong(input, 16) & 0xFFFFFFFFL;
+			if (input.length() <= 6)
+				return new ParsedColor(DEFAULT_ALPHA | value, false);
+			return new ParsedColor(value, true);
+		}
+		catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+
+	static private @Nullable Long ParseNamedColor(String input) {
+		switch (input.toLowerCase(Locale.ROOT)) {
+			case "black":         return 0x000000L;
+			case "dark_blue":     return 0x0000AAL;
+			case "dark_green":    return 0x00AA00L;
+			case "dark_aqua":     return 0x00AAAAL;
+			case "dark_red":      return 0xAA0000L;
+			case "dark_purple":   return 0xAA00AAL;
+			case "gold":          return 0xFFAA00L;
+			case "gray":          return 0xAAAAAAL;
+			case "dark_gray":     return 0x555555L;
+			case "blue":          return 0x5555FFL;
+			case "green":         return 0x55FF55L;
+			case "aqua":          return 0x55FFFFL;
+			case "red":           return 0xFF5555L;
+			case "light_purple":  return 0xFF55FFL;
+			case "yellow":        return 0xFFFF55L;
+			case "white":         return 0xFFFFFFL;
+			default:               return null;
+		}
+	}
+
+	static private long NormalizeArgb(ParsedColor color) {
+		long value = color.value & 0xFFFFFFFFL;
+		if (color.hasAlpha)
+			return value;
+		else
+			return DEFAULT_ALPHA | (value & 0xFFFFFFL);
+	}
+
+	static private @Nullable RawDataContainer<String> FormatRgb(@Nullable ParsedColor color) {
+		if (color == null)
+			return null;
+
+		return RawDataContainer.OfNullable(String.format(Locale.ROOT, "#%06X", NormalizeArgb(color) & 0xFFFFFFL));
+	}
+
+	static private @Nullable RawDataContainer<String> FormatArgb(@Nullable ParsedColor color) {
+		if (color == null)
+			return null;
+
+		return RawDataContainer.OfNullable(String.format(Locale.ROOT, "#%08X", NormalizeArgb(color)));
+	}
+
+	static private @Nullable RawDataContainer<String> FormatRgba(@Nullable ParsedColor color) {
+		if (color == null)
+			return null;
+
+		long argb = NormalizeArgb(color);
+		return RawDataContainer.OfNullable(String.format(Locale.ROOT, "#%06X%02X", argb & 0xFFFFFFL, (argb >>> 24) & 0xFFL));
+	}
+
+	static private @Nullable RawDataContainer<String> FormatHex(@Nullable ParsedColor color) {
+		if (color == null)
+			return null;
+
+		return RawDataContainer.OfNullable(String.format(Locale.ROOT, "0x%08X", NormalizeArgb(color)));
+	}
 
 	static public @Nullable Tag SoftCastToNbt(@Nullable Object value){
 		return value instanceof Tag nbt ? nbt :

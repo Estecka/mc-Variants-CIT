@@ -140,6 +140,10 @@ public final class VCitRegistries
 
 		TRANSFORMS.RegisterMap (VariantsCitMod.Identifier("nbt_path"),            NbtPath.MAPCODEC);
 		TRANSFORMS.Register    (VariantsCitMod.Identifier("get_identifier"),      DataConversions.GET_IDENTIFIER_MAPCODEC, DataConversions::StricIdentifier);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rgb"),             DataConversions::GetRgb);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_argb"),            DataConversions::GetArgb);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rgba"),            DataConversions::GetRgba);
+		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_hex"),             DataConversions::GetHex);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_nbt"),             DataConversions::StrictNbt);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_number"),          DataConversions::StrictNumber);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("get_rich_text"),       DataConversions::StrictRichText);
