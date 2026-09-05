@@ -19,24 +19,22 @@ import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.reload.EModuleHook;
 import net.minecraft.util.Util;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
-import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimSpriteKey;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimTextureKey;
 import net.minecraft.client.resources.model.EquipmentAssetManager;
+import net.minecraft.client.resources.palette.PalettedTextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.trim.ArmorTrim;
 
 
 @Unique
 @Mixin(EquipmentLayerRenderer.class)
 public class EquipmentLayerRendererMixin
 {
-	@Shadow private @Final Function<TrimSpriteKey,TextureAtlasSprite> trimSpriteLookup;
-	@Unique private BiFunction<TrimSpriteKey, TrimPatternOverlay, TextureAtlasSprite> trimSpriteOverlayLookup;
+	@Shadow private @Final Function<TrimTextureKey, PalettedTextureManager.Handle> trimTextureLookup;
+	@Unique private BiFunction<TrimTextureKey, TrimPatternOverlay, PalettedTextureManager.Handle> trimSpriteOverlayLookup;
 
 	@Inject(method="<init>", at=@At("TAIL"))
-	private void getAtlas(EquipmentAssetManager manager, TextureAtlas atlas, CallbackInfo ci){
+	private void getAtlas(EquipmentAssetManager manager, PalettedTextureManager atlas, CallbackInfo ci){
 		this.trimSpriteOverlayLookup = Util.memoize(
 			(trimSpriteKey, override) -> ComputeSprite(atlas, trimSpriteKey, override)
 		);
@@ -56,7 +54,7 @@ public class EquipmentLayerRendererMixin
 		Operation<Object> original,
 		@Local(argsOnly=true) ItemStack stack
 	){
-		if (memoizer != this.trimSpriteLookup || !(memoizerKey instanceof TrimSpriteKey trimSpriteKey))
+		if (memoizer != this.trimTextureLookup || !(memoizerKey instanceof TrimTextureKey trimSpriteKey))
 			throw new RuntimeException("Bad mixin injection point for variants-cit's trim_pattern hook.");
 
 		Identifier overlayId = VariantsCitMod.GetModules().GetModelForItem(EModuleHook.TRIM_PATTERN, stack);
@@ -69,25 +67,21 @@ public class EquipmentLayerRendererMixin
 
 	}
 
-	static private TextureAtlasSprite ComputeSprite(TextureAtlas atlas, TrimSpriteKey trimSpriteKey, TrimPatternOverlay overlay){
-		Identifier spriteId;
+	static private PalettedTextureManager.Handle ComputeSprite(PalettedTextureManager atlas, TrimTextureKey trimSpriteKey, TrimPatternOverlay overlay){
 		try {
 			MixinGlobals.trimOverride = overlay;
-			spriteId = trimSpriteKey.spriteId();
+			return trimSpriteKey.getOrPrepareTexture(atlas);
 		}
 		finally {
 			MixinGlobals.trimOverride = null;
 		}
-
-		return atlas.getSprite(spriteId);
-
 	}
 
-	@Mixin(ArmorTrim.class)
+	@Mixin(TrimTextureKey.class)
 	static public abstract class ArmorTrimMixin
 	{
 		@ModifyExpressionValue(
-			method = "layerAssetId",
+			method = "getOrPrepareTexture",
 			at = @At(
 				value = "INVOKE",
 				target = "net/minecraft/world/item/equipment/trim/TrimPattern.assetId()Lnet/minecraft/resources/Identifier;"

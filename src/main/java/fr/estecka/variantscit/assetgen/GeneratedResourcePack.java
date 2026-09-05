@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.loader.api.FabricLoader;
@@ -16,6 +17,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackMetadataResources;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
@@ -49,8 +51,8 @@ implements PackResources
 	);
 
 	static private final ResourcesSupplier FACTORY = new ResourcesSupplier() {
-		public PackResources openPrimary(PackLocationInfo var1) { return INSTANCE; };
-		public PackResources openFull(PackLocationInfo var1, Metadata var2) { return INSTANCE; };
+		public PackMetadataResources openMetadata(PackLocationInfo var1) { return INSTANCE; };
+		public Stream<PackResources> openResources(PackLocationInfo var1, Metadata var2) { return Stream.of(INSTANCE); };
 	};
 
 	static public final Pack PROFILE = new Pack(PACK_INFO, FACTORY, METADATA, POSITION);

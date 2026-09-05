@@ -1,4 +1,4 @@
 classTweaker v1 official
 
-accessible class	net/minecraft/client/renderer/entity/layers/EquipmentLayerRenderer$TrimSpriteKey
-
+accessible class	net/minecraft/client/renderer/entity/layers/EquipmentLayerRenderer$TrimTextureKey
+accessible method	net/minecraft/client/renderer/entity/layers/EquipmentLayerRenderer$TrimTextureKey getOrPrepareTexture (Lnet/minecraft/client/resources/palette/PalettedTextureManager;)Lnet/minecraft/client/resources/palette/PalettedTextureManager$Handle;

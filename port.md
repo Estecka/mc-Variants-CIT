@@ -34,4 +34,11 @@ Initial Release
 - `ItemAsset.Properties::new` takes another parameter. Use the statically available `DEFAULT` instead.
 
 ## 26.1
+- Mojmapocalypse
 - `ItemArgument::getItem` now returns a holder.
+
+## 26.3
+- Coloured trim textures no longer require an atlas. Instead they require an mcmeta file with the palette key.
+- `TrimSpriteKey` renamed to `TrimTextureKey`
+- `ResourcesSupplier::openPrimary` renamed to `ResourcesSupplier::openMetadata`
+- `ResourcesSupplier::openFull` renamed to `ResourcesSupplier::openResource`
