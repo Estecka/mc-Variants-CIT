@@ -402,8 +402,11 @@ Since v3.5:
 - Fixed some number-like components not automatically casting to string.
 - Command `module` shows the errors of modules that failed to load.
 - Added `expect` value: `snbt`
+## 5.6
 ### 5.6.0
 - Fixed crash when using components with no codecs.
 - Module `predicates` is now capable of operating without `modelPrefix` or `modelList`.
 - Added commands `module variant-id` and `module model-id`.
 - Command `module dump` now shows the same output for all module types
+### 5.6.1
+- (MC 26.3) VCIT Trim models now can define a fallback palette key.

@@ -1,3 +1,4 @@
 {
-	"asset_id": "${OUTPUT_ID}"
+	"asset_id": "${OUTPUT_ID}",
+	"base_palette_fallback": "minecraft:trim_base"
 }

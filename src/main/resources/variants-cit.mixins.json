@@ -6,6 +6,7 @@
 		"ClientWorldAccessor",
 		"EquipmentLayerRendererMixin",
 		"EquipmentLayerRendererMixin$ArmorTrimMixin",
+		"EquipmentLayerRendererMixin$PalettedTextureManagerMixin",
 		"FeatureRendererMixin$Armor",
 		"FeatureRendererMixin$Cape",
 		"FeatureRendererMixin$Elytra",

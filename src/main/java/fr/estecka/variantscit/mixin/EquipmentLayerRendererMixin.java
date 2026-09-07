@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -20,6 +21,7 @@ import fr.estecka.variantscit.reload.EModuleHook;
 import net.minecraft.util.Util;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer.TrimTextureKey;
+import net.minecraft.client.resources.metadata.texture.PaletteMetadataSection;
 import net.minecraft.client.resources.model.EquipmentAssetManager;
 import net.minecraft.client.resources.palette.PalettedTextureManager;
 import net.minecraft.resources.Identifier;
@@ -90,6 +92,46 @@ public class EquipmentLayerRendererMixin
 		public Identifier overrideTextureId(Identifier original){
 			if (MixinGlobals.trimOverride != null)
 				return MixinGlobals.trimOverride.assetId();
+			else
+				return original;
+		}
+	}
+
+	@Mixin(PalettedTextureManager.class)
+	static private abstract class PalettedTextureManagerMixin
+	{
+		@ModifyArg(
+			method = "getOrPrepare",
+			index = 0,
+			at = @At(
+				value = "INVOKE",
+				target = "net/minecraft/client/resources/palette/PalettedTextureManager$SlotKey.<init> (Lnet/minecraft/resources/Identifier;Lnet/minecraft/resources/Identifier;)V"
+			)
+		)
+		/**
+		 * Ensures that the same texture can be repaletted using multiple base
+		 * palettes, by including the base palette's ID in the slot key.
+		 * @see {@linkplain java.util.Arrays#hashCode(Object[])}
+		 */
+		private Identifier ChangePalettedCacheKey(Identifier original){
+			if (MixinGlobals.trimOverride != null && MixinGlobals.trimOverride.fallbackPaletteKey().isPresent()){
+				int hash = (17*31 + original.hashCode())*31 + MixinGlobals.trimOverride.fallbackPaletteKey().hashCode();
+				return VariantsCitMod.Identifier("repaletted/"+hash);
+			}
+			else
+				return original;
+		}
+
+		@ModifyExpressionValue(
+			method = "prepareSlot",
+			at = @At(
+				value = "INVOKE",
+				target = "net/minecraft/client/resources/palette/PalettedTextureManager$BaseTexture.paletteMetadata ()Lnet/minecraft/client/resources/metadata/texture/PaletteMetadataSection;"
+			)
+		)
+		private PaletteMetadataSection fallbackPaletteKey(PaletteMetadataSection original){
+			if (original == null && MixinGlobals.trimOverride != null)
+				return MixinGlobals.trimOverride.fallbackPaletteKey().orElse(null);
 			else
 				return original;
 		}

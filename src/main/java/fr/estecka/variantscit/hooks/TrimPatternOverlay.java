@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.ReloadableRepository;
+import net.minecraft.client.resources.metadata.texture.PaletteMetadataSection;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -12,11 +13,15 @@ import net.minecraft.resources.Identifier;
  */
 public record TrimPatternOverlay(
 	Identifier assetId,
+	Optional<PaletteMetadataSection> fallbackPaletteKey,
 	Optional<Boolean> isDecal
 ) {
+	static public final Codec<PaletteMetadataSection> PALETTE_CODEC = Identifier.CODEC.xmap(PaletteMetadataSection::new, PaletteMetadataSection::basePalette);
+
 	static public final MapCodec<TrimPatternOverlay> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			Identifier.CODEC.fieldOf("asset_id").forGetter(TrimPatternOverlay::assetId),
+			PALETTE_CODEC.optionalFieldOf("base_palette_fallback").forGetter(TrimPatternOverlay::fallbackPaletteKey),
 			Codec.BOOL.optionalFieldOf("decal").forGetter(TrimPatternOverlay::isDecal)
 		)
 		.apply(builder, TrimPatternOverlay::new)
