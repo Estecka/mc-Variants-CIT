@@ -1,0 +1,9 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"inputPath": "llama_body/(.*)",
+		"outputPath": "$1",
+		"template": "equipment/layer",
+		"variables": { "layerName": "llama_body" }
+	}
+]

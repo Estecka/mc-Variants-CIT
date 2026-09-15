@@ -350,7 +350,7 @@ extends CommandUtil
 		for (Identifier variantId : candidateVariantIds){
 			if (library.HasVariantModel(variantId))
 				foundvariants.add(variantId);
-			else if (!meta.parameters().AcceptsVariant(variantId))
+			else if (!isIntrinsic && !meta.parameters().AcceptsVariant(variantId))
 				rejectedVariants.add(variantId);
 			else
 				missingVariants.add(variantId);

@@ -1,7 +1,7 @@
 [
 	{
 		"pass": "equipments_from_textures",
-		"inputPath": "humanoid(_leggings)?/(.*)",
+		"inputPath": "humanoid(_leggings|_baby)?/(.*)",
 		"outputPath": "$2",
 		"template": "equipment/humanoid"
 	}

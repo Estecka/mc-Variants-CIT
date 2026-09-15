@@ -1,16 +1,11 @@
 {
 	"layers": {
-		"humanoid": [
+		"nautilus_body": [
 			{
 				"texture": "${OUTPUT_ID}"
 			}
 		],
-		"humanoid_baby": [
-			{
-				"texture": "${OUTPUT_ID}"
-			}
-		],
-		"humanoid_leggings": [
+		"nautilus_saddle": [
 			{
 				"texture": "${OUTPUT_ID}"
 			}
