@@ -10,7 +10,7 @@
 		"FeatureRendererMixin$Cape",
 		"FeatureRendererMixin$Elytra",
 		"FeatureRendererMixin$Llama",
-		"FeatureRendererMixin$Saddle",
+		"FeatureRendererMixin$SimpleEquipment",
 		"FeatureRendererMixin$Wolf",
 		"ItemModelManagerMixin",
 		"ReloadableResourceManagerImplMixin",

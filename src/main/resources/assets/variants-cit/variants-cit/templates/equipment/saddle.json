@@ -1,5 +1,10 @@
 {
 	"layers": {
+		"camel_husk_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
 		"camel_saddle": [
 			{
 				"texture": "${OUTPUT_ID}"
@@ -16,6 +21,11 @@
 			}
 		],
 		"mule_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
+		"nautilus_saddle": [
 			{
 				"texture": "${OUTPUT_ID}"
 			}

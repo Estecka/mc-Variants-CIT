@@ -12,7 +12,7 @@ import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
-import fr.estecka.variantscit.itemdata.transforms.impl.NbtPath;
+import fr.estecka.variantscit.itemdata.nbtpath.NbtPath;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 import fr.estecka.variantscit.modules.cache.ICacheKey;
 import net.minecraft.core.component.DataComponentType;

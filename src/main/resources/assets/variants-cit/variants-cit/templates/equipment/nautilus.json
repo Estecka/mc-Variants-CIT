@@ -1,0 +1,14 @@
+{
+	"layers": {
+		"nautilus_body": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
+		"nautilus_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		]
+	}
+}
