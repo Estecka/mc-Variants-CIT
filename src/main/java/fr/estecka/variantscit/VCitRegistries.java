@@ -16,6 +16,8 @@ import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.OptionalTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.*;
+import fr.estecka.variantscit.itemdata.transforms.impl.translate.TranslateTransform;
+import fr.estecka.variantscit.itemdata.nbtpath.NbtPath;
 import fr.estecka.variantscit.itemdata.preconditions.*;
 import fr.estecka.variantscit.modules.impl.*;
 import fr.estecka.variantscit.modules.libraries.*;
@@ -98,6 +100,7 @@ public final class VCitRegistries
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(VariantsCitMod.Identifier("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("display_name"), DisplayNameProperty.UNIT);
+		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("dyed_color"), DyedColorProperty.UNIT);
 		ITEM_PROPERTIES.RegisterMap(VariantsCitMod.Identifier("item_component"), ItemComponentProperty.MAP_CODEC);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_count"), ItemCountProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_type"), ItemTypeProperty.UNIT);
@@ -126,11 +129,21 @@ public final class VCitRegistries
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("alternative"),         AlternativeTransform.MAPCODEC);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("foreach"),             ForeachTransform.MAPCODEC);
 
-		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST);
-		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist"),           FilterlistTransform.MAPCODEC_BLACKLIST);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist"),           FilterlistTransform.MAPCODEC_WHITELIST_STRING);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist_string"),    FilterlistTransform.MAPCODEC_WHITELIST_STRING);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist_number"),    FilterlistTransform.MAPCODEC_WHITELIST_NUMBER);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("whitelist_id"),        FilterlistTransform.MAPCODEC_WHITELIST_ID);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist"),           FilterlistTransform.MAPCODEC_BLACKLIST_STRING);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist_string"),    FilterlistTransform.MAPCODEC_BLACKLIST_STRING);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist_number"),    FilterlistTransform.MAPCODEC_BLACKLIST_NUMBER);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("blacklist_id"),        FilterlistTransform.MAPCODEC_BLACKLIST_ID);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("charset_remap"),       CharRemapTransform.MAPCODEC);
-		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("remap"),               RemapTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("remap"),               RemapTransform.MAPCODEC_STRING);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("remap_string"),        RemapTransform.MAPCODEC_STRING);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("remap_number"),        RemapTransform.MAPCODEC_NUMBER);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("remap_id"),            RemapTransform.MAPCODEC_ID);
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("regex"),               RegexTransform.MAPCODEC);
+		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("translate"),           TranslateTransform.MAPCODEC);
 
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("equals"),              CodecUtil.MapWithAlternative(StringCompareTransform.MAPCODEC,NumberCompareTransform.MAPCODEC_EQUAL));
 		TRANSFORMS.RegisterMap(VariantsCitMod.Identifier("smaller_than"),        NumberCompareTransform.MAPCODEC_SMALLER);
@@ -152,8 +165,8 @@ public final class VCitRegistries
 			RegexTransform.MAPCODEC,
 			LogTransform.ANONYMOUS_MAPCODEC,
 			NbtPath.MAPCODEC,
-			FilterlistTransform.MAPCODEC_BLACKLIST,
-			FilterlistTransform.MAPCODEC_WHITELIST,
+			FilterlistTransform.MAPCODEC_BLACKLIST_STRING,
+			FilterlistTransform.MAPCODEC_WHITELIST_STRING,
 			MatchesTransform.MATCHANY_MAPCODEC,
 			MatchesTransform.MATCHALL_MAPCODEC,
 			StringCompareTransform.MAPCODEC,

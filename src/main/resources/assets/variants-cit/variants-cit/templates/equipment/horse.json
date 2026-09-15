@@ -1,0 +1,9 @@
+{
+	"layers": {
+		"horse_body": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		]
+	}
+}

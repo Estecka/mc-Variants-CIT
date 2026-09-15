@@ -19,6 +19,8 @@ import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.TemplateRepository;
 import fr.estecka.variantscit.hooks.TrimPatternOverlay;
+import fr.estecka.variantscit.itemdata.transforms.impl.translate.LanguageRepository;
+
 
 /**
  * The  resource manager  breaks  its packs down  based on  namespace, so VCIT's
@@ -58,10 +60,15 @@ public class ReloadableResourceManagerImplMixin
 
 		var hotswap = new HotswappableResourceManager(original, ()->new MultiPackResourceManager(this.type, packs));
 
+		LanguageRepository.Clear();
+		LanguageRepository.SetResourceManager(hotswap);
+
 		TemplateRepository.ReloadPatterns(original);
 		GeneratorPresets.ReloadPresets(original);
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(hotswap);
 		VariantsCitMod.OnResourceReload(result);
+
+		LanguageRepository.SetResourceManager(null);
 
 		// TODO: This could use the vanilla reload pipeline.
 		TrimPatternOverlay.REPOSITORY.Reload(hotswap.Get());
