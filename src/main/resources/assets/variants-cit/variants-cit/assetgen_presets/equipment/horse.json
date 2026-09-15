@@ -1,0 +1,8 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"inputPath": "(skeleton_|zombie_)?horse_(body|saddle)/(?<path>.*)",
+		"outputPath": "$path",
+		"template": "equipment/horse"
+	}
+]

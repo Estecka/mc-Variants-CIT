@@ -1,0 +1,24 @@
+{
+	"layers": {
+		"horse_body": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
+		"horse_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
+		"skeleton_horse_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
+		"zombie_horse_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		]
+	}
+}

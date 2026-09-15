@@ -401,3 +401,18 @@ Since v3.5:
 - Module `predicates` is now capable of operating without `modelPrefix` or `modelList`.
 - Added commands `module variant-id` and `module model-id`.
 - Command `module dump` now shows the same output for all module types
+### 5.6.1
+- (MC 26.3) VCIT Trim models now can define a fallback palette key.
+### 5.7.0
+- `nbtPath` keys are more lenient and will be treated as identifiers whenever possible.
+- Transforms `whitelist`, `blacklist` and `remap` now have `_id`, `_number` and `_string` variants.
+- Transform `remap` can now output numbers.
+- Added transform: `translate`
+- Added item property: `dyed_color`
+- Added equipment assetGen presets: `horse`, `wolf`, `llama`
+- Added equipment assetGen presets: `ghast` (MC 1.21.6+)
+- Added equipment assetGen presets: `nautilus` (MC 1.21.11+)
+- Added equipment layers `nautilus_saddle` and `camel_husk_saddle` to the saddle preset (MC 1.21.11+)
+- Added equipment layer `humanoid_baby` to the humanoid preset (MC 26.1+)
+- Added module field `item` (singular) as an alias for `items` (plural).
+- Fixed `module model-id` message for missing intrinsics.

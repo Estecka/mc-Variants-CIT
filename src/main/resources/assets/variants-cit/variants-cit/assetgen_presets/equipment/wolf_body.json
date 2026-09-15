@@ -1,0 +1,9 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"inputPath": "wolf_body/(.*)",
+		"outputPath": "$1",
+		"template": "equipment/layer",
+		"variables": { "layerName": "wolf_body" }
+	}
+]
