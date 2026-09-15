@@ -194,12 +194,26 @@ public final class CodecUtil
 	static public <T> MapCodec<T> WithAlias(Codec<T> codec, String primary, String alias){
 		return MapWithAlternative(
 			codec.fieldOf(primary),
+			codec.fieldOf(alias)
+		);
+	}
+
+	static public <T> MapCodec<T> WithDeprecatedAlias(Codec<T> codec, String primary, String alias){
+		return MapWithAlternative(
+			codec.fieldOf(primary),
 			codec.fieldOf(alias).validate(WithWarning("VCIT field `{}` is deprecated. Use `{}` instead.", alias, primary))
 		);
 	}
 
 	static public <T> MapCodec<Optional<T>> OptionalWithAlias(Codec<T> codec, String primary, String alias){
 		return WithAlias(codec, primary, alias)
+			.xmap(Optional::of, Optional::get)
+			.orElse(Optional.empty())
+			;
+	}
+
+	static public <T> MapCodec<Optional<T>> OptionalWithDeprecatedAlias(Codec<T> codec, String primary, String alias){
+		return WithDeprecatedAlias(codec, primary, alias)
 			.xmap(Optional::of, Optional::get)
 			.orElse(Optional.empty())
 			;

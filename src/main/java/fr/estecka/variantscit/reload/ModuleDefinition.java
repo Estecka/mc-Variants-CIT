@@ -28,8 +28,8 @@ public record ModuleDefinition(
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
 			VCitRegistries.MODULES.mapCodec.forGetter(ModuleDefinition::parameters),
-			CodecUtil.WithAlias(CodecUtil.OneOrMany(EModuleHook.CODEC), "hook", "context").orElse(List.of(EModuleHook.ITEM_MODEL)).forGetter(ModuleDefinition::hooks),
-			CodecUtil.OneOrMany(Identifier.CODEC).optionalFieldOf("items").forGetter(ModuleDefinition::targets),
+			CodecUtil.WithDeprecatedAlias(CodecUtil.OneOrMany(EModuleHook.CODEC), "hook", "context").orElse(List.of(EModuleHook.ITEM_MODEL)).forGetter(ModuleDefinition::hooks),
+			CodecUtil.OptionalWithAlias(CodecUtil.OneOrMany(Identifier.CODEC), "items", "item").forGetter(ModuleDefinition::targets),
 			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			LibraryDefinition.MAP_CODEC.forGetter(ModuleDefinition::libraryDefinition),
