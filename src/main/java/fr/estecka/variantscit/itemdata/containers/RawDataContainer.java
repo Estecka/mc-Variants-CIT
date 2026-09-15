@@ -13,6 +13,7 @@ implements IDataContainer
 	static public final Codec<RawDataContainer<Tag>> LITTERAL_CODEC = CodecUtil.NBT_ELEMENT.xmap(RawDataContainer::new, RawDataContainer::value);
 
 	static public <T> RawDataContainer<T> OfNullable(T value){
+		assert !(value instanceof IDataContainer);
 		if (value == null)
 			return null;
 		else

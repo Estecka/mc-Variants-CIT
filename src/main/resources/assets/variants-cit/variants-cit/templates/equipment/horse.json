@@ -1,16 +1,21 @@
 {
 	"layers": {
-		"humanoid": [
+		"horse_body": [
 			{
 				"texture": "${OUTPUT_ID}"
 			}
 		],
-		"humanoid_baby": [
+		"horse_saddle": [
 			{
 				"texture": "${OUTPUT_ID}"
 			}
 		],
-		"humanoid_leggings": [
+		"skeleton_horse_saddle": [
+			{
+				"texture": "${OUTPUT_ID}"
+			}
+		],
+		"zombie_horse_saddle": [
 			{
 				"texture": "${OUTPUT_ID}"
 			}

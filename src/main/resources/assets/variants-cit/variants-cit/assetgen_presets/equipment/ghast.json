@@ -1,0 +1,9 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"inputPath": "happy_ghast_body/(.*)",
+		"outputPath": "$1",
+		"template": "equipment/layer",
+		"variables": { "layerName": "happy_ghast_body" }
+	}
+]

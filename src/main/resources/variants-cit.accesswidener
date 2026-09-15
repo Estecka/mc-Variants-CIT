@@ -1,4 +1,4 @@
 classTweaker v1 official
 
 accessible class	net/minecraft/client/renderer/entity/layers/EquipmentLayerRenderer$TrimSpriteKey
-
+accessible method	net/minecraft/client/resources/language/ClientLanguage <init> (Ljava/util/Map;Z)V

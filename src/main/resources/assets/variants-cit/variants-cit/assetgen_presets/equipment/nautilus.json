@@ -1,0 +1,8 @@
+[
+	{
+		"pass": "equipments_from_textures",
+		"inputPath": "nautilus_(body|saddle)/(.*)",
+		"outputPath": "$2",
+		"template": "equipment/nautilus"
+	}
+]

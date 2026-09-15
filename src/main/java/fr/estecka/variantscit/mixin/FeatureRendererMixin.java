@@ -64,8 +64,9 @@ public class FeatureRendererMixin
 		}
 	}
 
+	// Used for the nautilus armor, ghast harness, and all saddles.
 	@Mixin(SimpleEquipmentLayer.class)
-	static public class Saddle
+	static public class SimpleEquipment
 	{
 		@WrapOperation(
 			method = { "submit" },
