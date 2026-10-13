@@ -396,6 +396,7 @@ Since v3.5:
 - Fixed some number-like components not automatically casting to string.
 - Command `module` shows the errors of modules that failed to load.
 - Added `expect` value: `snbt`
+## 5.6
 ### 5.6.0
 - Fixed crash when using components with no codecs.
 - Module `predicates` is now capable of operating without `modelPrefix` or `modelList`.
@@ -403,6 +404,7 @@ Since v3.5:
 - Command `module dump` now shows the same output for all module types
 ### 5.6.1
 - (MC 26.3) VCIT Trim models now can define a fallback palette key.
+## 5.7
 ### 5.7.0
 - `nbtPath` keys are more lenient and will be treated as identifiers whenever possible.
 - Transforms `whitelist`, `blacklist` and `remap` now have `_id`, `_number` and `_string` variants.
@@ -416,3 +418,5 @@ Since v3.5:
 - Added equipment layer `humanoid_baby` to the humanoid preset (MC 26.1+)
 - Added module field `item` (singular) as an alias for `items` (plural).
 - Fixed `module model-id` message for missing intrinsics.
+### 5.7.1
+- Fixed invalid substitution in horse asset-gen preset.
