@@ -14,4 +14,8 @@ extends ICacheKey.Cacheable
 	default @Nullable Identifier Walkthrough(ItemStack stack, L library, CommandLogger logger){
 		return this.GetItemModel(stack, library);
 	}
+
+	default boolean AcceptsVariant(Identifier variantId){
+		return true;
+	}
 }
