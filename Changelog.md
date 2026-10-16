@@ -422,3 +422,4 @@ Since v3.5:
 - Fixed invalid substitution in horse asset-gen preset.
 ## 5.8
 - Module `component_threshold` now supports item properties.
+- Modules with no `modelPrefix` now have higher asset-generation priority than modules with a `modelPrefix`.

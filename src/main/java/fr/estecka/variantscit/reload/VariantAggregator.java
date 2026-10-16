@@ -144,7 +144,7 @@ public class VariantAggregator
 	}
 
 	private void OnGeneratedResource(Identifier resourceId, LibraryDefinition libDefinition, IoSupplier<InputStream> resource){
-		int priority = libDefinition.modelPrefix().map(String::length).orElse(0);
+		int priority = libDefinition.modelPrefix().map(String::length).orElse(Integer.MAX_VALUE);
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)
