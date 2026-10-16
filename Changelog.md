@@ -420,3 +420,5 @@ Since v3.5:
 - Fixed `module model-id` message for missing intrinsics.
 ### 5.7.1
 - Fixed invalid substitution in horse asset-gen preset.
+## 5.8
+- Module `component_threshold` now supports item properties.
