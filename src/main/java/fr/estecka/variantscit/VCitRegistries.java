@@ -8,6 +8,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
+import fr.estecka.variantscit.assetgen.generators.FilteredGenerator;
 import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.assetgen.generators.TemplatedAssetGenerator;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
@@ -66,6 +67,7 @@ public final class VCitRegistries
 		new DecodableRegistry
 			.Builder<IAssetGenerator>("generatorType")
 			.WithDefault(VariantsCitMod.Identifier("auto_detect_generator"))
+			.WithWrapper(FilteredGenerator::CodecOf)
 			.Build()
 			;
 
