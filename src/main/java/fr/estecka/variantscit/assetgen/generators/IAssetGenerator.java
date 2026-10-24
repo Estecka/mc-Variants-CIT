@@ -81,7 +81,7 @@ public interface IAssetGenerator
 		return Codec.lazyInitialized(()->LIST_CODEC_NOPRESET).fieldOf("assetGen");
 	}
 
-	static public final ReloadableRepository<IAssetGenerator> PRESET_REPOSITORY = new ReloadableRepository<>(IAssetGenerator.LIST_CODEC_NOPRESET, "variants-cit/assetgen_presets", ".json");
+	static public final ReloadableRepository<IAssetGenerator> PRESET_REPOSITORY = new ReloadableRepository<>(IAssetGenerator.LIST_CODEC_NOPRESET, "variants-cit/assetgen_presets", "json");
 	static public final Codec<IAssetGenerator> PRESET_CODEC = PRESET_REPOSITORY.unitCodec;
 	static public final MapCodec<IAssetGenerator> PRESET_MAPCODEC = PRESET_CODEC.fieldOf("preset");
 
