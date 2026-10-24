@@ -41,7 +41,7 @@ implements IBakedModule,IUnbakedModule
 	static public final MapCodec<PhonyModule> UNBAKED_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			POLICY_CODEC.optionalFieldOf("cachePolicy", ECachePolicy.AVOID).forGetter(PhonyModule::cachePolicy),
-			SuccessiveTransform.CODEC.optionalFieldOf("acceptsVariant", IDataTransform.NULL).forGetter(PhonyModule::acceptedVariant),
+			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("acceptsVariant", IDataTransform.NULL).forGetter(PhonyModule::acceptedVariant),
 			Identifier.CODEC.listOf().optionalFieldOf("intrinsicModels", List.of()).forGetter(PhonyModule::intrinsicModels),
 			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().listOf().optionalFieldOf("componentTypes", List.of()).forGetter(PhonyModule::dependencies),
 			Identifier.CODEC.optionalFieldOf("returnedModel").forGetter(PhonyModule::returnedModel)

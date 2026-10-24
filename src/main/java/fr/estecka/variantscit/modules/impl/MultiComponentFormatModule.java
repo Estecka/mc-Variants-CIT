@@ -44,7 +44,7 @@ implements ISimpleCitModule
 				Substitution.VARNAME_CODEC,
 				CodecUtil.WithAlternative(VCitRegistries.ITEM_PROPERTIES.codec, SANITIZED_MONOSTRING_DECODER)
 			).fieldOf("variables").forGetter(m->m.varGetters),
-			SuccessiveTransform.CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(m->m.transform)
+			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(m->m.transform)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);

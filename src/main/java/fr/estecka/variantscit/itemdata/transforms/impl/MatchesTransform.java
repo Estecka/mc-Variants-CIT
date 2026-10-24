@@ -23,7 +23,7 @@ implements IDataTransform
 	static public final MapCodec<MatchesTransform> MATCHALL_MAPCODEC = MATCHALL_CODEC.fieldOf("matches_all");
 
 	static private Codec<MatchesTransform> TypedCodec(boolean groupType){
-		return SuccessiveTransform.CODEC.listOf()
+		return SuccessiveTransform.CHAIN_CODEC.listOf()
 			.xmap(list->new MatchesTransform(list, groupType), MatchesTransform::subTransforms)
 			;
 	}

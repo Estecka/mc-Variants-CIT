@@ -31,7 +31,7 @@ public record LibraryDefinition(
 {
 	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = CodecUtil.WithAlternatives(
 		StringCompareTransform.LITERAL_CODEC,
-		SuccessiveTransform.CODEC
+		SuccessiveTransform.CHAIN_CODEC
 	);
 
 	static private final MapCodec<Optional<String>> PREFIX_CODEC = CodecUtil.MapWithAlternative(
@@ -67,7 +67,7 @@ public record LibraryDefinition(
 		.group(
 			PREFIX_CODEC.forGetter(LibraryDefinition::modelPrefix),
 			NAMESPACE_TRANSFORM_CODEC.optionalFieldOf("modelNamespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
-			IDataTransform.CODEC.optionalFieldOf("modelPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
+			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("modelPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
 			HARDCODED_CODEC.forGetter(LibraryDefinition::hardcodedList)
 		)
 		.apply(builder, LibraryDefinition::new)
