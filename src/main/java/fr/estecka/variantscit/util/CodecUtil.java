@@ -148,6 +148,7 @@ public final class CodecUtil
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
+		assert original != null;
 		var listCodec = original.listOf();
 		return WithAlternative(
 			listCodec,

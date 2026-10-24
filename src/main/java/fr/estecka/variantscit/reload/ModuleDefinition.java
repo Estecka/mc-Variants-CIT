@@ -8,7 +8,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
-import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 
@@ -26,8 +25,8 @@ public record ModuleDefinition(
 {
 	static public final MapCodec<Optional<IAssetGenerator>> ASSETGEN_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			GeneratorPresets.MODELPARENT_CODEC.optionalFieldOf("modelParent").forGetter(o->o),
-			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(_0->Optional.empty())
+			IAssetGenerator.MODELPARENT_CODEC.optionalFieldOf("modelParent").forGetter(o->o),
+			IAssetGenerator.LIST_CODEC.optionalFieldOf("assetGen").forGetter(_0->Optional.empty())
 		)
 		.apply(builder, (assetGen,modelParent)->assetGen.isPresent() ? assetGen : modelParent)
 	);

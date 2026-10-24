@@ -18,6 +18,7 @@ implements IAssetGenerator
 	}
 
 	static public <T extends IAssetGenerator> Codec<IAssetGenerator> CodecOf(Codec<T> inner){
+		assert inner != null;
 		return CodecUtil.OneOrMany(inner).xmap(GeneratorList::Wrap, CodecUtil.NoGetter("Generator List"));
 	}
 
