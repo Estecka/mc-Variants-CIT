@@ -13,10 +13,6 @@ public interface IAssetGenerator
 {
 	Result AcceptAsset(EAssetGenPass pass, Identifier assetId);
 
-	// public default Identifier GetRadical(Identifier assetId){
-	// 	return assetId;
-	// }
-
 	static public final IAssetGenerator NOOP = (_0,_1)->new Result();
 	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(CodecUtil.WithAlternative(
 		GeneratorPresets.PRESET_CODEC,

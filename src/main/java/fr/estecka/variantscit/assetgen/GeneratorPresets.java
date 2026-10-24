@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
@@ -21,6 +22,7 @@ public final class GeneratorPresets
 	// TODO: Use ReloadableRepository
 	static private final Map<Identifier, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
 	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, BAKED_PRESETS);
+	static public final MapCodec<IAssetGenerator> PRESET_MAPCODEC = PRESET_CODEC.fieldOf("preset");
 
 	static public void ReloadPresets(ResourceManager manager){
 		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), DIRECTORY, EXTENSION);
