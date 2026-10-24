@@ -425,4 +425,6 @@ Since v3.5:
 - Module `component_data` and `component_format` now have a `namespace` parameter.
 - Modules with no `modelPrefix` now have higher asset-generation priority than modules with a `modelPrefix`.
 - All transforms can take a `logLabel` option.
+- Added `modelParent`, `preset` and `group` generator types.
+- Added `filter` field to all generator types
 - Fixed `modelPathes` only accepting a single transform function instead of a chain.
