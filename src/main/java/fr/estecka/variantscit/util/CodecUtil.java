@@ -156,10 +156,10 @@ public final class CodecUtil
 		);
 	}
 
-	static public <T> Codec<T> WithAlternative(Codec<T> primary, Codec<? extends T> alternative){
+	static public <T> Codec<T> WithAlternative(Codec<? extends T> primary, Codec<? extends T> alternative){
 		assert primary != null && alternative != null;
 		return Codec.withAlternative(
-			Objects.requireNonNull(primary),
+			Anonymize(Objects.requireNonNull(primary)),
 			Objects.requireNonNull(alternative)
 		);
 	}
