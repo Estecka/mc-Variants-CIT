@@ -1,7 +1,9 @@
 package fr.estecka.variantscit.assetgen.generators;
 
 import java.util.List;
+import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
+import fr.estecka.variantscit.util.CodecUtil;
 import net.minecraft.resources.Identifier;
 
 public record GeneratorList(IAssetGenerator[] subGenerators)
@@ -13,6 +15,10 @@ implements IAssetGenerator
 		for (IAssetGenerator generator : subGenerators)
 			result.PutAllIfAbsent(generator.AcceptAsset(pass, assetId));
 		return result;
+	}
+
+	static public <T extends IAssetGenerator> Codec<IAssetGenerator> CodecOf(Codec<T> inner){
+		return CodecUtil.OneOrMany(inner).xmap(GeneratorList::Wrap, CodecUtil.NoGetter("Generator List"));
 	}
 
 	static public GeneratorList Of(IAssetGenerator... subGenerators){

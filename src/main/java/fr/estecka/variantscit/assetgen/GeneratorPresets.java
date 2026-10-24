@@ -26,10 +26,10 @@ public final class GeneratorPresets
 	static public final MapCodec<IAssetGenerator> MODELPARENT_MAPCODEC = MODELPARENT_CODEC.fieldOf("modelParent");
 
 	static public void ReloadPresets(ResourceManager manager){
-		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), DIRECTORY, EXTENSION);
+		var result = CodecUtil.ReloadResources(manager, IAssetGenerator.LIST_CODEC_NOPRESET, DIRECTORY, EXTENSION);
 		BAKED_PRESETS.clear();
 		for (var entry : result.entrySet())
-			BAKED_PRESETS.put(entry.getKey(), GeneratorList.Wrap(entry.getValue()));
+			BAKED_PRESETS.put(entry.getKey(), entry.getValue());
 	}
 
 	static public DataResult<IAssetGenerator> ModelParent(Identifier modelParent){

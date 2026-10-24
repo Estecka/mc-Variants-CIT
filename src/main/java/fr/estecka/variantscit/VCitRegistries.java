@@ -7,10 +7,6 @@ import net.minecraft.resources.Identifier;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import fr.estecka.variantscit.modules.libraries.IVariantCitModule;
-import fr.estecka.variantscit.assetgen.GeneratorPresets;
-import fr.estecka.variantscit.assetgen.generators.FilteredGenerator;
-import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
-import fr.estecka.variantscit.assetgen.generators.TemplatedAssetGenerator;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.extractors.impl.*;
@@ -60,14 +56,6 @@ public final class VCitRegistries
 			.Builder<IItemPrecondition>("condition")
 			.WithDefault(VariantsCitMod.Identifier("transform"))
 			.WithWrapper(NegativeCondition::CodecOf)
-			.Build()
-			;
-
-	static public final DecodableRegistry<IAssetGenerator> ASSETGEN = 
-		new DecodableRegistry
-			.Builder<IAssetGenerator>("generatorType")
-			.WithDefault(VariantsCitMod.Identifier("auto_detect_generator"))
-			.WithWrapper(FilteredGenerator::CodecOf)
 			.Build()
 			;
 
@@ -195,16 +183,6 @@ public final class VCitRegistries
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_all"), ConditionList.MATCHALL_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_any"), ConditionList.MATCHANY_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("transform"),   ITEM_PROPERTIES.mapCodec);
-
-		// ## Asset Generators
-		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("templated"),    TemplatedAssetGenerator.MAPCODEC);
-		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("preset"),       GeneratorPresets.PRESET_MAPCODEC);
-		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("model_parent"), GeneratorPresets.MODELPARENT_MAPCODEC);
-		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("auto_detect_generator"), CodecUtil.MapWithAlternatives(
-			TemplatedAssetGenerator.MAPCODEC,
-			GeneratorPresets.PRESET_MAPCODEC,
-			GeneratorPresets.MODELPARENT_MAPCODEC
-		));
 	}
 
 
