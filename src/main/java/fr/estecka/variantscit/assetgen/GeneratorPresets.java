@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
+import fr.estecka.variantscit.assetgen.generators.GeneratorList;
 import fr.estecka.variantscit.assetgen.generators.TemplatedAssetGenerator;
 import fr.estecka.variantscit.reload.ModuleDefinition;
 
@@ -25,7 +26,7 @@ public final class GeneratorPresets
 		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), DIRECTORY, EXTENSION);
 		BAKED_PRESETS.clear();
 		for (var entry : result.entrySet())
-			BAKED_PRESETS.put(entry.getKey(), IAssetGenerator.ListGenerator.Wrap(entry.getValue()));
+			BAKED_PRESETS.put(entry.getKey(), GeneratorList.Wrap(entry.getValue()));
 	}
 
 	static public IAssetGenerator LegacyGenerator(ModuleDefinition module){
@@ -50,6 +51,6 @@ public final class GeneratorPresets
 		}
 		models = new TemplatedAssetGenerator(EAssetGenPass.BAKED_MODELS, acceptAll, modelTemplate.getOrThrow());
 
-		return IAssetGenerator.ListGenerator.Of(items, models);
+		return GeneratorList.Of(items, models);
 	}
 }

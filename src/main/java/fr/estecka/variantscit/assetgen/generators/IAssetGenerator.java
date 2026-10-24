@@ -2,7 +2,6 @@ package fr.estecka.variantscit.assetgen.generators;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import com.mojang.serialization.Codec;
@@ -22,39 +21,7 @@ public interface IAssetGenerator
 	static public final Codec<IAssetGenerator> CODEC = CodecUtil.OneOrMany(CodecUtil.WithAlternative(
 		GeneratorPresets.PRESET_CODEC,
 		TemplatedAssetGenerator.MAPCODEC.codec()
-	)).xmap(ListGenerator::Wrap, ListGenerator::Unwrap);
-
-	static public record ListGenerator(IAssetGenerator[] subGenerators)
-	implements IAssetGenerator
-	{
-		@Override
-		public Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
-			Result result = new Result();
-			for (IAssetGenerator generator : subGenerators)
-				result.PutAllIfAbsent(generator.AcceptAsset(pass, assetId));
-			return result;
-		}
-
-		static public ListGenerator Of(IAssetGenerator... subGenerators){
-			return new ListGenerator(subGenerators);
-		}
-
-		static public <T extends IAssetGenerator> IAssetGenerator Wrap(List<T> list){
-			if (list.size() == 0)
-				return IAssetGenerator.NOOP;
-			if (list.size() == 1)
-				return list.get(0);
-			else
-				return new ListGenerator(list.toArray(IAssetGenerator[]::new));
-		}
-
-		static public List<IAssetGenerator> Unwrap(IAssetGenerator generator){
-			if (generator instanceof ListGenerator list)
-				return List.of(list.subGenerators);
-			else
-				return List.of(generator);
-		}
-	}
+	)).xmap(GeneratorList::Wrap, GeneratorList::Unwrap);
 
 	static public record ParentedResource(
 		Identifier radical,
