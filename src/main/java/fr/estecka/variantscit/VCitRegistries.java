@@ -197,11 +197,13 @@ public final class VCitRegistries
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("transform"),   ITEM_PROPERTIES.mapCodec);
 
 		// ## Asset Generators
-		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("templated"), TemplatedAssetGenerator.MAPCODEC);
-		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("preset"),    GeneratorPresets.PRESET_MAPCODEC);
+		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("templated"),    TemplatedAssetGenerator.MAPCODEC);
+		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("preset"),       GeneratorPresets.PRESET_MAPCODEC);
+		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("model_parent"), GeneratorPresets.MODELPARENT_MAPCODEC);
 		ASSETGEN.RegisterMap(VariantsCitMod.Identifier("auto_detect_generator"), CodecUtil.MapWithAlternatives(
 			TemplatedAssetGenerator.MAPCODEC,
-			GeneratorPresets.PRESET_MAPCODEC
+			GeneratorPresets.PRESET_MAPCODEC,
+			GeneratorPresets.MODELPARENT_MAPCODEC
 		));
 	}
 

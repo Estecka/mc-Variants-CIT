@@ -15,7 +15,6 @@ import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
-import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.util.VariantUtil;
@@ -45,7 +44,7 @@ public class VariantAggregator
 			for (EModuleHook hook : module.hooks())
 				this.variantLibraries.put(hook, module, module.libraryDefinition().CreateInitialLibrary());
 
-			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
+			this.assetGenerators.put(module, module.assetGen().orElse(IAssetGenerator.NOOP));
 		}
 	}
 

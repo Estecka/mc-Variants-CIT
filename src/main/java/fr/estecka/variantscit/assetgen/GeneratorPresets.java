@@ -6,13 +6,12 @@ import java.util.regex.Pattern;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.util.CodecUtil;
-import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.assetgen.generators.GeneratorList;
 import fr.estecka.variantscit.assetgen.generators.TemplatedAssetGenerator;
-import fr.estecka.variantscit.reload.ModuleDefinition;
 
 public final class GeneratorPresets
 {
@@ -22,7 +21,9 @@ public final class GeneratorPresets
 	// TODO: Use ReloadableRepository
 	static private final Map<Identifier, IAssetGenerator> BAKED_PRESETS = new HashMap<>();
 	static public final Codec<IAssetGenerator> PRESET_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, BAKED_PRESETS);
+	static public final Codec<IAssetGenerator> MODELPARENT_CODEC = Identifier.CODEC.comapFlatMap(GeneratorPresets::ModelParent, CodecUtil.NoGetter("ModelPrent generator"));
 	static public final MapCodec<IAssetGenerator> PRESET_MAPCODEC = PRESET_CODEC.fieldOf("preset");
+	static public final MapCodec<IAssetGenerator> MODELPARENT_MAPCODEC = MODELPARENT_CODEC.fieldOf("modelParent");
 
 	static public void ReloadPresets(ResourceManager manager){
 		var result = CodecUtil.ReloadResources(manager, TemplatedAssetGenerator.MAPCODEC.codec().listOf(), DIRECTORY, EXTENSION);
@@ -31,28 +32,23 @@ public final class GeneratorPresets
 			BAKED_PRESETS.put(entry.getKey(), GeneratorList.Wrap(entry.getValue()));
 	}
 
-	static public IAssetGenerator LegacyGenerator(ModuleDefinition module){
+	static public DataResult<IAssetGenerator> ModelParent(Identifier modelParent){
 		Pattern acceptAll = Pattern.compile(".*");
 		IAssetGenerator items;
 		IAssetGenerator models;
 
-		if (!module.modelParent().isPresent())
-			return IAssetGenerator.NOOP;
-
 		var itemsTemplate = FilledTemplate.Stateless();
-		if (itemsTemplate.isError()){
-			VariantsCitMod.LOGGER.error("Missing built-in template for option itemsFromModel.\n{}", itemsTemplate.error().get().message());
-			return IAssetGenerator.NOOP;
-		}
+		if (itemsTemplate.isError())
+			return DataResult.error(() -> "Missing built-in template: \n"+itemsTemplate.error().get().message());
+
 		items  = new TemplatedAssetGenerator(EAssetGenPass.ITEM_STATES , acceptAll, itemsTemplate.getOrThrow());
 
-		var modelTemplate = FilledTemplate.ModelParent(module.modelParent().get().toString());
+		var modelTemplate = FilledTemplate.ModelParent(modelParent.toString());
 		if (modelTemplate.isError()){
-			VariantsCitMod.LOGGER.error("Missing built-in template for option modelParent.\n{}", modelTemplate.error().get().message());
-			return items;
+			return DataResult.error(()->"Missing built-in template: \n"+modelTemplate.error().get().message());
 		}
 		models = new TemplatedAssetGenerator(EAssetGenPass.BAKED_MODELS, acceptAll, modelTemplate.getOrThrow());
 
-		return GeneratorList.Of(items, models);
+		return DataResult.success(GeneratorList.Of(items, models));
 	}
 }
