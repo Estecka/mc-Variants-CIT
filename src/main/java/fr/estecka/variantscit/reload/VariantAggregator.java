@@ -17,7 +17,7 @@ import fr.estecka.variantscit.assetgen.EAssetGenPass;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
 import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.util.VariantUtil;
 import fr.estecka.variantscit.util.collections.HashMap2;
 import fr.estecka.variantscit.util.collections.Map2;

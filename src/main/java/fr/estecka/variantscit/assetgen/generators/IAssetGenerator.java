@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.assetgen;
+package fr.estecka.variantscit.assetgen.generators;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -6,6 +6,8 @@ import java.util.List;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.IoSupplier;
 import com.mojang.serialization.Codec;
+import fr.estecka.variantscit.assetgen.EAssetGenPass;
+import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.util.CodecUtil;
 
 public interface IAssetGenerator

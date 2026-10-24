@@ -1,4 +1,4 @@
-package fr.estecka.variantscit.assetgen;
+package fr.estecka.variantscit.assetgen.generators;
 
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +11,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
+import fr.estecka.variantscit.assetgen.EAssetGenPass;
+import fr.estecka.variantscit.assetgen.FilledTemplate;
 
 public record TemplatedAssetGenerator(
 	EAssetGenPass pass,

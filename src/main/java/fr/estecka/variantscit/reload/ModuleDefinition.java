@@ -8,7 +8,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
-import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 
 
