@@ -25,8 +25,8 @@ public record ModuleDefinition(
 {
 	static public final MapCodec<Optional<IAssetGenerator>> ASSETGEN_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			IAssetGenerator.MODELPARENT_CODEC.optionalFieldOf("modelParent").forGetter(o->o),
-			IAssetGenerator.LIST_CODEC.optionalFieldOf("assetGen").forGetter(_0->Optional.empty())
+			IAssetGenerator.MODELPARENT_CODEC.optionalFieldOf("modelParent").forGetter(_0->Optional.empty()),
+			IAssetGenerator.LIST_CODEC.optionalFieldOf("assetGen").forGetter(o->o)
 		)
 		.apply(builder, (assetGen,modelParent)->assetGen.isPresent() ? assetGen : modelParent)
 	);
