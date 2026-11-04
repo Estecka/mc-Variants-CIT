@@ -15,10 +15,10 @@ import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
-import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.util.VariantUtil;
+import fr.estecka.variantscit.util.identifier.IdentifierFilter;
 import net.minecraft.resources.Identifier;
 
 
@@ -29,10 +29,7 @@ public record LibraryDefinition(
 	Map<Identifier,Identifier> hardcodedList
 )
 {
-	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = CodecUtil.WithAlternatives(
-		StringCompareTransform.LITERAL_CODEC,
-		SuccessiveTransform.CHAIN_CODEC
-	);
+	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = IdentifierFilter.NAMESPACE_FILTER_CODEC;
 
 	static private final MapCodec<Optional<String>> PREFIX_CODEC = CodecUtil.MapWithAlternative(
 		CodecUtil.LEGACY_ITEM_PATH.validate(CodecUtil.NonEmptyString("Model Prefix")).optionalFieldOf("modelPrefix"),
