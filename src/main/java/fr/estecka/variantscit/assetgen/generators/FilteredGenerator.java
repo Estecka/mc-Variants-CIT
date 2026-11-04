@@ -1,13 +1,9 @@
 package fr.estecka.variantscit.assetgen.generators;
 
 import java.util.Map.Entry;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
-import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
-import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
-import fr.estecka.variantscit.itemdata.transforms.impl.RegexTransform;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.util.identifier.IdentifierFilter;
 import net.minecraft.resources.Identifier;
@@ -18,11 +14,6 @@ public record FilteredGenerator(
 )
 implements IAssetGenerator
 {
-	static public final Codec<IDataTransform> FILTER_CODEC = CodecUtil.WithAlternative(
-		RegexTransform.STRINGCODEC,
-		SuccessiveTransform.CHAIN_CODEC
-	);
-
 	static public <T extends IAssetGenerator> MapCodec<IAssetGenerator> CodecOf(MapCodec<T> inner){
 		return RecordCodecBuilder.<IAssetGenerator>mapCodec(builder->
 			builder.group(
