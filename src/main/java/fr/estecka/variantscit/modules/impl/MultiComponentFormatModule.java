@@ -91,11 +91,6 @@ implements ISimpleCitModule
 		}
 
 		IDataContainer result = this.transform.LooseTypedTransform(RawDataContainer.<String>OfNullable(this.format.Substitute(variables)));
-		variables.clear();
-		if (result == null)
-			return null;
-
-		result = DataConversions.StricIdentifier(result);
 		if (result == null)
 			return null;
 		else if (namespace.isEmpty())
