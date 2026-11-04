@@ -1,6 +1,6 @@
 package fr.estecka.variantscit.assetgen.generators;
 
-import java.util.Map.Entry;
+import java.util.Iterator;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
@@ -35,10 +35,10 @@ implements IAssetGenerator
 	public Result AcceptAsset(EAssetGenPass pass, Identifier assetId) {
 		Result result = this.inner.AcceptAsset(pass, assetId);
 
-		var iterator = result.entrySet().iterator();
+		Iterator<ParentedResource> iterator = result.values().iterator();
 		while (iterator.hasNext()) {
-			Entry<Identifier,ParentedResource> entry = iterator.next();
-			if (!filter.test(entry.getValue().radical()))
+			ParentedResource entry = iterator.next();
+			if (!filter.test(entry.radical()))
 				iterator.remove();
 		}
 
