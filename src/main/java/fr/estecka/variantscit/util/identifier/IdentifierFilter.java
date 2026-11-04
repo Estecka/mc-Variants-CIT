@@ -14,7 +14,7 @@ import net.minecraft.resources.Identifier;
 
 /**
  * TODO: Reduce code duplication with {@linkplain LibraryDefinition}; the fields
- * `modelPathes` and `modelNamespaces, could  be  refactored  to use  this class
+ * `modelPathes` and `modelNamespace`, could  be  refactored  to use  this class
  * instead.
  */
 public record IdentifierFilter(
