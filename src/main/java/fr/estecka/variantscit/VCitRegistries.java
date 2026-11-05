@@ -13,7 +13,7 @@ import fr.estecka.variantscit.itemdata.extractors.impl.*;
 import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
-import fr.estecka.variantscit.itemdata.transforms.OptionalTransform;
+import fr.estecka.variantscit.itemdata.transforms.TransformCommons;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.itemdata.transforms.impl.*;
 import fr.estecka.variantscit.itemdata.transforms.impl.translate.TranslateTransform;
@@ -47,7 +47,7 @@ public final class VCitRegistries
 		new DecodableRegistry
 			.Builder<IDataTransform>("function")
 			.WithDefault(VariantsCitMod.Identifier("auto_detect_function"))
-			.WithWrapper(OptionalTransform::CodecOf)
+			.WithWrapper(TransformCommons::CodecOf)
 			.Build()
 			;
 
