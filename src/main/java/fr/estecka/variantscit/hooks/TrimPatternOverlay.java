@@ -28,6 +28,6 @@ public record TrimPatternOverlay(
 	);
 
 	static public final ReloadableRepository<TrimPatternOverlay> REPOSITORY = new ReloadableRepository<>(MAPCODEC.codec(), "variants-cit/trim_pattern", "json");
-	static public final Codec<TrimPatternOverlay> UNIT_CODEC = REPOSITORY.UNIT_CODEC;
+	static public final Codec<TrimPatternOverlay> UNIT_CODEC = REPOSITORY.unitCodec;
 	
 }

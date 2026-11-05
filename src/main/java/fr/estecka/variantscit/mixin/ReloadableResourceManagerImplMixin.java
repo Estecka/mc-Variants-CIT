@@ -15,9 +15,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import com.llamalad7.mixinextras.sugar.Local;
 import fr.estecka.variantscit.reload.ModuleLoader;
 import fr.estecka.variantscit.VariantsCitMod;
-import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
 import fr.estecka.variantscit.assetgen.TemplateRepository;
+import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.hooks.TrimPatternOverlay;
 import fr.estecka.variantscit.itemdata.transforms.impl.translate.LanguageRepository;
 
@@ -64,7 +64,7 @@ public class ReloadableResourceManagerImplMixin
 		LanguageRepository.SetResourceManager(hotswap);
 
 		TemplateRepository.ReloadPatterns(original);
-		GeneratorPresets.ReloadPresets(original);
+		IAssetGenerator.PRESET_REPOSITORY.Reload(original);
 		ModuleLoader.Result result = ModuleLoader.ReloadModules(hotswap);
 		VariantsCitMod.OnResourceReload(result);
 

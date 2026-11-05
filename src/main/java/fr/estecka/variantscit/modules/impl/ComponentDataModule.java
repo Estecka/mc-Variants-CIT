@@ -2,12 +2,15 @@ package fr.estecka.variantscit.modules.impl;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
+import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
@@ -16,20 +19,23 @@ import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
 import fr.estecka.variantscit.itemdata.transforms.impl.LogTransform;
 
 
-public class ComponentDataModule<P extends IDataExtractor>
+public record ComponentDataModule<P extends IDataExtractor>(
+	P itemProperty,
+	Optional<String> namespace
+)
 implements ISimpleCitModule
 {
-	static public final MapCodec<ComponentDataModule<?>> MAPCODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec.xmap(ComponentDataModule::new, o->o.property);
-
-	private final P property;
-
-	public ComponentDataModule(P property){
-		this.property = property;
-	}
+	static public final MapCodec<ComponentDataModule<?>> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
+		.group(
+			VCitRegistries.ITEM_PROPERTIES.mapCodec.forGetter(o->o.itemProperty),
+			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace").forGetter(o->o.namespace)
+		)
+		.apply(builder, ComponentDataModule::new)
+	);
 
 	@Override
 	public CacheKeySet GetCacheKeys() {
-		return CacheKeySet.Of(property.GetCacheKey());
+		return itemProperty.GetCacheKeys();
 	}
 
 	@Override
@@ -38,18 +44,33 @@ implements ISimpleCitModule
 	}
 
 	@Override
+	public boolean AcceptsVariant(Identifier variantId) {
+		return namespace.isEmpty() || variantId.getNamespace().equals(namespace.get());
+	}
+
+	@Override
 	public @Nullable Identifier GetItemVariant(ItemStack stack) {
-		String result = IDataContainer.NullableAsString(this.property.Extract(stack));
-		return (result!=null) ? Identifier.tryParse(result) : null;
+		IDataContainer result = this.itemProperty.Extract(stack);
+		if (result == null)
+			return null;
+		else if (namespace.isEmpty())
+			return result.asIdentifier();
+		else if (result.asString() instanceof String string)
+			return Identifier.tryBuild(namespace.get(), string);
+		else
+			return null;
 	}
 
 	@Override
 	public @Nullable Identifier Walkthrough(ItemStack stack, IVariantLibrary library, CommandLogger logger) {
-		IDataContainer raw = TransformableExtractor.Unwrap(this.property).Extract(stack);
+		IDataContainer raw = TransformableExtractor.Unwrap(this.itemProperty).Extract(stack);
 		logger.Info("Raw data: {}",    CommandLogger.ItemData(raw, "Missing or invalid"));
 
-		IDataContainer transformed = LogTransform.WithLogger(logger, ()->property.Extract(stack));
+		IDataContainer transformed = LogTransform.WithLogger(logger, ()->itemProperty.Extract(stack));
 		logger.Info("Transformed: {}", CommandLogger.ItemData(transformed));
+
+		if (namespace.isPresent() && transformed.asString() instanceof String path)
+			logger.Info("Namespaced: {}", CommandLogger.ItemData(namespace.get()+":"+path));
 
 		return this.GetItemModel(stack, library);
 	}

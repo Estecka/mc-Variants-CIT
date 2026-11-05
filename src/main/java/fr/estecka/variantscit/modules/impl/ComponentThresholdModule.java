@@ -1,10 +1,6 @@
 package fr.estecka.variantscit.modules.impl;
 
 import java.util.Map;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.NumericTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -12,10 +8,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.CodecUtil;
+import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
-import fr.estecka.variantscit.itemdata.nbtpath.NbtPath;
+import fr.estecka.variantscit.itemdata.containers.IDataContainer;
+import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
-import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
 import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ILinearCitModule;
 import fr.estecka.variantscit.modules.libraries.ILinearLibrary;
@@ -31,8 +28,7 @@ implements ILinearCitModule
 
 	static public final MapCodec<ComponentThresholdModule> MAPCODEC = RecordCodecBuilder.<ComponentThresholdModule>mapCodec(builder->
 		builder.group(
-			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().fieldOf("componentType").forGetter(o->o.componentType),
-			NbtPath.CODEC.optionalFieldOf("nbtPath", NbtPath.IDENTITY).forGetter(o->o.nbtPath),
+			VCitRegistries.ITEM_PROPERTIES.mapCodec.forGetter(o->o.itemProperty),
 			BIAS_CODEC.fieldOf("modelRange").forGetter(o->o.bias),
 			Codec.FLOAT.optionalFieldOf("scale",  1f).forGetter(o->o.scale),
 			Codec.FLOAT.optionalFieldOf("offset", 0f).forGetter(o->o.offset)
@@ -40,16 +36,14 @@ implements ILinearCitModule
 		.apply(builder, ComponentThresholdModule::new)
 	);
 
-	private final DataComponentType<?> componentType;
-	private final NbtPath nbtPath;
+	private final IDataExtractor itemProperty;
 	private final int bias;
 	private final float scale;
 	private final float offset;
 
 
-	public ComponentThresholdModule(DataComponentType<?> component, NbtPath path, int bias, float scale, float offset){
-		this.componentType = component;
-		this.nbtPath = path;
+	public ComponentThresholdModule(IDataExtractor itemProperty, int bias, float scale, float offset){
+		this.itemProperty = itemProperty;
 		this.bias = bias;
 		this.scale = scale;
 		this.offset = offset;
@@ -57,7 +51,7 @@ implements ILinearCitModule
 
 	@Override
 	public CacheKeySet GetCacheKeys() {
-		return ComponentCacheKey.KeysOf(componentType);
+		return itemProperty.GetCacheKeys();
 	}
 
 	@Override
@@ -87,12 +81,8 @@ implements ILinearCitModule
 	}
 
 	private @Nullable Integer GetComponentValue(ItemStack stack){
-		Tag nbt = CodecUtil.GetComponentNbt(stack, componentType);
-		if (nbt == null)
-			return null;
-
-		nbt = this.nbtPath.Resolve(nbt);
-		if (nbt == null	||	!(nbt instanceof NumericTag number))
+		IDataContainer result = this.itemProperty.Extract(stack);
+		if (result == null || !(result.asNumber() instanceof Number number))
 			return null;
 
 		return number.intValue();
