@@ -22,7 +22,7 @@ public abstract class MonostringConditionBuilder
 	static private final Codec<IDataTransform> TRANSFORM_CODEC = CodecUtil.WithAlternatives(
 		StringCompareTransform.LITERAL_CODEC,
 		NumberCompareTransform.LITERAL_CODEC_EQUAL,
-		SuccessiveTransform.CODEC
+		SuccessiveTransform.CHAIN_CODEC
 	);
 
 	static public final Codec<List<IItemPrecondition>> MAP_CODEC = ExtraCodecs

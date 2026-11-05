@@ -9,18 +9,18 @@ import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import net.minecraft.ChatFormatting;
 
-public record LogTransform(Optional<String> prefix)
+public record LogTransform(Optional<String> label)
 implements IDataTransform
 {
 	static public final MapCodec<LogTransform> MAPCODEC = Codec.STRING
 		.optionalFieldOf("label")
-		.xmap(LogTransform::new, LogTransform::prefix)
+		.xmap(LogTransform::new, LogTransform::label)
 		;
 
 	static public final MapCodec<LogTransform> ANONYMOUS_MAPCODEC = Codec.STRING
 		.fieldOf("label")
 		.xmap(Optional::of, Optional::get)
-		.xmap(LogTransform::new, LogTransform::prefix)
+		.xmap(LogTransform::new, LogTransform::label)
 		;
 
 	static private CommandLogger LOGGER = null;
@@ -29,25 +29,28 @@ implements IDataTransform
 		this(Optional.empty());
 	}
 
-	@Override
-	public IDataContainer LooseTypedTransform(IDataContainer input) {
+	static public void Log(Optional<String> label, IDataContainer data){
 		if (LOGGER == null)
 			; // No-op
-		else if (prefix.isPresent()){
+		else if (label.isPresent()){
 			LOGGER.Info(ChatFormatting.GRAY,
 				"[Transform] {}: {}",
-				prefix.get(),
-				CommandLogger.ItemData(input)
+				label.get(),
+				CommandLogger.ItemData(data)
 			);
 		}
 		else {
 			LOGGER.Info(
 				ChatFormatting.GRAY,
 				"[Transform] {}",
-				CommandLogger.ItemData(input)
+				CommandLogger.ItemData(data)
 			);
 		}
+	}
 
+	@Override
+	public IDataContainer LooseTypedTransform(IDataContainer input) {
+		Log(this.label, input);
 		return input;
 	}
 

@@ -35,6 +35,12 @@ implements IStringTransform
 		).apply(instance, RegexTransform::new)
 	);
 
+	static public final Codec<RegexTransform> STRINGCODEC = CodecUtil.REGEX.xmap(
+		regex -> new RegexTransform(regex, "$0", false, true, true),
+		RegexTransform::pattern
+	);
+
+
 	@Override
 	public String apply(String input) {
 		String result = this.firstMatchingLine ?

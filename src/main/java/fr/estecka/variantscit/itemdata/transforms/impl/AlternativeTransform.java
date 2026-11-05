@@ -10,7 +10,7 @@ import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 public record AlternativeTransform(List<IDataTransform> alternatives)
 implements IDataTransform
 {
-	static public final MapCodec<AlternativeTransform> MAPCODEC = SuccessiveTransform.CODEC.listOf().fieldOf("alternatives")
+	static public final MapCodec<AlternativeTransform> MAPCODEC = SuccessiveTransform.CHAIN_CODEC.listOf().fieldOf("alternatives")
 		.xmap(AlternativeTransform::new, AlternativeTransform::alternatives)
 		;
 
