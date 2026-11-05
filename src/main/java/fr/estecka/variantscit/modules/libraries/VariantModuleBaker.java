@@ -3,6 +3,7 @@ package fr.estecka.variantscit.modules.libraries;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.reload.IUnbakedModule;
+import net.minecraft.resources.Identifier;
 
 public record VariantModuleBaker<T extends IGenericCitModule<IVariantLibrary>>(
 	T parameters
@@ -14,6 +15,11 @@ implements IUnbakedModule
 			VariantModuleBaker::new,
 			VariantModuleBaker::parameters
 		);
+	}
+
+	@Override
+	public boolean AcceptsVariant(Identifier variantId) {
+		return parameters.AcceptsVariant(variantId);
 	}
 
 	@Override

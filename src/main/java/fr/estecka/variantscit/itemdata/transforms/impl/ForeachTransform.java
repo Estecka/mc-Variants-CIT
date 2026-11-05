@@ -47,7 +47,7 @@ implements IDataTransform
 		"key_value", ForeachTransform::EntriesIterator
 	));
 
-	static private final Codec<IDataIterator> TRANSFORM_ITERATOR_CODEC = SuccessiveTransform.CODEC.listOf()
+	static private final Codec<IDataIterator> TRANSFORM_ITERATOR_CODEC = SuccessiveTransform.CHAIN_CODEC.listOf()
 		.xmap(list -> input -> TransformIterator(input, list), CodecUtil.NoGetter("Foreach TransformIterator"))
 		;
 
@@ -56,7 +56,7 @@ implements IDataTransform
 	static public final MapCodec<ForeachTransform> MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			ITERATOR_CODEC.fieldOf("foreach").forGetter(ForeachTransform::iterator),
-			SuccessiveTransform.CODEC.fieldOf("do").forGetter(ForeachTransform::foreachDo),
+			SuccessiveTransform.CHAIN_CODEC.fieldOf("do").forGetter(ForeachTransform::foreachDo),
 			RETURN_CODEC.fieldOf("return").forGetter(ForeachTransform::returnType)
 		)
 		.apply(builder, ForeachTransform::new)

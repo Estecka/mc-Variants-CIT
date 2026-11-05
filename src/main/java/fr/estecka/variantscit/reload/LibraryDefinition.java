@@ -15,10 +15,10 @@ import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
-import fr.estecka.variantscit.itemdata.transforms.impl.StringCompareTransform;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.util.VariantUtil;
+import fr.estecka.variantscit.util.identifier.IdentifierFilter;
 import net.minecraft.resources.Identifier;
 
 
@@ -29,10 +29,7 @@ public record LibraryDefinition(
 	Map<Identifier,Identifier> hardcodedList
 )
 {
-	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = CodecUtil.WithAlternatives(
-		StringCompareTransform.LITERAL_CODEC,
-		SuccessiveTransform.CODEC
-	);
+	static private final Codec<IDataTransform> NAMESPACE_TRANSFORM_CODEC = IdentifierFilter.NAMESPACE_FILTER_CODEC;
 
 	static private final MapCodec<Optional<String>> PREFIX_CODEC = CodecUtil.MapWithAlternative(
 		CodecUtil.LEGACY_ITEM_PATH.validate(CodecUtil.NonEmptyString("Model Prefix")).optionalFieldOf("modelPrefix"),
@@ -67,7 +64,7 @@ public record LibraryDefinition(
 		.group(
 			PREFIX_CODEC.forGetter(LibraryDefinition::modelPrefix),
 			NAMESPACE_TRANSFORM_CODEC.optionalFieldOf("modelNamespace", IDataTransform.NOOP).forGetter(LibraryDefinition::namespacePredicate),
-			IDataTransform.CODEC.optionalFieldOf("modelPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
+			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("modelPathes", IDataTransform.NOOP).forGetter(LibraryDefinition::pathPredicate),
 			HARDCODED_CODEC.forGetter(LibraryDefinition::hardcodedList)
 		)
 		.apply(builder, LibraryDefinition::new)

@@ -8,7 +8,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.VCitRegistries;
-import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.itemdata.preconditions.IItemPrecondition;
 
 
@@ -20,10 +20,17 @@ public record ModuleDefinition(
 	Optional<IItemPrecondition> precondition,
 	int priority,
 	LibraryDefinition libraryDefinition,
-	Optional<Identifier> modelParent,
 	Optional<IAssetGenerator> assetGen
 )
 {
+	static public final MapCodec<Optional<IAssetGenerator>> ASSETGEN_MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
+		.group(
+			IAssetGenerator.MODELPARENT_CODEC.optionalFieldOf("modelParent").forGetter(_0->Optional.empty()),
+			IAssetGenerator.LIST_CODEC.optionalFieldOf("assetGen").forGetter(o->o)
+		)
+		.apply(builder, (assetGen,modelParent)->assetGen.isPresent() ? assetGen : modelParent)
+	);
+
 	static public final MapCodec<ModuleDefinition> CODEC = RecordCodecBuilder.<ModuleDefinition>mapCodec(builder->builder
 		.group(
 			Identifier.CODEC.fieldOf("type").forGetter(ModuleDefinition::type),
@@ -33,8 +40,7 @@ public record ModuleDefinition(
 			IItemPrecondition.CODEC.optionalFieldOf("precondition").forGetter(ModuleDefinition::precondition),
 			Codec.INT.fieldOf("priority").orElse(0).forGetter(ModuleDefinition::priority),
 			LibraryDefinition.MAP_CODEC.forGetter(ModuleDefinition::libraryDefinition),
-			Identifier.CODEC.optionalFieldOf("modelParent").forGetter(ModuleDefinition::modelParent),
-			IAssetGenerator.CODEC.optionalFieldOf("assetGen").forGetter(ModuleDefinition::assetGen)
+			ASSETGEN_MAPCODEC.forGetter(ModuleDefinition::assetGen)
 		)
 		.apply(builder, ModuleDefinition::new)
 	);

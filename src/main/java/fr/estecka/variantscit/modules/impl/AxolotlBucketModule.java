@@ -2,6 +2,7 @@ package fr.estecka.variantscit.modules.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import net.minecraft.resources.Identifier;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -61,10 +62,20 @@ implements IUnbakedModule
 		variables.put("variant", AxolotlVariantProperty.UNIT);
 		variables.put("age", new EntityAgeMapProperty(adult, baby));
 
-		return new MultiComponentFormatModule(agedFormat, variables, IDataTransform.NOOP);
+		return new MultiComponentFormatModule(
+			Optional.empty(),
+			agedFormat,
+			variables,
+			IDataTransform.NOOP
+		);
 	}
 
 	static private MultiComponentFormatModule CreateAgeInvariantModule(String suffix){
-		return new MultiComponentFormatModule(Substitution.Parse("${variant}"+suffix).getOrThrow(), ageInvariantVariables, IDataTransform.NOOP);
+		return new MultiComponentFormatModule(
+			Optional.empty(),
+			Substitution.Parse("${variant}"+suffix).getOrThrow(),
+			ageInvariantVariables,
+			IDataTransform.NOOP
+		);
 	}
 }
