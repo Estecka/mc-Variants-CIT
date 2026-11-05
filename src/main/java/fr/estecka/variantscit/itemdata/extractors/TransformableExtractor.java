@@ -18,7 +18,7 @@ implements IDataExtractor
 		return RecordCodecBuilder.<TransformableExtractor<T>>mapCodec(builder->
 			builder.group(
 				innerCodec.forGetter(TransformableExtractor::inner),
-				SuccessiveTransform.CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(TransformableExtractor::transform),
+				SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(TransformableExtractor::transform),
 				RawDataContainer.LITTERAL_CODEC.optionalFieldOf("fallback").forGetter(TransformableExtractor::fallback)
 			).apply(builder, TransformableExtractor::new)
 		);

@@ -9,7 +9,7 @@ import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 public record TestTransform(IDataTransform subTransform)
 implements IDataTransform
 {
-	static public final MapCodec<TestTransform> MAPCODEC = CodecUtil.WithDeprecatedAlias(SuccessiveTransform.CODEC, "test", "tester")
+	static public final MapCodec<TestTransform> MAPCODEC = CodecUtil.WithDeprecatedAlias(SuccessiveTransform.CHAIN_CODEC, "test", "tester")
 		.xmap(TestTransform::new, TestTransform::subTransform)
 		;
 

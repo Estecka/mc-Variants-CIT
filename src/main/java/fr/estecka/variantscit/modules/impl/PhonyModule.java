@@ -11,6 +11,7 @@ import fr.estecka.variantscit.util.CodecUtil;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.commands.WalktroughLogger;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
+import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
 import fr.estecka.variantscit.modules.IBakedModule;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import fr.estecka.variantscit.modules.cache.ComponentCacheKey;
@@ -40,7 +41,7 @@ implements IBakedModule,IUnbakedModule
 	static public final MapCodec<PhonyModule> UNBAKED_MAPCODEC = RecordCodecBuilder.mapCodec(builder->
 		builder.group(
 			POLICY_CODEC.optionalFieldOf("cachePolicy", ECachePolicy.AVOID).forGetter(PhonyModule::cachePolicy),
-			IDataTransform.CODEC.optionalFieldOf("acceptsVariant", IDataTransform.NULL).forGetter(PhonyModule::acceptedVariant),
+			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("acceptsVariant", IDataTransform.NULL).forGetter(PhonyModule::acceptedVariant),
 			Identifier.CODEC.listOf().optionalFieldOf("intrinsicModels", List.of()).forGetter(PhonyModule::intrinsicModels),
 			BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec().listOf().optionalFieldOf("componentTypes", List.of()).forGetter(PhonyModule::dependencies),
 			Identifier.CODEC.optionalFieldOf("returnedModel").forGetter(PhonyModule::returnedModel)

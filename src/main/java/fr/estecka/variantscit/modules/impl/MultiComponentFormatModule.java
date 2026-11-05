@@ -38,26 +38,34 @@ implements ISimpleCitModule
 
 	static public final MapCodec<MultiComponentFormatModule> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
+			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace").forGetter(null),
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			ExtraCodecs.strictUnboundedMap(
 				Substitution.VARNAME_CODEC,
 				CodecUtil.WithAlternative(VCitRegistries.ITEM_PROPERTIES.codec, SANITIZED_MONOSTRING_DECODER)
 			).fieldOf("variables").forGetter(m->m.varGetters),
-			SuccessiveTransform.CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(m->m.transform)
+			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(m->m.transform)
 		)
 		.apply(builder, MultiComponentFormatModule::new)
 	);
 
+	private final Optional<String> namespace;
 	private final Substitution format;
 	private final IDataTransform transform;
 	private final Map<String, IDataExtractor> varGetters;
 
-	public MultiComponentFormatModule(Substitution format, Map<String,IDataExtractor> variables, IDataTransform transform){
+	public MultiComponentFormatModule(Optional<String> namespace, Substitution format, Map<String,IDataExtractor> variables, IDataTransform transform){
+		this.namespace = namespace;
 		this.format = format;
 		this.transform = transform;
 		this.varGetters = Map.copyOf(variables);
 
 		this.format.MatchWarning(variables.keySet());
+	}
+
+	@Override
+	public boolean AcceptsVariant(Identifier variantId) {
+		return namespace.isEmpty() || variantId.getNamespace().equals(namespace.get());
 	}
 
 	@Override
@@ -83,15 +91,14 @@ implements ISimpleCitModule
 		}
 
 		IDataContainer result = this.transform.LooseTypedTransform(RawDataContainer.<String>OfNullable(this.format.Substitute(variables)));
-		variables.clear();
 		if (result == null)
 			return null;
-
-		result = DataConversions.StricIdentifier(result);
-		if (result == null)
-			return null;
+		else if (namespace.isEmpty())
+			return result.asIdentifier();
+		else if (result.asString() instanceof String string)
+			return Identifier.tryBuild(namespace.get(), string);
 		else
-			return (Identifier)result.value();
+			return null;
 	}
 
 	@Override
@@ -116,14 +123,18 @@ implements ISimpleCitModule
 		if (failure)
 			logger.Info("Some data could not be processed.");
 
-		String substResult = this.format.Substitute(variables);
+		final String substResultFinal = this.format.Substitute(variables);
+		String substResult = substResultFinal;
 		logger.Info("Format result: {}", CommandLogger.ItemData(substResult));
 
 		if (this.transform != IDataTransform.NOOP){
-			var r = LogTransform.WithLogger(logger, ()->this.transform.LooseTypedTransform(RawDataContainer.<String>OfNullable(substResult)));
+			var r = LogTransform.WithLogger(logger, ()->this.transform.LooseTypedTransform(RawDataContainer.<String>OfNullable(substResultFinal)));
 			logger.Info("Transformed format: {}", CommandLogger.ItemData(r));
+			substResult = r.asString();
 		}
 
+		if (namespace.isPresent() && substResult != null)
+			logger.Info("Namespaced: {}", CommandLogger.ItemData(namespace.get()+":"+substResult));
 
 		return this.GetItemModel(stack, library);
 	}
