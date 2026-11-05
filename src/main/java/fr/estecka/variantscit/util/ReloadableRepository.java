@@ -11,7 +11,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 public class ReloadableRepository<T>
 {
 	private final Map<Identifier, T> entries = new HashMap<>();
-	public final Codec<T> UNIT_CODEC = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, entries);
+	public final Codec<T> unitCodec = CodecUtil.Enum(CodecUtil.VCIT_IDENTIFIER, entries);
 
 	private final Codec<T> resourceCodec;
 	private final String directory;

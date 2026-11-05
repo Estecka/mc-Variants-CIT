@@ -11,7 +11,7 @@ import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
 @FunctionalInterface
 public interface IDataTransform
 {
-	static public final Codec<IDataTransform> CODEC = VCitRegistries.TRANSFORMS.codec;
+	static public final Codec<IDataTransform> SINGLE_CODEC = VCitRegistries.TRANSFORMS.codec;
 	static public final IDataTransform NOOP = o->o;
 	static public final IDataTransform NULL = o->null;
 

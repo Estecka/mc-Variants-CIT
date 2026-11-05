@@ -75,6 +75,9 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 	extends IDebuggableLibrary.Snitch<ILinearLibrary>
 	implements ILinearLibrary
 	{
+		static private final String LOG_GREATER = "Getting model {} or greater.";
+		static private final String LOG_LESSER  = "Getting model {} or lesser.";
+		static private final String LOG_EQUAL   = "Getting model strictly equal to {}";
 
 		public SnitchingLinearLibrary(WalktroughLogger logger){
 			super(logger);
@@ -88,27 +91,27 @@ implements ILinearLibrary, IDebuggableLibrary<ILinearLibrary>
 				return GetOrGreater(magnitude);
 
 			Identifier r = LinearLibrary.this.GetWithBias(magnitude, 0);
-			LogGet(magnitude, r != null, "strictly equal", namespace);
+			LogGet(magnitude, r != null, LOG_EQUAL, namespace);
 			return r;
 		}
 
 		@Override
 		public Identifier GetOrGreater(int magnitude) {
 			Identifier r = LinearLibrary.this.GetOrGreater(magnitude);
-			LogGet(magnitude, r != null, "greater", namespace);
+			LogGet(magnitude, r != null, LOG_GREATER, namespace);
 			return r;
 		}
 
 		@Override
 		public Identifier GetOrLesser(int magnitude) {
 			Identifier r = LinearLibrary.this.GetOrLesser(magnitude);
-			LogGet(magnitude, r != null, "lesser", namespace);
+			LogGet(magnitude, r != null, LOG_LESSER, namespace);
 			return r;
 		}
 
-		private void LogGet(int magnitude, boolean exists, String textBias, String namespace){
+		private void LogGet(int magnitude, boolean exists, String format, String namespace){
 			this.OnTriedVariant(Identifier.fromNamespaceAndPath(namespace, String.valueOf(magnitude)), exists);
-			logger.Info("Getting model {} or {}", CommandLogger.ItemData(magnitude), textBias);
+			logger.Info(format, CommandLogger.ItemData(magnitude));
 		}
 	}
 

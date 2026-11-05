@@ -15,9 +15,8 @@ import fr.estecka.variantscit.modules.libraries.VariantLibrary;
 import fr.estecka.variantscit.VariantsCitMod;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
 import fr.estecka.variantscit.assetgen.GeneratedResourcePack;
-import fr.estecka.variantscit.assetgen.GeneratorPresets;
 import fr.estecka.variantscit.assetgen.HotswappableResourceManager;
-import fr.estecka.variantscit.assetgen.IAssetGenerator;
+import fr.estecka.variantscit.assetgen.generators.IAssetGenerator;
 import fr.estecka.variantscit.util.VariantUtil;
 import fr.estecka.variantscit.util.collections.HashMap2;
 import fr.estecka.variantscit.util.collections.Map2;
@@ -45,7 +44,7 @@ public class VariantAggregator
 			for (EModuleHook hook : module.hooks())
 				this.variantLibraries.put(hook, module, module.libraryDefinition().CreateInitialLibrary());
 
-			this.assetGenerators.put(module, module.assetGen().orElse(GeneratorPresets.LegacyGenerator(module)));
+			this.assetGenerators.put(module, module.assetGen().orElse(IAssetGenerator.NOOP));
 		}
 	}
 
@@ -144,7 +143,7 @@ public class VariantAggregator
 	}
 
 	private void OnGeneratedResource(Identifier resourceId, LibraryDefinition libDefinition, IoSupplier<InputStream> resource){
-		int priority = libDefinition.modelPrefix().map(String::length).orElse(0);
+		int priority = libDefinition.modelPrefix().map(String::length).orElse(Integer.MAX_VALUE);
 		GeneratedAsset oldAsset = this.generatedAssets.get(resourceId);
 
 		if (oldAsset == null || oldAsset.priority < priority)
