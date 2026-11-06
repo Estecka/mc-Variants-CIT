@@ -59,10 +59,16 @@ public final class VCitRegistries
 			.Build()
 			;
 
-	static
-	{
-		// ## Modules
 
+	static public void RegisterAll(){
+		RegisterTransforms();
+		RegisterProperties();
+		RegisterConditions();
+		RegisterModules();
+	}
+
+
+	static private void RegisterModules() {
 		RegisterBakedModule (VariantsCitMod.Identifier("phony"), PhonyModule.UNBAKED_MAPCODEC);
 
 		RegisterBakedModule (VariantsCitMod.Identifier("axolotl_variant"), AxolotlBucketModule.UNBAKED_MAPCODEC);
@@ -93,10 +99,11 @@ public final class VCitRegistries
 		RegisterRemoved("bucket_entity_data", "component_data");
 		RegisterRemoved("custom_data",        "component_data");
 		RegisterRemoved("entity_data",        "component_data");
+		MODULES.Lock();
+	}
 
 
-		// ## Properties
-
+	static private void RegisterProperties() {
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("axolotl_variant"), AxolotlVariantProperty.UNIT);
 		ITEM_PROPERTIES.Register(VariantsCitMod.Identifier("bucket_entity_age"), EntityAgeMapProperty.MAP_CODEC, EntityAgeMapProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("display_name"), DisplayNameProperty.UNIT);
@@ -105,10 +112,11 @@ public final class VCitRegistries
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_count"), ItemCountProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("item_type"), ItemTypeProperty.UNIT);
 		ITEM_PROPERTIES.RegisterUnit(VariantsCitMod.Identifier("painting_variant"), PaintingVariantProperty.UNIT);
+		ITEM_PROPERTIES.Lock();
+	}
 
 
-		// ## Transforms
-
+	static private void RegisterTransforms() {
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("noop"), IDataTransform.NOOP);
 		TRANSFORMS.RegisterUnit(VariantsCitMod.Identifier("null"), IDataTransform.NULL);
 		TRANSFORMS.Register    (VariantsCitMod.Identifier("log"),  LogTransform.MAPCODEC, new LogTransform());
@@ -177,14 +185,15 @@ public final class VCitRegistries
 			NumberCompareTransform.MAPCODEC_SMALL_OR_EQ
 		));
 
+		TRANSFORMS.Lock();
+	}
 
-		// ## Preconditions
-
+	static private void RegisterConditions() {
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_all"), ConditionList.MATCHALL_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("matches_any"), ConditionList.MATCHANY_MAPCODEC);
 		PRECONDITIONS.RegisterMap(VariantsCitMod.Identifier("transform"),   ITEM_PROPERTIES.mapCodec);
+		PRECONDITIONS.Lock();
 	}
-
 
 	static public void RegisterBakedModule(Identifier id, MapCodec<? extends IUnbakedModule> mapcodec){
 		MODULES.RegisterMap(id, mapcodec);

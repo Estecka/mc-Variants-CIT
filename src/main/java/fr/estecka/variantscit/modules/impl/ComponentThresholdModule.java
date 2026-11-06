@@ -8,7 +8,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.util.CodecUtil;
-import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
@@ -28,7 +27,7 @@ implements ILinearCitModule
 
 	static public final MapCodec<ComponentThresholdModule> MAPCODEC = RecordCodecBuilder.<ComponentThresholdModule>mapCodec(builder->
 		builder.group(
-			VCitRegistries.ITEM_PROPERTIES.mapCodec.forGetter(o->o.itemProperty),
+			IDataExtractor.MAPCODEC.forGetter(o->o.itemProperty),
 			BIAS_CODEC.fieldOf("modelRange").forGetter(o->o.bias),
 			Codec.FLOAT.optionalFieldOf("scale",  1f).forGetter(o->o.scale),
 			Codec.FLOAT.optionalFieldOf("offset", 0f).forGetter(o->o.offset)

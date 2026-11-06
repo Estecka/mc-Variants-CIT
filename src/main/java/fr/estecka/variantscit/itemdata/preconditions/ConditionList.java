@@ -5,7 +5,6 @@ import java.util.List;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fr.estecka.variantscit.util.CodecUtil;
-import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.modules.cache.CacheKeySet;
 import net.minecraft.world.item.ItemStack;
 
@@ -26,8 +25,8 @@ implements IItemPrecondition
 
 	static private Codec<IItemPrecondition> TypedCodec(boolean type){
 		return CodecUtil.WithAlternative(
-			VCitRegistries.PRECONDITIONS.codec.listOf(),
-			MonostringConditionBuilder.MAP_CODEC
+			IItemPrecondition.CANONICAL_MAPCODEC.codec().listOf(),
+			MonostringConditionBuilder.MONOSTRINGMAP_CODEC
 		)
 		.xmap(list->ConditionList.Wrap(list, type), cond->ConditionList.Unwrap(cond, type))
 		;
