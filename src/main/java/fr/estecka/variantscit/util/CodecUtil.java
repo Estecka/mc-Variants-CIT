@@ -134,6 +134,7 @@ public final class CodecUtil
 		return codec.validate(WithWarning(warning, args));
 	}
 
+	@Deprecated
 	static public <I,O> DataResult<O> NoEncode(I _0){
 		return DataResult.error(()->"Encoding not supported.");
 	}
@@ -148,7 +149,7 @@ public final class CodecUtil
 	}
 
 	static public <T> Codec<List<T>> OneOrMany(Codec<T> original){
-		assert original != null;
+		Objects.requireNonNull(original);
 		var listCodec = original.listOf();
 		return WithAlternative(
 			listCodec,
@@ -157,7 +158,8 @@ public final class CodecUtil
 	}
 
 	static public <T> Codec<T> WithAlternative(Codec<? extends T> primary, Codec<? extends T> alternative){
-		assert primary != null && alternative != null;
+		Objects.requireNonNull(primary);
+		Objects.requireNonNull(alternative);
 		return Codec.withAlternative(
 			Anonymize(Objects.requireNonNull(primary)),
 			Objects.requireNonNull(alternative)
