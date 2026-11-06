@@ -11,7 +11,6 @@ import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.util.CodecUtil;
-import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
@@ -27,7 +26,7 @@ implements ISimpleCitModule
 {
 	static public final MapCodec<ComponentDataModule<?>> MAPCODEC = RecordCodecBuilder.mapCodec(builder->builder
 		.group(
-			VCitRegistries.ITEM_PROPERTIES.mapCodec.forGetter(o->o.itemProperty),
+			IDataExtractor.MAPCODEC.forGetter(o->o.itemProperty),
 			CodecUtil.IDENTIFIER_NAMESPACE.optionalFieldOf("namespace").forGetter(o->o.namespace)
 		)
 		.apply(builder, ComponentDataModule::new)

@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.itemdata.preconditions;
 
+import java.util.Objects;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,6 +14,7 @@ public record NegativeCondition(
 implements IItemPrecondition
 {
 	static public MapCodec<IItemPrecondition> CodecOf(MapCodec<? extends IItemPrecondition> inner){
+		Objects.requireNonNull(inner);
 		return RecordCodecBuilder.mapCodec(builder->
 			builder.group(
 				Codec.BOOL.optionalFieldOf("negate", false).forGetter(CodecUtil.NoGetter("NegativeCondition")),
