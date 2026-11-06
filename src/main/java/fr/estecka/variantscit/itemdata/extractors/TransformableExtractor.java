@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.itemdata.extractors;
 
+import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
@@ -15,6 +16,7 @@ public record TransformableExtractor<T extends IDataExtractor>(T inner, IDataTra
 implements IDataExtractor
 {
 	static public <T extends IDataExtractor> MapCodec<TransformableExtractor<T>> CodecOf(MapCodec<T> innerCodec){
+		Objects.requireNonNull(innerCodec);
 		return RecordCodecBuilder.<TransformableExtractor<T>>mapCodec(builder->
 			builder.group(
 				innerCodec.forGetter(TransformableExtractor::inner),

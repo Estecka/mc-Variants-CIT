@@ -31,10 +31,12 @@ loom {
 			configName "Client"
 			programArgs "--username"
 			programArgs "Dev"
+			vmArg "-ea"
 			runDir "run/client"
 		}
 		server {
 			configName "Server"
+			vmArg "-ea"
 			runDir "run/server"
 		}
 	}
@@ -49,9 +51,14 @@ dependencies {
 		parchment("org.parchmentmc.data:parchment-${project.parchment_mappings}@zip")
 	})
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+test {
+	useJUnitPlatform()
 }
 
 processResources {

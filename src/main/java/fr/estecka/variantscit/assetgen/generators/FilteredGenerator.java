@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.assetgen.generators;
 
 import java.util.Iterator;
+import java.util.Objects;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
@@ -15,6 +16,7 @@ public record FilteredGenerator(
 implements IAssetGenerator
 {
 	static public <T extends IAssetGenerator> MapCodec<IAssetGenerator> CodecOf(MapCodec<T> inner){
+		Objects.requireNonNull(inner);
 		return RecordCodecBuilder.<IAssetGenerator>mapCodec(builder->
 			builder.group(
 				IdentifierFilter.MAPCODEC.codec().optionalFieldOf("filter", IdentifierFilter.NOOP).forGetter(CodecUtil.NoGetter("filter")),

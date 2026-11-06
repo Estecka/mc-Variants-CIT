@@ -36,6 +36,7 @@ public class DecodableRegistry<T>
 	public final MapCodec<T> mapCodec = MapCodec.of(new MapEncoderImpl(), new MapDecoderImpl());
 	public final Codec<T>    unitCodec;
 	public final Codec<T>    codec;
+	public boolean isLocked = false;
 
 	static public class Builder<T> {
 		private final @NotNull String keyname;
@@ -75,16 +76,23 @@ public class DecodableRegistry<T>
 		this.codec     = CodecUtil.WithAlternative(this.unitCodec, this.mapCodec.codec());
 	}
 
+	public void Lock(){
+		AssertLocked(false);
+		this.isLocked = true;
+	}
+
 	public void RegisterUnit(Identifier key, T unit){
 		this.Register(key, MapCodec.unit(unit), unit);
 	}
 
 	public void RegisterMap(Identifier key, MapCodec<? extends T> mapCodec){
+		AssertLocked(false);
 		AssertUnique(key);
 		this.mapCodecs.put(key, mapWrapper.apply(mapCodec));
 	}
 
 	public <U extends T> void Register(Identifier key, MapCodec<U> mapCodec, U unit){
+		AssertLocked(false);
 		AssertUnique(key);
 		this.RegisterMap(key, mapCodec);
 		this.units.put(key, unit);
@@ -100,7 +108,17 @@ public class DecodableRegistry<T>
 		}
 	}
 
+	private void AssertLocked(boolean expectedLock){
+		if (this.isLocked != expectedLock){
+			throw new IllegalStateException(isLocked ?
+				"Registry is already locked" :
+				"Registry is not done initializing"
+			);
+		}
+	}
+
 	public void Deprecate(Identifier id, String message){
+		AssertLocked(false);
 		this.deprecationWarnings.put(id, message);
 	}
 
@@ -117,6 +135,7 @@ public class DecodableRegistry<T>
 	{
 		@Override
 		public <I> DataResult<T> decode(DynamicOps<I> ops, MapLike<I> data){
+			AssertLocked(true);
 			var typeResult = typeMapCodec.decode(ops, data);
 			if (!typeResult.isSuccess())
 				return typeResult.map(_0->null);
