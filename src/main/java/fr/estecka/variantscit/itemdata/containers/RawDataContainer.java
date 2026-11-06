@@ -1,5 +1,6 @@
 package fr.estecka.variantscit.itemdata.containers;
 
+import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.util.CodecUtil;
 import net.minecraft.ChatFormatting;
@@ -12,8 +13,9 @@ implements IDataContainer
 {
 	static public final Codec<RawDataContainer<Tag>> LITTERAL_CODEC = CodecUtil.NBT_ELEMENT.xmap(RawDataContainer::new, RawDataContainer::value);
 
-	static public <T> RawDataContainer<T> OfNullable(T value){
-		assert !(value instanceof IDataContainer);
+	static public <T> RawDataContainer<T> OfNullable(@Nullable T value){
+		if (value instanceof IDataContainer)
+			throw new IllegalArgumentException("Datacontainerception");
 		if (value == null)
 			return null;
 		else

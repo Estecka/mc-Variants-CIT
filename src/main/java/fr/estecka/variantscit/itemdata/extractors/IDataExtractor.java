@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 public interface IDataExtractor
 extends ICacheKey.Keyable, IItemPrecondition
 {
+	static public final Codec<IDataExtractor> CODEC = VCitRegistries.ITEM_PROPERTIES.codec;
 	static public final MapCodec<IDataExtractor> MAPCODEC = VCitRegistries.ITEM_PROPERTIES.mapCodec;
 
 	static public final Codec<IDataExtractor> MONOSTRING_DECODER = CodecUtil.WithAlternative(
