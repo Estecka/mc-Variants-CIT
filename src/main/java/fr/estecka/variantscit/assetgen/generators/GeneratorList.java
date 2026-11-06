@@ -1,6 +1,7 @@
 package fr.estecka.variantscit.assetgen.generators;
 
 import java.util.List;
+import java.util.Objects;
 import com.mojang.serialization.Codec;
 import fr.estecka.variantscit.assetgen.EAssetGenPass;
 import fr.estecka.variantscit.util.CodecUtil;
@@ -18,7 +19,7 @@ implements IAssetGenerator
 	}
 
 	static public <T extends IAssetGenerator> Codec<IAssetGenerator> CodecOf(Codec<T> inner){
-		assert inner != null;
+		Objects.requireNonNull(inner);
 		return CodecUtil.OneOrMany(inner).xmap(GeneratorList::Wrap, CodecUtil.NoGetter("Generator List"));
 	}
 

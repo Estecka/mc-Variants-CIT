@@ -427,6 +427,7 @@ Since v3.5:
 ### 5.7.1
 - Fixed invalid substitution in horse asset-gen preset.
 ## 5.8
+### 5.8.0
 - Module `component_threshold` now supports item properties.
 - Module `component_data` and `component_format` now have a `namespace` parameter.
 - Modules with no `modelPrefix` now have higher asset-generation priority than modules with a `modelPrefix`.
@@ -434,3 +435,6 @@ Since v3.5:
 - Added `modelParent`, `preset` and `group` generator types.
 - Added `filter` field to all generator types
 - Fixed `modelPathes` only accepting a single transform function instead of a chain.
+### 5.8.1
+- Moved VCIT registries outside of static initialization.
+- Added some unit tests

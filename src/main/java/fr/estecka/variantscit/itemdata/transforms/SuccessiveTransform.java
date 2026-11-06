@@ -9,8 +9,6 @@ import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 public record SuccessiveTransform(IDataTransform[] subTransforms)
 implements IDataTransform
 {
-	static private final Codec<IDataTransform> SINGLE_CODEC = Codec.lazyInitialized(()->IDataTransform.SINGLE_CODEC);
-
 	static public final Codec<IDataTransform> CHAIN_CODEC = CodecUtil.OneOrMany(SINGLE_CODEC)
 		.xmap(SuccessiveTransform::Wrap, SuccessiveTransform::Unwrap)
 		;

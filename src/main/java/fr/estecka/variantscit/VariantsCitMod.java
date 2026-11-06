@@ -32,6 +32,7 @@ implements ClientModInitializer
 		ModuleCommands.Register();
 		AssetGenCommands.Register();
 		ModuleTreeCommands.Register();
+		VCitRegistries.RegisterAll();
 	}
 
 	static public void OnResourceReload(ModuleLoader.Result result){

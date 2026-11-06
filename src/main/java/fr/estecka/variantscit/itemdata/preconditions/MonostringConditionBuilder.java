@@ -25,9 +25,9 @@ public abstract class MonostringConditionBuilder
 		SuccessiveTransform.CHAIN_CODEC
 	);
 
-	static public final Codec<List<IItemPrecondition>> MAP_CODEC = ExtraCodecs
+	static public final Codec<List<IItemPrecondition>> MONOSTRINGMAP_CODEC = ExtraCodecs
 		.strictUnboundedMap(Codec.STRING, Codec.PASSTHROUGH)
-		.flatXmap(MonostringConditionBuilder::ParseMap, CodecUtil::NoEncode)
+		.flatXmap(MonostringConditionBuilder::ParseMap, CodecUtil.NoGetter("Monostring-Map condition"))
 		;
 
 	static public DataResult<List<IItemPrecondition>> ParseMap(Map<String,Dynamic<?>> map){

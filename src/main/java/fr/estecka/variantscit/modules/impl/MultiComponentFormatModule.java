@@ -15,14 +15,12 @@ import fr.estecka.variantscit.modules.cache.ECachePolicy;
 import fr.estecka.variantscit.modules.libraries.ISimpleCitModule;
 import fr.estecka.variantscit.modules.libraries.IVariantLibrary;
 import fr.estecka.variantscit.util.CodecUtil;
-import fr.estecka.variantscit.VCitRegistries;
 import fr.estecka.variantscit.commands.CommandLogger;
 import fr.estecka.variantscit.format.Substitution;
 import fr.estecka.variantscit.itemdata.containers.IDataContainer;
 import fr.estecka.variantscit.itemdata.containers.RawDataContainer;
 import fr.estecka.variantscit.itemdata.extractors.IDataExtractor;
 import fr.estecka.variantscit.itemdata.extractors.TransformableExtractor;
-import fr.estecka.variantscit.itemdata.transforms.DataConversions;
 import fr.estecka.variantscit.itemdata.transforms.IDataTransform;
 import fr.estecka.variantscit.itemdata.transforms.IStringTransform;
 import fr.estecka.variantscit.itemdata.transforms.SuccessiveTransform;
@@ -42,7 +40,7 @@ implements ISimpleCitModule
 			Substitution.CODEC.fieldOf("format").forGetter(m->m.format),
 			ExtraCodecs.strictUnboundedMap(
 				Substitution.VARNAME_CODEC,
-				CodecUtil.WithAlternative(VCitRegistries.ITEM_PROPERTIES.codec, SANITIZED_MONOSTRING_DECODER)
+				CodecUtil.WithAlternative(IDataExtractor.CODEC, SANITIZED_MONOSTRING_DECODER)
 			).fieldOf("variables").forGetter(m->m.varGetters),
 			SuccessiveTransform.CHAIN_CODEC.optionalFieldOf("transform", IDataTransform.NOOP).forGetter(m->m.transform)
 		)
